@@ -6,21 +6,17 @@ import Head from 'next/head'
 import { useUser } from '@supabase/auth-helpers-react'
 import React from 'react'
 
-interface PropsType {
-  devicePath: string
-}
 // /device/iphone page
 export default function List(): JSX.Element {
-  const { height, width } = useViewportSize()
+  const { height } = useViewportSize()
   const user = useUser()
   const userDevicesQuery = trpc.auth.getUserDevices.useQuery({
     userId: user?.id,
   })
-  console.log(userDevicesQuery.data)
   return (
     <>
       <Head>
-        <title>List</title>
+        <title>List hello</title>
       </Head>
       {userDevicesQuery.data ? (
         <Container size='lg'>

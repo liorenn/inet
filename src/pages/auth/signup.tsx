@@ -32,6 +32,7 @@ export default function signUp() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<Inputs>({})
 

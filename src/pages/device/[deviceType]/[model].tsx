@@ -50,7 +50,7 @@ interface PropsType {
 // /device/iphone/iphone13 page
 const DynamicPage: NextPage<PropsType> = ({ deviceModel }: PropsType) => {
   const router = useRouter()
-  const { height } = useViewportSize()
+  const { height, width } = useViewportSize()
   const { data: devicesArr } = trpc.AllDevices.getAllDevicesModels.useQuery()
   const deviceType = router.asPath.split('/')[2] as DeviceTypeValue
 

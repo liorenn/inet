@@ -1,7 +1,14 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Title, Text, Container, Button, SimpleGrid } from '@mantine/core'
+import {
+  Title,
+  Text,
+  Container,
+  Button,
+  Group,
+  SimpleGrid,
+} from '@mantine/core'
 import { TextInput, PasswordInput, Paper } from '@mantine/core'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useForm, SubmitHandler, SubmitErrorHandler } from 'react-hook-form'
