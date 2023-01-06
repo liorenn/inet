@@ -21,8 +21,6 @@ export default function home(): JSX.Element {
                 View devices information and specifications
                 <br />
                 Find the apple device that matches you
-                <br />
-                hello world
               </Text>
               <Group>
                 <Button color='gray' variant='light' size='lg' radius='md'>
