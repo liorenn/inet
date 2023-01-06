@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import { Grid, Button, Text, Title, Image } from '@mantine/core'
 import { Group, Stack, Container } from '@mantine/core'
-import Spline from '@splinetool/react-spline'
 
 export default function home(): JSX.Element {
   return (

@@ -6,7 +6,7 @@ import Head from 'next/head'
 // /device page
 export default function device() {
   const devicesTypes = Object.getOwnPropertyNames(DeviceTypeValue)
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
+  const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
 
   return (

@@ -1,18 +1,5 @@
-import {
-  useSession,
-  useSupabaseClient,
-  useUser,
-} from '@supabase/auth-helpers-react'
-import {
-  Text,
-  Container,
-  Stack,
-  Box,
-  Group,
-  Center,
-  Loader,
-  PasswordInput,
-} from '@mantine/core'
+import { Center, Loader, PasswordInput } from '@mantine/core'
+import { Text, Container, Stack, Box, Group } from '@mantine/core'
 import { TextInput, Divider, Avatar } from '@mantine/core'
 import { SimpleGrid, UnstyledButton } from '@mantine/core'
 import { useEffect } from 'react'
@@ -22,15 +9,17 @@ import Head from 'next/head'
 import { trpc } from '../../utils/trpc'
 import { CreateNotification } from '../../utils/functions'
 import { useViewportSize } from '@mantine/hooks'
+import { useSession, useUser } from '@supabase/auth-helpers-react'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 export default function account() {
   const session = useSession()
   const user = useUser()
   const supabase = useSupabaseClient()
   const router = useRouter()
-  const { height, width } = useViewportSize()
+  const { height } = useViewportSize()
   const updateMutation = trpc.auth.updateUserDetails.useMutation()
-  const { data: UserDetails, status } = trpc.auth.getUserDetails.useQuery({
+  const { data: UserDetails } = trpc.auth.getUserDetails.useQuery({
     id: user?.id,
   })
   const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' })
