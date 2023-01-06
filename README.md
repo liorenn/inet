@@ -1,5 +1,7 @@
 # inet-repo
- inet repository
+## inet repository
+ 
  react + next.js + supabase + project
+ 
  about apple devices and their specs
 
