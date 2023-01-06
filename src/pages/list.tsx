@@ -16,10 +16,11 @@ export default function List(): JSX.Element {
   const userDevicesQuery = trpc.auth.getUserDevices.useQuery({
     userId: user?.id,
   })
+  console.log(userDevicesQuery.data)
   return (
     <>
       <Head>
-        <title>List hello</title>
+        <title>List</title>
       </Head>
       {userDevicesQuery.data ? (
         <Container size='lg'>

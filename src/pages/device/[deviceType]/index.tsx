@@ -13,7 +13,7 @@ interface PropsType {
 // /device/iphone page
 const DynamicPage: NextPage<PropsType> = ({ devicePath }: PropsType) => {
   const deviceType = devicePath as DeviceTypeValue
-  const { height, width } = useViewportSize()
+  const { height } = useViewportSize()
   const devicesQuery = trpc.AllDevices.getAllDevicesProperties.useQuery({
     deviceType: deviceType,
   })
