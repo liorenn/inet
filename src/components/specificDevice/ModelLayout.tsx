@@ -9,10 +9,15 @@ import ModelSpecs from './ModelSpecs'
 
 type Props = {
   device: Device
-  // scrolls: any
+  commentsAmout: number
+  ratingValue: number
 }
 
-export default function ModelLayout({ device }: Props) {
+export default function ModelLayout({
+  device,
+  commentsAmout,
+  ratingValue,
+}: Props) {
   return (
     <>
       <Center>
@@ -35,7 +40,11 @@ export default function ModelLayout({ device }: Props) {
           <Grid.Col xs={12} md={6} lg={8}>
             <Stack align='stretch' justify='space-between'>
               <ModelWidgets device={device} />
-              <ModelDescription device={device} />
+              <ModelDescription
+                device={device}
+                commentsAmout={commentsAmout}
+                ratingValue={ratingValue}
+              />
             </Stack>
           </Grid.Col>
         </Grid>

@@ -27,7 +27,6 @@ export default function DeviceCard({ device, deviceType }: AppProps) {
 
   useEffect(() => {
     if (isDeviceInUser.data && isInList === undefined) {
-      console.log(isDeviceInUser.data.isInList)
       setIsInList(isDeviceInUser.data.isInList)
     }
   }, [isDeviceInUser])

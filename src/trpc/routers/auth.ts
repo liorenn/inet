@@ -6,6 +6,61 @@ export const authRouter = router({
   getSession: publicProcedure.query(({ ctx }) => {
     return ctx.session
   }),
+  deleteComment: publicProcedure
+    .input(z.object({ commentId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const comments = await ctx.prisma.comment.delete({
+        where: { id: input.commentId },
+      })
+      return comments
+    }),
+  addComment: publicProcedure
+    .input(
+      z.object({
+        deviceTypeValue: z.nativeEnum(DeviceTypeValue),
+        likes: z.number(),
+        message: z.string(),
+        Rating: z.number(),
+        updatedAt: z.date(),
+        createdAt: z.date(),
+        model: z.string(),
+        username: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const {
+        deviceTypeValue,
+        likes,
+        createdAt,
+        message,
+        model,
+        Rating,
+        updatedAt,
+        username,
+      } = input
+      const comment = await ctx.prisma.comment.create({
+        data: {
+          deviceTypeValue,
+          likes,
+          message,
+          Rating,
+          updatedAt,
+          createdAt,
+          model,
+          username,
+        },
+      })
+      return comment
+    }),
+  getAllComments: publicProcedure
+    .input(z.object({ model: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const comments = await ctx.prisma.comment.findMany({
+        where: { model: input.model },
+      })
+      return comments
+    }),
+
   isDeviceInUser: publicProcedure
     .input(
       z.object({

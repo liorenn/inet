@@ -2,7 +2,7 @@ import { showNotification } from '@mantine/notifications'
 import { DeviceTypeValue } from '@prisma/client'
 import { IconCheck, IconX, IconExclamationMark } from '@tabler/icons'
 import { ReactElement } from 'react'
-
+import { Comment } from '@prisma/client'
 export function FormatDate(releaseDate: Date): string {
   const date = new Date(releaseDate)
   const day = date.getUTCDate()
@@ -51,4 +51,13 @@ export function getDeviceType(deviceModel: string) {
     }
   }
   return 'unknown'
+}
+
+export function CalcAverageRating(comments: Comment[]) {
+  let AverageRating = 0
+  for (let i = 0; i < comments.length; i++) {
+    AverageRating += comments[i].Rating
+  }
+  AverageRating /= comments.length
+  return AverageRating
 }

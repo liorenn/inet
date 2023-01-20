@@ -8,6 +8,9 @@ import ModelHeader from '../../../components/specificDevice/ModelHeader'
 import Link from 'next/link'
 import { useViewportSize } from '@mantine/hooks'
 import Head from 'next/head'
+import ModelComments from '../../../components/specificDevice/ModelComments'
+import { useUser } from '@supabase/auth-helpers-react'
+import { useState } from 'react'
 
 enum queriesNames {
   getiPhone = 'getiPhone',
@@ -50,9 +53,13 @@ interface PropsType {
 // /device/iphone/iphone13 page
 const DynamicPage: NextPage<PropsType> = ({ deviceModel }: PropsType) => {
   const router = useRouter()
+  const user = useUser()
+  const { data } = trpc.auth.getUserDetails.useQuery({ id: user?.id })
   const { height } = useViewportSize()
   const { data: devicesArr } = trpc.AllDevices.getAllDevicesModels.useQuery()
   const deviceType = router.asPath.split('/')[2] as DeviceTypeValue
+  const [ratingValue, setRatingValue] = useState(0)
+  const [commentsAmout, setCommentsAmout] = useState(0)
 
   if (devicesArr && !isExistInArr(devicesArr, deviceModel)) {
     return (
@@ -97,7 +104,19 @@ const DynamicPage: NextPage<PropsType> = ({ deviceModel }: PropsType) => {
       </Head>
       <Container size='lg'>
         <ModelHeader device={device} />
-        <ModelLayout device={device} />
+        <ModelLayout
+          device={device}
+          ratingValue={ratingValue}
+          commentsAmout={commentsAmout}
+        />
+        {user && data?.username && (
+          <ModelComments
+            device={device}
+            username={data.username}
+            setRatingValue={setRatingValue}
+            setCommentsAmout={setCommentsAmout}
+          />
+        )}
       </Container>
     </>
   )

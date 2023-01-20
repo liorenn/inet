@@ -38,6 +38,7 @@ model Comment {
   likes           Int
   username        String?         @db.VarChar
   deviceTypeValue DeviceTypeValue
+  Rating          Int
   device          Device          @relation(fields: [model], references: [model], onDelete: Cascade)
   user            User?           @relation(fields: [username], references: [username])
 }

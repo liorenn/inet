@@ -1,16 +1,19 @@
-import { Title, Spoiler, Text, Group } from '@mantine/core'
+import { Title, Spoiler, Text, Group, Rating, Button } from '@mantine/core'
 import { useMantineColorScheme } from '@mantine/core'
+import { useWindowScroll } from '@mantine/hooks'
 import { Device } from '@prisma/client'
+import { IconArrowDown } from '@tabler/icons'
 
 type Props = {
   device: Device
-  // scrolls: any
+  commentsAmout: number
+  ratingValue: number
 }
 
-function ModelDescription({ device }: Props) {
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
+function ModelDescription({ device, commentsAmout, ratingValue }: Props) {
+  const [scroll, scrollTo] = useWindowScroll()
+  const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
-
   // function GetModelRting() {
   //   if (model.comments === null || model.comments === undefined) {
   //     return 0
@@ -28,29 +31,19 @@ function ModelDescription({ device }: Props) {
 
   return (
     <>
-      {/* <Group>
+      <Group>
+        <Button
+          variant='light'
+          color='gray'
+          leftIcon={<IconArrowDown size={16} />}
+          onClick={() => scrollTo({ y: 2700 })}>
+          go to comments
+        </Button>
         <Text size='xl' weight={600}>
-          {model.name} Rating
+          {commentsAmout} Comments
         </Text>
-        {model.comments !== null && (
-          <Rating initialValue={rating} transition allowHalfIcon />
-        )}
-        {model.comments !== null ? (
-          <Text size='xl' weight={600}>
-            {model.comments !== null && model.comments !== undefined
-              ? model.comments.length
-              : 0}{' '}
-            Comments
-          </Text>
-        ) : (
-          <Text size='xl' weight={600}>
-            0 Comments
-          </Text>
-        )}
-      </Group> */}
-      <Text size='xl' weight={600}>
-        0 Comments
-      </Text>
+        <Rating value={ratingValue} fractions={2} readOnly />
+      </Group>
 
       <Title
         order={2}

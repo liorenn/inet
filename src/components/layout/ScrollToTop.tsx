@@ -1,20 +1,20 @@
-import { IconArrowNarrowUp } from '@tabler/icons'
+import { IconArrowUp } from '@tabler/icons'
 import { useWindowScroll } from '@mantine/hooks'
 import { Affix, Button, Transition } from '@mantine/core'
 
-function ScrollToTop() {
+export default function ScrollToTop() {
   const [scroll, scrollTo] = useWindowScroll()
 
   return (
     <>
       <Affix position={{ bottom: 20, right: 20 }}>
-        <Transition transition='slide-up' mounted={scroll.y > 0}>
+        <Transition transition='slide-up' mounted={scroll.y > 100}>
           {(transitionStyles) => (
             <Button
-              rightIcon={<IconArrowNarrowUp />}
-              style={transitionStyles}
+              variant='light'
               color='gray'
-              variant='filled'
+              leftIcon={<IconArrowUp size={16} />}
+              style={transitionStyles}
               onClick={() => scrollTo({ y: 0 })}>
               Scroll to top
             </Button>
@@ -24,5 +24,3 @@ function ScrollToTop() {
     </>
   )
 }
-
-export default ScrollToTop
