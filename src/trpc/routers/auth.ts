@@ -20,14 +20,14 @@ export const authRouter = router({
           deviceModel: input.deviceModel,
         },
       })
-      return device ? true : false
+      return device ? { isInList: true } : { isInList: false }
     }),
   handleDeviceToUser: publicProcedure
     .input(
       z.object({
         deviceModel: z.string(),
         userId: z.string(),
-        isInList: z.boolean(),
+        isInList: z.boolean().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -58,16 +58,10 @@ export const authRouter = router({
           userId: input.userId,
         },
       })
-      type devicesArrType = {
-        model: string
-        name: string
-        imageAmount: number
-        deviceTypeValue: DeviceTypeValue
-      }[]
-      const devicesArr: devicesArrType = []
-      devices.forEach(async (value) => {
+      const devicesArr: devicesPropertiesArrType = []
+      for (let i = 0; i < devices.length; i++) {
         const device = await ctx.prisma.device.findFirst({
-          where: { model: value.deviceModel },
+          where: { model: devices[i].deviceModel },
           select: {
             model: true,
             name: true,
@@ -77,9 +71,8 @@ export const authRouter = router({
         })
         if (device) {
           devicesArr.push(device)
-          console.log(devicesArr)
         }
-      })
+      }
       return devicesArr
     }),
   MutateUserDevices: publicProcedure
@@ -192,3 +185,10 @@ export const authRouter = router({
       }
     }),
 })
+
+export type devicesPropertiesArrType = {
+  model: string
+  name: string
+  imageAmount: number
+  deviceTypeValue: DeviceTypeValue
+}[]

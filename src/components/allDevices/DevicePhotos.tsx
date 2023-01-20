@@ -1,9 +1,9 @@
-import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Center, Stack, Group } from '@mantine/core'
 import { Modal, useMantineColorScheme, Container } from '@mantine/core'
 import { useMantineTheme, ActionIcon, Image } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
+import { getDeviceType } from '../../utils/functions'
 
 type Props = {
   device: { model: string; name: string; imageAmount: number }
@@ -11,23 +11,25 @@ type Props = {
 }
 
 function DevicePhotos({ device, miniphotos }: Props) {
-  const router = useRouter()
-  const deviceType = router.asPath.split('/')[2]
+  const deviceType = getDeviceType(device.model)
   const [activeLink, setActiveLink] = useState(
     '/images/' + deviceType + '/' + device.model + '_1.png'
   )
   const [opened, setOpened] = useState(false)
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
+  const { colorScheme } = useMantineColorScheme()
   const { width } = useViewportSize()
   const theme = useMantineTheme()
   const dark = colorScheme === 'dark'
-
   const images_src = []
   for (let i = 0; i < device.imageAmount; i++) {
     images_src.push(
       '/images/' + deviceType + '/' + device.model + '_' + (i + 1) + '.png'
     )
   }
+
+  useEffect(() => {
+    setActiveLink('/images/' + deviceType + '/' + device.model + '_1.png')
+  }, [device])
 
   function handleSetActiveLink(index: number) {
     const img_num_index = activeLink.indexOf('_') + 1

@@ -4,19 +4,26 @@ import { Center, Container, Loader, SimpleGrid } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 import Head from 'next/head'
 import { useUser } from '@supabase/auth-helpers-react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { devicesPropertiesArrType } from '../trpc/routers/auth'
+import ListCard from '../components/allDevices/ListCard'
 
-interface PropsType {
-  devicePath: string
-}
-// /device/iphone page
 export default function List(): JSX.Element {
-  const { height, width } = useViewportSize()
+  const { height } = useViewportSize()
   const user = useUser()
   const userDevicesQuery = trpc.auth.getUserDevices.useQuery({
     userId: user?.id,
   })
-  console.log(userDevicesQuery.data)
+  const [devicesArr, setDevicesArr] = useState<
+    devicesPropertiesArrType | undefined
+  >(undefined)
+
+  useEffect(() => {
+    if (userDevicesQuery.data && devicesArr === undefined) {
+      setDevicesArr(userDevicesQuery.data)
+    }
+  }, [userDevicesQuery])
+
   return (
     <>
       <Head>
@@ -25,17 +32,20 @@ export default function List(): JSX.Element {
       {userDevicesQuery.data ? (
         <Container size='lg'>
           <SimpleGrid cols={3}>
-            {userDevicesQuery?.data?.map((value, index) => (
-              <DeviceCard
-                device={{
-                  model: value.model,
-                  imageAmount: value.imageAmount,
-                  name: value.name,
-                }}
-                key={index}
-                deviceType={value.deviceTypeValue}
-              />
-            ))}
+            {devicesArr &&
+              devicesArr.map((value, index) => (
+                <ListCard
+                  device={{
+                    model: value.model,
+                    imageAmount: value.imageAmount,
+                    name: value.name,
+                  }}
+                  key={index}
+                  deviceType={value.deviceTypeValue}
+                  setDevicesArr={setDevicesArr}
+                  devicesArr={devicesArr}
+                />
+              ))}
           </SimpleGrid>
         </Container>
       ) : (

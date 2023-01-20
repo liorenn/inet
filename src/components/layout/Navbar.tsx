@@ -54,15 +54,17 @@ const Navbar = () => {
               All Devices
             </Button>
           </Link>
-          <Link href={'/list'}>
-            <Button
-              variant='light'
-              color='gray'
-              radius='md'
-              className={classes.end}>
-              List
-            </Button>
-          </Link>
+          {session && (
+            <Link href={'/list'}>
+              <Button
+                variant='light'
+                color='gray'
+                radius='md'
+                className={classes.end}>
+                List
+              </Button>
+            </Link>
+          )}
         </Group>
         <Group>
           {!session ? (

@@ -1,4 +1,5 @@
 import { showNotification } from '@mantine/notifications'
+import { DeviceTypeValue } from '@prisma/client'
 import { IconCheck, IconX, IconExclamationMark } from '@tabler/icons'
 import { ReactElement } from 'react'
 
@@ -39,4 +40,15 @@ export function CreateNotification(
       float: 'right',
     },
   })
+}
+
+export function getDeviceType(deviceModel: string) {
+  const devicesTypes = Object.getOwnPropertyNames(DeviceTypeValue)
+  for (let i = 0; i < devicesTypes.length; i++) {
+    if (deviceModel.includes(devicesTypes[i]) && devicesTypes[i] !== 'mac') {
+      //because imac and macbook contain the word mac so it would always return mac
+      return devicesTypes[i]
+    }
+  }
+  return 'unknown'
 }

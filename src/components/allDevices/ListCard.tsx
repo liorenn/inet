@@ -4,8 +4,8 @@ import { DeviceTypeValue } from '@prisma/client'
 import Link from 'next/link'
 import { trpc } from '../../utils/trpc'
 import { User, useUser } from '@supabase/auth-helpers-react'
-import { useEffect, useState } from 'react'
 import { CreateNotification } from '../../utils/functions'
+import { devicesPropertiesArrType } from '../../trpc/routers/auth'
 
 type AppProps = {
   device: {
@@ -14,47 +14,42 @@ type AppProps = {
     imageAmount: number
   }
   deviceType: DeviceTypeValue
+  setDevicesArr: Function
+  devicesArr: devicesPropertiesArrType
 }
 
-export default function DeviceCard({ device, deviceType }: AppProps) {
-  const [isInList, setIsInList] = useState<boolean | undefined>(undefined)
+export default function ListCard({
+  device,
+  deviceType,
+  setDevicesArr,
+  devicesArr,
+}: AppProps) {
   const user = useUser()
   const userDevicesMutation = trpc.auth.handleDeviceToUser.useMutation()
-  const isDeviceInUser = trpc.auth.isDeviceInUser.useQuery({
-    deviceModel: device.model,
-    userId: user?.id,
-  })
 
-  useEffect(() => {
-    if (isDeviceInUser.data && isInList === undefined) {
-      console.log(isDeviceInUser.data.isInList)
-      setIsInList(isDeviceInUser.data.isInList)
+  function RemoveFromList() {
+    CreateNotification('device has been successfully removed from', 'green')
+    if (setDevicesArr && devicesArr) {
+      const newArr = devicesArr.filter((value) => value.model !== device.model)
+      setDevicesArr([...newArr])
     }
-  }, [isDeviceInUser])
-
-  function handleIsInlist(user: User) {
-    const message =
-      'device has been successfully ' +
-      (isInList ? 'removed from' : 'added to') +
-      ' list'
-    CreateNotification(message, 'green')
-    userDevicesMutation.mutate(
-      {
-        deviceModel: device.model,
-        userId: user.id,
-        isInList: isInList,
-      },
-      {
-        onError: () => {
-          const message =
-            'there has been an error ' +
-            (isInList ? 'removing' : 'adding') +
-            ' device to list'
-          CreateNotification(message, 'red')
+    if (user) {
+      userDevicesMutation.mutate(
+        {
+          deviceModel: device.model,
+          userId: user.id,
+          isInList: true,
         },
-      }
-    )
-    setIsInList(!isInList)
+        {
+          onError: () => {
+            CreateNotification(
+              'there has been an error removing device to list',
+              'red'
+            )
+          },
+        }
+      )
+    }
   }
 
   return (
@@ -74,7 +69,7 @@ export default function DeviceCard({ device, deviceType }: AppProps) {
       <Grid sx={{ marginTop: 2 }}>
         <Grid.Col span={6}>
           <Link
-            href={deviceType + '/' + device.model}
+            href={'device/' + deviceType + '/' + device.model}
             style={{ textDecoration: 'none' }}>
             <Button
               variant='light'
@@ -87,27 +82,15 @@ export default function DeviceCard({ device, deviceType }: AppProps) {
           </Link>
         </Grid.Col>
         <Grid.Col span={6}>
-          {user !== null ? (
-            <Button
-              variant='light'
-              color={isInList ? 'red' : 'green'}
-              radius='md'
-              size='md'
-              onClick={() => handleIsInlist(user)}
-              fullWidth>
-              {isInList ? 'Remove From List' : 'Add To List'}
-            </Button>
-          ) : (
-            <Button
-              variant='light'
-              color={'gray'}
-              radius='md'
-              size='md'
-              disabled
-              fullWidth>
-              log in to add
-            </Button>
-          )}
+          <Button
+            variant='light'
+            color={'red'}
+            radius='md'
+            size='md'
+            onClick={RemoveFromList}
+            fullWidth>
+            {'Remove From List'}
+          </Button>
         </Grid.Col>
       </Grid>
     </Card>
