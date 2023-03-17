@@ -10,8 +10,7 @@ import { CreateNotification } from '../../../utils/functions'
 import Head from 'next/head'
 
 type Inputs = {
-  email: string
-  password: string
+  phone: string
 }
 
 export default function viaphone() {
@@ -38,44 +37,22 @@ export default function viaphone() {
     }
   })
 
-  const onSubmit: SubmitHandler<Inputs> = (fields) => {
+  const onSubmit: SubmitHandler<Inputs> = async (fields) => {
     //when form is submitted and passed validation
-    IsUserExistsMutation.mutate(
-      {
-        email: fields.email,
-        password: fields.password,
-      },
-      {
-        async onSuccess(data) {
-          if (data) {
-            const { data, error } = await supabase.auth.signInWithPassword({
-              email: fields.email,
-              password: fields.password,
-            })
-            if (!error) {
-              CreateNotification('Signed in successfully', 'green')
-            } else {
-              CreateNotification('Error has accured', 'red')
-              reset()
-            }
-          } else {
-            CreateNotification('User Does Not Exist', 'red')
-            reset()
-          }
-        },
-      }
-    )
+    const { data, error } = await supabase.auth.signInWithOtp({
+      phone: fields.phone,
+    })
+    if (!error) {
+      CreateNotification('Signed in successfully', 'green')
+    } else {
+      console.log(error)
+      CreateNotification('Error has accured', 'red')
+      reset()
+    }
   }
 
-  const GetPasswordError = (): string => {
-    const error = errors.password?.type
-    if (error === 'required') return 'Enter Password Field'
-    if (error === 'pattern') return 'Wrong Pattern'
-    return error + ' Error'
-  }
-
-  function GetEmailError(): string {
-    const error = errors.email?.type
+  function GetPhoneError(): string {
+    const error = errors.phone?.type
     if (error === 'required') return 'Enter Email Field'
     if (error === 'pattern') return 'Wrong Pattern'
     return error + ' Error'
@@ -108,24 +85,14 @@ export default function viaphone() {
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
           <form onSubmit={handleSubmit(onSubmit, onError)}>
             <TextInput
-              label='Email'
-              defaultValue='lior.oren06@gmail.com'
+              label='Phone'
+              defaultValue='+9720548853393'
               placeholder='Your Email...'
-              error={errors.email ? GetEmailError() : ''}
-              {...register('email', {
+              error={errors.phone ? GetPhoneError() : ''}
+              {...register('phone', {
                 required: true,
-                pattern: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
-              })}
-            />
-            <PasswordInput
-              label='Password'
-              defaultValue='123456'
-              placeholder='Your password...'
-              error={errors.password ? GetPasswordError() : ''}
-              mt='md'
-              {...register('password', {
-                required: true,
-                pattern: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
+                //pattern: /^\+\d{13}$/,
+                //+9720548853393
               })}
             />
             <Button

@@ -1,4 +1,4 @@
-import { NextPage, NextPageContext } from 'next'
+import type { NextPage, NextPageContext } from 'next'
 import { DeviceTypeValue } from '@prisma/client'
 import { trpc } from '../../../utils/trpc'
 import DeviceCard from '../../../components/allDevices/DeviceCard'
@@ -43,7 +43,7 @@ const DynamicPage: NextPage<PropsType> = ({ devicePath }: PropsType) => {
 
 const devicesTypes = Object.getOwnPropertyNames(DeviceTypeValue)
 
-DynamicPage.getInitialProps = async ({ query }: NextPageContext) => {
+DynamicPage.getInitialProps = ({ query }: NextPageContext) => {
   const devicePath = query.deviceType as string
   const isExistInArr = () => {
     for (let i = 0; i < devicesTypes.length; i++) {

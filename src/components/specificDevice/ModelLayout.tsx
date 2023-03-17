@@ -1,10 +1,9 @@
-import ModelPhotos from '../allDevices/DevicePhotos'
 import ModelDescription from './ModelDescription'
 import ModelButtons from './ModelButtons'
 import ModelWidgets from './ModelWidgets'
 import { Stack, Grid, Center } from '@mantine/core'
 import DevicePhotos from '../allDevices/DevicePhotos'
-import { Device } from '@prisma/client'
+import type { Device } from '@prisma/client'
 import ModelSpecs from './ModelSpecs'
 
 type Props = {

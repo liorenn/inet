@@ -1,11 +1,12 @@
 import { FormEvent, useEffect, useState } from 'react'
 import ModelComment from './ModelComment'
-import { Textarea, Button, Box, Avatar, Rating } from '@mantine/core'
+import { Textarea, Button, Box, Image, Rating } from '@mantine/core'
 import { Text, Divider, Group, Accordion } from '@mantine/core'
-import { useUser } from '@supabase/auth-helpers-react'
-import { Comment, Device } from '@prisma/client'
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
+import { Comment, Device, User } from '@prisma/client'
 import { trpc } from '../../utils/trpc'
 import { CalcAverageRating, CreateNotification } from '../../utils/functions'
+import { usePublicUrl } from '../../utils/usePublicUrl'
 
 type Props = {
   device: Device
@@ -24,11 +25,40 @@ function ModelComments({
   const [rating, setRating] = useState(0)
   const [isFetched, setIsFetched] = useState(false)
   const [comments, setComments] = useState<Comment[]>([])
+  const [usersIds, setUsersIds] = useState<string[]>([])
+  const [picturesUrls, setPicturesUrls] = useState<string[]>([])
+  const publicUrl = usePublicUrl((state) => state.publicUrl)
   const date = new Date().toDateString()
   const { mutate } = trpc.auth.addComment.useMutation()
   const commentsQuery = trpc.auth.getAllComments.useQuery({
     model: device.model,
   })
+  const { mutate: mutateUsersIds } = trpc.auth.getUsersIds.useMutation()
+  const { mutate: mutatePicturesUrls } = trpc.auth.GetPublicUrlArr.useMutation()
+
+  useEffect(() => {
+    if (comments.length > 0) {
+      let arr: { username: string }[] = []
+      comments.forEach((comment) => {
+        if (comment.username) arr.push({ username: comment.username })
+      })
+      mutateUsersIds(arr, {
+        onSuccess(data) {
+          setUsersIds(data)
+        },
+      })
+    }
+  }, [comments])
+
+  useEffect(() => {
+    if (usersIds.length > 0) {
+      mutatePicturesUrls(usersIds, {
+        onSuccess(data) {
+          setPicturesUrls(data)
+        },
+      })
+    }
+  }, [usersIds])
 
   useEffect(() => {
     let commentsArr = commentsQuery.data
@@ -57,11 +87,16 @@ function ModelComments({
         CreateNotification('created comment successfully', 'green')
         setText('')
         setRating(0)
-        comments.push({ ...newComment, id: data.id })
+        setComments((prev) => pushComment(prev, data))
         setCommentsAmout(comments.length)
         setRatingValue(CalcAverageRating(comments))
       },
     })
+  }
+
+  function pushComment(comments: Comment[], newComment: Comment) {
+    let newComments = [...comments, newComment]
+    return newComments
   }
 
   return (
@@ -87,8 +122,7 @@ function ModelComments({
             <form onSubmit={(e) => AddComment(e)}>
               <Group position='apart'>
                 <Group sx={{ padding: 10 }}>
-                  {/* <Image src={image_url} height={45} width={45} radius='xl' /> */}
-                  <Avatar />
+                  <Image src={publicUrl} height={45} width={45} radius='xl' />
                   <div>
                     <Text size='lg' weight={500}>
                       {username}
@@ -120,6 +154,7 @@ function ModelComments({
       <Box sx={{ marginBottom: 120 }}>
         {comments.map((comment, index) => (
           <ModelComment
+            pictureUrl={picturesUrls[index]}
             comment={comment}
             comments={comments}
             setComments={setComments}

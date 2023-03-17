@@ -14,6 +14,7 @@ type Inputs = {
   name: string
   email: string
   password: string
+  phone: string
 }
 
 export default function signUp() {
@@ -68,6 +69,7 @@ export default function signUp() {
           if (!IsExist?.email && !IsExist?.username) {
             //if user doesnt exist create new user and saves data in user table
             let { data, error } = await supabase.auth.signUp({
+              phone: fields.phone,
               email: fields.email,
               password: fields.password,
             })
@@ -79,6 +81,7 @@ export default function signUp() {
                 CreateUserMutation.mutate({
                   id: data.user?.id,
                   email: fields.email,
+                  phone: fields.phone,
                   name: fields.name,
                   password: fields.password,
                   username: fields.username,
@@ -110,6 +113,12 @@ export default function signUp() {
     if (error === 'pattern') return 'Wrong Pattern'
     return error + ' Error'
   }
+  function GetPhoneError(): string {
+    const error = errors.email?.type
+    if (error === 'required') return 'Enter Phone Field'
+    if (error === 'pattern') return 'Wrong Pattern'
+    return error + ' Error'
+  }
   function GetNameError(): string {
     const error = errors.name?.type
     if (error === 'required') return 'Enter Name Field'
@@ -122,7 +131,6 @@ export default function signUp() {
     if (error === 'pattern') return 'Wrong Pattern'
     return error + ' Error'
   }
-
   function GetError(field: string): string {
     const error = errors.username?.type
     if (error === 'required') return 'Enter ' + field + ' Field'
@@ -186,6 +194,17 @@ export default function signUp() {
               {...register('email', {
                 required: true,
                 pattern: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
+              })}
+            />
+            <TextInput
+              label='Phone'
+              placeholder='Enter Your Phone...'
+              defaultValue='+9720548853393'
+              error={errors.email ? GetPhoneError() : ''}
+              {...register('phone', {
+                required: true,
+                //pattern: /^\+\d{13}$/,
+                //+9720548853393
               })}
             />
             <PasswordInput

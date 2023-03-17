@@ -11,6 +11,8 @@ import { CreateNotification } from '../../utils/functions'
 import { useViewportSize } from '@mantine/hooks'
 import { useSession, useUser } from '@supabase/auth-helpers-react'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import UploadAvatar from '../../components/layout/UploadAvatar'
+import { usePublicUrl } from '../../utils/usePublicUrl'
 
 export default function account() {
   const session = useSession()
@@ -22,8 +24,15 @@ export default function account() {
   const { data: UserDetails } = trpc.auth.getUserDetails.useQuery({
     id: user?.id,
   })
+  // const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
+  //   userId: user?.id,
+  // })
+  const publicUrl = usePublicUrl((state) => state.publicUrl)
+  const change = usePublicUrl((state) => state.change)
   const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' })
+  const [IsHovered, setIsHovered] = useState<boolean>(false)
   const [email, setEmail] = useState<string>('')
+  const [phone, setPhone] = useState<string>('')
   const [username, setUsername] = useState<string>('')
   const [usernameLabel, setUsernameLabel] = useState<string>('')
   const [nameLabel, setNameLabel] = useState<string>('')
@@ -41,6 +50,7 @@ export default function account() {
   useEffect(() => {
     if (UserDetails) {
       setEmail(UserDetails.email)
+      setPhone(UserDetails.phone)
       setUsername(UserDetails.username)
       setName(UserDetails.name)
       setPassword(UserDetails.password)
@@ -54,13 +64,27 @@ export default function account() {
     }
   }, [UserDetails])
 
+  useEffect(() => {
+    const url = localStorage.getItem('publicUrl')
+    if (url != null) {
+      change(url)
+    }
+  }, [])
+
+  // useEffect(() => {
+  //   if (PublicUrl) {
+  //     change(PublicUrl)
+  //   }
+  // }, [PublicUrl])
+
   async function UpdateDestail(
-    detail: 'email' | 'username' | 'name' | 'password'
+    detail: 'email' | 'username' | 'name' | 'password' | 'phone'
   ) {
-    if (detail === 'email' || detail === 'password') {
-      const { data, error } = await supabase.auth.updateUser({
+    if (detail === 'email' || detail === 'password' || detail === 'phone') {
+      await supabase.auth.updateUser({
         email: email,
         password: password,
+        phone: phone,
       })
     }
     updateMutation.mutate(
@@ -70,6 +94,7 @@ export default function account() {
         id: user?.id,
         name: name,
         username: username,
+        phone: phone,
       },
       {
         onSuccess() {
@@ -111,7 +136,15 @@ export default function account() {
       <Container size='xl'>
         <Group position='apart' sx={{ padding: 20, marginBottom: 30 }}>
           <Group spacing='xl'>
-            <Avatar size={160} radius='xl' />
+            <div
+              onMouseOver={() => setIsHovered(true)}
+              onMouseOut={() => setIsHovered(false)}>
+              {IsHovered ? (
+                <UploadAvatar setIsHovered={setIsHovered} />
+              ) : (
+                <Avatar src={publicUrl} size={160} radius='xl' />
+              )}
+            </div>
             <Box>
               <Text sx={{ fontSize: 50 }} weight={700}>
                 {usernameLabel}
@@ -216,6 +249,31 @@ export default function account() {
               size='md'
             />
             <UnstyledButton onClick={() => UpdateDestail('email')}>
+              <Text
+                sx={{ fontSize: 18 }}
+                weight={500}
+                align='right'
+                color='green'>
+                Update
+              </Text>
+            </UnstyledButton>
+          </SimpleGrid>
+          <Divider />
+          <SimpleGrid cols={3} sx={{ paddingLeft: 5, paddingRight: 5 }}>
+            <Text
+              sx={{ fontSize: 18, paddingTop: 6 }}
+              weight={500}
+              color='dimmed'>
+              Phone
+            </Text>
+            <TextInput
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder='Enter Your Phone...'
+              value={phone}
+              radius='md'
+              size='md'
+            />
+            <UnstyledButton onClick={() => UpdateDestail('phone')}>
               <Text
                 sx={{ fontSize: 18 }}
                 weight={500}

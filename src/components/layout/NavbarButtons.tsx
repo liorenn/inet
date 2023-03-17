@@ -19,7 +19,7 @@ function NavBarButtons() {
   return (
     <>
       {Buttons.map((item, index) => (
-        <Link href={item.href}>
+        <Link href={item.href} key={index}>
           <Button
             variant='subtle'
             color='gray'

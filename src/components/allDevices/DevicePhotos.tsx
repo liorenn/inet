@@ -52,11 +52,8 @@ function DevicePhotos({ device, miniphotos }: Props) {
           size='85%'
           opened={opened}
           radius='md'
-          title={name + ' Photos'}
-          onClose={() => setOpened(false)}
-          overlayColor={dark ? theme.colors.dark[9] : theme.colors.gray[2]}
-          overlayOpacity={0.55}
-          overlayBlur={3}>
+          title={device.name + ' Photos'}
+          onClose={() => setOpened(false)}>
           <Center>
             <Image
               src={activeLink}

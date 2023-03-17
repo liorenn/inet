@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useMantineColorScheme } from '@mantine/core'
 import { Group, Breadcrumbs, Text, Title } from '@mantine/core'
 import Link from 'next/link'
-import { Device } from '@prisma/client'
+import type { Device } from '@prisma/client'
 
 function ModelHeader({ device }: { device: Device }) {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()

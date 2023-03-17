@@ -10,7 +10,7 @@ export const getUniqueDeviceRouter = router({
       const device = (await ctx.prisma.device.findUnique({
         where: { model: input.model },
       })) as Device
-      
+
       const touchDevice = (await ctx.prisma.touchDevice.findUnique({
         where: { model: input.model },
       })) as TouchDevice

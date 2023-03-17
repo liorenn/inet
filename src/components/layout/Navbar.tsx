@@ -3,22 +3,40 @@ import { createStyles, Container, Avatar } from '@mantine/core'
 import { Header, Group, Button, Text } from '@mantine/core'
 import { ActionIcon, useMantineColorScheme } from '@mantine/core'
 import Link from 'next/link'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
+import {
+  useSession,
+  useSupabaseClient,
+  useUser,
+} from '@supabase/auth-helpers-react'
 import { useEffect, useState } from 'react'
 import { CreateNotification } from '../../utils/functions'
+import { trpc } from '../../utils/trpc'
+import { usePublicUrl } from '../../utils/usePublicUrl'
 
-const Navbar = () => {
+export const Navbar = () => {
   const { classes } = useStyles()
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
   const supabase = useSupabaseClient()
+  const user = useUser()
   const [session, setSession] = useState(useSession())
+  const publicUrl = usePublicUrl((state) => state.publicUrl)
+  const change = usePublicUrl((state) => state.change)
+  const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
+    userId: user?.id,
+  })
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabase.auth.onAuthStateChange((e, session) => {
       setSession(session)
     })
   }, [])
+
+  useEffect(() => {
+    if (PublicUrl) {
+      change(PublicUrl)
+    }
+  }, [PublicUrl])
 
   async function signOut() {
     const { error } = await supabase.auth.signOut()
@@ -99,7 +117,7 @@ const Navbar = () => {
                 Sign Out
               </Button>
               <Link href={'/auth/account'}>
-                <Avatar radius='md' />
+                <Avatar src={publicUrl} radius='md' />
               </Link>
             </>
           )}
@@ -117,8 +135,6 @@ const Navbar = () => {
     </Header>
   )
 }
-
-export default Navbar
 
 const useStyles = createStyles((theme) => ({
   root: {

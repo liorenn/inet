@@ -1,10 +1,11 @@
-import { Paper, Group, Text, ActionIcon, Avatar } from '@mantine/core'
-import { Tooltip, Image, Rating } from '@mantine/core'
-import { Comment, Device } from '@prisma/client'
+import { Paper, Group, Text, ActionIcon, Avatar, Image } from '@mantine/core'
+import { Tooltip, Rating } from '@mantine/core'
+import { Comment } from '@prisma/client'
 import { IconTrash, IconPencil, IconCornerUpLeft } from '@tabler/icons'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { trpc } from '../../utils/trpc'
 import { CalcAverageRating, CreateNotification } from '../../utils/functions'
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 
 type Props = {
   comment: Comment
@@ -13,6 +14,7 @@ type Props = {
   username: string
   setRatingValue: Function
   setCommentsAmout: Function
+  pictureUrl: string
 }
 
 function ModelComment({
@@ -22,11 +24,11 @@ function ModelComment({
   username,
   setCommentsAmout,
   setRatingValue,
+  pictureUrl,
 }: Props) {
   const [rating, setRating] = useState(comment.Rating)
   const { mutate } = trpc.auth.deleteComment.useMutation()
-
-  async function DeleteComment() {
+  function DeleteComment() {
     mutate(
       { commentId: comment.id },
       {
@@ -50,15 +52,19 @@ function ModelComment({
     <Paper withBorder radius='md' sx={{ padding: 10, marginTop: 20 }}>
       <Group position='apart' sx={{ marginBottom: 10 }}>
         <Group sx={{ padding: 10 }}>
-          {/* <Image
-            src={image_url}
-            height={45}
-            width={45}
-            style={{ borderRadius: '50%' }}
-            alt={comment.authur}
-            radius='xl'
-          /> */}
-          <Avatar />
+          {pictureUrl !== undefined ? (
+            <Image
+              src={pictureUrl}
+              height={45}
+              width={45}
+              style={{ borderRadius: '50%' }}
+              alt={comment.message}
+              radius='xl'
+            />
+          ) : (
+            <Avatar src={pictureUrl} radius='xl' />
+          )}
+
           <div>
             <Text size='lg' weight={500}>
               {comment.username}

@@ -4,9 +4,9 @@ import { SimpleGrid, Image, Button, Container, Text, Card } from '@mantine/core'
 import { Group, Breadcrumbs, Title, useMantineColorScheme } from '@mantine/core'
 import Head from 'next/head'
 // /device page
-export default function device() {
-  const devicesTypes = Object.getOwnPropertyNames(DeviceTypeValue)
+export default function Device() {
   const { colorScheme } = useMantineColorScheme()
+  const devicesTypes = Object.getOwnPropertyNames(DeviceTypeValue)
   const dark = colorScheme === 'dark'
 
   return (

@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { useViewportSize } from '@mantine/hooks'
 import Head from 'next/head'
 import ModelComments from '../../../components/specificDevice/ModelComments'
-import { useUser } from '@supabase/auth-helpers-react'
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import { useState } from 'react'
 
 enum queriesNames {
@@ -122,7 +122,7 @@ const DynamicPage: NextPage<PropsType> = ({ deviceModel }: PropsType) => {
   )
 }
 
-DynamicPage.getInitialProps = async ({ query }: NextPageContext) => {
+DynamicPage.getInitialProps = ({ query }: NextPageContext) => {
   const deviceModel = query.model as string
   return { deviceModel: deviceModel }
 }

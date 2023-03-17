@@ -5,7 +5,7 @@ import { useViewportSize } from '@mantine/hooks'
 import Head from 'next/head'
 import { useUser } from '@supabase/auth-helpers-react'
 import React, { useEffect, useState } from 'react'
-import { devicesPropertiesArrType } from '../trpc/routers/auth'
+import type { devicesPropertiesArrType } from '../trpc/routers/auth'
 import ListCard from '../components/allDevices/ListCard'
 
 export default function List(): JSX.Element {
@@ -22,7 +22,7 @@ export default function List(): JSX.Element {
     if (userDevicesQuery.data && devicesArr === undefined) {
       setDevicesArr(userDevicesQuery.data)
     }
-  }, [userDevicesQuery])
+  }, [devicesArr, userDevicesQuery])
 
   return (
     <>

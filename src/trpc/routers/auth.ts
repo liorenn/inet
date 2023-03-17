@@ -1,5 +1,5 @@
-import { DeviceTypeValue } from '@prisma/client'
-import { router, publicProcedure, protectedProcedure } from '../trpc'
+import { DeviceTypeValue, User } from '@prisma/client'
+import { router, publicProcedure } from '../trpc'
 import { z } from 'zod'
 
 export const authRouter = router({
@@ -52,11 +52,53 @@ export const authRouter = router({
       })
       return comment
     }),
+  GetPublicUrl: publicProcedure
+    .input(z.object({ userId: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      let { data } = await ctx.supabase.storage
+        .from('pictures')
+        .createSignedUrl(input.userId + '/profile.png', 60)
+      if (data?.signedUrl) {
+        return data?.signedUrl
+      } else {
+        return ''
+      }
+    }),
+  GetPublicUrlArr: publicProcedure
+    .input(z.array(z.string()))
+    .mutation(async ({ ctx, input }) => {
+      let UrlArr: string[] = []
+      for (let i = 0; i < input.length; i++) {
+        let { data } = await ctx.supabase.storage
+          .from('pictures')
+          .createSignedUrl(input[i] + '/profile.png', 60 * 60 * 24 * 60)
+        if (data?.signedUrl) {
+          UrlArr.push(data.signedUrl)
+        } else {
+          UrlArr.push('')
+        }
+      }
+      return UrlArr
+    }),
+  getUsersIds: publicProcedure
+    .input(z.array(z.object({ username: z.string() })))
+    .mutation(async ({ ctx, input }) => {
+      let arr: string[] = []
+      for (let i = 0; i < input.length; i++) {
+        const user = await ctx.prisma.user.findFirst({
+          where: { username: input[i].username },
+        })
+        if (user) arr.push(user.id)
+        else arr.push('error')
+      }
+      return arr
+    }),
   getAllComments: publicProcedure
     .input(z.object({ model: z.string() }))
     .query(async ({ ctx, input }) => {
       const comments = await ctx.prisma.comment.findMany({
         where: { model: input.model },
+        include: { user: true },
       })
       return comments
     }),
@@ -157,12 +199,17 @@ export const authRouter = router({
         })
       }
     }),
+  // getUserProfilePhohtoUrls: publicProcedure
+  //   .input(z.object({ username: z.string() }))
+  //   .query(async ({ ctx, input }) => {
+  //   }),
   updateUserDetails: publicProcedure
     .input(
       z.object({
         id: z.string().optional(),
         name: z.string(),
         email: z.string(),
+        phone: z.string(),
         username: z.string(),
         password: z.string(),
       })
@@ -190,6 +237,7 @@ export const authRouter = router({
         id: z.string(),
         name: z.string(),
         email: z.string(),
+        phone: z.string(),
         username: z.string(),
         password: z.string(),
       })
@@ -200,6 +248,7 @@ export const authRouter = router({
           id: input.id,
           email: input.email,
           name: input.name,
+          phone: input.phone,
           password: input.password,
           username: input.username,
           role: 'USER',

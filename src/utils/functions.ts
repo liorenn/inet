@@ -1,8 +1,8 @@
 import { showNotification } from '@mantine/notifications'
 import { DeviceTypeValue } from '@prisma/client'
 import { IconCheck, IconX, IconExclamationMark } from '@tabler/icons'
-import { ReactElement } from 'react'
-import { Comment } from '@prisma/client'
+import type { ReactElement } from 'react'
+import type { Comment } from '@prisma/client'
 export function FormatDate(releaseDate: Date): string {
   const date = new Date(releaseDate)
   const day = date.getUTCDate()

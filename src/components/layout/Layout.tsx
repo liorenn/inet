@@ -1,5 +1,5 @@
-import Navbar from './Navbar'
-import { ReactNode } from 'react'
+import { Navbar } from './Navbar'
+import type { ReactNode } from 'react'
 import ScrollToTop from './ScrollToTop'
 
 type Props = {

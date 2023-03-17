@@ -1,10 +1,10 @@
-import {
+import type {
   ResistanceFeature,
   DeviceTypeValue,
   AirpodsFeature,
 } from '@prisma/client'
-import { BiometricFeature, ScreenType, Camera } from '@prisma/client'
-import { Color, DeviceConnector, Comment } from '@prisma/client'
+import type { BiometricFeature, ScreenType, Camera } from '@prisma/client'
+import type { Color, DeviceConnector} from '@prisma/client';
 
 export interface deviceType {
   model: string
