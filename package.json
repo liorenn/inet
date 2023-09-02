@@ -10,10 +10,8 @@
     "start": "next start"
   },
   "dependencies": {
-    "@bmunozg/react-image-area": "^1.1.0",
     "@emotion/react": "^11.10.5",
     "@emotion/server": "^11.10.0",
-    "@formkit/auto-animate": "^1.0.0-beta.5",
     "@mantine/carousel": "^6.0.2",
     "@mantine/core": "^6.0.2",
     "@mantine/dates": "^6.0.2",
@@ -23,6 +21,8 @@
     "@mantine/next": "^6.0.2",
     "@mantine/notifications": "^6.0.2",
     "@mantine/nprogress": "^6.0.2",
+    "@splinetool/react-spline": "^2.2.6",
+    "@splinetool/runtime": "^0.9.436",
     "@supabase/auth-helpers-nextjs": "^0.5.2",
     "@supabase/auth-helpers-react": "^0.3.1",
     "@supabase/supabase-js": "^2.2.2",
@@ -33,13 +33,10 @@
     "@trpc/react-query": "10.7.0",
     "@trpc/server": "10.7.0",
     "dayjs": "^1.11.7",
-    "embla-carousel-react": "^7.0.9",
     "next": "13.0.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.40.0",
-    "react-pdf": "^6.2.2",
-    "react-zoom-pan-pinch": "^2.6.0",
     "superjson": "1.9.1",
     "zod": "^3.18.0",
     "zustand": "^4.3.6"
