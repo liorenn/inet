@@ -2,6 +2,7 @@ import Head from 'next/head'
 import { Grid, Button, Text, Title, Image } from '@mantine/core'
 import { Group, Stack, Container } from '@mantine/core'
 import Spline from '@splinetool/react-spline'
+import Link from 'next/link'
 
 export default function home(): JSX.Element {
   return (
@@ -27,9 +28,11 @@ export default function home(): JSX.Element {
                 <Button color='gray' variant='light' size='lg' radius='md'>
                   Find Your Device
                 </Button>
-                <Button color='gray' variant='light' size='lg' radius='md'>
-                  Compare Devices
-                </Button>
+                <Link href='/comapre'>
+                  <Button color='gray' variant='light' size='lg' radius='md'>
+                    Compare Devices
+                  </Button>
+                </Link>
               </Group>
             </Stack>
           </Grid.Col>

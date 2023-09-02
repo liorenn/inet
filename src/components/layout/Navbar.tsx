@@ -63,6 +63,15 @@ export const Navbar = () => {
         </Group>
         <Group spacing={5} className={classes.buttons}>
           {/* <NavBarButtons /> */}
+          <Link href={'/compare'}>
+            <Button
+              variant='light'
+              color='gray'
+              radius='md'
+              className={classes.end}>
+              Compare Devices
+            </Button>
+          </Link>
           <Link href={'/device'}>
             <Button
               variant='light'
