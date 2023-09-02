@@ -3,6 +3,12 @@ import { DeviceTypeValue } from '@prisma/client'
 import { IconCheck, IconX, IconExclamationMark } from '@tabler/icons'
 import type { ReactElement } from 'react'
 import type { Comment } from '@prisma/client'
+/**
+ * Formats the given release date into a string representation.
+ *
+ * @param {Date} releaseDate - The release date to be formatted.
+ * @return {string} The formatted date string in the format "day/month/year".
+ */
 export function FormatDate(releaseDate: Date): string {
   const date = new Date(releaseDate)
   const day = date.getUTCDate()
@@ -11,6 +17,13 @@ export function FormatDate(releaseDate: Date): string {
   return day + '/' + month + '/' + year
 }
 
+/**
+ * Creates a notification with the specified message and color.
+ *
+ * @param {string} message - The message to display in the notification.
+ * @param {'red' | 'green' | 'yellow'} color - The color of the notification.
+ * @return {void} The created notification.
+ */
 export function CreateNotification(
   message: string,
   color: 'red' | 'green' | 'yellow'
@@ -42,6 +55,12 @@ export function CreateNotification(
   })
 }
 
+/**
+ * Returns the device type based on the given device model.
+ *
+ * @param {string} deviceModel - The device model to determine the type for.
+ * @return {string} The device type.
+ */
 export function getDeviceType(deviceModel: string) {
   const devicesTypes = Object.getOwnPropertyNames(DeviceTypeValue)
   for (let i = 0; i < devicesTypes.length; i++) {
@@ -53,6 +72,12 @@ export function getDeviceType(deviceModel: string) {
   return 'unknown'
 }
 
+/**
+ * Calculates the average rating based on an array of comments.
+ *
+ * @param {Comment[]} comments - The array of comments.
+ * @return {number} The average rating.
+ */
 export function CalcAverageRating(comments: Comment[]) {
   let AverageRating = 0
   for (let i = 0; i < comments.length; i++) {

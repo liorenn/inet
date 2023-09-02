@@ -1,11 +1,12 @@
 import ModelPhotos from './DevicePhotos'
 import { Card, Button, Grid, Text, Space } from '@mantine/core'
-import { DeviceTypeValue } from '@prisma/client'
+import { DeviceTypeValue, User } from '@prisma/client'
 import Link from 'next/link'
 import { trpc } from '../../utils/trpc'
-import { User, useUser } from '@supabase/auth-helpers-react'
+import { useUser } from '@supabase/auth-helpers-react'
 import { useEffect, useState } from 'react'
 import { CreateNotification } from '../../utils/functions'
+import { allProperties } from '../../pages/device/[deviceType]/index'
 
 type AppProps = {
   device: {
@@ -13,48 +14,24 @@ type AppProps = {
     name: string
     imageAmount: number
   }
+  index: number
+  isInList: boolean
   deviceType: DeviceTypeValue
+  handleIsInlist: (
+    device: allProperties,
+    isInList: boolean,
+    index: number
+  ) => void
 }
 
-export default function DeviceCard({ device, deviceType }: AppProps) {
-  const [isInList, setIsInList] = useState<boolean | undefined>(undefined)
+export default function DeviceCard({
+  device,
+  deviceType,
+  isInList,
+  index,
+  handleIsInlist,
+}: AppProps) {
   const user = useUser()
-  const userDevicesMutation = trpc.auth.handleDeviceToUser.useMutation()
-  const isDeviceInUser = trpc.auth.isDeviceInUser.useQuery({
-    deviceModel: device.model,
-    userId: user?.id,
-  })
-
-  useEffect(() => {
-    if (isDeviceInUser.data && isInList === undefined) {
-      setIsInList(isDeviceInUser.data.isInList)
-    }
-  }, [isDeviceInUser])
-
-  function handleIsInlist(user: User) {
-    const message =
-      'device has been successfully ' +
-      (isInList ? 'removed from' : 'added to') +
-      ' list'
-    CreateNotification(message, 'green')
-    userDevicesMutation.mutate(
-      {
-        deviceModel: device.model,
-        userId: user.id,
-        isInList: isInList,
-      },
-      {
-        onError: () => {
-          const message =
-            'there has been an error ' +
-            (isInList ? 'removing' : 'adding') +
-            ' device to list'
-          CreateNotification(message, 'red')
-        },
-      }
-    )
-    setIsInList(!isInList)
-  }
 
   return (
     <Card shadow='lg' p='lg' radius='md'>
@@ -92,7 +69,7 @@ export default function DeviceCard({ device, deviceType }: AppProps) {
               color={isInList ? 'red' : 'green'}
               radius='md'
               size='md'
-              onClick={() => handleIsInlist(user)}
+              onClick={() => handleIsInlist(device, isInList, index)}
               fullWidth>
               {isInList ? 'Remove From List' : 'Add To List'}
             </Button>

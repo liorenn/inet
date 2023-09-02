@@ -1,6 +1,6 @@
 import { DeviceTypeValue, User } from '@prisma/client'
 import { router, publicProcedure } from '../trpc'
-import { z } from 'zod'
+import { array, z } from 'zod'
 
 export const authRouter = router({
   getSession: publicProcedure.query(({ ctx }) => {
@@ -102,7 +102,26 @@ export const authRouter = router({
       })
       return comments
     }),
-
+  areDevicesInUser: publicProcedure
+    .input(
+      z.object({
+        deviceModels: z.array(z.string()),
+        userId: z.string().optional(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const areInList: boolean[] = []
+      for (let i = 0; i < input.deviceModels.length; i++) {
+        const device = await ctx.prisma.deviceUser.findFirst({
+          where: {
+            userId: input.userId,
+            deviceModel: input.deviceModels[i],
+          },
+        })
+        areInList[i] = device ? true : false
+      }
+      return areInList
+    }),
   isDeviceInUser: publicProcedure
     .input(
       z.object({

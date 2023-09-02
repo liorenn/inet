@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import { Grid, Button, Text, Title, Image } from '@mantine/core'
 import { Group, Stack, Container } from '@mantine/core'
+import Spline from '@splinetool/react-spline'
 
 export default function home(): JSX.Element {
   return (
@@ -12,10 +13,10 @@ export default function home(): JSX.Element {
       </Head>
       <Container size={1600} px={10}>
         <Grid sx={{ marginTop: 70 }}>
-          <Grid.Col xl={5}>
+          <Grid.Col xl={4}>
             <Stack sx={{ marginTop: 110, marginLeft: 100 }} spacing='xl'>
-              <Title size={48}>Inet</Title>
-              <Text size={28}>
+              <Title size={56}>Inet</Title>
+              <Text size={30}>
                 Compare between different apple devices
                 <br />
                 View devices information and specifications
@@ -32,15 +33,12 @@ export default function home(): JSX.Element {
               </Group>
             </Stack>
           </Grid.Col>
-          <Grid.Col xl={7}>
-            {/* <Spline
-              scene='https://prod.spline.design/6Bg4l7N6w0UWWQqk/scene.splinecode'
-              width={1160}
-            /> */}
-            <Image
+          <Grid.Col xl={8}>
+            <Spline scene='https://prod.spline.design/6Bg4l7N6w0UWWQqk/scene.splinecode' />
+            {/* <Image
               src={'/images/commercial/iphone_gallery_4.png'}
               fit='contain'
-            />
+            /> */}
           </Grid.Col>
         </Grid>
       </Container>
