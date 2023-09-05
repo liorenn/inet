@@ -29,7 +29,6 @@ function NavBarDropdown() {
           </Text>
         }
         size={280}
-        overlayBlur={3}
         withOverlay={true}>
         {Buttons.map((item, index) => (
           <Link href={item.href} key={index}>

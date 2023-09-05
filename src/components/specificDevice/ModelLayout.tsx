@@ -32,7 +32,7 @@ export default function ModelLayout({
                   }}
                   miniphotos={true}
                 />
-                <ModelButtons />
+                <ModelButtons device={device} />
               </Stack>
             </Center>
           </Grid.Col>

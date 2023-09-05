@@ -7,8 +7,9 @@ import { useUser } from '@supabase/auth-helpers-react'
 import React, { useEffect, useState } from 'react'
 import type { devicesPropertiesArrType } from '../trpc/routers/auth'
 import ListCard from '../components/allDevices/ListCard'
+import { useRouter } from 'next/router'
 
-export default function List(): JSX.Element {
+export default function Favorites(): JSX.Element {
   const { height } = useViewportSize()
   const user = useUser()
   const userDevicesQuery = trpc.auth.getUserDevices.useQuery({
@@ -17,12 +18,23 @@ export default function List(): JSX.Element {
   const [devicesArr, setDevicesArr] = useState<
     devicesPropertiesArrType | undefined
   >(undefined)
+  const router = useRouter()
+
+  useEffect(() => {
+    const handleRouteChange = () => {
+      userDevicesQuery.refetch()
+    }
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router.events, userDevicesQuery.refetch])
 
   useEffect(() => {
     if (userDevicesQuery.data && devicesArr === undefined) {
       setDevicesArr(userDevicesQuery.data)
     }
-  }, [devicesArr, userDevicesQuery])
+  }, [devicesArr, userDevicesQuery.data])
 
   return (
     <>

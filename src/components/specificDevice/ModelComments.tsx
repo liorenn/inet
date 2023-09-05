@@ -6,7 +6,7 @@ import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import { Comment, Device, User } from '@prisma/client'
 import { trpc } from '../../utils/trpc'
 import { CalcAverageRating, CreateNotification } from '../../utils/functions'
-import { usePublicUrl } from '../../utils/usePublicUrl'
+import usePublicUrl from '../../utils/usePublicUrl'
 
 type Props = {
   device: Device
@@ -112,7 +112,7 @@ function ModelComments({
       <Divider sx={{ marginBottom: 20 }} />
       <Accordion
         defaultValue='comments'
-        radius='md'
+        radius='xl'
         styles={{
           label: { fontSize: 24, fontWeight: 500 },
         }}>

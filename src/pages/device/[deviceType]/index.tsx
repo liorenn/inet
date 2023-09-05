@@ -9,10 +9,7 @@ import Head from 'next/head'
 import { CreateNotification } from '../../../utils/functions'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useState, useEffect } from 'react'
-
-interface PropsType {
-  devicePath: string
-}
+import { useRouter } from 'next/router'
 
 export interface allProperties {
   model: string
@@ -20,10 +17,14 @@ export interface allProperties {
   imageAmount: number
 }
 // /device/iphone page
-const DynamicPage: NextPage<PropsType> = ({ devicePath }: PropsType) => {
-  const deviceType = devicePath as DeviceTypeValue
+function deviceTypePage() {
+  const router = useRouter()
+  const deviceType = router.asPath.split('/')[
+    router.asPath.split('/').length - 1
+  ] as DeviceTypeValue
   const { height } = useViewportSize()
   const user = useUser()
+
   const [areInList, setAreInList] = useState<{ isInList: boolean }[]>([])
   const userDevicesMutation = trpc.auth.handleDeviceToUser.useMutation()
   const { data } = trpc.AllDevices.getAllDevicesPropertiesExtra.useQuery({
@@ -105,50 +106,4 @@ const DynamicPage: NextPage<PropsType> = ({ devicePath }: PropsType) => {
     )
   }
 }
-
-const devicesTypes = Object.getOwnPropertyNames(DeviceTypeValue)
-
-DynamicPage.getInitialProps = ({ query }: NextPageContext) => {
-  const devicePath = query.deviceType as string
-  const isExistInArr = () => {
-    for (let i = 0; i < devicesTypes.length; i++) {
-      if (devicesTypes[i] === devicePath) return true
-    }
-    return false
-  }
-
-  if (!isExistInArr()) {
-    return { devicePath: 'invalid device type' }
-  }
-  return { devicePath: devicePath }
-}
-
-export default DynamicPage
-/*
-enum queriesNames {
-  getAlliPhones = 'getAlliPhones',
-  getAlliMacs = 'getAlliMacs',
-}
-
-type devicePropetiesType = {
-  deviceType: DeviceTypeValue
-  queryFunction: queriesNames
-}
-const devicePropeties: devicePropetiesType[] = [
-  {
-    deviceType: DeviceTypeValue.iphone,
-    queryFunction: queriesNames.getAlliPhones,
-  },
-  {
-    deviceType: DeviceTypeValue.imac,
-    queryFunction: queriesNames.getAlliMacs,
-  },
-]
-
-  const index = devicePropeties.findIndex(
-    (object) => object.deviceType === deviceType
-  )
-  const queryFunction = devicePropeties[index].queryFunction
-
-  const query = trpc.AllDevices[queryFunction].useQuery()
-*/
+export default deviceTypePage

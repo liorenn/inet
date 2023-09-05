@@ -52,7 +52,7 @@ export default function GetIphoneSpecs(device: iphoneType): categoriesType {
     {
       name: 'Features',
       values: [
-        { label: 'Biometrics', info: device.biometrics },
+        { label: 'Biometrics', info: device.biometrics.replace('_', ' ') },
         {
           label: 'Resistance',
           info: device.resistance ? device.resistance.join(' ') : 'none',

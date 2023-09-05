@@ -1,5 +1,10 @@
 import { useState } from 'react'
-import { useMantineColorScheme } from '@mantine/core'
+import {
+  ColorSwatch,
+  Group,
+  Tooltip,
+  useMantineColorScheme,
+} from '@mantine/core'
 import { Table, Accordion, Grid, Text } from '@mantine/core'
 import { Device, DeviceTypeValue } from '@prisma/client'
 import GetIphoneSpecs, {
@@ -97,15 +102,37 @@ function IphoneTable({ category }: TableProps) {
   return (
     <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
       <tbody>
-        {category.map((element: any) => (
+        {category.map((element) => (
           <tr key={element.label}>
             <td>
               <Grid>
                 <Grid.Col span={6} sx={{ fontWeight: 600, fontSize: 20 }}>
-                  <Text ref={element?.ref}>{element.label}</Text>
+                  <Text>{element.label}</Text>
                 </Grid.Col>
                 <Grid.Col span={6} sx={{ fontWeight: 400, fontSize: 20 }}>
-                  <Text>{element.info}</Text>
+                  <Text>
+                    {element.label === 'Colors' ? (
+                      <Group position='left' spacing='xs'>
+                        {element.info.split(' ').map(
+                          (color, index) =>
+                            color !== undefined && (
+                              <Tooltip
+                                offset={10}
+                                color='gray'
+                                label={color.split('/')[1]}
+                                key={index}>
+                                <ColorSwatch
+                                  color={color.split('/')[0]}
+                                  withShadow
+                                />
+                              </Tooltip>
+                            )
+                        )}
+                      </Group>
+                    ) : (
+                      element.info
+                    )}
+                  </Text>
                 </Grid.Col>
               </Grid>
             </td>

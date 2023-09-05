@@ -5,7 +5,9 @@ interface PublicUrl {
   change: (newPublicUrl: string) => void
 }
 
-export const usePublicUrl = create<PublicUrl>()((set) => ({
+const usePublicUrl = create<PublicUrl>()((set) => ({
   publicUrl: '',
   change: (newPublicUrl) => set(() => ({ publicUrl: newPublicUrl })),
 }))
+
+export default usePublicUrl

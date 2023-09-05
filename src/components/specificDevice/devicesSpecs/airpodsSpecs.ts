@@ -41,7 +41,7 @@ export default function GetAirpodsSpecs(device: airpodsType): categoriesType {
       name: 'Features',
       values: [
         { label: 'Case', info: device.case },
-        { label: 'Biometrics', info: device.biometrics },
+        { label: 'Biometrics', info: device.biometrics.replace('_', ' ') },
         {
           label: 'Resistance',
           info: device.resistance ? device.resistance.join(' ') : 'none',

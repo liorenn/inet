@@ -1,9 +1,11 @@
 import { IconArrowUp } from '@tabler/icons'
 import { useWindowScroll } from '@mantine/hooks'
 import { Affix, Button, Transition } from '@mantine/core'
+import useTranslation from 'next-translate/useTranslation'
 
 export default function ScrollToTop() {
   const [scroll, scrollTo] = useWindowScroll()
+  const { t } = useTranslation('common')
 
   return (
     <>
@@ -16,7 +18,7 @@ export default function ScrollToTop() {
               leftIcon={<IconArrowUp size={16} />}
               style={transitionStyles}
               onClick={() => scrollTo({ y: 0 })}>
-              Scroll to top
+              {t('scrollToTop')}
             </Button>
           )}
         </Transition>

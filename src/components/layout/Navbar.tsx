@@ -10,24 +10,26 @@ import {
 } from '@supabase/auth-helpers-react'
 import { useEffect, useState } from 'react'
 import { CreateNotification } from '../../utils/functions'
-import { trpc } from '../../utils/trpc'
-import { usePublicUrl } from '../../utils/usePublicUrl'
 import { DEFlag, ILFlag, GBFlag } from 'mantine-flagpack'
-import { languagesType, useLanguageStore } from '../../utils/languageStore'
+import { languagesType } from '../../utils/languageStore'
+import setLanguage from 'next-translate/setLanguage'
+import useTranslation from 'next-translate/useTranslation'
+import NavBarDropdown from './NavbarDropdown'
+import usePublicUrl from '../../utils/usePublicUrl'
+import { trpc } from '../../utils/trpc'
 
 export const Navbar = () => {
   const { classes } = useStyles()
+  const user = useUser()
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
   const supabase = useSupabaseClient()
-  const user = useUser()
   const [session, setSession] = useState(useSession())
-  // const publicUrl = usePublicUrl((state) => state.publicUrl)
-  // const change = usePublicUrl((state) => state.change)
-  // const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
-  //   userId: user?.id,
-  // })
-  const { language, setLanguage } = useLanguageStore()
+  const { t, lang } = useTranslation('common')
+  const { publicUrl, change } = usePublicUrl()
+  const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
+    userId: user?.id,
+  })
   useEffect(() => {
     setLanguage((localStorage.getItem('language') as languagesType) ?? 'en')
     supabase.auth.onAuthStateChange((e, session) => {
@@ -35,11 +37,11 @@ export const Navbar = () => {
     })
   }, [])
 
-  // useEffect(() => {
-  //   if (PublicUrl) {
-  //     change(PublicUrl)
-  //   }
-  // }, [PublicUrl])
+  useEffect(() => {
+    if (PublicUrl) {
+      change(PublicUrl)
+    }
+  }, [PublicUrl])
 
   async function signOut() {
     const { error } = await supabase.auth.signOut()
@@ -52,7 +54,9 @@ export const Navbar = () => {
     <Header height={65} className={classes.root} mb={20}>
       <Container className={classes.inner} fluid>
         <Group>
-          <div className={classes.dropdown}>{/* <NavBarDropdown /> */}</div>
+          <div className={classes.dropdown}>
+            <NavBarDropdown />
+          </div>
           <Link href={'/'}>
             <Button variant='subtle' color={'gray.' + (dark ? '1' : '9')}>
               <Group spacing='xs'>
@@ -65,14 +69,13 @@ export const Navbar = () => {
           </Link>
         </Group>
         <Group spacing={5} className={classes.buttons}>
-          {/* <NavBarButtons /> */}
           <Link href={'/compare'}>
             <Button
               variant='light'
               color='gray'
               radius='md'
               className={classes.end}>
-              Compare Devices
+              {t('compare')}
             </Button>
           </Link>
           <Link href={'/device'}>
@@ -81,17 +84,17 @@ export const Navbar = () => {
               color='gray'
               radius='md'
               className={classes.end}>
-              All Devices
+              {t('allDevices')}
             </Button>
           </Link>
           {session && (
-            <Link href={'/list'}>
+            <Link href={'/favorites'}>
               <Button
                 variant='light'
                 color='gray'
                 radius='md'
                 className={classes.end}>
-                List
+                {t('favorites')}
               </Button>
             </Link>
           )}
@@ -105,7 +108,7 @@ export const Navbar = () => {
                   color='gray'
                   radius='md'
                   className={classes.end}>
-                  Sign In
+                  {t('signIn')}
                 </Button>
               </Link>
               <Link href={'/auth/signup'}>
@@ -114,7 +117,7 @@ export const Navbar = () => {
                   color='gray'
                   radius='md'
                   className={classes.end}>
-                  Sign Up
+                  {t('signUp')}
                 </Button>
               </Link>
             </>
@@ -126,7 +129,7 @@ export const Navbar = () => {
                 radius='md'
                 className={classes.end}
                 onClick={() => signOut()}>
-                Sign Out
+                {t('signOut')}
               </Button>
               <Link href={'/auth/account'}>
                 {/* <Avatar src={publicUrl} radius='md' /> */}
@@ -147,20 +150,37 @@ export const Navbar = () => {
               </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
-              <Menu.Label>Sprachen</Menu.Label>
+              <Menu.Label>{t('languages')}</Menu.Label>
               <Menu.Item
+                mt={6}
+                style={{ background: lang === 'en' ? '#1c1c1c' : '' }}
                 icon={<GBFlag w={38} />}
-                onClick={() => setLanguage('en')}>
-                <Text weight={700}>english</Text>
+                onClick={() => {
+                  setLanguage('en')
+                  localStorage.setItem('language', 'en')
+                }}>
+                <Text weight={700}>English</Text>
               </Menu.Item>
               <Menu.Item
+                mt={6}
+                style={{
+                  background: lang === 'de' ? '#1c1c1c' : '',
+                }}
                 icon={<DEFlag w={38} />}
-                onClick={() => setLanguage('de')}>
+                onClick={() => {
+                  setLanguage('de')
+                  localStorage.setItem('language', 'de')
+                }}>
                 <Text weight={700}>Deutsch</Text>
               </Menu.Item>{' '}
               <Menu.Item
+                mt={6}
+                style={{ background: lang === 'he' ? '#1c1c1c' : '' }}
                 icon={<ILFlag w={38} />}
-                onClick={() => setLanguage('he')}>
+                onClick={() => {
+                  setLanguage('he')
+                  localStorage.setItem('language', 'he')
+                }}>
                 <Text weight={700}>עברית</Text>
               </Menu.Item>
             </Menu.Dropdown>

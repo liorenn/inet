@@ -22,7 +22,7 @@
     "@mantine/notifications": "^6.0.2",
     "@mantine/nprogress": "^6.0.2",
     "@splinetool/react-spline": "^2.2.6",
-    "@splinetool/runtime": "^0.9.436",
+    "@splinetool/runtime": "^0.9.437",
     "@supabase/auth-helpers-nextjs": "^0.5.2",
     "@supabase/auth-helpers-react": "^0.3.1",
     "@supabase/supabase-js": "^2.2.2",

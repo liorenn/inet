@@ -3,8 +3,10 @@ import { Grid, Button, Text, Title, Image } from '@mantine/core'
 import { Group, Stack, Container } from '@mantine/core'
 import Spline from '@splinetool/react-spline'
 import Link from 'next/link'
+import useTranslation from 'next-translate/useTranslation'
 
 export default function home(): JSX.Element {
+  const { t, lang } = useTranslation('home')
   return (
     <>
       <Head>
@@ -16,7 +18,7 @@ export default function home(): JSX.Element {
         <Grid sx={{ marginTop: 70 }}>
           <Grid.Col xl={4}>
             <Stack sx={{ marginTop: 110, marginLeft: 100 }} spacing='xl'>
-              <Title size={56}>Inet</Title>
+              <Title size={56}>{t('title')}</Title>
               <Text size={30}>
                 Compare between different apple devices
                 <br />
@@ -37,7 +39,7 @@ export default function home(): JSX.Element {
             </Stack>
           </Grid.Col>
           <Grid.Col xl={8}>
-            <Spline scene='https://prod.spline.design/6Bg4l7N6w0UWWQqk/scene.splinecode' />
+            {/* <Spline scene='https://prod.spline.design/6Bg4l7N6w0UWWQqk/scene.splinecode' /> */}
             {/* <Image
               src={'/images/commercial/iphone_gallery_4.png'}
               fit='contain'

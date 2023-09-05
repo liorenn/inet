@@ -51,9 +51,11 @@ interface PropsType {
   deviceModel: string
 }
 // /device/iphone/iphone13 page
-const DynamicPage: NextPage<PropsType> = ({ deviceModel }: PropsType) => {
+function ModelPage() {
   const router = useRouter()
   const user = useUser()
+  const deviceModel =
+    router.asPath.split('/')[router.asPath.split('/').length - 1]
   const { data } = trpc.auth.getUserDetails.useQuery({ id: user?.id })
   const { height } = useViewportSize()
   const { data: devicesArr } = trpc.AllDevices.getAllDevicesModels.useQuery()
@@ -121,40 +123,4 @@ const DynamicPage: NextPage<PropsType> = ({ deviceModel }: PropsType) => {
     </>
   )
 }
-
-DynamicPage.getInitialProps = ({ query }: NextPageContext) => {
-  const deviceModel = query.model as string
-  return { deviceModel: deviceModel }
-}
-
-export default DynamicPage
-// const { targetRef: RefRelease, scrollIntoView: ScrollRelease } =
-//   useScrollIntoView<HTMLDivElement>()
-// const { targetRef: RefDisplay, scrollIntoView: ScrollDisplay } =
-//   useScrollIntoView<HTMLDivElement>()
-// const { targetRef: RefBattery, scrollIntoView: ScrollBattery } =
-//   useScrollIntoView<HTMLDivElement>()
-// const { targetRef: RefChipset, scrollIntoView: ScrollChipset } =
-//   useScrollIntoView<HTMLDivElement>()
-// const { targetRef: RefCameras, scrollIntoView: ScrollCameras } =
-//   useScrollIntoView<HTMLDivElement>()
-// const { targetRef: RefPrice, scrollIntoView: ScrollPrice } =
-//   useScrollIntoView<HTMLDivElement>()
-
-// const Scrolls = [
-//   ScrollRelease,
-//   ScrollDisplay,
-//   ScrollBattery,
-//   ScrollChipset,
-//   ScrollCameras,
-//   ScrollPrice,
-// ]
-
-// const Refs = [
-//   RefRelease,
-//   RefDisplay,
-//   RefBattery,
-//   RefChipset,
-//   RefCameras,
-//   RefPrice,
-// ]
+export default ModelPage
