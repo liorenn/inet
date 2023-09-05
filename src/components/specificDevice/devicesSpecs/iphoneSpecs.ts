@@ -69,7 +69,9 @@ export default function GetIphoneSpecs(device: iphoneType): categoriesType {
         },
         {
           label: 'Colors',
-          info: device.colors.map((value) => value.Color.name).join(' '),
+          info: device.colors
+            .map((value) => value.Color.hex + '/' + value.Color.name)
+            .join(' '),
         },
       ],
     },

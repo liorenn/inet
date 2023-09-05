@@ -188,6 +188,7 @@ enum BiometricFeature {
   face_id
   touch_id
   passcode
+  device_connection
 }
 
 enum CameraType {

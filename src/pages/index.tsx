@@ -28,7 +28,7 @@ export default function home(): JSX.Element {
                 <Button color='gray' variant='light' size='lg' radius='md'>
                   Find Your Device
                 </Button>
-                <Link href='/comapre'>
+                <Link href='/compare'>
                   <Button color='gray' variant='light' size='lg' radius='md'>
                     Compare Devices
                   </Button>

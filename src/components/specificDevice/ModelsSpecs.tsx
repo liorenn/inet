@@ -1,5 +1,10 @@
 import { useState } from 'react'
-import { useMantineColorScheme } from '@mantine/core'
+import {
+  ColorSwatch,
+  Group,
+  Tooltip,
+  useMantineColorScheme,
+} from '@mantine/core'
 import { Table, Accordion, Grid, Text } from '@mantine/core'
 import { Device, DeviceTypeValue } from '@prisma/client'
 import GetIphoneSpecs, {
@@ -35,6 +40,14 @@ type MergedCategoriesType = {
   }[]
 }[]
 
+type TableProps = {
+  category: {
+    label: string
+    info1: string
+    info2: string
+  }[]
+}
+
 type devicePropetiesType = {
   accordionContents: string[]
   deviceTypeValue: DeviceTypeValue
@@ -59,16 +72,25 @@ const devicePropeties: devicePropetiesType[] = [
 ]
 
 function ModelsSpecs({ device1, device2 }: Props) {
+  const index = devicePropeties.findIndex(
+    (object) => object.deviceTypeValue === device1.deviceTypeValue
+  )
   const [value, setValue] = useState<string[]>([
     'Name',
-    ...devicePropeties[0].accordionContents,
+    ...devicePropeties[index].accordionContents,
   ])
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
+  const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
-  const categories1 = devicePropeties[0].specsFunction(
+  const index1 = devicePropeties.findIndex(
+    (object) => object.deviceTypeValue === device1.deviceTypeValue
+  )
+  const categories1 = devicePropeties[index1].specsFunction(
     device1
   ) as categoriesType
-  const categories2 = devicePropeties[0].specsFunction(
+  const index2 = devicePropeties.findIndex(
+    (object) => object.deviceTypeValue === device2.deviceTypeValue
+  )
+  const categories2 = devicePropeties[index2].specsFunction(
     device2
   ) as categoriesType
   const mergedCategories = mergeCategories(categories1, categories2)
@@ -78,12 +100,10 @@ function ModelsSpecs({ device1, device2 }: Props) {
     additionalCategories: categoriesType
   ): MergedCategoriesType {
     const mergedCategories: MergedCategoriesType = []
-
     mergedCategories.push({
       name: 'Name',
       values: [{ label: 'Name', info1: device1.name, info2: device2.name }],
     })
-
     for (let i = 0; i < originalCategories.length; i++) {
       const originalCategory = originalCategories[i]
       const additionalCategory = additionalCategories[i]
@@ -96,14 +116,12 @@ function ModelsSpecs({ device1, device2 }: Props) {
             info2: additionalCategory.values[index]?.info || '', // Ensure info2 exists
           })
         )
-
         mergedCategories.push({
           name: originalCategory.name,
           values: mergedValues,
         })
       }
     }
-
     return mergedCategories
   }
 
@@ -132,37 +150,71 @@ function ModelsSpecs({ device1, device2 }: Props) {
   )
 }
 
-type TableProps = {
-  category: {
-    label: string
-    info1: string
-    info2: string
-  }[]
-}
-
 function IphoneTable({ category }: TableProps) {
   return (
     <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
       <tbody>
-        {category.map(
-          (element: { label: string; info1: string; info2: string }) => (
-            <tr key={element.label}>
-              <td>
-                <Grid>
-                  <Grid.Col span={4} sx={{ fontWeight: 600, fontSize: 20 }}>
-                    <Text>{element.label}</Text>
-                  </Grid.Col>
-                  <Grid.Col span={4} sx={{ fontWeight: 400, fontSize: 20 }}>
-                    <Text>{element.info1}</Text>
-                  </Grid.Col>
-                  <Grid.Col span={4} sx={{ fontWeight: 400, fontSize: 20 }}>
-                    <Text>{element.info2}</Text>
-                  </Grid.Col>
-                </Grid>
-              </td>
-            </tr>
-          )
-        )}
+        {category.map((element) => (
+          <tr key={element.label}>
+            <td>
+              <Grid>
+                <Grid.Col span={4} sx={{ fontWeight: 600, fontSize: 20 }}>
+                  <Text>{element.label}</Text>
+                </Grid.Col>
+                <Grid.Col span={4} sx={{ fontWeight: 400, fontSize: 20 }}>
+                  <Text>
+                    {element.label === 'Colors' ? (
+                      <Group position='left' spacing='xs'>
+                        {element.info1.split(' ').map(
+                          (color, index) =>
+                            color !== undefined && (
+                              <Tooltip
+                                offset={10}
+                                color='gray'
+                                label={color.split('/')[1]}
+                                key={index}>
+                                <ColorSwatch
+                                  color={color.split('/')[0]}
+                                  withShadow
+                                />
+                              </Tooltip>
+                            )
+                        )}
+                      </Group>
+                    ) : (
+                      element.info1
+                    )}
+                  </Text>
+                </Grid.Col>
+                <Grid.Col span={4} sx={{ fontWeight: 400, fontSize: 20 }}>
+                  <Text>
+                    {element.label === 'Colors' ? (
+                      <Group position='left' spacing='xs'>
+                        {element.info2.split(' ').map(
+                          (color, index) =>
+                            color !== undefined && (
+                              <Tooltip
+                                offset={10}
+                                color='gray'
+                                label={color.split('/')[1]}
+                                key={index}>
+                                <ColorSwatch
+                                  color={color.split('/')[0]}
+                                  withShadow
+                                />
+                              </Tooltip>
+                            )
+                        )}
+                      </Group>
+                    ) : (
+                      element.info2
+                    )}
+                  </Text>
+                </Grid.Col>
+              </Grid>
+            </td>
+          </tr>
+        ))}
       </tbody>
     </Table>
   )

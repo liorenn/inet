@@ -1,5 +1,5 @@
-import { IconSun, IconMoon, IconDevices } from '@tabler/icons'
-import { createStyles, Container, Avatar } from '@mantine/core'
+import { IconSun, IconMoon, IconDevices, IconLanguage } from '@tabler/icons'
+import { createStyles, Container, Avatar, Menu } from '@mantine/core'
 import { Header, Group, Button, Text } from '@mantine/core'
 import { ActionIcon, useMantineColorScheme } from '@mantine/core'
 import Link from 'next/link'
@@ -12,6 +12,8 @@ import { useEffect, useState } from 'react'
 import { CreateNotification } from '../../utils/functions'
 import { trpc } from '../../utils/trpc'
 import { usePublicUrl } from '../../utils/usePublicUrl'
+import { DEFlag, ILFlag, GBFlag } from 'mantine-flagpack'
+import { languagesType, useLanguageStore } from '../../utils/languageStore'
 
 export const Navbar = () => {
   const { classes } = useStyles()
@@ -20,23 +22,24 @@ export const Navbar = () => {
   const supabase = useSupabaseClient()
   const user = useUser()
   const [session, setSession] = useState(useSession())
-  const publicUrl = usePublicUrl((state) => state.publicUrl)
-  const change = usePublicUrl((state) => state.change)
-  const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
-    userId: user?.id,
-  })
-
+  // const publicUrl = usePublicUrl((state) => state.publicUrl)
+  // const change = usePublicUrl((state) => state.change)
+  // const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
+  //   userId: user?.id,
+  // })
+  const { language, setLanguage } = useLanguageStore()
   useEffect(() => {
+    setLanguage((localStorage.getItem('language') as languagesType) ?? 'en')
     supabase.auth.onAuthStateChange((e, session) => {
       setSession(session)
     })
   }, [])
 
-  useEffect(() => {
-    if (PublicUrl) {
-      change(PublicUrl)
-    }
-  }, [PublicUrl])
+  // useEffect(() => {
+  //   if (PublicUrl) {
+  //     change(PublicUrl)
+  //   }
+  // }, [PublicUrl])
 
   async function signOut() {
     const { error } = await supabase.auth.signOut()
@@ -126,10 +129,42 @@ export const Navbar = () => {
                 Sign Out
               </Button>
               <Link href={'/auth/account'}>
-                <Avatar src={publicUrl} radius='md' />
+                {/* <Avatar src={publicUrl} radius='md' /> */}
+                <Avatar radius='md' />
               </Link>
             </>
           )}
+          <Menu shadow='md' width={140} offset={14}>
+            <Menu.Target>
+              <ActionIcon
+                variant='light'
+                radius='md'
+                size='lg'
+                color='gray'
+                onClick={() => {}}
+                title='Change Language'>
+                <IconLanguage size={18} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Label>Sprachen</Menu.Label>
+              <Menu.Item
+                icon={<GBFlag w={38} />}
+                onClick={() => setLanguage('en')}>
+                <Text weight={700}>english</Text>
+              </Menu.Item>
+              <Menu.Item
+                icon={<DEFlag w={38} />}
+                onClick={() => setLanguage('de')}>
+                <Text weight={700}>Deutsch</Text>
+              </Menu.Item>{' '}
+              <Menu.Item
+                icon={<ILFlag w={38} />}
+                onClick={() => setLanguage('he')}>
+                <Text weight={700}>עברית</Text>
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
           <ActionIcon
             variant='light'
             radius='md'

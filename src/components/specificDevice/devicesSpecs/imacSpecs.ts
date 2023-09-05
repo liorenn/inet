@@ -32,15 +32,20 @@ export default function GetImacSpecs(device: imacType): categoriesType {
       name: 'Cameras',
       values: [
         {
-          label: device.cameras[0].cameraType,
-          info: device.cameras[0].megapixel + ' MP',
+          label: 'Main Camera',
+          info: device.cameras[0]
+            ? device.cameras[0].cameraType +
+              ' ' +
+              device.cameras[0].megapixel +
+              ' MP'
+            : 'None',
         },
       ],
     },
     {
       name: 'Features',
       values: [
-        { label: 'Biometrics', info: device.biometrics },
+        { label: 'Biometrics', info: device.biometrics.replace('_', ' ') },
         {
           label: 'Resistance',
           info: device.resistance ? device.resistance.join(' ') : 'none',

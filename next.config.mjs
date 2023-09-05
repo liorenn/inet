@@ -4,16 +4,13 @@
  * This is especially useful for Docker builds.
  */
 /** @type {import("next").NextConfig} */
-const config = {
+import nextTranslate from 'next-translate-plugin'
+
+export default nextTranslate({
   reactStrictMode: true,
   distDir: 'build',
   compiler: {
     styledComponents: true,
   },
   swcMinify: true,
-  i18n: {
-    locales: ['en'],
-    defaultLocale: 'en',
-  },
-}
-export default config
+})

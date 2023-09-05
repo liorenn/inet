@@ -57,13 +57,15 @@ export const getAllDevicesRouter = router({
       }
       return devices
     }),
-  getAlliPhones: publicProcedure.query(async ({ ctx }) => {
-    const iphones = await ctx.prisma.device.findMany({
-      where: { deviceTypeValue: 'iphone' },
-      select: { model: true, name: true, imageAmount: true },
-    })
-    return iphones
-  }),
+  getAllDevices: publicProcedure
+    .input(z.object({ deviceType: z.nativeEnum(DeviceTypeValue) }))
+    .mutation(async ({ ctx, input }) => {
+      const iphones = await ctx.prisma.device.findMany({
+        where: { deviceTypeValue: input.deviceType },
+        select: { model: true, name: true, imageAmount: true },
+      })
+      return iphones
+    }),
   getAlliMacs: publicProcedure.query(async ({ ctx }) => {
     const iphones = await ctx.prisma.device.findMany({
       where: { deviceTypeValue: 'imac' },
