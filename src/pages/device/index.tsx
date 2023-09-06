@@ -3,16 +3,18 @@ import { DeviceTypeValue } from '@prisma/client'
 import { SimpleGrid, Image, Button, Container, Text, Card } from '@mantine/core'
 import { Group, Breadcrumbs, Title, useMantineColorScheme } from '@mantine/core'
 import Head from 'next/head'
+import useTranslation from 'next-translate/useTranslation'
 // /device page
 export default function Device() {
   const { colorScheme } = useMantineColorScheme()
   const devicesTypes = Object.getOwnPropertyNames(DeviceTypeValue)
   const dark = colorScheme === 'dark'
+  const { t } = useTranslation('common')
 
   return (
     <>
       <Head>
-        <title>All Devices</title>
+        <title>{t('allDevices')}</title>
       </Head>
       <Container size='lg'>
         <Group
@@ -25,11 +27,11 @@ export default function Device() {
           <Breadcrumbs separator='>'>
             <Link href={'/'} style={{ textDecoration: 'none' }}>
               <Text size='xl' color='dimmed'>
-                Home
+                {t('home')}
               </Text>
             </Link>
           </Breadcrumbs>
-          <Title order={2}>All Devices</Title>
+          <Title order={2}>{t('allDevices')}</Title>
         </Group>
         <SimpleGrid cols={3}>
           {devicesTypes.map((devicesType) => (

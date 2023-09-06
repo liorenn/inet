@@ -8,6 +8,7 @@ import useTranslation from 'next-translate/useTranslation'
 function ModelHeader({ device }: { device: Device }) {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const { t } = useTranslation('common')
+  const { t: devicesT } = useTranslation('devices')
   const dark = colorScheme === 'dark'
   const router = useRouter()
   const deviceType = router.asPath.split('/')[2]
@@ -35,7 +36,7 @@ function ModelHeader({ device }: { device: Device }) {
           </Link>
         ))}
       </Breadcrumbs>
-      <Title order={2}>{device.name} Specs</Title>
+      <Title order={2}>{device.name + ' ' + devicesT('specs')}</Title>
     </Group>
   )
 }

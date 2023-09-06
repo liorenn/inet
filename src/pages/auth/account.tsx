@@ -12,7 +12,8 @@ import { useViewportSize } from '@mantine/hooks'
 import { useSession, useUser } from '@supabase/auth-helpers-react'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import UploadAvatar from '../../components/layout/UploadAvatar'
-import { usePublicUrl } from '../../utils/usePublicUrl'
+import usePublicUrl from '../../utils/usePublicUrl'
+import useTranslation from 'next-translate/useTranslation'
 
 export default function account() {
   const session = useSession()
@@ -24,11 +25,8 @@ export default function account() {
   const { data: UserDetails } = trpc.auth.getUserDetails.useQuery({
     id: user?.id,
   })
-  // const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
-  //   userId: user?.id,
-  // })
-  const publicUrl = usePublicUrl((state) => state.publicUrl)
-  const change = usePublicUrl((state) => state.change)
+  const { t } = useTranslation('auth')
+  const { change, publicUrl } = usePublicUrl()
   const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' })
   const [IsHovered, setIsHovered] = useState<boolean>(false)
   const [email, setEmail] = useState<string>('')
@@ -64,18 +62,13 @@ export default function account() {
     }
   }, [UserDetails])
 
-  useEffect(() => {
-    const url = localStorage.getItem('publicUrl')
-    if (url != null) {
-      change(url)
-    }
-  }, [])
-
-  // useEffect(() => {
-  //   if (PublicUrl) {
-  //     change(PublicUrl)
-  //   }
-  // }, [PublicUrl])
+  const translations = [
+    { input: 'username', translation: t('username') },
+    { input: 'name', translation: t('name') },
+    { input: 'email', translation: t('email') },
+    { input: 'password', translation: t('password') },
+    { input: 'phone', translation: t('phone') },
+  ]
 
   async function UpdateDestail(
     detail: 'email' | 'username' | 'name' | 'password' | 'phone'
@@ -99,7 +92,12 @@ export default function account() {
       {
         onSuccess() {
           setUpdatedAt(dateFormmater.format(new Date()))
-          CreateNotification(detail + ' Updated Successfully', 'green')
+          CreateNotification(
+            translations.find((value) => value.input === detail)?.translation +
+              ' ' +
+              t('updatedSuccessfully'),
+            'green'
+          )
           if (detail === 'username') {
             setUsernameLabel(username)
           }
@@ -112,14 +110,14 @@ export default function account() {
   }
 
   if (!(user && session)) {
-    return <>login to view page</>
+    return <>{t('accessDeniedMessageSignIn')}</>
   }
 
   if (!UserDetails) {
     return (
       <>
         <Head>
-          <title>Account</title>
+          <title>{t('account')}</title>
         </Head>
         <Center>
           <Loader color='gray' size={120} variant='dots' mt={height / 3} />
@@ -131,7 +129,7 @@ export default function account() {
   return (
     <>
       <Head>
-        <title>Account</title>
+        <title>{t('account')}</title>
       </Head>
       <Container size='xl'>
         <Group position='apart' sx={{ padding: 20, marginBottom: 30 }}>
@@ -160,14 +158,14 @@ export default function account() {
               weight={500}
               color='dimmed'
               align='right'>
-              Created at: {created_at}
+              {t('createdAt') + ' ' + created_at}
             </Text>
             <Text
               sx={{ fontSize: 18 }}
               weight={500}
               color='dimmed'
               align='right'>
-              Updated at: {updatedAt}
+              {t('updatedAt') + ' ' + updatedAt}
             </Text>
             {/* <Text sx={{ fontSize: 18 }} weight={500} color='dimmed' align='right'>
               comments commented: 0
@@ -177,10 +175,10 @@ export default function account() {
         <Stack>
           <div>
             <Text sx={{ fontSize: 28 }} weight={700}>
-              Account Information
+              {t('accountInformation')}
             </Text>
             <Text sx={{ fontSize: 18 }} weight={500}>
-              update and change your account information
+              {t('accountInformationDescription')}
             </Text>
           </div>
           <Divider />
@@ -189,11 +187,13 @@ export default function account() {
               sx={{ fontSize: 18, paddingTop: 6 }}
               weight={500}
               color='dimmed'>
-              Username
+              {t('username')}
             </Text>
             <TextInput
               onChange={(e) => setUsername(e.target.value)}
-              placeholder='Enter Your Username...'
+              placeholder={t('placeholders.inputPlaceholder', {
+                input: t('username'),
+              })}
               value={username}
               radius='md'
               size='md'
@@ -204,7 +204,7 @@ export default function account() {
                 weight={500}
                 align='right'
                 color='green'>
-                Update
+                {t('update')}
               </Text>
             </UnstyledButton>
           </SimpleGrid>
@@ -214,11 +214,13 @@ export default function account() {
               sx={{ fontSize: 18, paddingTop: 6 }}
               weight={500}
               color='dimmed'>
-              Name
+              {t('name')}
             </Text>
             <TextInput
               onChange={(e) => setName(e.target.value)}
-              placeholder='Enter Your Name...'
+              placeholder={t('placeholders.inputPlaceholder', {
+                input: t('name'),
+              })}
               value={name}
               radius='md'
               size='md'
@@ -229,7 +231,7 @@ export default function account() {
                 weight={500}
                 align='right'
                 color='green'>
-                Update
+                {t('update')}
               </Text>
             </UnstyledButton>
           </SimpleGrid>
@@ -239,11 +241,13 @@ export default function account() {
               sx={{ fontSize: 18, paddingTop: 6 }}
               weight={500}
               color='dimmed'>
-              Email
+              {t('email')}
             </Text>
             <TextInput
               onChange={(e) => setEmail(e.target.value)}
-              placeholder='Enter Your Email...'
+              placeholder={t('placeholders.inputPlaceholder', {
+                input: t('email'),
+              })}
               value={email}
               radius='md'
               size='md'
@@ -254,7 +258,7 @@ export default function account() {
                 weight={500}
                 align='right'
                 color='green'>
-                Update
+                {t('update')}
               </Text>
             </UnstyledButton>
           </SimpleGrid>
@@ -264,11 +268,13 @@ export default function account() {
               sx={{ fontSize: 18, paddingTop: 6 }}
               weight={500}
               color='dimmed'>
-              Phone
+              {t('phone')}
             </Text>
             <TextInput
               onChange={(e) => setPhone(e.target.value)}
-              placeholder='Enter Your Phone...'
+              placeholder={t('placeholders.inputPlaceholder', {
+                input: t('phone'),
+              })}
               value={phone}
               radius='md'
               size='md'
@@ -279,7 +285,7 @@ export default function account() {
                 weight={500}
                 align='right'
                 color='green'>
-                Update
+                {t('update')}
               </Text>
             </UnstyledButton>
           </SimpleGrid>
@@ -289,11 +295,13 @@ export default function account() {
               sx={{ fontSize: 18, paddingTop: 6 }}
               weight={500}
               color='dimmed'>
-              Password
+              {t('password')}
             </Text>
             <PasswordInput
               onChange={(e) => setPassword(e.target.value)}
-              placeholder='Enter Your New Password...'
+              placeholder={t('placeholders.inputPlaceholder', {
+                input: t('password'),
+              })}
               value={password}
               radius='md'
               size='md'
@@ -304,7 +312,7 @@ export default function account() {
                 weight={500}
                 align='right'
                 color='green'>
-                Update
+                {t('update')}
               </Text>
             </UnstyledButton>
           </SimpleGrid>

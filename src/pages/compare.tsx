@@ -16,6 +16,7 @@ import { airpodsType, imacType, iphoneType } from '../utils/deviceTypes'
 import { trpc } from '../utils/trpc'
 import DevicePhotos from '../components/allDevices/DevicePhotos'
 import { DeviceTypeValue } from '@prisma/client'
+import useTranslation from 'next-translate/useTranslation'
 
 export default function compare() {
   const { height } = useViewportSize()
@@ -35,6 +36,7 @@ export default function compare() {
   const airpodsMutation = trpc.UniqueDevice.getAirpodsMutation.useMutation()
   const imacMutation = trpc.UniqueDevice.getiMacMutation.useMutation()
   const iphoneMutation = trpc.UniqueDevice.getiPhoneMutation.useMutation()
+  const { t } = useTranslation('common')
 
   const devicesQueries = [
     {
@@ -103,7 +105,7 @@ export default function compare() {
   return (
     <>
       <Head>
-        <title>compare</title>
+        <title>{t('compare')}</title>
       </Head>
       <Container size='lg'>
         <SegmentedControl
@@ -129,14 +131,18 @@ export default function compare() {
         />
         <Group grow position='apart' mb='xs' mt='sm'>
           <Select
-            label={'Select ' + value + ' For Comparison'}
+            label={t('placeholders.selectDevice', {
+              input: value,
+            })}
             placeholder='Pick one'
             value={value1}
             onChange={setValue1}
             data={devicesList}
           />
           <Select
-            label={'Select ' + value + ' For Comparison'}
+            label={t('placeholders.selectDevice', {
+              input: value,
+            })}
             placeholder='Pick one'
             value={value2}
             onChange={setValue2}

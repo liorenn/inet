@@ -4,6 +4,7 @@ import { Modal, useMantineColorScheme, Container } from '@mantine/core'
 import { useMantineTheme, ActionIcon, Image } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 import { getDeviceType } from '../../utils/functions'
+import useTranslation from 'next-translate/useTranslation'
 
 type Props = {
   device: { model: string; name: string; imageAmount: number }
@@ -18,7 +19,7 @@ function DevicePhotos({ device, miniphotos }: Props) {
   const [opened, setOpened] = useState(false)
   const { colorScheme } = useMantineColorScheme()
   const { width } = useViewportSize()
-  const theme = useMantineTheme()
+  const { t } = useTranslation('devices')
   const dark = colorScheme === 'dark'
   const images_src = []
   for (let i = 0; i < device.imageAmount; i++) {
@@ -52,7 +53,7 @@ function DevicePhotos({ device, miniphotos }: Props) {
           size='85%'
           opened={opened}
           radius='md'
-          title={device.name + ' Photos'}
+          title={device.name + ' ' + t('photos')}
           onClose={() => setOpened(false)}>
           <Center>
             <Image

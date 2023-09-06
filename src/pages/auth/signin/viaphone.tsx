@@ -8,6 +8,7 @@ import { useForm, SubmitHandler, SubmitErrorHandler } from 'react-hook-form'
 import { trpc } from '../../../utils/trpc'
 import { CreateNotification } from '../../../utils/functions'
 import Head from 'next/head'
+import useTranslation from 'next-translate/useTranslation'
 
 type Inputs = {
   phone: string
@@ -18,6 +19,9 @@ export default function viaphone() {
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
+  const { t } = useTranslation('auth')
+  const { t: commonT } = useTranslation('common')
+
   useEffect(() => {
     if (session) {
       router.push('/')
@@ -43,56 +47,41 @@ export default function viaphone() {
       phone: fields.phone,
     })
     if (!error) {
-      CreateNotification('Signed in successfully', 'green')
+      CreateNotification(t('signedInSuccessfully'), 'green')
     } else {
       console.log(error)
-      CreateNotification('Error has accured', 'red')
+      CreateNotification(t('errorAccured'), 'red')
       reset()
     }
   }
 
-  function GetPhoneError(): string {
-    const error = errors.phone?.type
-    if (error === 'required') return 'Enter Email Field'
-    if (error === 'pattern') return 'Wrong Pattern'
-    return error + ' Error'
-  }
-  const onError: SubmitErrorHandler<Inputs> = (errors) => {
-    console.log(errors)
-  }
-
   if (session) {
-    return <>you are already logged in</>
+    return <>{t('accessDeniedMessageSignOut')}</>
   }
 
   return (
     <>
       <Head>
-        <title>Sign In By Phone</title>
+        <title>{t('signInByPhone')}</title>
       </Head>
       <Container size={420} my={40}>
-        <Title
-          align='center'
-          sx={(theme) => ({
-            fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-            fontWeight: 900,
-          })}>
-          Welcome back!
-        </Title>
+        <Title align='center'>{t('welcomeBack')}</Title>
         <Text color='dimmed' size='sm' align='center' mt={5}>
-          Do not have an account yet? <Link href='/signup'>Create Account</Link>
+          {t('dontHaveAnAccount')}{' '}
+          <Link href='/auth/signup'>{t('createAnAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
-          <form onSubmit={handleSubmit(onSubmit, onError)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <TextInput
-              label='Phone'
+              label={t('phone')}
               defaultValue='+9720548853393'
-              placeholder='Your Email...'
-              error={errors.phone ? GetPhoneError() : ''}
+              placeholder={t('placeholders.inputPlaceholder', {
+                input: t('phone'),
+              })}
+              error={errors.phone && t('wrongPattern')}
               {...register('phone', {
                 required: true,
-                //pattern: /^\+\d{13}$/,
-                //+9720548853393
+                pattern: /^\+\d{13}$/,
               })}
             />
             <Button
@@ -101,20 +90,20 @@ export default function viaphone() {
               fullWidth
               mt='lg'
               type='submit'>
-              Sign In
+              {commonT('signIn')}
             </Button>
           </form>
           <SimpleGrid cols={2}>
             <Link href={'/auth/signin'} style={{ textDecoration: 'none' }}>
               <Button color='gray' variant='light' fullWidth mt='lg'>
-                Via Credentials
+                {t('viaCredentials')}
               </Button>
             </Link>
             <Link
               href={'/auth/signin/viaemail'}
               style={{ textDecoration: 'none' }}>
               <Button color='gray' variant='light' fullWidth mt='lg' mb='sm'>
-                Via Email
+                {t('viaPhone')}
               </Button>
             </Link>
           </SimpleGrid>

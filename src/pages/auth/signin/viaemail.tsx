@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react'
 import { Title, Text, Container, Button, SimpleGrid } from '@mantine/core'
 import { TextInput, Paper } from '@mantine/core'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { useForm, SubmitHandler, SubmitErrorHandler } from 'react-hook-form'
-import { trpc } from '../../../utils/trpc'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import { CreateNotification } from '../../../utils/functions'
 import Head from 'next/head'
+import useTranslation from 'next-translate/useTranslation'
 
 type Inputs = {
   email: string
@@ -17,7 +17,9 @@ export default function viaemail() {
   const router = useRouter()
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
-  const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
+  const { t } = useTranslation('auth')
+  const { t: commonT } = useTranslation('common')
+
   useEffect(() => {
     if (session) {
       router.push('/')
@@ -45,54 +47,36 @@ export default function viaemail() {
       },
     })
     if (!error) {
-      CreateNotification(
-        'Check Your Email To Sign In at ' + fields.email,
-        'yellow'
-      )
+      CreateNotification(t('checkEmail') + ' ' + fields.email, 'yellow')
     } else {
-      CreateNotification('Error has accured', 'red')
+      CreateNotification(t('errorAccured'), 'red')
     }
   }
 
-  function GetEmailError(): string {
-    const error = errors.email?.type
-    if (error === 'required') return 'Enter Email Field'
-    if (error === 'pattern') return 'Wrong Pattern'
-    return error + ' Error'
-  }
-
-  const onError: SubmitErrorHandler<Inputs> = (errors) => {
-    console.log(errors)
-  }
-
   if (session) {
-    return <>you are already logged in</>
+    return <>{t('accessDeniedMessageSignOut')}</>
   }
 
   return (
     <>
       <Head>
-        <title>Sign In By Email</title>
+        <title>{t('signInByEmail')}</title>
       </Head>
       <Container size={420} my={40}>
-        <Title
-          align='center'
-          sx={(theme) => ({
-            fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-            fontWeight: 900,
-          })}>
-          Welcome back!
-        </Title>
+        <Title align='center'>{t('welcomeBack')}</Title>
         <Text color='dimmed' size='sm' align='center' mt={5}>
-          Do not have an account yet? <Link href='/signup'>Create Account</Link>
+          {t('dontHaveAnAccount')}{' '}
+          <Link href='/auth/signup'>{t('createAnAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
-          <form onSubmit={handleSubmit(onSubmit, onError)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <TextInput
-              label='Email'
+              label={t('email')}
               defaultValue='lior.oren06@gmail.com'
-              placeholder='Your Email...'
-              error={errors.email ? GetEmailError() : ''}
+              placeholder={t('placeholders.inputPlaceholder', {
+                input: t('email'),
+              })}
+              error={errors.email && t('wrongPattern')}
               {...register('email', {
                 required: true,
                 pattern: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
@@ -104,20 +88,20 @@ export default function viaemail() {
               fullWidth
               mt='lg'
               type='submit'>
-              Sign In
+              {commonT('signIn')}
             </Button>
           </form>
           <SimpleGrid cols={2}>
             <Link href={'/auth/signin'} style={{ textDecoration: 'none' }}>
               <Button color='gray' variant='light' fullWidth mt='lg'>
-                Via Credentials
+                {t('viaCredentials')}
               </Button>
             </Link>
             <Link
               href={'/auth/signin/viaphone'}
               style={{ textDecoration: 'none' }}>
               <Button color='gray' variant='light' fullWidth mt='lg' mb='sm'>
-                Via Phone
+                {t('viaPhone')}
               </Button>
             </Link>
           </SimpleGrid>

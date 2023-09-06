@@ -2,8 +2,13 @@
   "locales": ["en", "de", "he"],
   "defaultLocale": "en",
   "pages": {
-    "*": ["common"],
+    "*": ["common", "auth", "devices"],
     "/": ["home", "example"],
     "/about": ["about"]
+  },
+  "namespaces": {
+    "auth": {
+      "createAnAccount": true
+    }
   }
 }

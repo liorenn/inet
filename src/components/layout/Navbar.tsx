@@ -26,6 +26,7 @@ export const Navbar = () => {
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
   const { t, lang } = useTranslation('common')
+  const { t: authT } = useTranslation('auth')
   const { publicUrl, change } = usePublicUrl()
   const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
     userId: user?.id,
@@ -46,7 +47,7 @@ export const Navbar = () => {
   async function signOut() {
     const { error } = await supabase.auth.signOut()
     if (!error) {
-      CreateNotification('Signed Out Successfully', 'green')
+      CreateNotification(authT('signedOutSuccessfully'), 'green')
     }
   }
 
@@ -60,8 +61,8 @@ export const Navbar = () => {
           <Link href={'/'}>
             <Button variant='subtle' color={'gray.' + (dark ? '1' : '9')}>
               <Group spacing='xs'>
-                <Text style={{ fontSize: '30px', fontWeight: 500 }} mb='xs'>
-                  Inet
+                <Text style={{ fontSize: '22px', fontWeight: 500 }} mb='xs'>
+                  {t('inet')}
                 </Text>
                 <IconDevices height={30} width={30} />
               </Group>
@@ -145,7 +146,7 @@ export const Navbar = () => {
                 size='lg'
                 color='gray'
                 onClick={() => {}}
-                title='Change Language'>
+                title={t('changeLanguage')}>
                 <IconLanguage size={18} />
               </ActionIcon>
             </Menu.Target>
@@ -191,7 +192,7 @@ export const Navbar = () => {
             size='lg'
             color='gray'
             onClick={() => toggleColorScheme()}
-            title='Toggle color scheme'>
+            title={t('toggleColorScheme')}>
             {dark ? <IconSun size={18} /> : <IconMoon size={18} />}
           </ActionIcon>
         </Group>

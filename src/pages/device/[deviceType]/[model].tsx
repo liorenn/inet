@@ -11,6 +11,7 @@ import Head from 'next/head'
 import ModelComments from '../../../components/specificDevice/ModelComments'
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import { useState } from 'react'
+import useTranslation from 'next-translate/useTranslation'
 
 enum queriesNames {
   getiPhone = 'getiPhone',
@@ -62,15 +63,15 @@ function ModelPage() {
   const deviceType = router.asPath.split('/')[2] as DeviceTypeValue
   const [ratingValue, setRatingValue] = useState(0)
   const [commentsAmout, setCommentsAmout] = useState(0)
-
+  const { t } = useTranslation('common')
   if (devicesArr && !isExistInArr(devicesArr, deviceModel)) {
     return (
       <Container size='lg'>
-        The Device You Are Looking For Doesnt Exist
+        {t('deviceDoesntExist')}
         <br />
         <Link href={'/'}>
           <Button color='gray' size='lg' radius='md' mt='lg' variant='light'>
-            Go To Home Page
+            {t('goToHomePage')}
           </Button>
         </Link>
       </Container>

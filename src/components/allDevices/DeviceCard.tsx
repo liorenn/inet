@@ -7,6 +7,7 @@ import { useUser } from '@supabase/auth-helpers-react'
 import { useEffect, useState } from 'react'
 import { CreateNotification } from '../../utils/functions'
 import { allProperties } from '../../pages/device/[deviceType]/index'
+import useTranslation from 'next-translate/useTranslation'
 
 type AppProps = {
   device: {
@@ -32,6 +33,7 @@ export default function DeviceCard({
   handleIsInlist,
 }: AppProps) {
   const user = useUser()
+  const { t } = useTranslation('devices')
 
   return (
     <Card shadow='lg' p='lg' radius='md'>
@@ -58,7 +60,7 @@ export default function DeviceCard({
               radius='md'
               size='md'
               fullWidth>
-              More Details
+              {t('moreDetails')}
             </Button>
           </Link>
         </Grid.Col>
@@ -71,7 +73,7 @@ export default function DeviceCard({
               size='md'
               onClick={() => handleIsInlist(device, isInList, index)}
               fullWidth>
-              {isInList ? 'Remove From List' : 'Add To List'}
+              {isInList ? t('remove') : t('add')}
             </Button>
           ) : (
             <Button
@@ -81,7 +83,7 @@ export default function DeviceCard({
               size='md'
               disabled
               fullWidth>
-              log in to add
+              {t('signInToAdd')}
             </Button>
           )}
         </Grid.Col>

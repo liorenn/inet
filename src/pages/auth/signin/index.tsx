@@ -8,6 +8,7 @@ import { useForm, SubmitHandler, SubmitErrorHandler } from 'react-hook-form'
 import { trpc } from '../../../utils/trpc'
 import { CreateNotification } from '../../../utils/functions'
 import Head from 'next/head'
+import useTranslation from 'next-translate/useTranslation'
 
 type Inputs = {
   email: string
@@ -19,6 +20,9 @@ export default function signin() {
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
+  const { t } = useTranslation('auth')
+  const { t: commonT } = useTranslation('common')
+
   useEffect(() => {
     if (session) {
       router.push('/')
@@ -53,13 +57,13 @@ export default function signin() {
               password: fields.password,
             })
             if (!error) {
-              CreateNotification('Signed in successfully', 'green')
+              CreateNotification(t('signedInSuccessfully'), 'green')
             } else {
-              CreateNotification('Error has accured', 'red')
+              CreateNotification(t('errorAccured'), 'red')
               reset()
             }
           } else {
-            CreateNotification('User Does Not Exist', 'red')
+            CreateNotification(t('userDoesNotExist'), 'red')
             reset()
           }
         },
@@ -67,62 +71,42 @@ export default function signin() {
     )
   }
 
-  const GetPasswordError = (): string => {
-    const error = errors.password?.type
-    if (error === 'required') return 'Enter Password Field'
-    if (error === 'pattern') return 'Wrong Pattern'
-    return error + ' Error'
-  }
-
-  function GetEmailError(): string {
-    const error = errors.email?.type
-    if (error === 'required') return 'Enter Email Field'
-    if (error === 'pattern') return 'Wrong Pattern'
-    return error + ' Error'
-  }
-  const onError: SubmitErrorHandler<Inputs> = (errors) => {
-    console.log(errors)
-  }
-
   if (session) {
-    return <>you are already logged in</>
+    return <>{t('accessDeniedMessageSignOut')}</>
   }
 
   return (
     <>
       <Head>
-        <title>Sign In</title>
+        <title>{commonT('signIn')}</title>
       </Head>
       <Container size={420} my={40}>
-        <Title
-          align='center'
-          sx={(theme) => ({
-            fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-            fontWeight: 900,
-          })}>
-          Welcome back!
-        </Title>
+        <Title align='center'>{t('welcomeBack')}</Title>
         <Text color='dimmed' size='sm' align='center' mt={5}>
-          Do not have an account yet?{' '}
-          <Link href='/auth/signup'>Create Account</Link>
+          {t('dontHaveAnAccount')}{' '}
+          <Link href='/auth/signup'>{t('createAnAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
-          <form onSubmit={handleSubmit(onSubmit, onError)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <TextInput
-              label='Email'
+              label={t('email')}
               defaultValue='lior.oren06@gmail.com'
-              placeholder='Your Email...'
-              error={errors.email ? GetEmailError() : ''}
+              placeholder={t('placeholders.inputPlaceholder', {
+                input: t('email'),
+              })}
+              error={errors.email && t('wrongPattern')}
               {...register('email', {
                 required: true,
                 pattern: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
               })}
             />
             <PasswordInput
-              label='Password'
+              label={t('password')}
               defaultValue='123456'
-              placeholder='Your password...'
-              error={errors.password ? GetPasswordError() : ''}
+              placeholder={t('placeholders.inputPlaceholder', {
+                input: t('password'),
+              })}
+              error={errors.password && t('wrongPattern')}
               mt='md'
               {...register('password', {
                 required: true,
@@ -135,7 +119,7 @@ export default function signin() {
               fullWidth
               mt='lg'
               type='submit'>
-              Sign In
+              {commonT('signIn')}
             </Button>
           </form>
           <SimpleGrid cols={2}>
@@ -143,14 +127,14 @@ export default function signin() {
               href={'/auth/signin/viaemail'}
               style={{ textDecoration: 'none' }}>
               <Button color='gray' variant='light' fullWidth mt='lg'>
-                Via Email
+                {t('viaEmail')}
               </Button>
             </Link>
             <Link
               href={'/auth/signin/viaphone'}
               style={{ textDecoration: 'none' }}>
               <Button color='gray' variant='light' fullWidth mt='lg' mb='sm'>
-                Via Phone
+                {t('viaPhone')}
               </Button>
             </Link>
           </SimpleGrid>

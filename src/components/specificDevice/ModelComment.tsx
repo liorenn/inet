@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { trpc } from '../../utils/trpc'
 import { CalcAverageRating, CreateNotification } from '../../utils/functions'
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
+import useTranslation from 'next-translate/useTranslation'
 
 type Props = {
   comment: Comment
@@ -28,12 +29,14 @@ function ModelComment({
 }: Props) {
   const [rating, setRating] = useState(comment.Rating)
   const { mutate } = trpc.auth.deleteComment.useMutation()
+  const { t } = useTranslation('devices')
+
   function DeleteComment() {
     mutate(
       { commentId: comment.id },
       {
         onSuccess() {
-          CreateNotification('Comment deleted successfully', 'green')
+          CreateNotification(t('commentDeletedSuccessfully'), 'green')
         },
       }
     )
@@ -75,20 +78,20 @@ function ModelComment({
           </div>
         </Group>
         <Group sx={{ padding: 10 }}>
-          <Rating value={rating} onChange={setRating} />
-          <Tooltip label='reply'>
+          <Rating readOnly value={rating} onChange={setRating} />
+          <Tooltip color='gray' label={t('reply')}>
             <ActionIcon color='dark'>
               <IconCornerUpLeft />
             </ActionIcon>
           </Tooltip>
           {comment.username === username && (
             <>
-              <Tooltip label='edit'>
+              <Tooltip color='gray' label={t('edit')}>
                 <ActionIcon color='dark'>
                   <IconPencil />
                 </ActionIcon>
               </Tooltip>
-              <Tooltip label='delete'>
+              <Tooltip color='gray' label={t('delete')}>
                 <ActionIcon color='dark' onClick={DeleteComment}>
                   <IconTrash />
                 </ActionIcon>

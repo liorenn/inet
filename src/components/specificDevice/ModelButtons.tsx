@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { trpc } from '../../utils/trpc'
 import { Device } from '@prisma/client'
 import { boolean } from 'zod'
+import useTranslation from 'next-translate/useTranslation'
 
 type Props = {
   device: Device
@@ -20,6 +21,7 @@ function ModelButtons({ device }: Props) {
     deviceModel: device.model,
     userId: user?.id,
   })
+  const { t } = useTranslation('devices')
 
   useEffect(() => {
     if (data) {
@@ -29,10 +31,9 @@ function ModelButtons({ device }: Props) {
 
   function handleIsInlist(device: allProperties, isInList: boolean) {
     if (user) {
-      const message =
-        'device has been successfully ' +
-        (isInList ? 'removed from' : 'added to') +
-        ' list'
+      const message = isInList
+        ? t('removeDeviceErrorMessage')
+        : t('removeDeviceSuccessMessage')
       CreateNotification(message, 'green')
       userDevicesMutation.mutate(
         {
@@ -42,16 +43,15 @@ function ModelButtons({ device }: Props) {
         },
         {
           onError: () => {
-            const message =
-              'there has been an error ' +
-              (isInList ? 'removing' : 'adding') +
-              ' device to list'
+            const message = isInList
+              ? t('removeDeviceErrorMessage')
+              : t('addDeviceErrorMessage')
             CreateNotification(message, 'red')
           },
         }
       )
       setIsInList(!isInList)
-    } else CreateNotification('Sign in To Add to List', 'green')
+    } else CreateNotification(t('signInToAdd'), 'green')
   }
 
   return (
@@ -65,9 +65,9 @@ function ModelButtons({ device }: Props) {
       fullWidth>
       {isInList !== undefined
         ? isInList === true
-          ? 'Remove From List'
-          : 'Add To List'
-        : 'Loading...'}
+          ? t('remove')
+          : t('add')
+        : t('loading')}
     </Button>
   )
 }

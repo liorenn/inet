@@ -3,6 +3,7 @@ import { useMantineColorScheme } from '@mantine/core'
 import { Group, Breadcrumbs, Text, Anchor, Title } from '@mantine/core'
 import Link from 'next/link'
 import { DeviceTypeValue } from '@prisma/client'
+import useTranslation from 'next-translate/useTranslation'
 
 export default function DeviceHeader({
   deviceType,
@@ -13,9 +14,9 @@ export default function DeviceHeader({
   const dark = colorScheme === 'dark'
   const router = useRouter()
   const model_type = router.asPath.split('/')[1]
-
+  const { t } = useTranslation('common')
   const links = [
-    { name: 'All Devices', href: '/device' },
+    { name: t('allDevices'), href: '/device' },
     { name: deviceType, href: '/device/' + deviceType },
   ]
 
@@ -36,7 +37,7 @@ export default function DeviceHeader({
           </Link>
         ))}
       </Breadcrumbs>
-      <Title order={2}>All {deviceType}</Title>
+      <Title order={2}>{t('all') + ' ' + deviceType}</Title>
     </Group>
   )
 }

@@ -10,6 +10,7 @@ import { CreateNotification } from '../../../utils/functions'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import useTranslation from 'next-translate/useTranslation'
 
 export interface allProperties {
   model: string
@@ -24,7 +25,7 @@ function deviceTypePage() {
   ] as DeviceTypeValue
   const { height } = useViewportSize()
   const user = useUser()
-
+  const { t } = useTranslation('devices')
   const [areInList, setAreInList] = useState<{ isInList: boolean }[]>([])
   const userDevicesMutation = trpc.auth.handleDeviceToUser.useMutation()
   const { data } = trpc.AllDevices.getAllDevicesPropertiesExtra.useQuery({
@@ -48,10 +49,9 @@ function deviceTypePage() {
     index: number
   ) {
     if (user) {
-      const message =
-        'device has been successfully ' +
-        (isInList ? 'removed from' : 'added to') +
-        ' list'
+      const message = isInList
+        ? t('removeDeviceErrorMessage')
+        : t('removeDeviceSuccessMessage')
       CreateNotification(message, 'green')
       userDevicesMutation.mutate(
         {
@@ -61,10 +61,9 @@ function deviceTypePage() {
         },
         {
           onError: () => {
-            const message =
-              'there has been an error ' +
-              (isInList ? 'removing' : 'adding') +
-              ' device to list'
+            const message = isInList
+              ? t('removeDeviceErrorMessage')
+              : t('addDeviceErrorMessage')
             CreateNotification(message, 'red')
           },
         }
@@ -72,7 +71,7 @@ function deviceTypePage() {
       const newArr = areInList
       newArr[index].isInList = !isInList
       setAreInList(newArr)
-    } else CreateNotification('Sign in To Add to List', 'green')
+    } else CreateNotification(t('signInToAdd'), 'green')
   }
 
   if (data && areInList.length > 0 && areInList[0]?.isInList !== undefined) {

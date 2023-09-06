@@ -6,6 +6,7 @@ import { trpc } from '../../utils/trpc'
 import { User, useUser } from '@supabase/auth-helpers-react'
 import { CreateNotification } from '../../utils/functions'
 import { devicesPropertiesArrType } from '../../trpc/routers/auth'
+import useTranslation from 'next-translate/useTranslation'
 
 type AppProps = {
   device: {
@@ -26,9 +27,10 @@ export default function ListCard({
 }: AppProps) {
   const user = useUser()
   const userDevicesMutation = trpc.auth.handleDeviceToUser.useMutation()
+  const { t } = useTranslation('devices')
 
   function RemoveFromList() {
-    CreateNotification('device has been successfully removed from', 'green')
+    CreateNotification(t('removeDeviceSuccessMessage'), 'green')
     if (setDevicesArr && devicesArr) {
       const newArr = devicesArr.filter((value) => value.model !== device.model)
       setDevicesArr([...newArr])
@@ -42,10 +44,7 @@ export default function ListCard({
         },
         {
           onError: () => {
-            CreateNotification(
-              'there has been an error removing device to list',
-              'red'
-            )
+            CreateNotification(t('removeDeviceErrorMessage'), 'red')
           },
         }
       )
@@ -77,7 +76,7 @@ export default function ListCard({
               radius='md'
               size='md'
               fullWidth>
-              More Details
+              {t('moreDetails')}
             </Button>
           </Link>
         </Grid.Col>
@@ -89,76 +88,10 @@ export default function ListCard({
             size='md'
             onClick={RemoveFromList}
             fullWidth>
-            {'Remove From List'}
+            {t('remove')}
           </Button>
         </Grid.Col>
       </Grid>
     </Card>
   )
-}
-
-{
-  /* <Grid>
-          <Grid.Col span={3}>
-            <Grid>
-              <Grid.Col span={6}>
-                {' '}
-                <ActionIcon color='blue' size='xl' variant='light'>
-                  2018
-                </ActionIcon>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                {' '}
-                <ActionIcon color='blue' size='xl' variant='light'>
-                  <Clock />
-                </ActionIcon>
-              </Grid.Col>
-            </Grid>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Grid>
-              <Grid.Col span={6}>
-                {' '}
-                <ActionIcon color='blue' size='xl' variant='light'>
-                  6.1 in
-                </ActionIcon>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                {' '}
-                <ActionIcon color='blue' size='xl' variant='light'>
-                  <DeviceMobile />
-                </ActionIcon>
-              </Grid.Col>
-            </Grid>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Grid>
-              <Grid.Col span={6}>
-                <ActionIcon color='blue' size='xl' variant='light'>
-                  3095
-                </ActionIcon>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                {' '}
-                <ActionIcon color='blue' size='xl' variant='light'>
-                  <Battery3 />
-                </ActionIcon>
-              </Grid.Col>
-            </Grid>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Grid>
-              <Grid.Col span={6}>
-                <ActionIcon color='blue' size='xl' variant='light'>
-                  999$
-                </ActionIcon>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <ActionIcon color='blue' size='xl' variant='light'>
-                  <Coin />
-                </ActionIcon>
-              </Grid.Col>
-            </Grid>
-          </Grid.Col>
-        </Grid> */
 }

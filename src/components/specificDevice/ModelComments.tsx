@@ -7,6 +7,7 @@ import { Comment, Device, User } from '@prisma/client'
 import { trpc } from '../../utils/trpc'
 import { CalcAverageRating, CreateNotification } from '../../utils/functions'
 import usePublicUrl from '../../utils/usePublicUrl'
+import useTranslation from 'next-translate/useTranslation'
 
 type Props = {
   device: Device
@@ -35,6 +36,7 @@ function ModelComments({
   })
   const { mutate: mutateUsersIds } = trpc.auth.getUsersIds.useMutation()
   const { mutate: mutatePicturesUrls } = trpc.auth.GetPublicUrlArr.useMutation()
+  const { t } = useTranslation('devices')
 
   useEffect(() => {
     if (comments.length > 0) {
@@ -84,7 +86,7 @@ function ModelComments({
     }
     mutate(newComment, {
       onSuccess(data) {
-        CreateNotification('created comment successfully', 'green')
+        CreateNotification(t('commentDeletedSuccessfully'), 'green')
         setText('')
         setRating(0)
         setComments((prev) => pushComment(prev, data))
@@ -103,10 +105,10 @@ function ModelComments({
     <Box sx={{ marginBottom: 80 }}>
       <div>
         <Text sx={{ fontSize: 28 }} weight={700}>
-          Comment Section
+          {t('commentSection')}
         </Text>
         <Text sx={{ fontSize: 18 }} weight={500}>
-          view comments and add your own comment
+          {t('viewCommentsSentence')}
         </Text>
       </div>
       <Divider sx={{ marginBottom: 20 }} />
@@ -117,7 +119,7 @@ function ModelComments({
           label: { fontSize: 24, fontWeight: 500 },
         }}>
         <Accordion.Item value='comments'>
-          <Accordion.Control>Write a Comment</Accordion.Control>
+          <Accordion.Control>{t('writeAComment')}</Accordion.Control>
           <Accordion.Panel>
             <form onSubmit={(e) => AddComment(e)}>
               <Group position='apart'>
@@ -135,10 +137,10 @@ function ModelComments({
                 <Group>
                   <Rating value={rating} onChange={setRating} />
                   <Button type='submit' variant='subtle'>
-                    add comment
+                    {t('addComment')}
                   </Button>
                   <Button type='reset' variant='subtle' color='gray'>
-                    cancel
+                    {t('cancel')}
                   </Button>
                 </Group>
               </Group>

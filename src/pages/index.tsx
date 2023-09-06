@@ -6,7 +6,9 @@ import Link from 'next/link'
 import useTranslation from 'next-translate/useTranslation'
 
 export default function home(): JSX.Element {
-  const { t, lang } = useTranslation('home')
+  const { t, lang } = useTranslation('common')
+  const paragraphs = t('homeParagraph').split('\n')
+
   return (
     <>
       <Head>
@@ -18,21 +20,19 @@ export default function home(): JSX.Element {
         <Grid sx={{ marginTop: 70 }}>
           <Grid.Col xl={4}>
             <Stack sx={{ marginTop: 110, marginLeft: 100 }} spacing='xl'>
-              <Title size={56}>{t('title')}</Title>
+              <Title size={56}>{t('inet')}</Title>
               <Text size={30}>
-                Compare between different apple devices
-                <br />
-                View devices information and specifications
-                <br />
-                Find the apple device that matches you
+                {paragraphs.map((line, index) => (
+                  <Text key={index}>{line}</Text>
+                ))}
               </Text>
               <Group>
                 <Button color='gray' variant='light' size='lg' radius='md'>
-                  Find Your Device
+                  {t('findYourDevice')}
                 </Button>
                 <Link href='/compare'>
                   <Button color='gray' variant='light' size='lg' radius='md'>
-                    Compare Devices
+                    {t('compare')}
                   </Button>
                 </Link>
               </Group>

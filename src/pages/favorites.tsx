@@ -7,7 +7,7 @@ import { useUser } from '@supabase/auth-helpers-react'
 import React, { useEffect, useState } from 'react'
 import type { devicesPropertiesArrType } from '../trpc/routers/auth'
 import ListCard from '../components/allDevices/ListCard'
-import { useRouter } from 'next/router'
+import useTranslation from 'next-translate/useTranslation'
 
 export default function Favorites(): JSX.Element {
   const { height } = useViewportSize()
@@ -18,17 +18,7 @@ export default function Favorites(): JSX.Element {
   const [devicesArr, setDevicesArr] = useState<
     devicesPropertiesArrType | undefined
   >(undefined)
-  const router = useRouter()
-
-  useEffect(() => {
-    const handleRouteChange = () => {
-      userDevicesQuery.refetch()
-    }
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.events, userDevicesQuery.refetch])
+  const { t } = useTranslation('common')
 
   useEffect(() => {
     if (userDevicesQuery.data && devicesArr === undefined) {
@@ -39,7 +29,7 @@ export default function Favorites(): JSX.Element {
   return (
     <>
       <Head>
-        <title>List</title>
+        <title>{t('favorites')}</title>
       </Head>
       {userDevicesQuery.data ? (
         <Container size='lg'>

@@ -1,0 +1,33 @@
+export default {
+  moreDetails: 'More Details',
+  remove: 'Remove',
+  add: 'Add',
+  photos: 'Photos',
+  loading: 'Loading...',
+  specs: 'Specs',
+  signInToAdd: 'Sign In To Add',
+  removeDeviceSuccessMessage:
+    'device has been successfully removed from Favorites',
+  removeDeviceErrorMessage:
+    'An Error Accoured While Removing The Device From Favorites',
+  addDeviceErrorMessage:
+    'An Error Accoured While Adding The Device From Favorites',
+  goToComments: 'Go To Comments',
+  comments: 'Comments',
+  description: 'Description',
+  name: 'Name',
+  release: 'Release',
+  operatingSystem: 'OS',
+  battery: 'Battery',
+  chipset: 'Chipset',
+  price: 'Price',
+  commentDeletedSuccessfully: 'Comment deleted successfully',
+  commentSection: 'Comment Section',
+  viewCommentsSentence: 'view comments and add your own comment',
+  writeAComment: 'Write A Comment',
+  addComment: 'Add Comment',
+  cancel: 'Cancel',
+  reply: 'Reply',
+  edit: 'Edit',
+  delete: 'Delete',
+}

@@ -6,7 +6,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { CreateNotification } from '../../utils/functions'
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import { trpc } from '../../utils/trpc'
-import { usePublicUrl } from '../../utils/usePublicUrl'
+import usePublicUrl from '../../utils/usePublicUrl'
 
 type props = {
   setIsHovered: Dispatch<SetStateAction<boolean>>
@@ -17,7 +17,7 @@ export default function UploadAvatar({ setIsHovered }: props) {
   const [file, setFile] = useState<File>()
   const supabase = useSupabaseClient()
   const user = useUser()
-  const change = usePublicUrl((state) => state.change)
+  const { change } = usePublicUrl()
 
   const { data: UserDetails } = trpc.auth.getUserDetails.useQuery({
     id: user?.id,
