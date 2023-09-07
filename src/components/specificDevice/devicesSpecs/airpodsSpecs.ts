@@ -1,4 +1,5 @@
-import { airpodsType, iphoneType } from '../../../utils/deviceTypes'
+import useTranslation from 'next-translate/useTranslation'
+import { airpodsType } from '../../../utils/deviceTypes'
 import { FormatDate } from '../../../utils/functions'
 import { categoriesType } from '../ModelSpecs'
 
@@ -11,54 +12,55 @@ export const accordionContents = [
 ]
 
 export default function GetAirpodsSpecs(device: airpodsType): categoriesType {
+  const { t } = useTranslation('devices')
   const soundFeatures = []
   for (let i = 0; i < device.features.length; i++) {
     soundFeatures.push({
-      label: device.features[i],
-      info: 'Exists',
+      label: t(device.features[i]),
+      info: t('exist'),
     })
   }
   const categories: categoriesType = [
     {
-      name: 'Sound Features',
+      name: t('soundFeatures'),
       values: soundFeatures,
     },
     {
-      name: 'Battery',
+      name: t('battery'),
+      values: [{ label: t('batterySize'), info: device.batterySize + ' mAh' }],
+    },
+    {
+      name: t('hardware'),
       values: [
-        { label: 'Battery Size', info: device.batterySize + ' mAh' }, //, ref: refs[2]
+        { label: t('weight'), info: device.weight + ' g' },
+        { label: t('chipset'), info: device.chipset },
+        { label: t('operatingSystem'), info: 'iOS ' + device.operatingSystem },
       ],
     },
     {
-      name: 'Hardware',
+      name: t('features'),
       values: [
-        { label: 'Weight', info: device.weight + ' g' },
-        { label: 'Chipset', info: device.chipset }, //, ref: refs[3]
-        { label: 'Operating System', info: 'iOS ' + device.operatingSystem },
-      ],
-    },
-    {
-      name: 'Features',
-      values: [
-        { label: 'Case', info: device.case },
-        { label: 'Biometrics', info: device.biometrics.replace('_', ' ') },
+        { label: t('case'), info: device.case },
+        { label: t('biometrics'), info: device.biometrics.replace('_', ' ') },
         {
-          label: 'Resistance',
-          info: device.resistance ? device.resistance.join(' ') : 'none',
+          label: t('resistance'),
+          info: device.resistance ? device.resistance.join(' ') : t('none'),
         },
       ],
     },
     {
-      name: 'Availability',
+      name: t('availability'),
       values: [
-        { label: 'Price', info: device.releasePrice + '$' }, //, ref: refs[5]
+        { label: t('price'), info: device.releasePrice + '$' },
         {
-          label: 'Release Date',
+          label: t('releaseDate'),
           info: FormatDate(device.releaseDate),
         },
         {
-          label: 'Colors',
-          info: device.colors.map((value) => value.Color.name).join(' '),
+          label: t('colors'),
+          info: device.colors
+            .map((value) => value.Color.hex + '/' + value.Color.name)
+            .join(' '),
         },
       ],
     },

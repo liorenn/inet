@@ -39,7 +39,7 @@ export default function home(): JSX.Element {
             </Stack>
           </Grid.Col>
           <Grid.Col xl={8}>
-            {/* <Spline scene='https://prod.spline.design/6Bg4l7N6w0UWWQqk/scene.splinecode' /> */}
+            <Spline scene='https://prod.spline.design/6Bg4l7N6w0UWWQqk/scene.splinecode' />
             {/* <Image
               src={'/images/commercial/iphone_gallery_4.png'}
               fit='contain'

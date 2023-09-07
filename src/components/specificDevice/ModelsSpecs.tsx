@@ -1,26 +1,15 @@
-import { useState } from 'react'
-import {
-  ColorSwatch,
-  Group,
-  Tooltip,
-  useMantineColorScheme,
-} from '@mantine/core'
-import { Table, Accordion, Grid, Text } from '@mantine/core'
+import { ColorSwatch, Tooltip, useMantineColorScheme } from '@mantine/core'
+import { Table, Accordion, Grid, Text, Group } from '@mantine/core'
 import { Device, DeviceTypeValue } from '@prisma/client'
-import GetIphoneSpecs, {
-  accordionContents as iphoneAccordionContents,
-} from './devicesSpecs/iphoneSpecs'
-import GetImacSpecs, {
-  accordionContents as imacAccordionContents,
-} from './devicesSpecs/imacSpecs'
-import GetAirpodsSpecs, {
-  accordionContents as airpodsAccordionContents,
-} from './devicesSpecs/airpodsSpecs'
+import GetIphoneSpecs from './devicesSpecs/iphoneSpecs'
+import GetImacSpecs from './devicesSpecs/imacSpecs'
+import GetAirpodsSpecs from './devicesSpecs/airpodsSpecs'
+import useTranslation from 'next-translate/useTranslation'
+import { useState } from 'react'
 
 type Props = {
   device1: Device
   device2: Device
-  //refs: any
 }
 
 export type categoriesType = {
@@ -53,25 +42,47 @@ type devicePropetiesType = {
   deviceTypeValue: DeviceTypeValue
   specsFunction: Function
 }
-const devicePropeties: devicePropetiesType[] = [
-  {
-    deviceTypeValue: DeviceTypeValue.iphone,
-    specsFunction: GetIphoneSpecs,
-    accordionContents: iphoneAccordionContents,
-  },
-  {
-    deviceTypeValue: DeviceTypeValue.imac,
-    specsFunction: GetImacSpecs,
-    accordionContents: imacAccordionContents,
-  },
-  {
-    deviceTypeValue: DeviceTypeValue.airpods,
-    specsFunction: GetAirpodsSpecs,
-    accordionContents: airpodsAccordionContents,
-  },
-]
 
 function ModelsSpecs({ device1, device2 }: Props) {
+  const { t } = useTranslation('devices')
+  const devicePropeties: devicePropetiesType[] = [
+    {
+      deviceTypeValue: DeviceTypeValue.iphone,
+      specsFunction: GetIphoneSpecs,
+      accordionContents: [
+        t('name'),
+        t('display'),
+        t('battery'),
+        t('hardware'),
+        t('cameras'),
+        t('features'),
+        t('availability'),
+      ],
+    },
+    {
+      deviceTypeValue: DeviceTypeValue.imac,
+      specsFunction: GetImacSpecs,
+      accordionContents: [
+        t('display'),
+        t('hardware'),
+        t('cameras'),
+        t('features'),
+        t('availability'),
+      ],
+    },
+    {
+      deviceTypeValue: DeviceTypeValue.airpods,
+      specsFunction: GetAirpodsSpecs,
+      accordionContents: [
+        t('soundFeatures'),
+        t('battery'),
+        t('hardware'),
+        t('features'),
+        t('availability'),
+      ],
+    },
+  ]
+
   const index = devicePropeties.findIndex(
     (object) => object.deviceTypeValue === device1.deviceTypeValue
   )
@@ -101,8 +112,8 @@ function ModelsSpecs({ device1, device2 }: Props) {
   ): MergedCategoriesType {
     const mergedCategories: MergedCategoriesType = []
     mergedCategories.push({
-      name: 'Name',
-      values: [{ label: 'Name', info1: device1.name, info2: device2.name }],
+      name: t('name'),
+      values: [{ label: t('name'), info1: device1.name, info2: device2.name }],
     })
     for (let i = 0; i < originalCategories.length; i++) {
       const originalCategory = originalCategories[i]
@@ -151,6 +162,7 @@ function ModelsSpecs({ device1, device2 }: Props) {
 }
 
 function IphoneTable({ category }: TableProps) {
+  const { t } = useTranslation('devices')
   return (
     <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
       <tbody>
@@ -163,7 +175,7 @@ function IphoneTable({ category }: TableProps) {
                 </Grid.Col>
                 <Grid.Col span={4} sx={{ fontWeight: 400, fontSize: 20 }}>
                   <Text>
-                    {element.label === 'Colors' ? (
+                    {element.label === t('colors') ? (
                       <Group position='left' spacing='xs'>
                         {element.info1.split(' ').map(
                           (color, index) =>
@@ -188,9 +200,9 @@ function IphoneTable({ category }: TableProps) {
                 </Grid.Col>
                 <Grid.Col span={4} sx={{ fontWeight: 400, fontSize: 20 }}>
                   <Text>
-                    {element.label === 'Colors' ? (
+                    {element.label === t('colors') ? (
                       <Group position='left' spacing='xs'>
-                        {element.info2.split(' ').map(
+                        {element.info1.split(' ').map(
                           (color, index) =>
                             color !== undefined && (
                               <Tooltip
@@ -207,7 +219,7 @@ function IphoneTable({ category }: TableProps) {
                         )}
                       </Group>
                     ) : (
-                      element.info2
+                      element.info1
                     )}
                   </Text>
                 </Grid.Col>

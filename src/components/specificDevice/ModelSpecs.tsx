@@ -16,10 +16,10 @@ import GetImacSpecs, {
 import GetAirpodsSpecs, {
   accordionContents as airpodsAccordionContents,
 } from './devicesSpecs/airpodsSpecs'
+import useTranslation from 'next-translate/useTranslation'
 
 type Props = {
   device: Device
-  //refs: any
 }
 
 export type categoriesType = {
@@ -35,25 +35,45 @@ type devicePropetiesType = {
   deviceTypeValue: DeviceTypeValue
   specsFunction: Function
 }
-const devicePropeties: devicePropetiesType[] = [
-  {
-    deviceTypeValue: DeviceTypeValue.iphone,
-    specsFunction: GetIphoneSpecs,
-    accordionContents: iphoneAccordionContents,
-  },
-  {
-    deviceTypeValue: DeviceTypeValue.imac,
-    specsFunction: GetImacSpecs,
-    accordionContents: imacAccordionContents,
-  },
-  {
-    deviceTypeValue: DeviceTypeValue.airpods,
-    specsFunction: GetAirpodsSpecs,
-    accordionContents: airpodsAccordionContents,
-  },
-]
 
 function ModelSpecs({ device }: Props) {
+  const { t } = useTranslation('devices')
+  const devicePropeties: devicePropetiesType[] = [
+    {
+      deviceTypeValue: DeviceTypeValue.iphone,
+      specsFunction: GetIphoneSpecs,
+      accordionContents: [
+        t('display'),
+        t('battery'),
+        t('hardware'),
+        t('cameras'),
+        t('features'),
+        t('availability'),
+      ],
+    },
+    {
+      deviceTypeValue: DeviceTypeValue.imac,
+      specsFunction: GetImacSpecs,
+      accordionContents: [
+        t('display'),
+        t('hardware'),
+        t('cameras'),
+        t('features'),
+        t('availability'),
+      ],
+    },
+    {
+      deviceTypeValue: DeviceTypeValue.airpods,
+      specsFunction: GetAirpodsSpecs,
+      accordionContents: [
+        t('soundFeatures'),
+        t('battery'),
+        t('hardware'),
+        t('features'),
+        t('availability'),
+      ],
+    },
+  ]
   const index = devicePropeties.findIndex(
     (object) => object.deviceTypeValue === device.deviceTypeValue
   )
@@ -99,6 +119,7 @@ type TableProps = {
 }
 
 function IphoneTable({ category }: TableProps) {
+  const { t } = useTranslation('devices')
   return (
     <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
       <tbody>
@@ -111,7 +132,7 @@ function IphoneTable({ category }: TableProps) {
                 </Grid.Col>
                 <Grid.Col span={6} sx={{ fontWeight: 400, fontSize: 20 }}>
                   <Text>
-                    {element.label === 'Colors' ? (
+                    {element.label === t('colors') ? (
                       <Group position='left' spacing='xs'>
                         {element.info.split(' ').map(
                           (color, index) =>

@@ -1,3 +1,4 @@
+import useTranslation from 'next-translate/useTranslation'
 import { imacType, iphoneType } from '../../../utils/deviceTypes'
 import { FormatDate } from '../../../utils/functions'
 import { categoriesType } from '../ModelSpecs'
@@ -11,58 +12,62 @@ export const accordionContents = [
 ]
 
 export default function GetImacSpecs(device: imacType): categoriesType {
+  const { t } = useTranslation('devices')
   const categories: categoriesType = [
     {
-      name: 'Display',
+      name: t('display'),
       values: [
-        { label: 'Screen Size', info: device.screenSize + ' inches' }, //, ref: refs[1]
+        { label: t('screenSize'), info: device.screenSize + ' ' + t('inches') }, //, ref: refs[1]
       ],
     },
     {
-      name: 'Hardware',
+      name: t('hardware'),
       values: [
-        { label: 'Weight', info: device.weight + ' g' },
-        { label: 'Chipset', info: device.chipset }, //, ref: refs[3]
-        { label: 'Memory', info: device.unifiedMemory + 'GB RAM' },
-        { label: 'Storage', info: device.storage + ' GB' },
-        { label: 'Operating System', info: 'iOS ' + device.operatingSystem },
+        { label: t('weight'), info: device.weight + ' g' },
+        { label: t('chipset'), info: device.chipset }, //, ref: refs[3]
+        { label: t('memory'), info: device.unifiedMemory + 'GB RAM' },
+        { label: t('storage'), info: device.storage + ' GB' },
+        { label: t('operatingSystem'), info: 'iOS ' + device.operatingSystem },
       ],
     },
     {
-      name: 'Cameras',
+      name: t('cameras'),
       values: [
         {
-          label: 'Main Camera',
+          label: t('mainCamera'),
           info: device.cameras[0]
-            ? device.cameras[0].cameraType +
+            ? t(device.cameras[0].cameraType) +
               ' ' +
               device.cameras[0].megapixel +
-              ' MP'
-            : 'None',
+              ' ' +
+              t('mp')
+            : t('none'),
         },
       ],
     },
     {
-      name: 'Features',
+      name: t('features'),
       values: [
-        { label: 'Biometrics', info: device.biometrics.replace('_', ' ') },
+        { label: t('biometrics'), info: device.biometrics.replace('_', ' ') },
         {
-          label: 'Resistance',
-          info: device.resistance ? device.resistance.join(' ') : 'none',
+          label: t('resistance'),
+          info: device.resistance ? device.resistance.join(' ') : t('none'),
         },
       ],
     },
     {
-      name: 'Availability',
+      name: t('availability'),
       values: [
-        { label: 'Price', info: device.releasePrice + '$' }, //, ref: refs[5]
+        { label: t('price'), info: device.releasePrice + '$' }, //, ref: refs[5]
         {
-          label: 'Release Date',
+          label: t('releaseDate'),
           info: FormatDate(device.releaseDate),
         },
         {
-          label: 'Colors',
-          info: device.colors.map((value) => value.Color.name).join(' '),
+          label: t('colors'),
+          info: device.colors
+            .map((value) => value.Color.hex + '/' + value.Color.name)
+            .join(' '),
         },
       ],
     },

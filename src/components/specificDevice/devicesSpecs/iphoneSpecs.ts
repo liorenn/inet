@@ -1,74 +1,87 @@
+import useTranslation from 'next-translate/useTranslation'
 import { iphoneType } from '../../../utils/deviceTypes'
 import { FormatDate } from '../../../utils/functions'
 import { categoriesType } from '../ModelSpecs'
 
+type returnType = {
+  categories: categoriesType
+  accordionContents: string[]
+}
+
 export const accordionContents = [
-  'Display',
-  'Battery',
-  'Hardware',
-  'Cameras',
-  'Features',
-  'Availability',
+  'display',
+  'battery',
+  'hardware',
+  'cameras',
+  'features',
+  'availability',
 ]
 
-export default function GetIphoneSpecs(device: iphoneType): categoriesType {
+export default function GetIphoneSpecs(device: iphoneType) {
+  const { t } = useTranslation('devices')
   const cameras = []
   for (let i = 0; i < device.cameras.length; i++) {
     cameras.push({
-      label: device.cameras[i].cameraType,
-      info: device.cameras[i].megapixel + ' MP',
+      label: t(device.cameras[i].cameraType),
+      info: device.cameras[i].megapixel + ' ' + t('mp'),
     })
   }
   const categories: categoriesType = [
     {
-      name: 'Display',
+      name: t('display'),
       values: [
-        { label: 'Screen Size', info: device.screenSize + ' inches' }, //, ref: refs[1]
-        { label: 'Screen Type', info: device.screenType },
+        { label: t('screenSize'), info: device.screenSize + ' ' + t('inches') },
+        { label: t('screenType'), info: device.screenType },
       ],
     },
     {
-      name: 'Battery',
+      name: t('battery'),
       values: [
-        { label: 'Battery Size', info: device.batterySize + ' mAh' }, //, ref: refs[2]
-        { label: 'Wired Charging', info: device.wiredCharging + ' W' },
-        { label: 'Wireless Charging', info: device.wirelessCharging + ' W' },
+        { label: t('batterySize'), info: device.batterySize + ' mAh' },
+        {
+          label: t('wiredCharging'),
+          info: device.wiredCharging + ' ' + t('watt'),
+        },
+        {
+          label: t('wirelessCharging'),
+          info: device.wirelessCharging + ' ' + t('watt'),
+        },
       ],
     },
     {
-      name: 'Hardware',
+      name: t('hardware'),
       values: [
-        { label: 'Weight', info: device.weight + ' g' },
-        { label: 'Chipset', info: device.chipset }, //, ref: refs[3]
-        { label: 'Memory', info: device.memory + 'GB RAM' },
-        { label: 'Storage', info: device.storage + ' GB' },
-        { label: 'Operating System', info: 'iOS ' + device.operatingSystem },
+        { label: t('weight'), info: device.weight + ' g' },
+        { label: t('chipset'), info: device.chipset },
+        { label: t('memory'), info: device.memory + 'GB RAM' },
+        { label: t('storage'), info: device.storage + ' GB' },
+        { label: t('operatingSystem'), info: 'iOS ' + device.operatingSystem },
       ],
     },
     {
-      name: 'Cameras',
+      name: t('cameras'),
       values: cameras,
     },
     {
-      name: 'Features',
+      name: t('features'),
       values: [
-        { label: 'Biometrics', info: device.biometrics.replace('_', ' ') },
+        { label: t('biometrics'), info: device.biometrics.replace('_', ' ') },
         {
-          label: 'Resistance',
-          info: device.resistance ? device.resistance.join(' ') : 'none',
+          label: t('resistance'),
+          info: device.resistance ? device.resistance.join(' ') : t('none'),
         },
       ],
     },
     {
-      name: 'Availability',
+      name: t('availability'),
       values: [
-        { label: 'Price', info: device.releasePrice + '$' }, //, ref: refs[5]
+        { label: t('price'), info: device.releasePrice + '$' },
         {
-          label: 'Release Date',
+          label: t('releaseDate'),
           info: FormatDate(device.releaseDate),
         },
         {
-          label: 'Colors',
+          label: t('colors'),
           info: device.colors
             .map((value) => value.Color.hex + '/' + value.Color.name)
             .join(' '),
