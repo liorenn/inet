@@ -6,7 +6,7 @@ import type { Device } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
 
 function ModelHeader({ device }: { device: Device }) {
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
+  const { colorScheme } = useMantineColorScheme()
   const { t } = useTranslation('common')
   const { t: devicesT } = useTranslation('devices')
   const dark = colorScheme === 'dark'

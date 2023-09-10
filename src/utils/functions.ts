@@ -14,10 +14,10 @@ import type { Comment } from '@prisma/client'
  *   capitalize('javaSCrIPT');          // -> 'JavaSCrIPT'
  *   capitalize('javaSCrIPT', true);    // -> 'Javascript'
  */
-const capitalize = (str: string, lower: boolean = false) =>
-  (lower ? str.toLowerCase() : str).replace(/(?:^|\s|["'([{])+\S/g, (match) =>
-    match.toUpperCase()
-  )
+// const capitalize = (str: string, lower = false) =>
+//   (lower ? str.toLowerCase() : str).replace(/(?:^|\s|["'([{])+\S/g, (match) =>
+//     match.toUpperCase()
+//   )
 /**
  * Formats the given release date into a string representation.
  *
@@ -29,7 +29,7 @@ export function FormatDate(releaseDate: Date): string {
   const day = date.getUTCDate()
   const month = date.getMonth() + 1
   const year = date.getFullYear()
-  return day + '/' + month + '/' + year
+  return day.toString() + '/' + month.toString() + '/' + year.toString()
 }
 
 /**
@@ -43,9 +43,9 @@ export function CreateNotification(
   message: string,
   color: 'red' | 'green' | 'yellow'
 ) {
-  const icon: ReactElement<any, any> | null = getIcon()
+  const icon: ReactElement | null = getIcon()
 
-  function getIcon(): ReactElement<any, any> | null {
+  function getIcon(): ReactElement | null {
     if (color === 'green') {
       return IconCheck({})
     } else if (color === 'yellow') {

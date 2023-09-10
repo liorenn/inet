@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 import { Title, Text, Container, Button } from '@mantine/core'
 import { TextInput, PasswordInput, Paper } from '@mantine/core'
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
+import type { SubmitHandler } from 'react-hook-form'
 import { useRouter } from 'next/router'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { trpc } from '../../utils/trpc'
@@ -18,7 +19,7 @@ type Inputs = {
   phone: string
 }
 
-export default function signUp() {
+export default function SignUp() {
   const router = useRouter()
   const session = useSession()
   const supabase = useSupabaseClient()
@@ -29,9 +30,11 @@ export default function signUp() {
 
   useEffect(() => {
     if (session) {
-      router.push('/')
+      router.push('/').catch((error) => {
+        console.error('Navigation error:', error)
+      })
     }
-  }, [session])
+  }, [session, router])
 
   const {
     register,
@@ -62,7 +65,7 @@ export default function signUp() {
           }
           if (!IsExist?.email && !IsExist?.username) {
             //if user doesnt exist create new user and saves data in user table
-            let { data, error } = await supabase.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
               phone: fields.phone,
               email: fields.email,
               password: fields.password,

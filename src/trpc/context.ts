@@ -1,12 +1,12 @@
 import { type inferAsyncReturnType } from '@trpc/server'
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next'
-import { SupabaseClient, type Session } from '@supabase/supabase-js'
+import type { SupabaseClient, Session } from '@supabase/supabase-js'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { prisma } from '../utils/prisma-client'
 
 type CreateContextOptions = {
   session: Session | null
-  supabase: SupabaseClient<any, 'public', any>
+  supabase: SupabaseClient
 }
 
 /** Use this helper for:
@@ -14,7 +14,7 @@ type CreateContextOptions = {
  * - trpc's `createSSGHelpers` where we don't have req/res
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  **/
-export const createContextInner = async (opts: CreateContextOptions) => {
+export const createContextInner = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     supabase: opts.supabase,
@@ -32,7 +32,7 @@ export const createContext = async (opts: CreateNextContextOptions) => {
   const supabase = createServerSupabaseClient({ req, res })
   const session = (await supabase.auth.getSession()).data.session
 
-  return await createContextInner({
+  return createContextInner({
     supabase: supabase,
     session: session,
   })

@@ -6,16 +6,11 @@ import {
   useMantineColorScheme,
 } from '@mantine/core'
 import { Table, Accordion, Grid, Text } from '@mantine/core'
-import { Device, DeviceTypeValue } from '@prisma/client'
-import GetIphoneSpecs, {
-  accordionContents as iphoneAccordionContents,
-} from './devicesSpecs/iphoneSpecs'
-import GetImacSpecs, {
-  accordionContents as imacAccordionContents,
-} from './devicesSpecs/imacSpecs'
-import GetAirpodsSpecs, {
-  accordionContents as airpodsAccordionContents,
-} from './devicesSpecs/airpodsSpecs'
+import { DeviceTypeValue } from '@prisma/client'
+import type { Device } from '@prisma/client'
+import GetIphoneSpecs from './devicesSpecs/iphoneSpecs'
+import GetImacSpecs from './devicesSpecs/imacSpecs'
+import GetAirpodsSpecs from './devicesSpecs/airpodsSpecs'
 import useTranslation from 'next-translate/useTranslation'
 
 type Props = {
@@ -33,7 +28,7 @@ export type categoriesType = {
 type devicePropetiesType = {
   accordionContents: string[]
   deviceTypeValue: DeviceTypeValue
-  specsFunction: Function
+  specsFunction: (device: any) => categoriesType
 }
 
 function ModelSpecs({ device }: Props) {
@@ -80,11 +75,9 @@ function ModelSpecs({ device }: Props) {
   const [value, setValue] = useState<string[]>(
     devicePropeties[index].accordionContents
   )
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
+  const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
-  const categories = devicePropeties[index].specsFunction(
-    device
-  ) as categoriesType
+  const categories = devicePropeties[index].specsFunction(device)
 
   return (
     <Accordion

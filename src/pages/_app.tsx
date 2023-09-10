@@ -5,18 +5,11 @@ import type { AppProps } from 'next/app'
 import { useState } from 'react'
 import Layout from '../components/layout/Layout'
 import type { ColorScheme } from '@mantine/core'
-import {
-  MantineProvider,
-  ColorSchemeProvider,
-  createEmotionCache,
-} from '@mantine/core'
+import { MantineProvider, ColorSchemeProvider } from '@mantine/core'
 import { useLocalStorage } from '@mantine/hooks'
 import { RouterTransition } from '../components/layout/RouterTransition'
 import { createClient } from '@supabase/supabase-js'
 import { Notifications } from '@mantine/notifications'
-import rtlPlugin from 'stylis-plugin-rtl'
-import useTranslation from 'next-translate/useTranslation'
-
 function MyApp({
   Component,
   pageProps,

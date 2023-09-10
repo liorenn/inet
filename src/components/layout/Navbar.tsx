@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from 'react'
 import { CreateNotification } from '../../utils/functions'
 import { DEFlag, ILFlag, GBFlag } from 'mantine-flagpack'
-import { languagesType } from '../../utils/languageStore'
+import type { languagesType } from '../../utils/languageStore'
 import setLanguage from 'next-translate/setLanguage'
 import useTranslation from 'next-translate/useTranslation'
 import NavBarDropdown from './NavbarDropdown'
@@ -27,7 +27,7 @@ export const Navbar = () => {
   const [session, setSession] = useState(useSession())
   const { t, lang } = useTranslation('common')
   const { t: authT } = useTranslation('auth')
-  const { publicUrl, change } = usePublicUrl()
+  const { change } = usePublicUrl()
   const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
     userId: user?.id,
   })
@@ -145,7 +145,6 @@ export const Navbar = () => {
                 radius='md'
                 size='lg'
                 color='gray'
-                onClick={() => {}}
                 title={t('changeLanguage')}>
                 <IconLanguage size={18} />
               </ActionIcon>
@@ -173,7 +172,7 @@ export const Navbar = () => {
                   localStorage.setItem('language', 'de')
                 }}>
                 <Text weight={700}>Deutsch</Text>
-              </Menu.Item>{' '}
+              </Menu.Item>
               <Menu.Item
                 mt={6}
                 style={{ background: lang === 'he' ? '#1c1c1c' : '' }}
@@ -235,29 +234,3 @@ const useStyles = createStyles((theme) => ({
     },
   },
 }))
-
-// async function getAvatarUrl() {
-//   if (user) {
-//     const { data } = await supabase
-//       .from('profiles')
-//       .select('avatar_url')
-//       .eq('id', user?.id)
-
-//     const img_name = data[0].avatar_url
-
-//     const { signedURL, error } = await supabase.storage
-//       .from('avatars')
-//       .createSignedUrl(img_name, 60 * 60 * 24 * 60)
-
-//     setAvatarUrl(signedURL)
-//   }
-// }
-
-// const handleSignOut = async (e) => {
-//   let { error } = await supabase.auth.signOut()
-//   if (error) {
-//     console.log(error)
-//   } else {
-//     console.log('user disconnected')
-//   }
-// }

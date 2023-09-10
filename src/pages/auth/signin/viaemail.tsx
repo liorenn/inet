@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { Title, Text, Container, Button, SimpleGrid } from '@mantine/core'
 import { TextInput, Paper } from '@mantine/core'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
+import type { SubmitHandler } from 'react-hook-form'
 import { CreateNotification } from '../../../utils/functions'
 import Head from 'next/head'
 import useTranslation from 'next-translate/useTranslation'
@@ -13,7 +14,7 @@ type Inputs = {
   email: string
 }
 
-export default function viaemail() {
+export default function ViaEmail() {
   const router = useRouter()
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
@@ -22,9 +23,11 @@ export default function viaemail() {
 
   useEffect(() => {
     if (session) {
-      router.push('/')
+      router.push('/').catch((error) => {
+        console.error('Failed to navigate:', error)
+      })
     }
-  }, [session])
+  }, [session, router])
 
   const {
     register,
@@ -40,7 +43,7 @@ export default function viaemail() {
 
   const onSubmit: SubmitHandler<Inputs> = async (fields) => {
     //when form is submitted and passed validation
-    const { data, error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithOtp({
       email: fields.email,
       options: {
         emailRedirectTo: 'http://localhost:3000/',

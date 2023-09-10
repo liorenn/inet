@@ -1,12 +1,9 @@
 import ModelPhotos from './DevicePhotos'
 import { Card, Button, Grid, Text, Space } from '@mantine/core'
-import { DeviceTypeValue, User } from '@prisma/client'
+import type { DeviceTypeValue } from '@prisma/client'
 import Link from 'next/link'
-import { trpc } from '../../utils/trpc'
 import { useUser } from '@supabase/auth-helpers-react'
-import { useEffect, useState } from 'react'
-import { CreateNotification } from '../../utils/functions'
-import { allProperties } from '../../pages/device/[deviceType]/index'
+import type { allProperties } from '../../pages/device/[deviceType]/index'
 import useTranslation from 'next-translate/useTranslation'
 
 type AppProps = {

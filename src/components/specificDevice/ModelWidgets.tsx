@@ -1,7 +1,7 @@
 import { IconCalendarTime, IconCpu, IconTypography } from '@tabler/icons'
 import { IconCoin, IconBrandApple, IconBattery3 } from '@tabler/icons'
-import { Grid, Card, Button, Text, Group, Title } from '@mantine/core'
-import { Device } from '@prisma/client'
+import { Grid, Card, Text, Group, Title } from '@mantine/core'
+import type { Device } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
 
 type Props = {
@@ -16,7 +16,7 @@ function ModelWidgets({ device }: Props) {
     const day = date.getUTCDate()
     const month = date.getMonth() + 1
     const year = date.getFullYear()
-    return day + '/' + month + '/' + year
+    return day.toString() + '/' + month.toString() + '/' + year.toString()
   }
 
   const cards = [
@@ -32,18 +32,18 @@ function ModelWidgets({ device }: Props) {
     },
     {
       title: t('operatingSystem'),
-      spec: 'ios ' + device.operatingSystem,
+      spec: 'ios ' + device.operatingSystem.toString(),
       icon: <IconBrandApple size={45} />,
     },
     {
       title: t('battery'),
-      spec: device.batterySize + ' mAh',
+      spec: device.batterySize.toString() + ' mAh',
       icon: <IconBattery3 size={45} />,
     },
     { title: t('chipset'), spec: device.chipset, icon: <IconCpu size={45} /> },
     {
       title: t('price'),
-      spec: device.releasePrice + '$',
+      spec: device.releasePrice.toString() + '$',
       icon: <IconCoin size={45} />,
     },
   ]

@@ -2,10 +2,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Title, Text, Container, Button, SimpleGrid } from '@mantine/core'
-import { TextInput, PasswordInput, Paper } from '@mantine/core'
+import { TextInput, Paper } from '@mantine/core'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { useForm, SubmitHandler, SubmitErrorHandler } from 'react-hook-form'
-import { trpc } from '../../../utils/trpc'
+import { useForm } from 'react-hook-form'
+import type { SubmitHandler } from 'react-hook-form'
 import { CreateNotification } from '../../../utils/functions'
 import Head from 'next/head'
 import useTranslation from 'next-translate/useTranslation'
@@ -14,11 +14,10 @@ type Inputs = {
   phone: string
 }
 
-export default function viaphone() {
+export default function ViaPhone() {
   const router = useRouter()
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
-  const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
   const { t } = useTranslation('auth')
   const { t: commonT } = useTranslation('common')
 
@@ -26,7 +25,7 @@ export default function viaphone() {
     if (session) {
       router.push('/')
     }
-  }, [session])
+  }, [session, router])
 
   const {
     reset,
@@ -43,7 +42,7 @@ export default function viaphone() {
 
   const onSubmit: SubmitHandler<Inputs> = async (fields) => {
     //when form is submitted and passed validation
-    const { data, error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithOtp({
       phone: fields.phone,
     })
     if (!error) {

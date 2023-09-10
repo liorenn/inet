@@ -1,25 +1,25 @@
 import {
-  Button,
   Center,
   Container,
   Group,
   Loader,
   SegmentedControl,
   Select,
+  SimpleGrid,
 } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import React from 'react'
 import ModelsSpecs from '../components/specificDevice/ModelsSpecs'
-import { airpodsType, imacType, iphoneType } from '../utils/deviceTypes'
+import type { airpodsType, imacType, iphoneType } from '../utils/deviceTypes'
 import { trpc } from '../utils/trpc'
 import DevicePhotos from '../components/allDevices/DevicePhotos'
 import { DeviceTypeValue } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
 
-export default function compare() {
-  const { height } = useViewportSize()
+export default function Compare() {
+  const { height, width } = useViewportSize()
   const devicesQuery = trpc.AllDevices.getAllDevices.useMutation()
   const [value1, setValue1] = useState<string | null>(null)
   const [value2, setValue2] = useState<string | null>(null)
@@ -38,20 +38,27 @@ export default function compare() {
   const iphoneMutation = trpc.UniqueDevice.getiPhoneMutation.useMutation()
   const { t } = useTranslation('common')
 
-  const devicesQueries = [
-    {
-      deviceType: DeviceTypeValue.iphone,
-      queryMutation: iphoneMutation,
-    },
-    {
-      deviceType: DeviceTypeValue.airpods,
-      queryMutation: airpodsMutation,
-    },
-    {
-      deviceType: DeviceTypeValue.imac,
-      queryMutation: imacMutation,
-    },
-  ]
+  const devicesQueries = useMemo(
+    () => [
+      {
+        deviceType: DeviceTypeValue.iphone,
+        queryMutation: iphoneMutation,
+      },
+      {
+        deviceType: DeviceTypeValue.airpods,
+        queryMutation: airpodsMutation,
+      },
+      {
+        deviceType: DeviceTypeValue.imac,
+        queryMutation: imacMutation,
+      },
+    ],
+    []
+  ) // Empty dependency array to ensure it doesn't change
+
+  useEffect(() => {
+    // Your code that uses devicesQueries
+  }, [devicesQueries]) // Include devicesQueries in the dependency array
 
   useEffect(() => {
     if (value) {
@@ -68,7 +75,7 @@ export default function compare() {
         }
       )
     }
-  }, [value])
+  }, [value, devicesQuery])
 
   useEffect(() => {
     if (value1 && value2) {
@@ -92,7 +99,7 @@ export default function compare() {
         }
       )
     }
-  }, [value1, value2])
+  }, [value, value1, value2, devicesQueries])
 
   if (devicesList === undefined || devicesList === null) {
     return (
@@ -109,7 +116,7 @@ export default function compare() {
       </Head>
       <Container size='lg'>
         <SegmentedControl
-          size='xl'
+          size={width < 500 ? 'md' : 'xl'}
           fullWidth
           transitionDuration={500}
           transitionTimingFunction='linear'
@@ -151,8 +158,16 @@ export default function compare() {
         </Group>
         {device1 !== undefined && device2 !== undefined ? (
           <>
-            <Group grow position='apart' mb='xs'>
+            <SimpleGrid
+              mb='md'
+              cols={2}
+              breakpoints={[
+                { maxWidth: 'sm', cols: 1 },
+                { minWidth: 'lg', cols: 2 },
+              ]}>
+              {' '}
               <DevicePhotos
+                withName={true}
                 device={{
                   name: device1.name,
                   model: device1.model,
@@ -161,6 +176,7 @@ export default function compare() {
                 miniphotos={true}
               />
               <DevicePhotos
+                withName={true}
                 device={{
                   name: device2.name,
                   model: device2.model,
@@ -168,7 +184,7 @@ export default function compare() {
                 }}
                 miniphotos={true}
               />
-            </Group>
+            </SimpleGrid>
             <ModelsSpecs device1={device1} device2={device2} />
           </>
         ) : (

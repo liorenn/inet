@@ -1,6 +1,6 @@
-import { DeviceTypeValue, User } from '@prisma/client'
+import { DeviceTypeValue } from '@prisma/client'
 import { router, publicProcedure } from '../trpc'
-import { array, z } from 'zod'
+import { z } from 'zod'
 
 export const authRouter = router({
   getSession: publicProcedure.query(({ ctx }) => {
@@ -55,9 +55,12 @@ export const authRouter = router({
   GetPublicUrl: publicProcedure
     .input(z.object({ userId: z.string().optional() }))
     .query(async ({ ctx, input }) => {
-      let { data } = await ctx.supabase.storage
+      const { data } = await ctx.supabase.storage
         .from('pictures')
-        .createSignedUrl(input.userId + '/profile.png', 60)
+        .createSignedUrl(
+          input.userId ? input.userId.toString() : '' + '/profile.png',
+          60
+        )
       if (data?.signedUrl) {
         return data?.signedUrl
       } else {
@@ -67,9 +70,9 @@ export const authRouter = router({
   GetPublicUrlArr: publicProcedure
     .input(z.array(z.string()))
     .mutation(async ({ ctx, input }) => {
-      let UrlArr: string[] = []
+      const UrlArr: string[] = []
       for (let i = 0; i < input.length; i++) {
-        let { data } = await ctx.supabase.storage
+        const { data } = await ctx.supabase.storage
           .from('pictures')
           .createSignedUrl(input[i] + '/profile.png', 60 * 60 * 24 * 60)
         if (data?.signedUrl) {
@@ -83,7 +86,7 @@ export const authRouter = router({
   getUsersIds: publicProcedure
     .input(z.array(z.object({ username: z.string() })))
     .mutation(async ({ ctx, input }) => {
-      let arr: string[] = []
+      const arr: string[] = []
       for (let i = 0; i < input.length; i++) {
         const user = await ctx.prisma.user.findFirst({
           where: { username: input[i].username },

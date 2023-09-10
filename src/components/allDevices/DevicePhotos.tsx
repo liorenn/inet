@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Center, Stack, Group } from '@mantine/core'
+import { Center, Stack, Group, Text } from '@mantine/core'
 import { Modal, useMantineColorScheme, Container } from '@mantine/core'
-import { useMantineTheme, ActionIcon, Image } from '@mantine/core'
+import { ActionIcon, Image } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 import { getDeviceType } from '../../utils/functions'
 import useTranslation from 'next-translate/useTranslation'
@@ -9,9 +9,10 @@ import useTranslation from 'next-translate/useTranslation'
 type Props = {
   device: { model: string; name: string; imageAmount: number }
   miniphotos: boolean
+  withName?: boolean
 }
 
-function DevicePhotos({ device, miniphotos }: Props) {
+function DevicePhotos({ device, miniphotos, withName }: Props) {
   const deviceType = getDeviceType(device.model)
   const [activeLink, setActiveLink] = useState(
     '/images/' + deviceType + '/' + device.model + '_1.png'
@@ -24,13 +25,19 @@ function DevicePhotos({ device, miniphotos }: Props) {
   const images_src = []
   for (let i = 0; i < device.imageAmount; i++) {
     images_src.push(
-      '/images/' + deviceType + '/' + device.model + '_' + (i + 1) + '.png'
+      '/images/' +
+        deviceType +
+        '/' +
+        device.model +
+        '_' +
+        (i + 1).toString() +
+        '.png'
     )
   }
 
   useEffect(() => {
     setActiveLink('/images/' + deviceType + '/' + device.model + '_1.png')
-  }, [device])
+  }, [device, deviceType])
 
   function handleSetActiveLink(index: number) {
     const img_num_index = activeLink.indexOf('_') + 1
@@ -41,7 +48,7 @@ function DevicePhotos({ device, miniphotos }: Props) {
   function replaceAt(index: number, replacement: number, string: string) {
     return (
       string.substring(0, index) +
-      replacement +
+      replacement.toString() +
       string.substring(index + 1, string.length)
     )
   }
@@ -89,6 +96,13 @@ function DevicePhotos({ device, miniphotos }: Props) {
           </Container>
         </Modal>
         <Image
+          caption={
+            withName && (
+              <Text mb='md' weight={500} size='lg'>
+                {device.name + ' ' + t('photos')}
+              </Text>
+            )
+          }
           src={activeLink}
           fit='contain'
           width={300}

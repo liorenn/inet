@@ -1,21 +1,20 @@
 import { Paper, Group, Text, ActionIcon, Avatar, Image } from '@mantine/core'
 import { Tooltip, Rating } from '@mantine/core'
-import { Comment } from '@prisma/client'
+import type { Comment } from '@prisma/client'
 import { IconTrash, IconPencil, IconCornerUpLeft } from '@tabler/icons'
 import { useState } from 'react'
 import { trpc } from '../../utils/trpc'
 import { CalcAverageRating, CreateNotification } from '../../utils/functions'
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import useTranslation from 'next-translate/useTranslation'
 
 type Props = {
   comment: Comment
   comments: Comment[]
-  setComments: Function
   username: string
-  setRatingValue: Function
-  setCommentsAmout: Function
   pictureUrl: string
+  setComments: (value: Comment[]) => void
+  setRatingValue: (value: number) => void
+  setCommentsAmout: (value: number) => void
 }
 
 function ModelComment({

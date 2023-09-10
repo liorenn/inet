@@ -1,7 +1,7 @@
 import useTranslation from 'next-translate/useTranslation'
-import { imacType, iphoneType } from '../../../utils/deviceTypes'
+import type { imacType } from '../../../utils/deviceTypes'
 import { FormatDate } from '../../../utils/functions'
-import { categoriesType } from '../ModelSpecs'
+import type { categoriesType } from '../ModelSpecs'
 
 export const accordionContents = [
   'Display',
@@ -17,17 +17,26 @@ export default function GetImacSpecs(device: imacType): categoriesType {
     {
       name: t('display'),
       values: [
-        { label: t('screenSize'), info: device.screenSize + ' ' + t('inches') }, //, ref: refs[1]
+        {
+          label: t('screenSize'),
+          info: device.screenSize.toString() + ' ' + t('inches'),
+        }, //, ref: refs[1]
       ],
     },
     {
       name: t('hardware'),
       values: [
-        { label: t('weight'), info: device.weight + ' g' },
+        { label: t('weight'), info: device.weight.toString() + ' g' },
         { label: t('chipset'), info: device.chipset }, //, ref: refs[3]
-        { label: t('memory'), info: device.unifiedMemory + 'GB RAM' },
-        { label: t('storage'), info: device.storage + ' GB' },
-        { label: t('operatingSystem'), info: 'iOS ' + device.operatingSystem },
+        {
+          label: t('memory'),
+          info: device.unifiedMemory.toString() + 'GB RAM',
+        },
+        { label: t('storage'), info: device.storage.toString() + ' GB' },
+        {
+          label: t('operatingSystem'),
+          info: 'iOS ' + device.operatingSystem.toString(),
+        },
       ],
     },
     {
@@ -36,9 +45,9 @@ export default function GetImacSpecs(device: imacType): categoriesType {
         {
           label: t('mainCamera'),
           info: device.cameras[0]
-            ? t(device.cameras[0].cameraType) +
+            ? t(device.cameras[0].cameraType.toString()) +
               ' ' +
-              device.cameras[0].megapixel +
+              device.cameras[0].megapixel.toString() +
               ' ' +
               t('mp')
             : t('none'),
@@ -58,7 +67,7 @@ export default function GetImacSpecs(device: imacType): categoriesType {
     {
       name: t('availability'),
       values: [
-        { label: t('price'), info: device.releasePrice + '$' }, //, ref: refs[5]
+        { label: t('price'), info: device.releasePrice.toString() + '$' }, //, ref: refs[5]
         {
           label: t('releaseDate'),
           info: FormatDate(device.releaseDate),

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { Title, Text, Container, Button, SimpleGrid } from '@mantine/core'
 import { TextInput, PasswordInput, Paper } from '@mantine/core'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { useForm, SubmitHandler, SubmitErrorHandler } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
+import type { SubmitHandler } from 'react-hook-form'
 import { trpc } from '../../../utils/trpc'
 import { CreateNotification } from '../../../utils/functions'
 import Head from 'next/head'
@@ -15,7 +16,7 @@ type Inputs = {
   password: string
 }
 
-export default function signin() {
+export default function SignIn() {
   const router = useRouter()
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
@@ -27,7 +28,7 @@ export default function signin() {
     if (session) {
       router.push('/')
     }
-  }, [session])
+  }, [session, router])
 
   const {
     reset,
@@ -52,7 +53,7 @@ export default function signin() {
       {
         async onSuccess(data) {
           if (data) {
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { error } = await supabase.auth.signInWithPassword({
               email: fields.email,
               password: fields.password,
             })
@@ -87,7 +88,7 @@ export default function signin() {
           <Link href='/auth/signup'>{t('createAnAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={() => handleSubmit(onSubmit)}>
             <TextInput
               label={t('email')}
               defaultValue='lior.oren06@gmail.com'

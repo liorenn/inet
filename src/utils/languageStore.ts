@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@mantine/hooks'
 import { create } from 'zustand'
 
 export type languagesType = 'en' | 'de' | 'he'

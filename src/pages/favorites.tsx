@@ -1,5 +1,4 @@
 import { trpc } from '../utils/trpc'
-import DeviceCard from '../components/allDevices/DeviceCard'
 import { Center, Container, Loader, SimpleGrid } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 import Head from 'next/head'
@@ -33,7 +32,13 @@ export default function Favorites(): JSX.Element {
       </Head>
       {userDevicesQuery.data ? (
         <Container size='lg'>
-          <SimpleGrid cols={3}>
+          <SimpleGrid
+            cols={3}
+            breakpoints={[
+              { maxWidth: 'sm', cols: 1 },
+              { maxWidth: 'md', cols: 2 },
+              { minWidth: 'lg', cols: 3 },
+            ]}>
             {devicesArr &&
               devicesArr.map((value, index) => (
                 <ListCard

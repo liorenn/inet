@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '../trpc'
-import { Airpods, Device, Mac, TouchDevice, iMac } from '@prisma/client'
-import { airpodsType, imacType, iphoneType } from '../../utils/deviceTypes'
+import type { Airpods, Device, Mac, TouchDevice, iMac } from '@prisma/client'
+import type { airpodsType, imacType, iphoneType } from '../../utils/deviceTypes'
 
 export const getUniqueDeviceRouter = router({
   getiPhone: publicProcedure

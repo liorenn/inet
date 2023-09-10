@@ -33,7 +33,13 @@ export default function Device() {
           </Breadcrumbs>
           <Title order={2}>{t('allDevices')}</Title>
         </Group>
-        <SimpleGrid cols={3}>
+        <SimpleGrid
+          cols={3}
+          breakpoints={[
+            { maxWidth: 'sm', cols: 1 },
+            { maxWidth: 'md', cols: 2 },
+            { minWidth: 'lg', cols: 3 },
+          ]}>
           {devicesTypes.map((devicesType) => (
             <Card key={devicesType}>
               <Card.Section>

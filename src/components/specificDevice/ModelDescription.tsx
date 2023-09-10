@@ -1,7 +1,7 @@
 import { Title, Spoiler, Text, Group, Rating, Button } from '@mantine/core'
 import { useMantineColorScheme } from '@mantine/core'
 import { useWindowScroll } from '@mantine/hooks'
-import { Device } from '@prisma/client'
+import type { Device } from '@prisma/client'
 import { IconArrowDown } from '@tabler/icons'
 import useTranslation from 'next-translate/useTranslation'
 
@@ -12,7 +12,7 @@ type Props = {
 }
 
 function ModelDescription({ device, commentsAmout, ratingValue }: Props) {
-  const [scroll, scrollTo] = useWindowScroll()
+  const [_scroll, scrollTo] = useWindowScroll()
   const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
   const { t } = useTranslation('devices')
@@ -28,7 +28,7 @@ function ModelDescription({ device, commentsAmout, ratingValue }: Props) {
           {t('goToComments')}
         </Button>
         <Text size='xl' weight={600}>
-          {commentsAmout + ' ' + t('comments')}
+          {commentsAmout.toString() + ' ' + t('comments')}
         </Text>
         <Rating value={ratingValue} fractions={2} readOnly />
       </Group>

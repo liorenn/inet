@@ -2,6 +2,7 @@ export default {
   compare: 'Compare Devices',
   allDevices: 'All Devices',
   favorites: 'Favorite Devices',
+  pages: 'Pages',
   all: 'all',
   home: 'Home',
   signIn: 'Sign In',

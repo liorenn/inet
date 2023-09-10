@@ -1,7 +1,7 @@
 import useTranslation from 'next-translate/useTranslation'
-import { airpodsType } from '../../../utils/deviceTypes'
+import type { airpodsType } from '../../../utils/deviceTypes'
 import { FormatDate } from '../../../utils/functions'
-import { categoriesType } from '../ModelSpecs'
+import type { categoriesType } from '../ModelSpecs'
 
 export const accordionContents = [
   'Sound Features',
@@ -27,14 +27,22 @@ export default function GetAirpodsSpecs(device: airpodsType): categoriesType {
     },
     {
       name: t('battery'),
-      values: [{ label: t('batterySize'), info: device.batterySize + ' mAh' }],
+      values: [
+        {
+          label: t('batterySize'),
+          info: device.batterySize.toString() + ' mAh',
+        },
+      ],
     },
     {
       name: t('hardware'),
       values: [
-        { label: t('weight'), info: device.weight + ' g' },
+        { label: t('weight'), info: device.weight.toString() + ' g' },
         { label: t('chipset'), info: device.chipset },
-        { label: t('operatingSystem'), info: 'iOS ' + device.operatingSystem },
+        {
+          label: t('operatingSystem'),
+          info: 'iOS ' + device.operatingSystem.toString(),
+        },
       ],
     },
     {
@@ -51,7 +59,7 @@ export default function GetAirpodsSpecs(device: airpodsType): categoriesType {
     {
       name: t('availability'),
       values: [
-        { label: t('price'), info: device.releasePrice + '$' },
+        { label: t('price'), info: device.releasePrice.toString() + '$' },
         {
           label: t('releaseDate'),
           info: FormatDate(device.releaseDate),

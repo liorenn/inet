@@ -1,8 +1,7 @@
-import { useRouter } from 'next/router'
 import { useMantineColorScheme } from '@mantine/core'
-import { Group, Breadcrumbs, Text, Anchor, Title } from '@mantine/core'
+import { Group, Breadcrumbs, Text, Title } from '@mantine/core'
 import Link from 'next/link'
-import { DeviceTypeValue } from '@prisma/client'
+import type { DeviceTypeValue } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
 
 export default function DeviceHeader({
@@ -10,10 +9,8 @@ export default function DeviceHeader({
 }: {
   deviceType: DeviceTypeValue
 }) {
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
+  const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
-  const router = useRouter()
-  const model_type = router.asPath.split('/')[1]
   const { t } = useTranslation('common')
   const links = [
     { name: t('allDevices'), href: '/device' },

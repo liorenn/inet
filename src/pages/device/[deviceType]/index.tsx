@@ -1,5 +1,4 @@
-import type { NextPage, NextPageContext } from 'next'
-import { DeviceTypeValue, User } from '@prisma/client'
+import type { DeviceTypeValue } from '@prisma/client'
 import { trpc } from '../../../utils/trpc'
 import DeviceCard from '../../../components/allDevices/DeviceCard'
 import { Center, Container, Loader, SimpleGrid } from '@mantine/core'
@@ -18,7 +17,7 @@ export interface allProperties {
   imageAmount: number
 }
 // /device/iphone page
-function deviceTypePage() {
+function DeviceTypePage() {
   const router = useRouter()
   const deviceType = router.asPath.split('/')[
     router.asPath.split('/').length - 1
@@ -82,7 +81,13 @@ function deviceTypePage() {
         </Head>
         <Container size='lg'>
           <DeviceHeader deviceType={deviceType} />
-          <SimpleGrid cols={3}>
+          <SimpleGrid
+            cols={3}
+            breakpoints={[
+              { maxWidth: 'sm', cols: 1 },
+              { maxWidth: 'md', cols: 2 },
+              { minWidth: 'lg', cols: 3 },
+            ]}>
             {data.map((value, index) => (
               <DeviceCard
                 handleIsInlist={handleIsInlist}
@@ -105,4 +110,4 @@ function deviceTypePage() {
     )
   }
 }
-export default deviceTypePage
+export default DeviceTypePage

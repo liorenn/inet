@@ -1,11 +1,13 @@
 import { ColorSwatch, Tooltip, useMantineColorScheme } from '@mantine/core'
 import { Table, Accordion, Grid, Text, Group } from '@mantine/core'
-import { Device, DeviceTypeValue } from '@prisma/client'
+import { DeviceTypeValue } from '@prisma/client'
+import type { Device } from '@prisma/client'
 import GetIphoneSpecs from './devicesSpecs/iphoneSpecs'
 import GetImacSpecs from './devicesSpecs/imacSpecs'
 import GetAirpodsSpecs from './devicesSpecs/airpodsSpecs'
 import useTranslation from 'next-translate/useTranslation'
 import { useState } from 'react'
+import { useViewportSize } from '@mantine/hooks'
 
 type Props = {
   device1: Device
@@ -40,11 +42,12 @@ type TableProps = {
 type devicePropetiesType = {
   accordionContents: string[]
   deviceTypeValue: DeviceTypeValue
-  specsFunction: Function
+  specsFunction: (device: any) => categoriesType
 }
 
 function ModelsSpecs({ device1, device2 }: Props) {
   const { t } = useTranslation('devices')
+  const { width } = useViewportSize()
   const devicePropeties: devicePropetiesType[] = [
     {
       deviceTypeValue: DeviceTypeValue.iphone,
@@ -95,15 +98,11 @@ function ModelsSpecs({ device1, device2 }: Props) {
   const index1 = devicePropeties.findIndex(
     (object) => object.deviceTypeValue === device1.deviceTypeValue
   )
-  const categories1 = devicePropeties[index1].specsFunction(
-    device1
-  ) as categoriesType
+  const categories1 = devicePropeties[index1].specsFunction(device1)
   const index2 = devicePropeties.findIndex(
     (object) => object.deviceTypeValue === device2.deviceTypeValue
   )
-  const categories2 = devicePropeties[index2].specsFunction(
-    device2
-  ) as categoriesType
+  const categories2 = devicePropeties[index2].specsFunction(device2)
   const mergedCategories = mergeCategories(categories1, categories2)
 
   function mergeCategories(
@@ -145,7 +144,7 @@ function ModelsSpecs({ device1, device2 }: Props) {
       onChange={setValue}
       sx={{ marginBottom: 100 }}
       styles={{
-        label: { fontSize: 28, fontWeight: 500 },
+        label: { fontSize: width < 500 ? 20 : 26, fontWeight: 500 },
         content: { backgroundColor: dark ? 'gray.9' : 'white' },
         control: { backgroundColor: dark ? 'gray.9' : 'white' },
       }}>
@@ -163,17 +162,23 @@ function ModelsSpecs({ device1, device2 }: Props) {
 
 function IphoneTable({ category }: TableProps) {
   const { t } = useTranslation('devices')
+  const { width } = useViewportSize()
+
   return (
-    <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
+    <Table highlightOnHover verticalSpacing='lg'>
       <tbody>
         {category.map((element) => (
           <tr key={element.label}>
             <td>
               <Grid>
-                <Grid.Col span={4} sx={{ fontWeight: 600, fontSize: 20 }}>
+                <Grid.Col
+                  span={4}
+                  sx={{ fontWeight: 600, fontSize: width < 500 ? 16 : 20 }}>
                   <Text>{element.label}</Text>
                 </Grid.Col>
-                <Grid.Col span={4} sx={{ fontWeight: 400, fontSize: 20 }}>
+                <Grid.Col
+                  span={4}
+                  sx={{ fontWeight: 400, fontSize: width < 500 ? 16 : 20 }}>
                   <Text>
                     {element.label === t('colors') ? (
                       <Group position='left' spacing='xs'>
@@ -198,7 +203,9 @@ function IphoneTable({ category }: TableProps) {
                     )}
                   </Text>
                 </Grid.Col>
-                <Grid.Col span={4} sx={{ fontWeight: 400, fontSize: 20 }}>
+                <Grid.Col
+                  span={4}
+                  sx={{ fontWeight: 400, fontSize: width < 500 ? 16 : 20 }}>
                   <Text>
                     {element.label === t('colors') ? (
                       <Group position='left' spacing='xs'>

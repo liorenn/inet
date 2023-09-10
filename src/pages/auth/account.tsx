@@ -15,7 +15,7 @@ import UploadAvatar from '../../components/layout/UploadAvatar'
 import usePublicUrl from '../../utils/usePublicUrl'
 import useTranslation from 'next-translate/useTranslation'
 
-export default function account() {
+export default function Account() {
   const session = useSession()
   const user = useUser()
   const supabase = useSupabaseClient()
@@ -26,7 +26,7 @@ export default function account() {
     id: user?.id,
   })
   const { t } = useTranslation('auth')
-  const { change, publicUrl } = usePublicUrl()
+  const { publicUrl } = usePublicUrl()
   const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' })
   const [IsHovered, setIsHovered] = useState<boolean>(false)
   const [email, setEmail] = useState<string>('')
@@ -37,7 +37,7 @@ export default function account() {
   const [name, setName] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [updatedAt, setUpdatedAt] = useState<string>()
-  supabase.auth.onAuthStateChange((event, session) => {
+  supabase.auth.onAuthStateChange((session) => {
     if (!session) {
       router.push('/')
     }
@@ -70,7 +70,7 @@ export default function account() {
     { input: 'phone', translation: t('phone') },
   ]
 
-  async function UpdateDestail(
+  async function UpdateDetail(
     detail: 'email' | 'username' | 'name' | 'password' | 'phone'
   ) {
     if (detail === 'email' || detail === 'password' || detail === 'phone') {
@@ -198,7 +198,14 @@ export default function account() {
               radius='md'
               size='md'
             />
-            <UnstyledButton onClick={() => UpdateDestail('username')}>
+            <UnstyledButton
+              onClick={async () => {
+                try {
+                  await UpdateDetail('username')
+                } catch (error) {
+                  console.log(error)
+                }
+              }}>
               <Text
                 sx={{ fontSize: 18 }}
                 weight={500}
@@ -225,7 +232,14 @@ export default function account() {
               radius='md'
               size='md'
             />
-            <UnstyledButton onClick={() => UpdateDestail('name')}>
+            <UnstyledButton
+              onClick={async () => {
+                try {
+                  await UpdateDetail('name')
+                } catch (error) {
+                  console.log(error)
+                }
+              }}>
               <Text
                 sx={{ fontSize: 18 }}
                 weight={500}
@@ -252,7 +266,14 @@ export default function account() {
               radius='md'
               size='md'
             />
-            <UnstyledButton onClick={() => UpdateDestail('email')}>
+            <UnstyledButton
+              onClick={async () => {
+                try {
+                  await UpdateDetail('email')
+                } catch (error) {
+                  console.log(error)
+                }
+              }}>
               <Text
                 sx={{ fontSize: 18 }}
                 weight={500}
@@ -279,7 +300,14 @@ export default function account() {
               radius='md'
               size='md'
             />
-            <UnstyledButton onClick={() => UpdateDestail('phone')}>
+            <UnstyledButton
+              onClick={async () => {
+                try {
+                  await UpdateDetail('phone')
+                } catch (error) {
+                  console.log(error)
+                }
+              }}>
               <Text
                 sx={{ fontSize: 18 }}
                 weight={500}
@@ -306,7 +334,7 @@ export default function account() {
               radius='md'
               size='md'
             />
-            <UnstyledButton onClick={() => UpdateDestail('password')}>
+            <UnstyledButton onClick={() => UpdateDetail('password')}>
               <Text
                 sx={{ fontSize: 18 }}
                 weight={500}

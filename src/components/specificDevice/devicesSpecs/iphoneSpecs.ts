@@ -1,12 +1,7 @@
 import useTranslation from 'next-translate/useTranslation'
-import { iphoneType } from '../../../utils/deviceTypes'
+import type { iphoneType } from '../../../utils/deviceTypes'
 import { FormatDate } from '../../../utils/functions'
-import { categoriesType } from '../ModelSpecs'
-
-type returnType = {
-  categories: categoriesType
-  accordionContents: string[]
-}
+import type { categoriesType } from '../ModelSpecs'
 
 export const accordionContents = [
   'display',
@@ -22,40 +17,49 @@ export default function GetIphoneSpecs(device: iphoneType) {
   const cameras = []
   for (let i = 0; i < device.cameras.length; i++) {
     cameras.push({
-      label: t(device.cameras[i].cameraType),
-      info: device.cameras[i].megapixel + ' ' + t('mp'),
+      label: t(device.cameras[i].cameraType.toString()),
+      info: device.cameras[i].megapixel.toString() + ' ' + t('mp'),
     })
   }
   const categories: categoriesType = [
     {
       name: t('display'),
       values: [
-        { label: t('screenSize'), info: device.screenSize + ' ' + t('inches') },
-        { label: t('screenType'), info: device.screenType },
+        {
+          label: t('screenSize'),
+          info: device.screenSize.toString() + ' ' + t('inches'),
+        },
+        { label: t('screenType'), info: device.screenType.toString() },
       ],
     },
     {
       name: t('battery'),
       values: [
-        { label: t('batterySize'), info: device.batterySize + ' mAh' },
+        {
+          label: t('batterySize'),
+          info: device.batterySize.toString() + ' mAh',
+        },
         {
           label: t('wiredCharging'),
-          info: device.wiredCharging + ' ' + t('watt'),
+          info: device.wiredCharging.toString() + ' ' + t('watt'),
         },
         {
           label: t('wirelessCharging'),
-          info: device.wirelessCharging + ' ' + t('watt'),
+          info: device.wirelessCharging.toString() + ' ' + t('watt'),
         },
       ],
     },
     {
       name: t('hardware'),
       values: [
-        { label: t('weight'), info: device.weight + ' g' },
+        { label: t('weight'), info: device.weight.toString() + ' g' },
         { label: t('chipset'), info: device.chipset },
-        { label: t('memory'), info: device.memory + 'GB RAM' },
-        { label: t('storage'), info: device.storage + ' GB' },
-        { label: t('operatingSystem'), info: 'iOS ' + device.operatingSystem },
+        { label: t('memory'), info: device.memory.toString() + 'GB RAM' },
+        { label: t('storage'), info: device.storage.toString() + ' GB' },
+        {
+          label: t('operatingSystem'),
+          info: 'iOS ' + device.operatingSystem.toString(),
+        },
       ],
     },
     {
@@ -75,7 +79,7 @@ export default function GetIphoneSpecs(device: iphoneType) {
     {
       name: t('availability'),
       values: [
-        { label: t('price'), info: device.releasePrice + '$' },
+        { label: t('price'), info: device.releasePrice.toString() + '$' },
         {
           label: t('releaseDate'),
           info: FormatDate(device.releaseDate),

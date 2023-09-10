@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Title, Text, Container, Button } from '@mantine/core'
 import { TextInput, Paper } from '@mantine/core'
@@ -7,13 +6,7 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { CreateNotification } from '../../utils/functions'
 import Head from 'next/head'
 
-type Inputs = {
-  email: string
-  password: string
-}
-
-export default function resetpassword() {
-  const router = useRouter()
+export default function ResetPassword() {
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
   const [currentForm, setCurrentForm] = useState<'email' | 'password'>('email')
@@ -27,7 +20,7 @@ export default function resetpassword() {
         setSession(session)
       }
     })
-  }, [])
+  }, [supabase.auth])
 
   async function handleEmailSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

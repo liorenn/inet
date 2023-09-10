@@ -1,7 +1,7 @@
 import { trpc } from '../../../utils/trpc'
-import { NextPage, NextPageContext } from 'next'
 import { useRouter } from 'next/router'
-import { Device, DeviceTypeValue } from '@prisma/client'
+import { DeviceTypeValue } from '@prisma/client'
+import type { Device } from '@prisma/client'
 import ModelLayout from '../../../components/specificDevice/ModelLayout'
 import { Button, Center, Container, Loader } from '@mantine/core'
 import ModelHeader from '../../../components/specificDevice/ModelHeader'
@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { useViewportSize } from '@mantine/hooks'
 import Head from 'next/head'
 import ModelComments from '../../../components/specificDevice/ModelComments'
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
+import { useUser } from '@supabase/auth-helpers-react'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 
@@ -48,9 +48,6 @@ const isExistInArr = (devicesArr: devicesArrType, deviceModel: string) => {
   return false
 }
 
-interface PropsType {
-  deviceModel: string
-}
 // /device/iphone/iphone13 page
 function ModelPage() {
   const router = useRouter()

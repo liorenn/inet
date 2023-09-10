@@ -1,9 +1,9 @@
-import { FormEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import type { FormEvent } from 'react'
 import ModelComment from './ModelComment'
 import { Textarea, Button, Box, Image, Rating } from '@mantine/core'
 import { Text, Divider, Group, Accordion } from '@mantine/core'
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
-import { Comment, Device, User } from '@prisma/client'
+import type { Comment, Device } from '@prisma/client'
 import { trpc } from '../../utils/trpc'
 import { CalcAverageRating, CreateNotification } from '../../utils/functions'
 import usePublicUrl from '../../utils/usePublicUrl'
@@ -12,8 +12,8 @@ import useTranslation from 'next-translate/useTranslation'
 type Props = {
   device: Device
   username: string
-  setRatingValue: Function
-  setCommentsAmout: Function
+  setRatingValue: (value: number) => void
+  setCommentsAmout: (value: number) => void
 }
 
 function ModelComments({
@@ -40,17 +40,20 @@ function ModelComments({
 
   useEffect(() => {
     if (comments.length > 0) {
-      let arr: { username: string }[] = []
-      comments.forEach((comment) => {
-        if (comment.username) arr.push({ username: comment.username })
-      })
-      mutateUsersIds(arr, {
-        onSuccess(data) {
-          setUsersIds(data)
-        },
-      })
+      const arr: { username: string }[] = []
+      for (let i = 0; i < comments.length; i++) {
+        const username = comments[i].username
+        if (username) {
+          arr.push({ username: username })
+        }
+        mutateUsersIds(arr, {
+          onSuccess(data) {
+            setUsersIds(data)
+          },
+        })
+      }
     }
-  }, [comments])
+  }, [comments, mutateUsersIds])
 
   useEffect(() => {
     if (usersIds.length > 0) {
@@ -60,19 +63,19 @@ function ModelComments({
         },
       })
     }
-  }, [usersIds])
+  }, [usersIds, mutatePicturesUrls])
 
   useEffect(() => {
-    let commentsArr = commentsQuery.data
+    const commentsArr = commentsQuery.data
     if (commentsArr && !isFetched) {
       setIsFetched(true)
       setComments(commentsArr)
       setCommentsAmout(commentsArr.length)
       setRatingValue(CalcAverageRating(commentsArr))
     }
-  }, [commentsQuery])
+  }, [commentsQuery, isFetched, setCommentsAmout, setRatingValue])
 
-  async function AddComment(e: FormEvent<HTMLFormElement>) {
+  function AddComment(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const newComment = {
       createdAt: new Date(),
@@ -97,7 +100,7 @@ function ModelComments({
   }
 
   function pushComment(comments: Comment[], newComment: Comment) {
-    let newComments = [...comments, newComment]
+    const newComments = [...comments, newComment]
     return newComments
   }
 
@@ -124,7 +127,13 @@ function ModelComments({
             <form onSubmit={(e) => AddComment(e)}>
               <Group position='apart'>
                 <Group sx={{ padding: 10 }}>
-                  <Image src={publicUrl} height={45} width={45} radius='xl' />
+                  <Image
+                    src={publicUrl}
+                    height={45}
+                    width={45}
+                    alt='image'
+                    radius='xl'
+                  />
                   <div>
                     <Text size='lg' weight={500}>
                       {username}

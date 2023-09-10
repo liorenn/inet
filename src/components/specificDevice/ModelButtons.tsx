@@ -1,12 +1,10 @@
 import { Button } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
-import { allProperties } from '../../pages/device/[deviceType]'
+import type { allProperties } from '../../pages/device/[deviceType]'
 import { CreateNotification } from '../../utils/functions'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useEffect, useState } from 'react'
 import { trpc } from '../../utils/trpc'
-import { Device } from '@prisma/client'
-import { boolean } from 'zod'
+import type { Device } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
 
 type Props = {

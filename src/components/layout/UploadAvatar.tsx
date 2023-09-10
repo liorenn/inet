@@ -1,8 +1,10 @@
-import { Group, Button, rem, FileInputProps } from '@mantine/core'
+import { Group, Button, rem } from '@mantine/core'
+import type { FileInputProps } from '@mantine/core'
 import { ActionIcon, Modal, FileInput, Avatar, Center } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconUpload } from '@tabler/icons'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 import { CreateNotification } from '../../utils/functions'
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import { trpc } from '../../utils/trpc'
@@ -23,30 +25,32 @@ export default function UploadAvatar({ setIsHovered }: props) {
     id: user?.id,
   })
   async function SubmitFile(file: File) {
-    const { data } = await supabase.storage
-      .from('pictures')
-      .list(UserDetails?.id)
-
-    let action = 'upload'
-    data?.map((value) => {
-      if (value.name === 'profile.png') action = 'update'
-    })
-
-    if (action === 'upload') {
-      await supabase.storage
+    if (UserDetails?.id) {
+      const { data } = await supabase.storage
         .from('pictures')
-        .upload(UserDetails?.id + '/profile.png', file, { upsert: true })
+        .list(UserDetails.id)
+
+      let action = 'upload'
+      data?.map((value) => {
+        if (value.name === 'profile.png') action = 'update'
+      })
+
+      if (action === 'upload') {
+        await supabase.storage
+          .from('pictures')
+          .upload(`${UserDetails.id}/profile.png`, file, { upsert: true })
+      }
+      if (action === 'update') {
+        await supabase.storage
+          .from('pictures')
+          .update(UserDetails.id + '/profile.png', file, { upsert: true })
+      }
+      change(URL.createObjectURL(file))
+      CreateNotification('Profile Picture Changed', 'green')
+      setFile(undefined)
+      close()
+      setIsHovered(false)
     }
-    if (action === 'update') {
-      await supabase.storage
-        .from('pictures')
-        .update(UserDetails?.id + '/profile.png', file, { upsert: true })
-    }
-    change(URL.createObjectURL(file))
-    CreateNotification('Profile Picture Changed', 'green')
-    setFile(undefined)
-    close()
-    setIsHovered(false)
   }
 
   function ChangeFile(newFile: File | null) {
@@ -88,7 +92,13 @@ export default function UploadAvatar({ setIsHovered }: props) {
             </Center>
             <Group grow mt='xl'>
               <Button
-                onClick={() => SubmitFile(file)}
+                onClick={async () => {
+                  try {
+                    await SubmitFile(file)
+                  } catch (error) {
+                    console.log(error)
+                  }
+                }}
                 variant='light'
                 color='green'
                 radius='md'>
