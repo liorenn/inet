@@ -1,10 +1,21 @@
 import { DeviceTypeValue } from '@prisma/client'
 import { router, publicProcedure } from '../trpc'
+import { Resend } from 'resend'
 import { z } from 'zod'
+import { EmailTemplate } from '../../components/emailTemplates/welcome'
 
 export const authRouter = router({
   getSession: publicProcedure.query(({ ctx }) => {
     return ctx.session
+  }),
+  sendEmail: publicProcedure.mutation(({ ctx }) => {
+    const resend = new Resend(process.env.RESEND_KEY)
+    resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: 'lior.oren06@gmail.com',
+      subject: 'Hello World Test',
+      react: EmailTemplate({ firstName: 'John' }),
+    })
   }),
   deleteComment: publicProcedure
     .input(z.object({ commentId: z.number() }))

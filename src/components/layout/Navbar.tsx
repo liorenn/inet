@@ -52,16 +52,16 @@ export const Navbar = () => {
   }
 
   return (
-    <Header height={65} className={classes.root} mb={20}>
+    <Header height={65} mt={32} className={classes.root} mb={20}>
       <Container className={classes.inner} fluid>
         <Group>
           <div className={classes.dropdown}>
             <NavBarDropdown />
           </div>
-          <Link href={'/'}>
+          <Link className={classes.end} href={'/'}>
             <Button variant='subtle' color={'gray.' + (dark ? '1' : '9')}>
               <Group spacing='xs'>
-                <Text style={{ fontSize: '22px', fontWeight: 500 }} mb='xs'>
+                <Text style={{ fontSize: '22px', fontWeight: 500 }}>
                   {t('inet')}
                 </Text>
                 <IconDevices height={30} width={30} />

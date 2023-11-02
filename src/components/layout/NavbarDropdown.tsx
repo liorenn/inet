@@ -46,7 +46,7 @@ function NavBarDropdown() {
         onClose={() => setOpened(false)}
         padding='xl'
         title={
-          <Text weight={600} size='xl'>
+          <Text weight={600} mt={32} size='xl'>
             {t('pages')}
           </Text>
         }

@@ -45,6 +45,7 @@ export default function SignIn() {
 
   const onSubmit: SubmitHandler<Inputs> = (fields) => {
     //when form is submitted and passed validation
+    console.log(fields)
     IsUserExistsMutation.mutate(
       {
         email: fields.email,

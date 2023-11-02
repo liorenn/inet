@@ -7,20 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Airpods {
-  model      String           @id @unique @db.VarChar
-  case       String           @db.VarChar
-  features   AirpodsFeature[]
-  deviceType DeviceType       @relation(fields: [model], references: [model], onDelete: Cascade)
-}
-
 model Camera {
-  id              Int             @id @unique @default(autoincrement())
-  deviceTypeValue DeviceTypeValue
-  megapixel       Int             @db.SmallInt
-  model           String?
-  cameraType      CameraType
-  device          Device?         @relation(fields: [model], references: [model], onDelete: Cascade)
+  id         Int        @id @unique @default(autoincrement())
+  deviceType DeviceType
+  megapixel  Int        @db.SmallInt
+  model      String
+  cameraType CameraType
+  device     Device     @relation(fields: [model], references: [model], onDelete: Cascade)
 }
 
 model Color {
@@ -29,41 +22,29 @@ model Color {
   devices DeviceColor[]
 }
 
-model Comment {
-  id              Int             @id @unique @default(autoincrement())
-  model           String
-  message         String
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime
-  likes           Int
-  username        String?         @db.VarChar
-  deviceTypeValue DeviceTypeValue
-  Rating          Int
-  device          Device          @relation(fields: [model], references: [model], onDelete: Cascade)
-  user            User?           @relation(fields: [username], references: [username])
+model User {
+  id         String       @id @unique @db.VarChar
+  username   String       @unique @db.VarChar
+  name       String       @db.VarChar
+  password   String       @db.VarChar
+  email      String       @unique @db.VarChar
+  phone      String       @unique @db.VarChar
+  accessKey  Int          @default(1)
+  comments   Comment[]
+  deviceList DeviceUser[]
 }
 
-model Device {
-  model            String              @id
-  deviceTypeValue  DeviceTypeValue
-  name             String              @db.VarChar
-  releaseDate      DateTime            @db.Date
-  batterySize      Int
-  chipset          String              @db.VarChar
-  operatingSystem  Float               @db.Real
-  weight           Float               @db.Real
-  description      String
-  imageAmount      Int                 @db.SmallInt
-  biometrics       BiometricFeature
-  resistanceRating String              @db.VarChar
-  resistance       ResistanceFeature[]
-  releasePrice     Int                 @db.SmallInt
-  connectors       DeviceConnector[]
-  cameras          Camera[]
-  comments         Comment[]
-  colors           DeviceColor[]
-  deviceType       DeviceType?
-  usersList        DeviceUser[]
+model Comment {
+  id         Int        @id @unique @default(autoincrement())
+  model      String
+  message    String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime
+  likes      Int
+  username   String     @db.VarChar
+  Rating     Int
+  device     Device     @relation(fields: [model], references: [model], onDelete: Cascade)
+  user       User       @relation(fields: [username], references: [username])
 }
 
 model DeviceUser {
@@ -76,112 +57,68 @@ model DeviceUser {
 }
 
 model DeviceColor {
-  colorName       String
-  model           String
-  deviceTypeValue DeviceTypeValue
-  Color           Color           @relation(fields: [colorName], references: [name])
-  device          Device          @relation(fields: [model], references: [model])
+  colorName  String
+  model      String
+  Color      Color      @relation(fields: [colorName], references: [name])
+  device     Device     @relation(fields: [model], references: [model])
 
   @@id([colorName, model])
 }
 
-model DeviceType {
-  model            String           @id @unique
-  deviceTypeFamily DeviceTypeFamily
-  airpods          Airpods?
-  device           Device           @relation(fields: [model], references: [model], onDelete: Cascade)
-  mac              Mac?
-  touchDevice      TouchDevice?
+model Device {
+  model            String              @id
+  deviceType       DeviceType
+  name             String              @db.VarChar
+  releaseDate      DateTime            @db.Date
+  batterySize      Int
+  chipset          String              @db.VarChar
+  operatingSystem  Float               @db.Real
+  weight           Float               @db.Real
+  description      String
+  imageAmount      Int                 @db.SmallInt
+  resistanceRating String              @db.VarChar
+  releasePrice     Int                 @db.SmallInt
+  height           Int                 @db.SmallInt
+  width            Int                 @db.SmallInt
+  depth            Int                 @db.SmallInt
+  storage          Int?                @db.SmallInt
+  cpu              Int?                @db.SmallInt
+  gpu              Int?                @db.SmallInt
+  unifiedMemory    Int?                @db.SmallInt
+  wiredCharging    Float?              @db.Real
+  wirelessCharging Float?              @db.Real
+  memory           Int?                @db.SmallInt
+  screenSize       Float?              @db.Real
+  screenType       String?             @db.VarChar
+    resistance       String?
+  biometrics       BiometricFeature
+  features         DeviceFeature[]
+  connectors       DeviceConnector[]
+  cameras          Camera[]
+  comments         Comment[]
+  colors           DeviceColor[]
+  usersList        DeviceUser[]
 }
 
-model Mac {
-  model         String     @id @unique @db.VarChar
-  cpu           Int        @db.SmallInt
-  gpu           Int        @db.SmallInt
-  unifiedMemory Int        @db.SmallInt
-  storage       Int        @db.SmallInt
-  macType       MacType
-  deviceType    DeviceType @relation(fields: [model], references: [model], onDelete: Cascade)
-  macbook       Macbook?
-  iMac          iMac?
+model DeviceConnector {
+  model String @id
+  lightning     Boolean
+  usb_c         Boolean
+  thunderbolt_3 Boolean
+  magsafe       Boolean
+  device        Device  @relation(fields: [model], references: [model], onDelete: Cascade)
 }
 
-model Macbook {
-  model         String @id @unique @db.VarChar
-  screenSize    Float  @db.Real
-  batterySize   Int
-  wiredCharging Int
-  mac           Mac    @relation(fields: [model], references: [model], onDelete: Cascade)
-}
-
-model TouchDevice {
-  model            String          @id @unique @db.VarChar
-  screenSize       Float           @db.Real
-  screenType       ScreenType
-  wiredCharging    Float           @db.Real
-  wirelessCharging Float           @db.Real
-  memory           Int             @db.SmallInt
-  storage          Int             @db.SmallInt
-  touchDeviceType  TouchDeviceType
-  deviceType       DeviceType      @relation(fields: [model], references: [model], onDelete: Cascade)
-  iPad             iPad?
-  iPhone           iPhone?
-}
-
-model User {
-  id         String       @id @unique @db.VarChar
-  username   String       @unique @db.VarChar
-  name       String       @db.VarChar
-  password   String       @db.VarChar
-  email      String       @unique @db.VarChar
-  phone      String       @unique @db.VarChar
-  role       Role
-  comments   Comment[]
-  deviceList DeviceUser[]
-}
-
-model iMac {
-  model      String @id @unique @db.VarChar
-  screenSize Float  @db.Real
-  Mac        Mac    @relation(fields: [model], references: [model], onDelete: Cascade)
-}
-
-model iPad {
-  model       String      @id @unique @db.VarChar
-  TouchDevice TouchDevice @relation(fields: [model], references: [model], onDelete: Cascade)
-}
-
-model iPhone {
-  model       String      @id @unique @db.VarChar
-  TouchDevice TouchDevice @relation(fields: [model], references: [model], onDelete: Cascade)
-}
-
-enum DeviceTypeFamily {
-  airpods
-  mac
-  touchDevice
-}
-
-enum MacType {
-  macbook
-  iMac
-}
-
-enum TouchDeviceType {
-  ipad
-  iphone
-}
-
-enum Role {
-  USER
-  ADMIN
-  MANAGER
-}
-
-enum AirpodsFeature {
-  spatial_audio
-  active_noise_cancellation
-  transparency_mode
+model DeviceFeature {
+  model                       String  @id
+  spatial_audio               Boolean
+  active_noise_cancellation   Boolean
+  transparency_mode           Boolean
+  apple_pencil_one_compatible Boolean
+  apple_pencil_two_compatible Boolean
+  magic_keyboard_compatible   Boolean
+  dynamic_island              Boolean
+  device                      Device  @relation(fields: [model], references: [model], onDelete: Cascade)
 }
 
 enum BiometricFeature {
@@ -198,30 +135,11 @@ enum CameraType {
   front
 }
 
-enum DeviceConnector {
-  lightning
-  usb_c
-  thunderbolt_3
-  magsafe
-}
-
-enum DeviceTypeValue {
+enum DeviceType {
   airpods
   ipad
   iphone
   mac
   imac
   macbook
-}
-
-enum ResistanceFeature {
-  water
-  splash
-  dust
-  sweat
-}
-
-enum ScreenType {
-  oled
-  lcd
 }
