@@ -35,16 +35,16 @@ model User {
 }
 
 model Comment {
-  id         Int        @id @unique @default(autoincrement())
-  model      String
-  message    String
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime
-  likes      Int
-  username   String     @db.VarChar
-  Rating     Int
-  device     Device     @relation(fields: [model], references: [model], onDelete: Cascade)
-  user       User       @relation(fields: [username], references: [username])
+  id        Int      @id @unique @default(autoincrement())
+  model     String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  likes     Int
+  username  String   @db.VarChar
+  Rating    Int
+  device    Device   @relation(fields: [model], references: [model], onDelete: Cascade)
+  user      User     @relation(fields: [username], references: [username])
 }
 
 model DeviceUser {
@@ -57,42 +57,40 @@ model DeviceUser {
 }
 
 model DeviceColor {
-  colorName  String
-  model      String
-  Color      Color      @relation(fields: [colorName], references: [name])
-  device     Device     @relation(fields: [model], references: [model])
+  colorName String
+  model     String
+  Color     Color  @relation(fields: [colorName], references: [name])
+  device    Device @relation(fields: [model], references: [model])
 
   @@id([colorName, model])
 }
 
 model Device {
-  model            String              @id
+  model            String            @id
   deviceType       DeviceType
-  name             String              @db.VarChar
-  releaseDate      DateTime            @db.Date
+  name             String            @db.VarChar
+  releaseDate      DateTime          @db.Date
   batterySize      Int
-  chipset          String              @db.VarChar
-  operatingSystem  Float               @db.Real
-  weight           Float               @db.Real
+  chipset          String            @db.VarChar
+  operatingSystem  Float             @db.Real
+  weight           Float             @db.Real
   description      String
-  imageAmount      Int                 @db.SmallInt
-  resistanceRating String              @db.VarChar
-  releasePrice     Int                 @db.SmallInt
-  height           Int                 @db.SmallInt
-  width            Int                 @db.SmallInt
-  depth            Int                 @db.SmallInt
-  storage          Int?                @db.SmallInt
-  cpu              Int?                @db.SmallInt
-  gpu              Int?                @db.SmallInt
-  unifiedMemory    Int?                @db.SmallInt
-  wiredCharging    Float?              @db.Real
-  wirelessCharging Float?              @db.Real
-  memory           Int?                @db.SmallInt
-  screenSize       Float?              @db.Real
-  screenType       String?             @db.VarChar
-    resistance       String?
+  imageAmount      Int               @db.SmallInt
+  resistanceRating String            @db.VarChar
+  releasePrice     Int               @db.SmallInt
+  height           Int               @db.SmallInt
+  width            Int               @db.SmallInt
+  depth            Int               @db.SmallInt
+  storage          Int?              @db.SmallInt
+  cpu              Int?              @db.SmallInt
+  gpu              Int?              @db.SmallInt
+  unifiedMemory    Int?              @db.SmallInt
+  wiredCharging    Float?            @db.Real
+  wirelessCharging Float?            @db.Real
+  memory           Int?              @db.SmallInt
+  screenSize       Float?            @db.Real
+  screenType       String?           @db.VarChar
   biometrics       BiometricFeature
-  features         DeviceFeature[]
   connectors       DeviceConnector[]
   cameras          Camera[]
   comments         Comment[]
@@ -101,24 +99,12 @@ model Device {
 }
 
 model DeviceConnector {
-  model String @id
+  model         String  @id
   lightning     Boolean
   usb_c         Boolean
   thunderbolt_3 Boolean
   magsafe       Boolean
   device        Device  @relation(fields: [model], references: [model], onDelete: Cascade)
-}
-
-model DeviceFeature {
-  model                       String  @id
-  spatial_audio               Boolean
-  active_noise_cancellation   Boolean
-  transparency_mode           Boolean
-  apple_pencil_one_compatible Boolean
-  apple_pencil_two_compatible Boolean
-  magic_keyboard_compatible   Boolean
-  dynamic_island              Boolean
-  device                      Device  @relation(fields: [model], references: [model], onDelete: Cascade)
 }
 
 enum BiometricFeature {
