@@ -32,7 +32,7 @@ function ModelWidgets({ device }: Props) {
     },
     {
       title: t('operatingSystem'),
-      spec: 'ios ' + device.operatingSystem.toString(),
+      spec: 'ios ' + device.releaseOS,
       icon: <IconBrandApple size={45} />,
     },
     {

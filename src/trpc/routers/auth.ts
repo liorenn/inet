@@ -1,4 +1,3 @@
-import { DeviceTypeValue } from '@prisma/client'
 import { router, publicProcedure } from '../trpc'
 import { Resend } from 'resend'
 import { z } from 'zod'
@@ -8,7 +7,7 @@ export const authRouter = router({
   getSession: publicProcedure.query(({ ctx }) => {
     return ctx.session
   }),
-  sendEmail: publicProcedure.mutation(({ ctx }) => {
+  sendEmail: publicProcedure.mutation(() => {
     const resend = new Resend(process.env.RESEND_KEY)
     resend.emails.send({
       from: 'onboarding@resend.dev',
@@ -28,7 +27,6 @@ export const authRouter = router({
   addComment: publicProcedure
     .input(
       z.object({
-        deviceTypeValue: z.nativeEnum(DeviceTypeValue),
         likes: z.number(),
         message: z.string(),
         Rating: z.number(),
@@ -39,19 +37,10 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const {
-        deviceTypeValue,
-        likes,
-        createdAt,
-        message,
-        model,
-        Rating,
-        updatedAt,
-        username,
-      } = input
+      const { likes, createdAt, message, model, Rating, updatedAt, username } =
+        input
       const comment = await ctx.prisma.comment.create({
         data: {
-          deviceTypeValue,
           likes,
           message,
           Rating,
@@ -196,7 +185,7 @@ export const authRouter = router({
             model: true,
             name: true,
             imageAmount: true,
-            deviceTypeValue: true,
+            type: true,
           },
         })
         if (device) {
@@ -232,10 +221,6 @@ export const authRouter = router({
         })
       }
     }),
-  // getUserProfilePhohtoUrls: publicProcedure
-  //   .input(z.object({ username: z.string() }))
-  //   .query(async ({ ctx, input }) => {
-  //   }),
   updateUserDetails: publicProcedure
     .input(
       z.object({
@@ -276,19 +261,22 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.user.create({
-        data: {
-          id: input.id,
-          email: input.email,
-          name: input.name,
-          phone: input.phone,
-          password: input.password,
-          username: input.username,
-          role: 'USER',
-          comments: { create: [] },
-          deviceList: { create: [] },
-        },
-      })
+      try {
+        await ctx.prisma.user.create({
+          data: {
+            id: input.id,
+            email: input.email,
+            name: input.name,
+            phone: input.phone,
+            password: input.password,
+            username: input.username,
+            comments: { create: [] },
+            deviceList: { create: [] },
+          },
+        })
+      } catch (e) {
+        return e
+      }
     }),
   IsUserExists: publicProcedure
     .input(
@@ -326,6 +314,6 @@ export const authRouter = router({
 export type devicesPropertiesArrType = {
   model: string
   name: string
+  type: string
   imageAmount: number
-  deviceTypeValue: DeviceTypeValue
 }[]

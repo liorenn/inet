@@ -8,12 +8,13 @@ datasource db {
 }
 
 model Camera {
-  id         Int        @id @unique @default(autoincrement())
-  deviceType DeviceType
-  megapixel  Int        @db.SmallInt
+  type       String
   model      String
-  cameraType CameraType
+  megapixel  Int        @db.SmallInt
   device     Device     @relation(fields: [model], references: [model], onDelete: Cascade)
+  CameraType CameraType @relation(fields: [type], references: [name])
+
+  @@id([model, type])
 }
 
 model Color {
@@ -50,8 +51,8 @@ model Comment {
 model DeviceUser {
   deviceModel String @db.VarChar
   userId      String @db.VarChar
-  device      Device @relation(fields: [deviceModel], references: [model])
-  user        User   @relation(fields: [userId], references: [id])
+  device      Device @relation(fields: [deviceModel], references: [model], onDelete: Cascade)
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([deviceModel, userId])
 }
@@ -59,73 +60,64 @@ model DeviceUser {
 model DeviceColor {
   colorName String
   model     String
-  Color     Color  @relation(fields: [colorName], references: [name])
-  device    Device @relation(fields: [model], references: [model])
+  Color     Color  @relation(fields: [colorName], references: [name], onDelete: Cascade)
+  device    Device @relation(fields: [model], references: [model], onDelete: Cascade)
 
   @@id([colorName, model])
 }
 
 model Device {
-  model            String            @id
-  deviceType       DeviceType
-  name             String            @db.VarChar
-  releaseDate      DateTime          @db.Date
-  batterySize      Int
-  chipset          String            @db.VarChar
-  operatingSystem  Float             @db.Real
-  weight           Float             @db.Real
-  description      String
-  imageAmount      Int               @db.SmallInt
-  resistanceRating String            @db.VarChar
-  releasePrice     Int               @db.SmallInt
-  height           Int               @db.SmallInt
-  width            Int               @db.SmallInt
-  depth            Int               @db.SmallInt
-  storage          Int?              @db.SmallInt
-  cpu              Int?              @db.SmallInt
-  gpu              Int?              @db.SmallInt
-  unifiedMemory    Int?              @db.SmallInt
-  wiredCharging    Float?            @db.Real
-  wirelessCharging Float?            @db.Real
-  memory           Int?              @db.SmallInt
-  screenSize       Float?            @db.Real
-  screenType       String?           @db.VarChar
-  biometrics       BiometricFeature
-  connectors       DeviceConnector[]
+  model            String           @id
+  name             String           @db.VarChar
+  type             String           @db.VarChar
+  releaseDate      DateTime         @db.Date
+  releasePrice     Int              @db.SmallInt
+  connector        String           @db.VarChar
+  biometrics       String           @db.VarChar
+  batterySize      Int              @db.SmallInt
+  chipset          String           @db.VarChar
+  weight           Float            @db.Real
+  description      String           @db.VarChar
+  imageAmount      Int              @db.SmallInt
+  height           Int              @db.SmallInt
+  width            Int              @db.SmallInt
+  depth            Int              @db.SmallInt
+  storage          Int?             @db.SmallInt
+  cpu              Int?             @db.SmallInt
+  gpu              Int?             @db.SmallInt
+  memory           Int?             @db.SmallInt
+  releaseOS        String?           @db.VarChar
+  wiredCharging    Float?           @db.Real
+  magsafe          Boolean
+  wirelessCharging Float?           @db.Real
+  screenSize       Float?           @db.Real
+  screenType       String?          @db.VarChar
+  resistanceRating String?          @db.VarChar
   cameras          Camera[]
   comments         Comment[]
+  biometricFeature BiometricFeature @relation(fields: [biometrics], references: [name])
+  deviceConnector  DeviceConnector  @relation(fields: [connector], references: [name])
+  deviceType       DeviceType       @relation(fields: [type], references: [name])
   colors           DeviceColor[]
   usersList        DeviceUser[]
 }
 
 model DeviceConnector {
-  model         String  @id
-  lightning     Boolean
-  usb_c         Boolean
-  thunderbolt_3 Boolean
-  magsafe       Boolean
-  device        Device  @relation(fields: [model], references: [model], onDelete: Cascade)
+  name    String   @id @unique
+  devices Device[]
 }
 
-enum BiometricFeature {
-  face_id
-  touch_id
-  passcode
-  device_connection
+model BiometricFeature {
+  name    String   @id @unique
+  devices Device[]
 }
 
-enum CameraType {
-  ultrawide
-  wide
-  telephoto
-  front
+model CameraType {
+  name   String   @id @unique
+  Camera Camera[]
 }
 
-enum DeviceType {
-  airpods
-  ipad
-  iphone
-  mac
-  imac
-  macbook
+model DeviceType {
+  name    String   @id @unique
+  devices Device[]
 }

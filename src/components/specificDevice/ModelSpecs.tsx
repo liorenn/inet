@@ -1,20 +1,22 @@
-import { useState } from 'react'
 import {
+  Button,
   ColorSwatch,
+  Container,
   Group,
   Tooltip,
   useMantineColorScheme,
 } from '@mantine/core'
 import { Table, Accordion, Grid, Text } from '@mantine/core'
-import { DeviceTypeValue } from '@prisma/client'
-import type { Device } from '@prisma/client'
-import GetIphoneSpecs from './devicesSpecs/iphoneSpecs'
-import GetImacSpecs from './devicesSpecs/imacSpecs'
-import GetAirpodsSpecs from './devicesSpecs/airpodsSpecs'
 import useTranslation from 'next-translate/useTranslation'
+import FortmatSpecs, {
+  accordionContents,
+  deviceSpecsType,
+} from './SpecsFormatter'
+import { useState } from 'react'
+import Link from 'next/link'
 
 type Props = {
-  device: Device
+  device: deviceSpecsType
 }
 
 export type categoriesType = {
@@ -25,59 +27,33 @@ export type categoriesType = {
   }[]
 }[]
 
-type devicePropetiesType = {
-  accordionContents: string[]
-  deviceTypeValue: DeviceTypeValue
-  specsFunction: (device: any) => categoriesType
-}
-
 function ModelSpecs({ device }: Props) {
   const { t } = useTranslation('devices')
-  const devicePropeties: devicePropetiesType[] = [
-    {
-      deviceTypeValue: DeviceTypeValue.iphone,
-      specsFunction: GetIphoneSpecs,
-      accordionContents: [
-        t('display'),
-        t('battery'),
-        t('hardware'),
-        t('cameras'),
-        t('features'),
-        t('availability'),
-      ],
-    },
-    {
-      deviceTypeValue: DeviceTypeValue.imac,
-      specsFunction: GetImacSpecs,
-      accordionContents: [
-        t('display'),
-        t('hardware'),
-        t('cameras'),
-        t('features'),
-        t('availability'),
-      ],
-    },
-    {
-      deviceTypeValue: DeviceTypeValue.airpods,
-      specsFunction: GetAirpodsSpecs,
-      accordionContents: [
-        t('soundFeatures'),
-        t('battery'),
-        t('hardware'),
-        t('features'),
-        t('availability'),
-      ],
-    },
-  ]
-  const index = devicePropeties.findIndex(
-    (object) => object.deviceTypeValue === device.deviceTypeValue
-  )
-  const [value, setValue] = useState<string[]>(
-    devicePropeties[index].accordionContents
-  )
   const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
-  const categories = devicePropeties[index].specsFunction(device)
+  const formattedSpecs = FortmatSpecs(device)
+  const accordionContents = [
+    t('display'),
+    t('battery'),
+    t('hardware'),
+    t('cameras'),
+    t('features'),
+    t('availability'),
+  ]
+  const [value, setValue] = useState<string[]>(accordionContents)
+
+  if (formattedSpecs === null)
+    return (
+      <Container size='lg'>
+        {t('deviceDoesntExist')}
+        <br />
+        <Link href={'/'}>
+          <Button color='gray' size='lg' radius='md' mt='lg' variant='light'>
+            {t('goToHomePage')}
+          </Button>
+        </Link>
+      </Container>
+    )
 
   return (
     <Accordion
@@ -92,7 +68,7 @@ function ModelSpecs({ device }: Props) {
         content: { backgroundColor: dark ? 'gray.9' : 'white' },
         control: { backgroundColor: dark ? 'gray.9' : 'white' },
       }}>
-      {categories.map((category) => (
+      {formattedSpecs.map((category) => (
         <Accordion.Item value={category.name} key={category.name}>
           <Accordion.Control>{category.name}</Accordion.Control>
           <Accordion.Panel>

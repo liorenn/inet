@@ -5,9 +5,10 @@ import { Stack, Grid, Center } from '@mantine/core'
 import DevicePhotos from '../allDevices/DevicePhotos'
 import type { Device } from '@prisma/client'
 import ModelSpecs from './ModelSpecs'
+import { deviceSpecsType } from './SpecsFormatter'
 
 type Props = {
-  device: Device
+  device: deviceSpecsType
   commentsAmout: number
   ratingValue: number
 }

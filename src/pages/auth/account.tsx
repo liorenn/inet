@@ -109,6 +109,8 @@ export default function Account() {
     )
   }
 
+  console.log(UserDetails)
+
   if (!(user && session)) {
     return <>{t('accessDeniedMessageSignIn')}</>
   }

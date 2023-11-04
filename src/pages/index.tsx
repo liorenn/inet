@@ -3,15 +3,9 @@ import { Grid, Button, Text, Title, Image } from '@mantine/core'
 import { Group, Stack, Container } from '@mantine/core'
 import Link from 'next/link'
 import useTranslation from 'next-translate/useTranslation'
-import { trpc } from '../utils/trpc'
-import { useOs } from '@mantine/hooks'
 export default function Index() {
   const { t } = useTranslation('common')
   const paragraphs = t('homeParagraph').split('\n')
-  const x = trpc.AllDevices.getAllDevicesProperties.useQuery({
-    deviceType: 'iphone',
-  })
-  const os = useOs()
 
   return (
     <>
@@ -31,11 +25,6 @@ export default function Index() {
                 ))}
               </Text>
               <Group>
-                {x.data
-                  ? x.data.map((value) => (
-                      <Text key={value.model}>{value.name}</Text>
-                    ))
-                  : ''}
                 <Button color='gray' variant='light' size='lg' radius='md'>
                   {t('findYourDevice')}
                 </Button>

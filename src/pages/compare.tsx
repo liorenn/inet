@@ -12,18 +12,16 @@ import Head from 'next/head'
 import { useEffect, useMemo, useState } from 'react'
 import React from 'react'
 import ModelsSpecs from '../components/specificDevice/ModelsSpecs'
-import type { airpodsType, imacType, iphoneType } from '../utils/deviceTypes'
 import { trpc } from '../utils/trpc'
 import DevicePhotos from '../components/allDevices/DevicePhotos'
-import { DeviceTypeValue } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
 
 export default function Compare() {
   const { height, width } = useViewportSize()
-  const devicesQuery = trpc.AllDevices.getAllDevices.useMutation()
+  const devicesQuery = trpc.device.getAllDevices.useMutation()
   const [value1, setValue1] = useState<string | null>(null)
   const [value2, setValue2] = useState<string | null>(null)
-  const [value, setValue] = useState<DeviceTypeValue>('iphone')
+  const [value, setValue] = useState<deviceType>()
   const [devicesList, setDevicesList] = useState<
     { label: string; value: string }[]
   >([])

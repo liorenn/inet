@@ -1,8 +1,8 @@
 import { showNotification } from '@mantine/notifications'
-import { DeviceTypeValue } from '@prisma/client'
 import { IconCheck, IconX, IconExclamationMark } from '@tabler/icons'
 import type { ReactElement } from 'react'
 import type { Comment } from '@prisma/client'
+import { deviceType } from './deviceTypes'
 
 /**
  * Capitalizes first letters of words in string.
@@ -77,7 +77,7 @@ export function CreateNotification(
  * @return {string} The device type.
  */
 export function getDeviceType(deviceModel: string) {
-  const devicesTypes = Object.getOwnPropertyNames(DeviceTypeValue)
+  const devicesTypes = Object.getOwnPropertyNames(deviceType)
   for (let i = 0; i < devicesTypes.length; i++) {
     if (deviceModel.includes(devicesTypes[i]) && devicesTypes[i] !== 'mac') {
       //because imac and macbook contain the word mac so it would always return mac

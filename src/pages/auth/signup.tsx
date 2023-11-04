@@ -72,9 +72,8 @@ export default function SignUp() {
             })
             if (!error) {
               CreateNotification(t('accountCreatedSuccessfully'), 'green')
-              router.push('/')
-              router.reload()
               if (data.user?.id !== undefined) {
+                console.log(fields)
                 CreateUserMutation.mutate({
                   id: data.user?.id,
                   email: fields.email,

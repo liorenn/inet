@@ -26,7 +26,7 @@ export default function SignIn() {
 
   useEffect(() => {
     if (session) {
-      router.push('/')
+      //router.push('/')
     }
   }, [session, router])
 
@@ -45,6 +45,7 @@ export default function SignIn() {
 
   const onSubmit: SubmitHandler<Inputs> = (fields) => {
     //when form is submitted and passed validation
+
     console.log(fields)
     IsUserExistsMutation.mutate(
       {
@@ -53,6 +54,7 @@ export default function SignIn() {
       },
       {
         async onSuccess(data) {
+          console.log(data)
           if (data) {
             const { error } = await supabase.auth.signInWithPassword({
               email: fields.email,

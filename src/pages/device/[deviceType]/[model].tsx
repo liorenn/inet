@@ -1,7 +1,5 @@
 import { trpc } from '../../../utils/trpc'
 import { useRouter } from 'next/router'
-import { DeviceTypeValue } from '@prisma/client'
-import type { Device } from '@prisma/client'
 import ModelLayout from '../../../components/specificDevice/ModelLayout'
 import { Button, Center, Container, Loader } from '@mantine/core'
 import ModelHeader from '../../../components/specificDevice/ModelHeader'
@@ -12,56 +10,39 @@ import ModelComments from '../../../components/specificDevice/ModelComments'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
-
-enum queriesNames {
-  getiPhone = 'getiPhone',
-  getiMac = 'getiMac',
-  getAirpods = 'getAirpods',
-}
-type devicePropetiesType = {
-  deviceType: DeviceTypeValue
-  queryFunction: queriesNames
-}
-const devicePropeties: devicePropetiesType[] = [
-  {
-    deviceType: DeviceTypeValue.iphone,
-    queryFunction: queriesNames.getiPhone,
-  },
-  {
-    deviceType: DeviceTypeValue.imac,
-    queryFunction: queriesNames.getiMac,
-  },
-  {
-    deviceType: DeviceTypeValue.airpods,
-    queryFunction: queriesNames.getAirpods,
-  },
-]
-
-type devicesArrType = {
-  model: string
-}[]
-
-const isExistInArr = (devicesArr: devicesArrType, deviceModel: string) => {
-  for (let i = 0; i < devicesArr.length; i++) {
-    if (devicesArr[i].model === deviceModel) return true
-  }
-  return false
-}
+import { DeviceType } from '../../../utils/deviceTypes'
 
 // /device/iphone/iphone13 page
 function ModelPage() {
   const router = useRouter()
   const user = useUser()
-  const deviceModel =
-    router.asPath.split('/')[router.asPath.split('/').length - 1]
-  const { data } = trpc.auth.getUserDetails.useQuery({ id: user?.id })
+  const deviceType = router.asPath.split('/')[2] as DeviceType
+  const deviceModel = router.asPath.split('/')[3]
   const { height } = useViewportSize()
-  const { data: devicesArr } = trpc.AllDevices.getAllDevicesModels.useQuery()
-  const deviceType = router.asPath.split('/')[2] as DeviceTypeValue
   const [ratingValue, setRatingValue] = useState(0)
   const [commentsAmout, setCommentsAmout] = useState(0)
+  const { data: deviceDetails } = trpc.device.getDevice.useQuery({
+    model: deviceModel,
+  })
+  const { data: userDetails } = trpc.auth.getUserDetails.useQuery({
+    id: user?.id,
+  })
   const { t } = useTranslation('common')
-  if (devicesArr && !isExistInArr(devicesArr, deviceModel)) {
+
+  if (deviceDetails === undefined) {
+    return (
+      <>
+        <Head>
+          <title>{deviceType}</title>
+        </Head>
+        <Center>
+          <Loader color='gray' size={120} variant='dots' mt={height / 3} />
+        </Center>
+      </>
+    )
+  }
+
+  if (deviceDetails === null) {
     return (
       <Container size='lg'>
         {t('deviceDoesntExist')}
@@ -75,44 +56,22 @@ function ModelPage() {
     )
   }
 
-  const index = devicePropeties.findIndex(
-    (object) => object.deviceType === deviceType
-  )
-  const queryFunction = devicePropeties[index].queryFunction
-  const deviceQuery = trpc.UniqueDevice[queryFunction].useQuery({
-    model: deviceModel,
-  })
-  const device = deviceQuery.data as Device
-
-  if (device === undefined) {
-    return (
-      <>
-        <Head>
-          <title>{deviceType}</title>
-        </Head>
-        <Center>
-          <Loader color='gray' size={120} variant='dots' mt={height / 3} />
-        </Center>
-      </>
-    )
-  }
-
   return (
     <>
       <Head>
-        <title>{device.name}</title>
+        <title>{deviceDetails.name}</title>
       </Head>
       <Container size='lg'>
-        <ModelHeader device={device} />
+        <ModelHeader device={deviceDetails} />
         <ModelLayout
-          device={device}
+          device={deviceDetails}
           ratingValue={ratingValue}
           commentsAmout={commentsAmout}
         />
-        {user && data?.username && (
+        {user && userDetails?.username && (
           <ModelComments
-            device={device}
-            username={data.username}
+            device={deviceDetails}
+            username={userDetails.username}
             setRatingValue={setRatingValue}
             setCommentsAmout={setCommentsAmout}
           />

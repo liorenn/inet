@@ -1,13 +1,13 @@
 import Link from 'next/link'
-import { DeviceTypeValue } from '@prisma/client'
 import { SimpleGrid, Image, Button, Container, Text, Card } from '@mantine/core'
 import { Group, Breadcrumbs, Title, useMantineColorScheme } from '@mantine/core'
 import Head from 'next/head'
 import useTranslation from 'next-translate/useTranslation'
+import { deviceType } from '../../utils/deviceTypes'
 // /device page
 export default function Device() {
   const { colorScheme } = useMantineColorScheme()
-  const devicesTypes = Object.getOwnPropertyNames(DeviceTypeValue)
+  const devicesTypes = Object.getOwnPropertyNames(deviceType)
   const dark = colorScheme === 'dark'
   const { t } = useTranslation('common')
 

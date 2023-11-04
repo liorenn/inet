@@ -52,7 +52,7 @@ export const Navbar = () => {
   }
 
   return (
-    <Header height={65} mt={32} className={classes.root} mb={20}>
+    <Header height={65} className={classes.root} mb={20}>
       <Container className={classes.inner} fluid>
         <Group>
           <div className={classes.dropdown}>

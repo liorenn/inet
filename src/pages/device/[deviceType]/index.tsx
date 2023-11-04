@@ -1,4 +1,3 @@
-import type { DeviceTypeValue } from '@prisma/client'
 import { trpc } from '../../../utils/trpc'
 import DeviceCard from '../../../components/allDevices/DeviceCard'
 import { Center, Container, Loader, SimpleGrid } from '@mantine/core'
@@ -10,6 +9,7 @@ import { useUser } from '@supabase/auth-helpers-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
+import { DeviceType } from '../../../utils/deviceTypes'
 
 export interface allProperties {
   model: string
@@ -21,13 +21,13 @@ function DeviceTypePage() {
   const router = useRouter()
   const deviceType = router.asPath.split('/')[
     router.asPath.split('/').length - 1
-  ] as DeviceTypeValue
+  ] as DeviceType
   const { height } = useViewportSize()
   const user = useUser()
   const { t } = useTranslation('devices')
   const [areInList, setAreInList] = useState<{ isInList: boolean }[]>([])
   const userDevicesMutation = trpc.auth.handleDeviceToUser.useMutation()
-  const { data } = trpc.AllDevices.getAllDevicesPropertiesExtra.useQuery({
+  const { data } = trpc.device.getUserDevices.useQuery({
     deviceType: deviceType,
     userId: user?.id,
   })

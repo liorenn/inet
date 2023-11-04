@@ -48,7 +48,7 @@ export default function Favorites(): JSX.Element {
                     name: value.name,
                   }}
                   key={index}
-                  deviceType={value.deviceTypeValue}
+                  deviceType={value.type}
                   setDevicesArr={setDevicesArr}
                   devicesArr={devicesArr}
                 />

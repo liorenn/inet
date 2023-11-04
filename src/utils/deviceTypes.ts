@@ -1,54 +1,32 @@
-import type {
-  ResistanceFeature,
-  DeviceTypeValue,
-  AirpodsFeature,
-} from '@prisma/client'
-import type { BiometricFeature, ScreenType, Camera } from '@prisma/client'
-import type { Color, DeviceConnector} from '@prisma/client';
-
-export interface deviceType {
-  model: string
-  deviceTypeValue: DeviceTypeValue
-  name: string
-  releaseDate: Date
-  batterySize: number
-  chipset: string
-  operatingSystem: number
-  weight: number
-  description: string
-  imageAmount: number
-  biometrics: BiometricFeature
-  resistanceRating: string
-  resistance: ResistanceFeature[]
-  releasePrice: number
-  connectors: DeviceConnector[]
-  cameras: Camera[]
-  colors: {
-    Color: Color
-  }[]
+export const deviceType = {
+  iphone: 'iphone',
+  ipad: 'ipad',
+  airpods: 'airpods',
+  mac: 'mac',
+  imac: 'imac',
+  macbook: 'macbook',
 }
 
-export interface iphoneType extends deviceType {
-  screenSize: number
-  screenType: ScreenType
-  wiredCharging: number
-  wirelessCharging: number
-  memory: number
-  storage: number
+export const cameraType = {
+  ultrawide: 'ultrawide',
+  wide: 'wide',
+  telephoto: 'telephoto',
+  selfie: 'selfie',
 }
 
-export interface macType extends deviceType {
-  cpu: number
-  gpu: number
-  unifiedMemory: number
-  storage: number
+export const deviceConnector = {
+  lightning: 'lightning',
+  usb_c: 'usb_c',
+  usb_30_pin: 'usb_30_pin',
 }
 
-export interface airpodsType extends deviceType {
-  case: string
-  features: AirpodsFeature[]
+export const biometricFeature = {
+  face_id: 'face_id',
+  touch_id: 'touch_id',
+  passcode: 'passcode',
 }
 
-export interface imacType extends macType {
-  screenSize: number
-}
+export type DeviceType = keyof typeof deviceType
+export type CameraType = keyof typeof cameraType
+export type DeviceConnector = keyof typeof deviceConnector
+export type BiometricFeature = keyof typeof biometricFeature
