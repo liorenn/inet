@@ -29,7 +29,7 @@ model User {
   name       String       @db.VarChar
   password   String       @db.VarChar
   email      String       @unique @db.VarChar
-  phone      String       @unique @db.VarChar
+  phone      String       @db.VarChar
   accessKey  Int          @default(1)
   comments   Comment[]
   deviceList DeviceUser[]
@@ -71,6 +71,7 @@ model Device {
   name             String           @db.VarChar
   type             String           @db.VarChar
   releaseDate      DateTime         @db.Date
+  releaseOS        String?          @db.VarChar
   releasePrice     Int              @db.SmallInt
   connector        String           @db.VarChar
   biometrics       String           @db.VarChar
@@ -86,7 +87,6 @@ model Device {
   cpu              Int?             @db.SmallInt
   gpu              Int?             @db.SmallInt
   memory           Int?             @db.SmallInt
-  releaseOS        String?           @db.VarChar
   wiredCharging    Float?           @db.Real
   magsafe          Boolean
   wirelessCharging Float?           @db.Real

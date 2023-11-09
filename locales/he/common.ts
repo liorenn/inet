@@ -5,6 +5,7 @@ export default {
   pages: 'דפים',
   all: 'כל',
   home: 'דף הבית',
+  admin: 'מנהל',
   signIn: 'התחברת',
   signUp: 'הרשמה',
   signOut: 'התנתקות',

@@ -26,7 +26,7 @@ export default function SignIn() {
 
   useEffect(() => {
     if (session) {
-      //router.push('/')
+      router.push('/')
     }
   }, [session, router])
 
@@ -62,6 +62,7 @@ export default function SignIn() {
             })
             if (!error) {
               CreateNotification(t('signedInSuccessfully'), 'green')
+              router.push('/')
             } else {
               CreateNotification(t('errorAccured'), 'red')
               reset()
@@ -91,7 +92,7 @@ export default function SignIn() {
           <Link href='/auth/signup'>{t('createAnAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
-          <form onSubmit={() => handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <TextInput
               label={t('email')}
               defaultValue='lior.oren06@gmail.com'

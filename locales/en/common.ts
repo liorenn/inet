@@ -5,6 +5,7 @@ export default {
   pages: 'Pages',
   all: 'all',
   home: 'Home',
+  admin: 'Admin',
   signIn: 'Sign In',
   signUp: 'Sign Up',
   signOut: 'Sign Out',

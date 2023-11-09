@@ -132,6 +132,15 @@ export const Navbar = () => {
                 onClick={() => signOut()}>
                 {t('signOut')}
               </Button>
+              <Link href={'/auth/admin'}>
+                <Button
+                  variant='light'
+                  color='gray'
+                  radius='md'
+                  className={classes.end}>
+                  {t('admin')}
+                </Button>
+              </Link>
               <Link href={'/auth/account'}>
                 {/* <Avatar src={publicUrl} radius='md' /> */}
                 <Avatar radius='md' />

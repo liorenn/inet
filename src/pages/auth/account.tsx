@@ -112,7 +112,7 @@ export default function Account() {
   console.log(UserDetails)
 
   if (!(user && session)) {
-    return <>{t('accessDeniedMessageSignIn')}</>
+    return <Center>{t('accessDeniedMessageSignIn')}</Center>
   }
 
   if (!UserDetails) {

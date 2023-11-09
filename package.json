@@ -13,8 +13,9 @@
     "ionic:serve": "npm run start"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.5",
+    "@emotion/react": "^11.11.1",
     "@emotion/server": "^11.10.0",
+    "@emotion/styled": "^11.11.0",
     "@mantine/carousel": "^6.0.2",
     "@mantine/core": "^6.0.2",
     "@mantine/dates": "^6.0.2",
@@ -24,6 +25,7 @@
     "@mantine/next": "^6.0.2",
     "@mantine/notifications": "^6.0.2",
     "@mantine/nprogress": "^6.0.2",
+    "@mui/system": "^5.14.17",
     "@react-email/components": "0.0.6",
     "@splinetool/react-spline": "^2.2.6",
     "@splinetool/runtime": "^0.9.437",
