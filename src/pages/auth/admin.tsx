@@ -28,14 +28,20 @@ const Admin = () => {
   const [table, setTable] = useState('')
   const { data: tableColumns } = trpc.admin.getDeviceColumns.useQuery()
   const { mutate } = trpc.admin.getTableData.useMutation()
+  const [tableData, setTableData] = useState<string[][]>([])
+  console.log(tableColumns)
 
   function changeTableName(tableName: string) {
     setTable(tableName)
     mutate(
       { tableName: tableName },
       {
-        onSuccess(data) {
-          console.log(data)
+        onSuccess(unknownData) {
+          const data = unknownData as any
+          const stringArrays: string[][] = data.map((obj: any) =>
+            Object.values(obj).map((val) => String(val))
+          )
+          setTableData(stringArrays)
         },
       }
     )
@@ -77,22 +83,24 @@ const Admin = () => {
             <tr>
               {getObject(tableColumns, 'name', table)?.fields.map(
                 (value, index) => {
-                  return <th key={index}>{value.name}</th>
+                  if (!value.relationName)
+                    return <th key={index}>{value.name}</th>
                 }
               )}
             </tr>
           </thead>
-          {/* <tbody>
-            <tr>
-              {getObject(tableColumns, 'name', table)?.fields.map((value) => {
+          <tbody>
+            {tableData &&
+              tableData.map((value, index) => {
                 return (
-                  <>
-                    <td key={value.name}>{value.name}</td>
-                  </>
+                  <tr key={index}>
+                    {value.map((value, index) => {
+                      return <td key={index}>{value}</td>
+                    })}
+                  </tr>
                 )
               })}
-            </tr>
-          </tbody> */}
+          </tbody>
         </Table>
       </Container>
     </>
