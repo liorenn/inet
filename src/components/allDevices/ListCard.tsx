@@ -1,12 +1,12 @@
 import ModelPhotos from './DevicePhotos'
 import { Card, Button, Grid, Text, Space } from '@mantine/core'
-import type { DeviceTypeValue } from '@prisma/client'
 import Link from 'next/link'
 import { trpc } from '../../utils/trpc'
 import { useUser } from '@supabase/auth-helpers-react'
 import { CreateNotification } from '../../utils/functions'
 import type { devicesPropertiesArrType } from '../../trpc/routers/auth'
 import useTranslation from 'next-translate/useTranslation'
+import { DeviceType } from '@prisma/client'
 
 type AppProps = {
   device: {
@@ -14,7 +14,7 @@ type AppProps = {
     name: string
     imageAmount: number
   }
-  deviceType: DeviceTypeValue
+  deviceType: DeviceType
   setDevicesArr: (value: devicesPropertiesArrType | undefined) => void
   devicesArr: devicesPropertiesArrType
 }

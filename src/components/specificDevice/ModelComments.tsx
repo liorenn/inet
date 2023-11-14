@@ -79,7 +79,7 @@ function ModelComments({
     e.preventDefault()
     const newComment = {
       createdAt: new Date(),
-      deviceTypeValue: device.deviceTypeValue,
+      deviceTypeValue: device.type,
       likes: 0,
       message: text,
       model: device.model,

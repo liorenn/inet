@@ -40,7 +40,7 @@ export default function SignUp() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>({})
+  } = useForm<Inputs>()
 
   const onSubmit: SubmitHandler<Inputs> = (fields) => {
     //when form is submitted and passed validation
