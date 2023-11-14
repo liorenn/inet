@@ -19,12 +19,7 @@ import { IconRefresh } from '@tabler/icons'
 
 export default function UserManagement() {
   const { t } = useTranslation('auth')
-  const { data, refetch } = trpc.admin.getUsersData.useQuery()
-  const [tableData, setTableData] = useState<User[] | undefined>(data)
-
-  useEffect(() => {
-    setTableData(data)
-  }, [data])
+  const { data: tableData, refetch } = trpc.admin.getUsersData.useQuery()
 
   if (!tableData) {
     return (
@@ -60,7 +55,7 @@ export default function UserManagement() {
           </tbody>
         </Table>
       </ScrollArea>
-      <Affix position={{ bottom: 20, right: 20 }}>
+      {/* <Affix position={{ bottom: 20, right: 20 }}>
         <Button
           variant='light'
           color='gray'
@@ -79,7 +74,7 @@ export default function UserManagement() {
           }}>
           {t('refresh')}
         </Button>
-      </Affix>
+      </Affix> */}
     </>
   )
 }

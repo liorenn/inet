@@ -1,8 +1,34 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '../trpc'
-import { Prisma, User } from '@prisma/client'
+import { Prisma } from '@prisma/client'
+import $ from 'jquery.soap'
 
 export const AdminRouter = router({
+  getSoap: publicProcedure.query(async ({ ctx }) => {
+    const url = 'https://localhost:44394/Asp/WebService1.asmx?WSDL'
+    $.soap({
+      url: url,
+      method: 'Add',
+
+      data: {
+        n1: '3',
+        n2: '2',
+      },
+
+      success: function (soapResponse) {
+        console.log(soapResponse)
+        // do stuff with soapResponse
+        // if you want to have the response as JSON use soapResponse.toJSON();
+        // or soapResponse.toString() to get XML string
+        // or soapResponse.toXML() to get XML DOM
+      },
+      error: function (SOAPResponse) {
+        console.log(SOAPResponse)
+        // show error
+      },
+    })
+    return false
+  }),
   getUserColumns: publicProcedure.query(async ({ ctx }) => {
     return Prisma.dmmf.datamodel.models.find((model) => model.name === 'User')
   }),
