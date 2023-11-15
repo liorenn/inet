@@ -4,6 +4,7 @@ import { Group, Stack, Container } from '@mantine/core'
 import Link from 'next/link'
 import useTranslation from 'next-translate/useTranslation'
 import { trpc } from '../utils/trpc'
+
 export default function Index() {
   const { t } = useTranslation('common')
   const paragraphs = t('homeParagraph').split('\n')

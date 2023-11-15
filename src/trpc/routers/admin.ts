@@ -1,33 +1,40 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '../trpc'
 import { Prisma } from '@prisma/client'
-import $ from 'jquery.soap'
+import soapRequest from 'easy-soap-request'
+import { XMLParser } from 'fast-xml-parser'
 
 export const AdminRouter = router({
   getSoap: publicProcedure.query(async ({ ctx }) => {
-    const url = 'https://localhost:44394/Asp/WebService1.asmx?WSDL'
-    $.soap({
-      url: url,
-      method: 'Add',
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+    const url = 'https://localhost:44394/Asp/WebService1.asmx'
+    const xml = `
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+    <soapenv:Header/>
+    <soapenv:Body>
+       <tem:UserExists>
+          <tem:username>lioren</tem:username>
+       </tem:UserExists>
+    </soapenv:Body>
+ </soapenv:Envelope>
+    `
+    const Headers = {
+      'Content-Type': 'text/xml;charset=UTF-8',
+    }
 
-      data: {
-        n1: '3',
-        n2: '2',
-      },
-
-      success: function (soapResponse) {
-        console.log(soapResponse)
-        // do stuff with soapResponse
-        // if you want to have the response as JSON use soapResponse.toJSON();
-        // or soapResponse.toString() to get XML string
-        // or soapResponse.toXML() to get XML DOM
-      },
-      error: function (SOAPResponse) {
-        console.log(SOAPResponse)
-        // show error
-      },
+    const { response } = await soapRequest({
+      url,
+      xml,
+      headers: Headers,
     })
-    return false
+    const { body } = response
+    const parser = new XMLParser()
+    let json = parser.parse(body)
+    const userExistsResult =
+      json['soap:Envelope']['soap:Body']['UserExistsResponse'][
+        'UserExistsResult'
+      ]
+    return userExistsResult
   }),
   getUserColumns: publicProcedure.query(async ({ ctx }) => {
     return Prisma.dmmf.datamodel.models.find((model) => model.name === 'User')
@@ -74,3 +81,91 @@ export const AdminRouter = router({
       })
     }),
 })
+
+/*
+    const xmlData = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+    <soapenv:Header/>
+    <soapenv:Body>
+       <tem:Add>
+          <tem:n1>6</tem:n1>
+          <tem:n2>4</tem:n2>
+       </tem:Add>
+    </soapenv:Body>
+ </soapenv:Envelope>`
+
+    const config = {
+      headers: {
+        'Content-Type': 'text/xml',
+      },
+    }
+    axios
+      .post(url, xmlData, config)
+      .then((response) => {
+        console.log(response.data)
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+   
+*/
+
+/*
+  const soapRequest = require('easy-soap-request')
+    const sampleHeaders = {
+      'Content-Type': 'text/xml;charset=UTF-8',
+    }
+    const xml = `
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <tem:Add>
+         <tem:n1>5</tem:n1>
+         <tem:n2>3</tem:n2>
+      </tem:Add>
+   </soapenv:Body>
+</soapenv:Envelope>
+    `
+    ;(async () => {
+      const { response } = await soapRequest({
+        url: url,
+        headers: sampleHeaders,
+        xml: xml,
+        timeout: 1000,
+      }) // Optional timeout parameter(milliseconds)
+      const { body, statusCode } = response
+      console.log(body)
+    })()
+*/
+
+/*
+    const client = require('soap-client-node')
+
+    const urls = {
+      url: 'https://localhost:44394/Asp/WebService1.asmx?WSDL',
+      xmlns: 'http://tempuri.org/',
+    }
+
+    const methodParams = {
+      type: 'POST',
+      method: 'Add',
+    }
+
+    const params = {
+      n1: 5,
+      n2: 3,
+    }
+
+    client.createClient(
+      urls,
+      methodParams,
+      params,
+      function (err: any, result: any) {
+        if (err) {
+          console.log(err)
+        } else {
+          console.log(JSON.stringify(result))
+        }
+      }
+    )
+    return null
+*/
