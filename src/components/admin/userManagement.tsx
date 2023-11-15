@@ -14,12 +14,11 @@ import { User } from '@prisma/client'
 import { Controller, useForm } from 'react-hook-form'
 import debounce from 'lodash.debounce'
 import { CreateNotification } from '../../utils/functions'
-import { useEffect, useState } from 'react'
-import { IconRefresh } from '@tabler/icons'
+import { useState } from 'react'
 
 export default function UserManagement() {
   const { t } = useTranslation('auth')
-  const { data: tableData, refetch } = trpc.admin.getUsersData.useQuery()
+  const { data: tableData } = trpc.admin.getUsersData.useQuery()
 
   if (!tableData) {
     return (

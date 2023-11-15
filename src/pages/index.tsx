@@ -1,15 +1,12 @@
 import Head from 'next/head'
-import { Grid, Button, Text, Title, Image } from '@mantine/core'
+import { Grid, Button, Text, Title } from '@mantine/core'
 import { Group, Stack, Container } from '@mantine/core'
 import Link from 'next/link'
 import useTranslation from 'next-translate/useTranslation'
-import { trpc } from '../utils/trpc'
 
 export default function Index() {
   const { t } = useTranslation('common')
   const paragraphs = t('homeParagraph').split('\n')
-  const { data } = trpc.admin.getSoap.useQuery()
-  console.log(data)
 
   return (
     <>
