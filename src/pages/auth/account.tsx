@@ -109,8 +109,6 @@ export default function Account() {
     )
   }
 
-  console.log(UserDetails)
-
   if (!(user && session)) {
     return <Center>{t('accessDeniedMessageSignIn')}</Center>
   }
@@ -204,9 +202,7 @@ export default function Account() {
               onClick={async () => {
                 try {
                   await UpdateDetail('username')
-                } catch (error) {
-                  console.log(error)
-                }
+                } catch (error) {}
               }}>
               <Text
                 sx={{ fontSize: 18 }}
@@ -238,9 +234,7 @@ export default function Account() {
               onClick={async () => {
                 try {
                   await UpdateDetail('name')
-                } catch (error) {
-                  console.log(error)
-                }
+                } catch (error) {}
               }}>
               <Text
                 sx={{ fontSize: 18 }}
@@ -272,9 +266,7 @@ export default function Account() {
               onClick={async () => {
                 try {
                   await UpdateDetail('email')
-                } catch (error) {
-                  console.log(error)
-                }
+                } catch (error) {}
               }}>
               <Text
                 sx={{ fontSize: 18 }}
@@ -306,9 +298,7 @@ export default function Account() {
               onClick={async () => {
                 try {
                   await UpdateDetail('phone')
-                } catch (error) {
-                  console.log(error)
-                }
+                } catch (error) {}
               }}>
               <Text
                 sx={{ fontSize: 18 }}

@@ -73,7 +73,6 @@ export default function SignUp() {
             if (!error) {
               CreateNotification(t('accountCreatedSuccessfully'), 'green')
               if (data.user?.id !== undefined) {
-                console.log(fields)
                 CreateUserMutation.mutate({
                   id: data.user?.id,
                   email: fields.email,
@@ -158,7 +157,7 @@ export default function SignUp() {
               error={errors.phone && t('wrongPattern')}
               {...register('phone', {
                 required: true,
-                pattern: /^\+\d{13}$/,
+                pattern: /^0\d{1,2}-?\d{7}$/,
               })}
             />
             <PasswordInput

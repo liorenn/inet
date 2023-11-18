@@ -19,6 +19,7 @@ export default {
   commentDeletedSuccessfully: 'Comment deleted successfully',
   commentSection: 'Comment Section',
   viewCommentsSentence: 'view comments and add your own comment',
+  releasePrice: 'Release Price',
   writeAComment: 'Write A Comment',
   addComment: 'Add Comment',
   cancel: 'Cancel',

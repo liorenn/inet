@@ -20,6 +20,7 @@ export default {
   battery: 'Batterie',
   chipset: 'Chipset',
   price: 'Preis',
+  releasePrice: 'Veröffentlichungspreis',
   commentDeletedSuccessfully: 'Kommentar erfolgreich gelöscht',
   commentSection: 'Kommentarbereich',
   viewCommentsSentence: 'Kommentare anzeigen und eigenen Kommentar hinzufügen',

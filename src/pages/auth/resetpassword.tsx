@@ -24,13 +24,9 @@ export default function ResetPassword() {
 
   async function handleEmailSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    await supabase.auth
-      .resetPasswordForEmail(email)
-      .then((data) => {
-        console.log(data)
-        CreateNotification('Check Your Email To Sign In at ' + email, 'yellow')
-      })
-      .catch((error) => console.log(error))
+    await supabase.auth.resetPasswordForEmail(email).then((data) => {
+      CreateNotification('Check Your Email To Sign In at ' + email, 'yellow')
+    })
   }
 
   async function handlePasswordSubmit(e: React.FormEvent<HTMLFormElement>) {

@@ -116,7 +116,7 @@ function ModelComments({
       </div>
       <Divider sx={{ marginBottom: 20 }} />
       <Accordion
-        defaultValue='comments'
+        defaultValue=''
         radius='xl'
         styles={{
           label: { fontSize: 24, fontWeight: 500 },

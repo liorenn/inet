@@ -48,7 +48,6 @@ export default function ViaPhone() {
     if (!error) {
       CreateNotification(t('signedInSuccessfully'), 'green')
     } else {
-      console.log(error)
       CreateNotification(t('errorAccured'), 'red')
       reset()
     }

@@ -38,6 +38,7 @@ function ModelsSpecs({ device1, device2 }: Props) {
   const { t } = useTranslation('devices')
   const { width } = useViewportSize()
   const accordionContents = [
+    t('name'),
     t('display'),
     t('battery'),
     t('hardware'),
@@ -156,7 +157,7 @@ function IphoneTable({ category }: TableProps) {
                   <Text>
                     {element.label === t('colors') ? (
                       <Group position='left' spacing='xs'>
-                        {element.info1.split(' ').map(
+                        {element.info2.split(' ').map(
                           (color, index) =>
                             color !== undefined && (
                               <Tooltip
@@ -173,7 +174,7 @@ function IphoneTable({ category }: TableProps) {
                         )}
                       </Group>
                     ) : (
-                      element.info1
+                      element.info2
                     )}
                   </Text>
                 </Grid.Col>

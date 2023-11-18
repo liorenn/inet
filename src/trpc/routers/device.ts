@@ -12,7 +12,6 @@ export const DeviceRouter = router({
           colors: { select: { Color: true } },
         },
       })
-      console.log(device)
       return device
     }),
   getDeviceMutation: publicProcedure
@@ -25,7 +24,6 @@ export const DeviceRouter = router({
           colors: { select: { Color: true } },
         },
       })
-      console.log(device)
       return device
     }),
   getAllDevicesModels: publicProcedure.query(async ({ ctx }) => {

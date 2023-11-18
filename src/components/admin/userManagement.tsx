@@ -62,7 +62,6 @@ export default function UserManagement() {
           leftIcon={<IconRefresh size={16} />}
           onClick={() => {
             refetch().then((data) => {
-              console.log(data.data)
               setTableData(() => {
                 if (data.data) {
                   return [...data.data]
@@ -102,8 +101,7 @@ function UserRow({ data }: { data: User }) {
             os === 'ios' ? true : false
           )
         },
-        onError: (error) => {
-          console.log(error)
+        onError: () => {
           CreateNotification(
             t('errorAccured'),
             'red',
@@ -212,7 +210,7 @@ function UserRow({ data }: { data: User }) {
           <FormInput
             inputName='phone'
             defaultValue={data.phone}
-            regex={/^\+\d{13}$/}
+            regex={/^0\d{1,2}-?\d{7}$/}
           />
         </td>
         <td>

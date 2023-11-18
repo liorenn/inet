@@ -45,8 +45,6 @@ export default function SignIn() {
 
   const onSubmit: SubmitHandler<Inputs> = (fields) => {
     //when form is submitted and passed validation
-
-    console.log(fields)
     IsUserExistsMutation.mutate(
       {
         email: fields.email,
@@ -54,7 +52,6 @@ export default function SignIn() {
       },
       {
         async onSuccess(data) {
-          console.log(data)
           if (data) {
             const { error } = await supabase.auth.signInWithPassword({
               email: fields.email,

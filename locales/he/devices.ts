@@ -60,6 +60,7 @@ export default {
   wide: 'רחב',
   ultrawind: 'סופר רחב',
   front: 'קדמית',
+  releasePrice: 'מחיר יציאה',
   active_noise_cancellation: 'ביטול רעש פעיל',
   transparency_mode: 'מצב שקיפות',
   spatial_audio: 'שמע מרחבי',

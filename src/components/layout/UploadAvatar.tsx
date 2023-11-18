@@ -95,9 +95,7 @@ export default function UploadAvatar({ setIsHovered }: props) {
                 onClick={async () => {
                   try {
                     await SubmitFile(file)
-                  } catch (error) {
-                    console.log(error)
-                  }
+                  } catch (error) {}
                 }}
                 variant='light'
                 color='green'

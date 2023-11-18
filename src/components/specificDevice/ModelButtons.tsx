@@ -29,7 +29,7 @@ function ModelButtons({ device }: Props) {
 
   function handleIsInlist(device: allProperties, isInList: boolean) {
     if (user) {
-      const message = isInList
+      const message = !isInList
         ? t('removeDeviceErrorMessage')
         : t('removeDeviceSuccessMessage')
       CreateNotification(message, 'green')

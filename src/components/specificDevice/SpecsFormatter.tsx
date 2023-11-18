@@ -137,7 +137,7 @@ export default function FortmatSpecs(device: deviceSpecsType) {
       name: t('availability'),
       values: [
         {
-          label: t('price'),
+          label: t('releasePrice'),
           info: device.releasePrice.toString() + t('releasePriceUnits'),
         },
         {
@@ -148,7 +148,10 @@ export default function FortmatSpecs(device: deviceSpecsType) {
           label: t('colors'),
           info: device.colors
             ? device.colors
-                .map((value) => value.Color.hex + '/' + value.Color.name)
+                .map(
+                  (value) =>
+                    value.Color.hex + '/' + value.Color.name.replace(/\s/g, '')
+                )
                 .join(' ')
             : t('none'),
         },

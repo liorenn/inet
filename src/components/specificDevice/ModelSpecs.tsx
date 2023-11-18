@@ -87,6 +87,7 @@ type TableProps = {
 
 function IphoneTable({ category }: TableProps) {
   const { t } = useTranslation('devices')
+
   return (
     <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
       <tbody>
