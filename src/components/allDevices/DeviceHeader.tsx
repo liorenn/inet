@@ -1,13 +1,13 @@
 import { useMantineColorScheme } from '@mantine/core'
 import { Group, Breadcrumbs, Text, Title } from '@mantine/core'
 import Link from 'next/link'
-import type { DeviceTypeValue } from '@prisma/client'
+import { DeviceType } from '../../utils/deviceTypes'
 import useTranslation from 'next-translate/useTranslation'
 
 export default function DeviceHeader({
   deviceType,
 }: {
-  deviceType: DeviceTypeValue
+  deviceType: DeviceType
 }) {
   const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'

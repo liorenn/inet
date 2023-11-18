@@ -1,6 +1,6 @@
 import ModelPhotos from './DevicePhotos'
 import { Card, Button, Grid, Text, Space } from '@mantine/core'
-import type { DeviceTypeValue } from '@prisma/client'
+import { DeviceType } from '../../utils/deviceTypes'
 import Link from 'next/link'
 import { useUser } from '@supabase/auth-helpers-react'
 import type { allProperties } from '../../pages/device/[deviceType]/index'
@@ -14,7 +14,7 @@ type AppProps = {
   }
   index: number
   isInList: boolean
-  deviceType: DeviceTypeValue
+  deviceType: DeviceType
   handleIsInlist: (
     device: allProperties,
     isInList: boolean,

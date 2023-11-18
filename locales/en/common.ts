@@ -3,6 +3,7 @@ export default {
   allDevices: 'All Devices',
   favorites: 'Favorite Devices',
   pages: 'Pages',
+  selectDevice: 'Select Device',
   userManagement: 'User Management',
   deviceManagement: 'Device Management',
   data: 'Data',

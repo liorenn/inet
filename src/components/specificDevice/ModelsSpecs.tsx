@@ -1,13 +1,13 @@
 import { ColorSwatch, Tooltip, useMantineColorScheme } from '@mantine/core'
 import { Table, Accordion, Grid, Text, Group } from '@mantine/core'
-import type { Device } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
 import { useState } from 'react'
 import { useViewportSize } from '@mantine/hooks'
+import FortmatSpecs, { deviceSpecsType } from './SpecsFormatter'
 
 type Props = {
-  device1: Device
-  device2: Device
+  device1: deviceSpecsType
+  device2: deviceSpecsType
 }
 
 export type categoriesType = {
@@ -34,71 +34,22 @@ type TableProps = {
     info2: string
   }[]
 }
-
-type devicePropetiesType = {
-  accordionContents: string[]
-  deviceTypeValue: DeviceTypeValue
-  specsFunction: (device: any) => categoriesType
-}
-
 function ModelsSpecs({ device1, device2 }: Props) {
   const { t } = useTranslation('devices')
   const { width } = useViewportSize()
-  const devicePropeties: devicePropetiesType[] = [
-    {
-      deviceTypeValue: DeviceTypeValue.iphone,
-      specsFunction: GetIphoneSpecs,
-      accordionContents: [
-        t('name'),
-        t('display'),
-        t('battery'),
-        t('hardware'),
-        t('cameras'),
-        t('features'),
-        t('availability'),
-      ],
-    },
-    {
-      deviceTypeValue: DeviceTypeValue.imac,
-      specsFunction: GetImacSpecs,
-      accordionContents: [
-        t('display'),
-        t('hardware'),
-        t('cameras'),
-        t('features'),
-        t('availability'),
-      ],
-    },
-    {
-      deviceTypeValue: DeviceTypeValue.airpods,
-      specsFunction: GetAirpodsSpecs,
-      accordionContents: [
-        t('soundFeatures'),
-        t('battery'),
-        t('hardware'),
-        t('features'),
-        t('availability'),
-      ],
-    },
+  const accordionContents = [
+    t('display'),
+    t('battery'),
+    t('hardware'),
+    t('cameras'),
+    t('features'),
+    t('availability'),
   ]
-
-  const index = devicePropeties.findIndex(
-    (object) => object.deviceTypeValue === device1.deviceTypeValue
-  )
-  const [value, setValue] = useState<string[]>([
-    'Name',
-    ...devicePropeties[index].accordionContents,
-  ])
+  const [value, setValue] = useState<string[]>(accordionContents)
   const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
-  const index1 = devicePropeties.findIndex(
-    (object) => object.deviceTypeValue === device1.deviceTypeValue
-  )
-  const categories1 = devicePropeties[index1].specsFunction(device1)
-  const index2 = devicePropeties.findIndex(
-    (object) => object.deviceTypeValue === device2.deviceTypeValue
-  )
-  const categories2 = devicePropeties[index2].specsFunction(device2)
+  const categories1 = FortmatSpecs(device1)
+  const categories2 = FortmatSpecs(device2)
   const mergedCategories = mergeCategories(categories1, categories2)
 
   function mergeCategories(

@@ -15,6 +15,7 @@ import { Controller, useForm } from 'react-hook-form'
 import debounce from 'lodash.debounce'
 import { CreateNotification } from '../../utils/functions'
 import { useState } from 'react'
+import { useOs } from '@mantine/hooks'
 
 export default function UserManagement() {
   const { t } = useTranslation('auth')
@@ -79,6 +80,7 @@ export default function UserManagement() {
 }
 
 function UserRow({ data }: { data: User }) {
+  const os = useOs()
   const { t } = useTranslation('auth')
   const { mutate: mutateUpdate } = trpc.admin.updateUser.useMutation()
   const { mutate: mutateDelete } = trpc.admin.deleteUser.useMutation()
@@ -94,10 +96,19 @@ function UserRow({ data }: { data: User }) {
       { ...fields, id: data.id },
       {
         onSuccess: () => {
-          CreateNotification(t('updatedSuccessfully'), 'green')
+          CreateNotification(
+            t('updatedSuccessfully'),
+            'green',
+            os === 'ios' ? true : false
+          )
         },
-        onError: () => {
-          CreateNotification(t('errorAccured'), 'red')
+        onError: (error) => {
+          console.log(error)
+          CreateNotification(
+            t('errorAccured'),
+            'red',
+            os === 'ios' ? true : false
+          )
         },
       }
     )
@@ -116,9 +127,15 @@ function UserRow({ data }: { data: User }) {
     inputName: inputName
     defaultValue: string
     regex: RegExp
+    disabled?: boolean
   }
 
-  function FormInput({ inputName, defaultValue, regex }: FormInputProps) {
+  function FormInput({
+    inputName,
+    defaultValue,
+    regex,
+    disabled,
+  }: FormInputProps) {
     const [error, setError] = useState(!regex.test(defaultValue))
     return (
       <Controller
@@ -128,7 +145,11 @@ function UserRow({ data }: { data: User }) {
         render={({ field }) => (
           <TextInput
             {...field}
-            w='100%'
+            w='160px'
+            style={{
+              pointerEvents: disabled ? 'none' : 'auto',
+              opacity: disabled ? 0.6 : 1,
+            }}
             onChange={(event) => {
               field.onChange(event)
               if (regex.test(event.target.value)) {
@@ -160,6 +181,7 @@ function UserRow({ data }: { data: User }) {
         </td>
         <td>
           <FormInput
+            disabled
             inputName='username'
             defaultValue={data.username}
             regex={/^[A-Za-z\d_.]{5,}$/}

@@ -3,6 +3,7 @@ export default {
   allDevices: 'כל המכשירים',
   favorites: 'מכשירים אהובים',
   pages: 'דפים',
+  selectDevice: 'בחר מכשיר',
   userManagement: 'ניהול משתמשים',
   deviceManagement: 'ניהול מכשירים',
   data: 'נתונים',

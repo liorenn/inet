@@ -249,6 +249,14 @@ export const authRouter = router({
       })
       return details
     }),
+  getAccessKey: publicProcedure
+    .input(z.object({ userId: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      const details = await ctx.prisma.user.findFirst({
+        where: { id: input.userId },
+      })
+      return details?.accessKey
+    }),
   CreateUser: publicProcedure
     .input(
       z.object({

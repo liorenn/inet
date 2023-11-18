@@ -31,6 +31,9 @@ export const Navbar = () => {
   const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
     userId: user?.id,
   })
+  const { data: AccessKey } = trpc.auth.getAccessKey.useQuery({
+    userId: user?.id,
+  })
   useEffect(() => {
     setLanguage((localStorage.getItem('language') as languagesType) ?? 'en')
     supabase.auth.onAuthStateChange((e, session) => {
@@ -56,7 +59,7 @@ export const Navbar = () => {
       <Container className={classes.inner} fluid>
         <Group>
           <div className={classes.dropdown}>
-            <NavBarDropdown />
+            <NavBarDropdown AccessKey={AccessKey} />
           </div>
           <Link className={classes.end} href={'/'}>
             <Button variant='subtle' color={'gray.' + (dark ? '1' : '9')}>
@@ -64,7 +67,7 @@ export const Navbar = () => {
                 <Text style={{ fontSize: '22px', fontWeight: 500 }}>
                   {t('inet')}
                 </Text>
-                <IconDevices height={30} width={30} />
+                {/* <IconDevices height={30} width={30} /> */}
               </Group>
             </Button>
           </Link>
@@ -132,15 +135,17 @@ export const Navbar = () => {
                 onClick={() => signOut()}>
                 {t('signOut')}
               </Button>
-              <Link href={'/auth/admin'}>
-                <Button
-                  variant='light'
-                  color='gray'
-                  radius='md'
-                  className={classes.end}>
-                  {t('admin')}
-                </Button>
-              </Link>
+              {AccessKey && AccessKey >= 5 && (
+                <Link href={'/auth/admin'}>
+                  <Button
+                    variant='light'
+                    color='gray'
+                    radius='md'
+                    className={classes.end}>
+                    {t('admin')}
+                  </Button>
+                </Link>
+              )}
               <Link href={'/auth/account'}>
                 {/* <Avatar src={publicUrl} radius='md' /> */}
                 <Avatar radius='md' />

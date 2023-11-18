@@ -6,7 +6,7 @@ import useTranslation from 'next-translate/useTranslation'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { CreateNotification } from '../../utils/functions'
 
-function NavBarDropdown() {
+function NavBarDropdown({ AccessKey }: { AccessKey: number | undefined }) {
   const [opened, setOpened] = useState(false)
   const { classes, cx } = useStyles()
   const [activeLink] = useState('Settings')
@@ -22,22 +22,23 @@ function NavBarDropdown() {
     }
   }
 
-  const authButtons = session
-    ? [
-        { title: authT('account'), href: '/auth/account' },
-        { title: t('signOut'), href: '/' },
-      ]
-    : [
-        { title: t('signIn'), href: '/auth/signin' },
-        { title: t('signUp'), href: '/auth/signup' },
-      ]
   const Buttons = [
     { title: t('home'), href: '/' },
     { title: t('allDevices'), href: '/device' },
     { title: t('compare'), href: '/compare' },
     { title: t('favorites'), href: '/favorites' },
-    ...authButtons,
   ]
+
+  if (session) {
+    Buttons.push({ title: authT('account'), href: '/auth/account' })
+    if (AccessKey && AccessKey >= 5) {
+      Buttons.push({ title: t('admin'), href: '/auth/admin' })
+    }
+    Buttons.push({ title: t('signOut'), href: '/' })
+  } else {
+    Buttons.push({ title: t('signIn'), href: '/auth/signin' })
+    Buttons.push({ title: t('signUp'), href: '/auth/signup' })
+  }
 
   return (
     <>

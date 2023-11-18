@@ -10,7 +10,11 @@ export default function Admin() {
     <>
       <Container size='xl'>
         <SegmentedControl
-          data={['Data', 'deviceManager', 'userManagement']}
+          data={[
+            { value: 'Data', label: 'Data' },
+            { value: 'deviceManager', label: 'Devices' },
+            { value: 'userManagement', label: 'Users' },
+          ]}
           onChange={setPage}
           value={page}
           fullWidth

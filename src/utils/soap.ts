@@ -1,6 +1,6 @@
 import { XMLParser } from 'fast-xml-parser'
 
-export const sendSoapRequest: boolean = true
+export const sendSoapRequest: boolean = false
 export const soapServerUrl: string =
   'https://localhost:44394/Asp/WebService1.asmx'
 
