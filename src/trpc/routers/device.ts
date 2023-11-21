@@ -1,7 +1,23 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '../trpc'
-
 export const DeviceRouter = router({
+  getPrice: publicProcedure
+    .input(z.object({ name: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const gsmarena = require('gsmarena-api')
+      const devices = await gsmarena.catalog.getBrand('apple-phones-48')
+      let deviceID: any = null
+      devices.forEach(async (device: any) => {
+        if (
+          device.name.toString().toLowerCase() ===
+          input.name.toString().toLowerCase()
+        ) {
+          deviceID = device.id
+        }
+      })
+      const device = await gsmarena.catalog.getDevice(deviceID)
+      return device.detailSpec[12].specifications[4].value
+    }),
   getDevice: publicProcedure
     .input(z.object({ model: z.string() }))
     .query(async ({ ctx, input }) => {
