@@ -31,9 +31,9 @@ export async function FormatPrice(priceString: string) {
     return parseFloat(dollarNumber)
   } else {
     const response = await fetch(
-      'https://api.freecurrencyapi.com/v1/latest?apikey=' +
-        process.env.CURRENCY_API_KEY +
-        '&currencies=USD&base_currency=EUR'
+      `https://api.freecurrencyapi.com/v1/latest?apikey=
+        ${process.env.CURRENCY_API_KEY}
+        &currencies=USD&base_currency=EUR`
     )
     const data = await response.json()
     const extractedNumber = parseFloat(priceString.split(' ')[1])

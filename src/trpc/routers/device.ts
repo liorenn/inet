@@ -5,7 +5,7 @@ import { FormatPrice } from '../../utils/functions'
 export const DeviceRouter = router({
   getPrice: publicProcedure
     .input(z.object({ name: z.string() }))
-    .query(async ({ ctx, input }) => {
+    .query(async ({ input }) => {
       const gsmarena = require('gsmarena-api')
       const devices = await gsmarena.catalog.getBrand('apple-phones-48')
       let deviceID: any = null
@@ -22,7 +22,7 @@ export const DeviceRouter = router({
       const price = device.detailSpec[12].specifications.find(
         (item: any) => item.name === 'Price'
       ).value
-      return device
+      return FormatPrice(price)
     }),
   getDevice: publicProcedure
     .input(z.object({ model: z.string() }))
@@ -54,7 +54,7 @@ export const DeviceRouter = router({
     })
     return devices
   }),
-  getAllDevices: publicProcedure.query(async ({ ctx, input }) => {
+  getAllDevices: publicProcedure.query(async ({ ctx }) => {
     const devices = await ctx.prisma.device.findMany({
       select: { model: true, name: true },
     })

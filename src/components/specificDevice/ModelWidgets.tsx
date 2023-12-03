@@ -32,12 +32,12 @@ function ModelWidgets({ device }: Props) {
     },
     {
       title: t('operatingSystem'),
-      spec: 'ios ' + device.releaseOS,
+      spec: `ios ${device.releaseOS}`,
       icon: <IconBrandApple size={45} />,
     },
     {
       title: t('battery'),
-      spec: device.batterySize.toString() + ' mAh',
+      spec: device.batterySize?.toString() + ' mAh',
       icon: <IconBattery3 size={45} />,
     },
     { title: t('chipset'), spec: device.chipset, icon: <IconCpu size={45} /> },

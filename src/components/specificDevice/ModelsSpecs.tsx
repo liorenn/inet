@@ -3,7 +3,7 @@ import { Table, Accordion, Grid, Text, Group } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 import { useState } from 'react'
 import { useViewportSize } from '@mantine/hooks'
-import FortmatSpecs, { deviceSpecsType } from './SpecsFormatter'
+import FortmatSpecs, { type deviceSpecsType } from './SpecsFormatter'
 
 type Props = {
   device1: deviceSpecsType

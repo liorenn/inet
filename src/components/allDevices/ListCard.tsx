@@ -6,7 +6,6 @@ import { useUser } from '@supabase/auth-helpers-react'
 import { CreateNotification } from '../../utils/functions'
 import type { devicesPropertiesArrType } from '../../trpc/routers/auth'
 import useTranslation from 'next-translate/useTranslation'
-import { DeviceType } from '../../utils/deviceTypes'
 
 type AppProps = {
   device: {
@@ -14,7 +13,7 @@ type AppProps = {
     name: string
     imageAmount: number
   }
-  deviceType: String
+  deviceType: string
   setDevicesArr: (value: devicesPropertiesArrType | undefined) => void
   devicesArr: devicesPropertiesArrType
 }
@@ -68,7 +67,7 @@ export default function ListCard({
       <Grid sx={{ marginTop: 2 }}>
         <Grid.Col span={6}>
           <Link
-            href={'device/' + deviceType + '/' + device.model}
+            href={`device/${deviceType}/${device.model}`}
             style={{ textDecoration: 'none' }}>
             <Button
               variant='light'

@@ -1,7 +1,6 @@
 import {
   IconSun,
   IconMoon,
-  IconDevices,
   IconLanguage,
   IconCurrencyDollar,
 } from '@tabler/icons'

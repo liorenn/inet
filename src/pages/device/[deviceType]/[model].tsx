@@ -10,7 +10,7 @@ import ModelComments from '../../../components/specificDevice/ModelComments'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
-import { DeviceType } from '../../../utils/deviceTypes'
+import type { DeviceType } from '../../../utils/deviceTypes'
 
 // /device/iphone/iphone13 page
 function ModelPage() {

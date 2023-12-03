@@ -3,9 +3,8 @@ import ModelButtons from './ModelButtons'
 import ModelWidgets from './ModelWidgets'
 import { Stack, Grid, Center } from '@mantine/core'
 import DevicePhotos from '../allDevices/DevicePhotos'
-import type { Device } from '@prisma/client'
 import ModelSpecs from './ModelSpecs'
-import { deviceSpecsType } from './SpecsFormatter'
+import type { deviceSpecsType } from './SpecsFormatter'
 
 type Props = {
   device: deviceSpecsType

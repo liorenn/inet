@@ -11,16 +11,13 @@ import {
 } from '../../utils/soap'
 
 export const AdminRouter = router({
-  soapUpsertUser: publicProcedure
-    .input(z.object({}))
-    .query(async ({ ctx }) => {}),
-  getUserColumns: publicProcedure.query(async ({ ctx }) => {
+  getUserColumns: publicProcedure.query(() => {
     return Prisma.dmmf.datamodel.models.find((model) => model.name === 'User')
   }),
-  getTablesColumns: publicProcedure.query(async ({ ctx }) => {
+  getTablesColumns: publicProcedure.query(() => {
     return Prisma.dmmf.datamodel.models
   }),
-  getUsersData: publicProcedure.query(async ({ ctx, input }) => {
+  getUsersData: publicProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.user.findMany()
   }),
   getTableData: publicProcedure
@@ -75,6 +72,7 @@ export const AdminRouter = router({
         })
         const { body } = response
         const result = getResultFromResponse('UpsertUser', body)
+        return result
       }
     }),
   updateDevice: publicProcedure
@@ -188,6 +186,7 @@ export const AdminRouter = router({
         })
         const { body } = response
         const result = getResultFromResponse('UpsertDevice', body)
+        return result
       }
     }),
 })

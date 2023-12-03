@@ -14,7 +14,7 @@ export default function ResetPassword() {
   const [password, setPassword] = useState('1234567')
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange(async (event, session) => {
+    supabase.auth.onAuthStateChange((event, session) => {
       if (event == 'PASSWORD_RECOVERY') {
         setCurrentForm('password')
         setSession(session)
@@ -25,7 +25,8 @@ export default function ResetPassword() {
   async function handleEmailSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     await supabase.auth.resetPasswordForEmail(email).then((data) => {
-      CreateNotification('Check Your Email To Sign In at ' + email, 'yellow')
+      data &&
+        CreateNotification('Check Your Email To Sign In at ' + email, 'yellow')
     })
   }
 

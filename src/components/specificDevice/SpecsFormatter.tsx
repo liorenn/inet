@@ -1,7 +1,7 @@
-import { Device } from '@prisma/client'
-import useTranslation from 'next-translate/useTranslation'
-import { categoriesType } from './ModelSpecs'
+import type { Device } from '@prisma/client'
+import type { categoriesType } from './ModelSpecs'
 import { FormatDate } from '../../utils/functions'
+import useTranslation from 'next-translate/useTranslation'
 
 export const accordionContents = [
   'display',

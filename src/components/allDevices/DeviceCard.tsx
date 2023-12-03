@@ -1,6 +1,6 @@
 import ModelPhotos from './DevicePhotos'
 import { Card, Button, Grid, Text, Space } from '@mantine/core'
-import { DeviceType } from '../../utils/deviceTypes'
+import type { DeviceType } from '../../utils/deviceTypes'
 import Link from 'next/link'
 import { useUser } from '@supabase/auth-helpers-react'
 import type { allProperties } from '../../pages/device/[deviceType]/index'

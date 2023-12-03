@@ -9,7 +9,7 @@ import {
 import { trpc } from '../../utils/trpc'
 import Head from 'next/head'
 import useTranslation from 'next-translate/useTranslation'
-import { User } from '@prisma/client'
+import type { User } from '@prisma/client'
 import { Controller, useForm } from 'react-hook-form'
 import debounce from 'lodash.debounce'
 import { CreateNotification } from '../../utils/functions'
@@ -88,7 +88,7 @@ function UserRow({ data }: { data: User }) {
     mutateDelete({ id: data.id })
   }
 
-  const handleEdit = debounce(async (fields: User) => {
+  const handleEdit = debounce((fields: User) => {
     fields.accessKey = Number(fields.accessKey)
     mutateUpdate(
       { ...fields, id: data.id },

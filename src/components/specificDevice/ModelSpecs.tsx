@@ -8,8 +8,8 @@ import {
 } from '@mantine/core'
 import { Table, Accordion, Grid, Text } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
-import FortmatSpecs, { deviceSpecsType } from './SpecsFormatter'
-import { useEffect, useMemo, useState } from 'react'
+import FortmatSpecs, { type deviceSpecsType } from './SpecsFormatter'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useCurrencytore } from '../../utils/CurrencyStore'
 import { convertPrice } from '../../utils/functions'
@@ -100,25 +100,27 @@ function IphoneTable({ category, categoryName }: TableProps) {
   const [price, setPrice] = useState<number>(parseFloat(priceString ?? '0'))
   const [prevCurrency, setPrevCurrency] = useState<string>(currency.value)
 
-  if (categoryName === t('availability')) {
-    useEffect(() => {
-      if (currency.value !== 'USD') {
-        setPrice(0)
-        convertPrice(price, 'USD', currency.value).then((data) => {
+  useEffect(() => {
+    if (categoryName === t('availability') && currency.value !== 'USD') {
+      setPrice(0)
+      convertPrice(price, 'USD', currency.value)
+        .then((data) => {
           console.log('in use effect' + data)
           setPrice(data)
         })
-      }
-    }, [])
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+  }, [])
 
-    useEffect(() => {
-      if (!currency) return
-      convertPrice(price, prevCurrency, currency.value).then((price) => {
-        setPrice(price)
-        setPrevCurrency(currency.value)
-      })
-    }, [currency])
-  }
+  useEffect(() => {
+    if (!currency || categoryName !== t('availability')) return
+    convertPrice(price, prevCurrency, currency.value).then((price) => {
+      setPrice(price)
+      setPrevCurrency(currency.value)
+    })
+  }, [currency])
 
   return (
     <Table fontSize={16} highlightOnHover verticalSpacing='lg'>

@@ -9,7 +9,7 @@ import { useUser } from '@supabase/auth-helpers-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
-import { DeviceType } from '../../../utils/deviceTypes'
+import type { DeviceType } from '../../../utils/deviceTypes'
 
 export interface allProperties {
   model: string

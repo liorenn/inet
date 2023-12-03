@@ -13,8 +13,7 @@ import React from 'react'
 import { trpc } from '../utils/trpc'
 import DevicePhotos from '../components/allDevices/DevicePhotos'
 import useTranslation from 'next-translate/useTranslation'
-import ModelSpecs from '../components/specificDevice/ModelSpecs'
-import { deviceSpecsType } from '../components/specificDevice/SpecsFormatter'
+import {type deviceSpecsType } from '../components/specificDevice/SpecsFormatter'
 import ModelsSpecs from '../components/specificDevice/ModelsSpecs'
 
 export default function Compare() {
@@ -50,7 +49,7 @@ export default function Compare() {
         }
       )
     }
-  }, [value1, value2])
+  }, [value1, value2, deviceMutation])
 
   if (allDevices === undefined) {
     return (

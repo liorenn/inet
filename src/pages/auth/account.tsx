@@ -37,12 +37,12 @@ export default function Account() {
   const [name, setName] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [updatedAt, setUpdatedAt] = useState<string>()
-  supabase.auth.onAuthStateChange((session) => {
+  supabase.auth.onAuthStateChange(async (session) => {
     if (!session) {
-      router.push('/')
+      await router.push('/')
     }
   })
-  let created_at = dateFormmater.format(
+  const createdAt = dateFormmater.format(
     new Date(user?.created_at ?? new Date())
   )
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function Account() {
         )
       }
     }
-  }, [UserDetails])
+  }, [UserDetails, user, dateFormmater])
 
   const translations = [
     { input: 'username', translation: t('username') },
@@ -93,9 +93,9 @@ export default function Account() {
         onSuccess() {
           setUpdatedAt(dateFormmater.format(new Date()))
           CreateNotification(
-            translations.find((value) => value.input === detail)?.translation +
-              ' ' +
-              t('updatedSuccessfully'),
+            `${
+              translations.find((value) => value.input === detail)?.translation
+            } ${t('updatedSuccessfully')}`,
             'green'
           )
           if (detail === 'username') {
@@ -158,14 +158,14 @@ export default function Account() {
               weight={500}
               color='dimmed'
               align='right'>
-              {t('createdAt') + ' ' + created_at}
+              {`${t('createdAt')} ${createdAt}`}
             </Text>
             <Text
               sx={{ fontSize: 18 }}
               weight={500}
               color='dimmed'
               align='right'>
-              {t('updatedAt') + ' ' + updatedAt}
+              {`${t('updatedAt')} ${updatedAt}`}
             </Text>
             {/* <Text sx={{ fontSize: 18 }} weight={500} color='dimmed' align='right'>
               comments commented: 0
