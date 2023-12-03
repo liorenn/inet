@@ -8,11 +8,11 @@ import { trpc } from '../utils/trpc'
 export default function Index() {
   const { t } = useTranslation('common')
   const paragraphs = t('homeParagraph').split('\n')
-  const { data } = trpc.device.getPrice.useQuery({ name: 'iphone 13' })
+  // const { data } = trpc.device.getPrice.useQuery({ name: 'iphone 13' })
 
-  if (data != undefined) {
-    console.log(data)
-  }
+  // if (data != undefined) {
+  //   console.log(data)
+  // }
 
   return (
     <>

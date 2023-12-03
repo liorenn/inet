@@ -6,7 +6,7 @@ import { useUser } from '@supabase/auth-helpers-react'
 import { CreateNotification } from '../../utils/functions'
 import type { devicesPropertiesArrType } from '../../trpc/routers/auth'
 import useTranslation from 'next-translate/useTranslation'
-import { DeviceType } from '@prisma/client'
+import { DeviceType } from '../../utils/deviceTypes'
 
 type AppProps = {
   device: {
@@ -14,7 +14,7 @@ type AppProps = {
     name: string
     imageAmount: number
   }
-  deviceType: DeviceType
+  deviceType: String
   setDevicesArr: (value: devicesPropertiesArrType | undefined) => void
   devicesArr: devicesPropertiesArrType
 }

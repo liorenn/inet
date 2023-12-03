@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '../trpc'
+import { FormatPrice } from '../../utils/functions'
+
 export const DeviceRouter = router({
   getPrice: publicProcedure
     .input(z.object({ name: z.string() }))
@@ -8,15 +10,19 @@ export const DeviceRouter = router({
       const devices = await gsmarena.catalog.getBrand('apple-phones-48')
       let deviceID: any = null
       devices.forEach(async (device: any) => {
+        const deviceName = device.name as string
         if (
-          device.name.toString().toLowerCase() ===
-          input.name.toString().toLowerCase()
+          deviceName.toLowerCase().replace(' ', '') ===
+          input.name.toLowerCase().replace(' ', '')
         ) {
           deviceID = device.id
         }
       })
       const device = await gsmarena.catalog.getDevice(deviceID)
-      return device.detailSpec[12].specifications[4].value
+      const price = device.detailSpec[12].specifications.find(
+        (item: any) => item.name === 'Price'
+      ).value
+      return device
     }),
   getDevice: publicProcedure
     .input(z.object({ model: z.string() }))

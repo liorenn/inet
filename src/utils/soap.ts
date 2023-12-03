@@ -1,4 +1,4 @@
-import { XMLParser } from 'fast-xml-parser'
+import { XMLBuilder, XMLParser } from 'fast-xml-parser'
 
 export const sendSoapRequest: boolean = false
 export const soapServerUrl: string =
@@ -31,6 +31,9 @@ export function createSoapRequestXml(
 </soapenv:Envelope>
   `
 }
+
+const builder = new XMLBuilder()
+const xmlContent = builder.build({ name: 'hello', value: 'world' })
 
 export function getResultFromResponse(Method: string, xml: any) {
   const parser = new XMLParser()

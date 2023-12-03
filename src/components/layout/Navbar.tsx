@@ -1,4 +1,10 @@
-import { IconSun, IconMoon, IconDevices, IconLanguage } from '@tabler/icons'
+import {
+  IconSun,
+  IconMoon,
+  IconDevices,
+  IconLanguage,
+  IconCurrencyDollar,
+} from '@tabler/icons'
 import { createStyles, Container, Avatar, Menu } from '@mantine/core'
 import { Header, Group, Button, Text } from '@mantine/core'
 import { ActionIcon, useMantineColorScheme } from '@mantine/core'
@@ -11,12 +17,13 @@ import {
 import { useEffect, useState } from 'react'
 import { CreateNotification } from '../../utils/functions'
 import { DEFlag, ILFlag, GBFlag } from 'mantine-flagpack'
-import type { languagesType } from '../../utils/languageStore'
+import { languages, useLanguageStore } from '../../utils/languageStore'
 import setLanguage from 'next-translate/setLanguage'
 import useTranslation from 'next-translate/useTranslation'
 import NavBarDropdown from './NavbarDropdown'
 import usePublicUrl from '../../utils/usePublicUrl'
 import { trpc } from '../../utils/trpc'
+import { currencies, useCurrencytore } from '../../utils/CurrencyStore'
 
 export const Navbar = () => {
   const { classes } = useStyles()
@@ -25,6 +32,8 @@ export const Navbar = () => {
   const dark = colorScheme === 'dark'
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
+  const { currency, setCurrency } = useCurrencytore()
+  const { setLanguage: setlanguageStore } = useLanguageStore()
   const { t, lang } = useTranslation('common')
   const { t: authT } = useTranslation('auth')
   const { change } = usePublicUrl()
@@ -35,8 +44,18 @@ export const Navbar = () => {
     userId: user?.id,
   })
   useEffect(() => {
-    setLanguage((localStorage.getItem('language') as languagesType) ?? 'en')
-    supabase.auth.onAuthStateChange((e, session) => {
+    setlanguageStore(
+      languages.find(
+        (lang) => lang.value === localStorage.getItem('language')
+      ) ?? languages[0]
+    )
+    setLanguage(localStorage.getItem('language') ?? 'en')
+    setCurrency(
+      currencies.find(
+        (Currency) => Currency.value === localStorage.getItem('currency')
+      ) ?? currencies[0]
+    )
+    supabase.auth.onAuthStateChange((_e, session) => {
       setSession(session)
     })
   }, [])
@@ -160,12 +179,65 @@ export const Navbar = () => {
                 size='lg'
                 color='gray'
                 title={t('changeLanguage')}>
+                <IconCurrencyDollar size={18} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Label>{t('currencies')}</Menu.Label>
+              {currencies.map((Currency) => (
+                <Menu.Item
+                  key={Currency.value}
+                  mt={6}
+                  style={{
+                    background:
+                      currency.value === Currency.value ? '#1c1c1c' : '',
+                  }}
+                  icon={Currency.icon({})}
+                  onClick={() => {
+                    setCurrency(Currency)
+                  }}>
+                  <Text weight={700}>{Currency.name}</Text>
+                </Menu.Item>
+              ))}
+            </Menu.Dropdown>
+          </Menu>
+          <Menu shadow='md' width={140} offset={14}>
+            <Menu.Target>
+              <ActionIcon
+                variant='light'
+                radius='md'
+                size='lg'
+                color='gray'
+                title={t('changeLanguage')}>
                 <IconLanguage size={18} />
               </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Label>{t('languages')}</Menu.Label>
-              <Menu.Item
+              {languages.map((language) => (
+                <Menu.Item
+                  key={language.value}
+                  mt={6}
+                  style={{
+                    background: lang === language.value ? '#1c1c1c' : '',
+                  }}
+                  icon={
+                    language.value === 'en' ? (
+                      <GBFlag w={38} />
+                    ) : language.value === 'de' ? (
+                      <DEFlag w={38} />
+                    ) : (
+                      language.value === 'he' && <ILFlag w={38} />
+                    )
+                  }
+                  onClick={() => {
+                    setLanguage(language.value)
+                    setlanguageStore(language)
+                  }}>
+                  <Text weight={700}>{language.name}</Text>
+                </Menu.Item>
+              ))}
+              {/* <Menu.Item
                 mt={6}
                 style={{ background: lang === 'en' ? '#1c1c1c' : '' }}
                 icon={<GBFlag w={38} />}
@@ -196,7 +268,7 @@ export const Navbar = () => {
                   localStorage.setItem('language', 'he')
                 }}>
                 <Text weight={700}>עברית</Text>
-              </Menu.Item>
+              </Menu.Item> */}
             </Menu.Dropdown>
           </Menu>
           <ActionIcon

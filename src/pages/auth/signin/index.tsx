@@ -37,7 +37,7 @@ export default function SignIn() {
     formState: { errors },
   } = useForm<Inputs>({})
 
-  supabase.auth.onAuthStateChange((event, session) => {
+  supabase.auth.onAuthStateChange((_e, session) => {
     if (session) {
       setSession(session)
     }

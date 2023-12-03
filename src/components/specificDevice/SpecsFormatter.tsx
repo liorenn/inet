@@ -64,18 +64,6 @@ export default function FortmatSpecs(device: deviceSpecsType) {
             ? device.batterySize.toString() + ' ' + t('batterySizeUnits')
             : t('none'),
         },
-        {
-          label: t('wiredCharging'),
-          info: device.wiredCharging
-            ? device.wiredCharging?.toString() + ' ' + t('wiredChargingUnits')
-            : t('none'),
-        },
-        {
-          label: t('wirelessCharging'),
-          info: device.wirelessCharging
-            ? device.wirelessCharging?.toString() + ' ' + t('wiredCharging')
-            : t('none'),
-        },
       ],
     },
     {
@@ -138,7 +126,7 @@ export default function FortmatSpecs(device: deviceSpecsType) {
       values: [
         {
           label: t('releasePrice'),
-          info: device.releasePrice.toString() + t('releasePriceUnits'),
+          info: device.releasePrice.toString(),
         },
         {
           label: t('releaseDate'),

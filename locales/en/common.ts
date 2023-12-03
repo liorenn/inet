@@ -6,6 +6,7 @@ export default {
   selectDevice: 'Select Device',
   userManagement: 'User Management',
   deviceManagement: 'Device Management',
+  currencies: 'Currencies',
   data: 'Data',
   all: 'all',
   home: 'Home',

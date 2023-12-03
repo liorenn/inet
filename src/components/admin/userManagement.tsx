@@ -1,5 +1,4 @@
 import {
-  Affix,
   Button,
   Center,
   Loader,

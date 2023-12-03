@@ -6,6 +6,7 @@ export default {
   selectDevice: 'בחר מכשיר',
   userManagement: 'ניהול משתמשים',
   deviceManagement: 'ניהול מכשירים',
+  currencies: 'מטבעות',
   data: 'נתונים',
   all: 'כל',
   home: 'דף הבית',

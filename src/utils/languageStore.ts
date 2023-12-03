@@ -1,16 +1,25 @@
 import { create } from 'zustand'
 
-export type languagesType = 'en' | 'de' | 'he'
+export type languagesType = {
+  value: string
+  name: string
+}
 
-interface BearState {
+export const languages: languagesType[] = [
+  { value: 'en', name: 'English' },
+  { value: 'de', name: 'Deutsch' },
+  { value: 'he', name: 'עברית' },
+]
+
+interface LanguageState {
   language: languagesType
   setLanguage: (language: languagesType) => void
 }
 
-export const useLanguageStore = create<BearState>()((set) => ({
-  language: 'en',
+export const useLanguageStore = create<LanguageState>()((set) => ({
+  language: languages[0],
   setLanguage: (newLanguage) => {
     set(() => ({ language: newLanguage }))
-    localStorage.setItem('language', newLanguage)
+    localStorage.setItem('language', newLanguage.value)
   },
 }))

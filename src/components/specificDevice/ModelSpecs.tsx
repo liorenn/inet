@@ -9,8 +9,10 @@ import {
 import { Table, Accordion, Grid, Text } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 import FortmatSpecs, { deviceSpecsType } from './SpecsFormatter'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useCurrencytore } from '../../utils/CurrencyStore'
+import { convertPrice } from '../../utils/functions'
 
 type Props = {
   device: deviceSpecsType
@@ -70,7 +72,10 @@ function ModelSpecs({ device }: Props) {
         <Accordion.Item value={category.name} key={category.name}>
           <Accordion.Control>{category.name}</Accordion.Control>
           <Accordion.Panel>
-            <IphoneTable category={category.values} />
+            <IphoneTable
+              category={category.values}
+              categoryName={category.name}
+            />
           </Accordion.Panel>
         </Accordion.Item>
       ))}
@@ -83,10 +88,37 @@ type TableProps = {
     label: string
     info: string
   }[]
+  categoryName: string
 }
 
-function IphoneTable({ category }: TableProps) {
+function IphoneTable({ category, categoryName }: TableProps) {
   const { t } = useTranslation('devices')
+  const { currency } = useCurrencytore()
+  const priceString = category.find(
+    (element) => element.label === 'Release Price'
+  )?.info as string
+  const [price, setPrice] = useState<number>(parseFloat(priceString ?? '0'))
+  const [prevCurrency, setPrevCurrency] = useState<string>(currency.value)
+
+  if (categoryName === t('availability')) {
+    useEffect(() => {
+      if (currency.value !== 'USD') {
+        setPrice(0)
+        convertPrice(price, 'USD', currency.value).then((data) => {
+          console.log('in use effect' + data)
+          setPrice(data)
+        })
+      }
+    }, [])
+
+    useEffect(() => {
+      if (!currency) return
+      convertPrice(price, prevCurrency, currency.value).then((price) => {
+        setPrice(price)
+        setPrevCurrency(currency.value)
+      })
+    }, [currency])
+  }
 
   return (
     <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
@@ -119,6 +151,9 @@ function IphoneTable({ category }: TableProps) {
                               )
                           )}
                         </Group>
+                      ) : element.label === t('releasePrice') ||
+                        element.label === t('price') ? (
+                        price.toFixed(2) + currency.symol
                       ) : (
                         element.info
                       )}

@@ -1,8 +1,45 @@
 import { showNotification } from '@mantine/notifications'
 import { IconCheck, IconX, IconExclamationMark } from '@tabler/icons'
-import type { ReactElement } from 'react'
+import { type ReactElement } from 'react'
 import type { Comment } from '@prisma/client'
 import { deviceType } from './deviceTypes'
+
+export async function convertPrice(
+  price: number,
+  currency: string,
+  targetCurrency: string
+) {
+  const response = await fetch(
+    'https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_yepX15sCjHvHFsdPr4zLPPWIIQ49wOkQZSGdl8l9' +
+      '&currencies=' +
+      targetCurrency +
+      '&base_currency=' +
+      currency
+  )
+  const data = await response.json()
+  const convertedPrice = price * data.data[targetCurrency]
+  return convertedPrice
+}
+
+export async function FormatPrice(priceString: string) {
+  if (priceString.includes('$')) {
+    const dollarIndex = priceString.indexOf('$')
+    const dollarNumber = priceString
+      .slice(dollarIndex + 1)
+      .trim()
+      .split(' ')[0]
+    return parseFloat(dollarNumber)
+  } else {
+    const response = await fetch(
+      'https://api.freecurrencyapi.com/v1/latest?apikey=' +
+        process.env.CURRENCY_API_KEY +
+        '&currencies=USD&base_currency=EUR'
+    )
+    const data = await response.json()
+    const extractedNumber = parseFloat(priceString.split(' ')[1])
+    return extractedNumber * data.data.USD
+  }
+}
 
 export function FormatDate(releaseDate: Date): string {
   const date = new Date(releaseDate)
