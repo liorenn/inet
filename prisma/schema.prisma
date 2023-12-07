@@ -73,7 +73,7 @@ model Device {
   releaseDate      DateTime         @db.Date
   releaseOS        String?          @db.VarChar
   releasePrice     Int              @db.SmallInt
-  Price            Float            @default(0)
+  price            Float            @db.Real @default(0)
   connector        String           @db.VarChar
   biometrics       String           @db.VarChar
   batterySize      Int?             @db.SmallInt
@@ -81,14 +81,14 @@ model Device {
   weight           Float            @db.Real
   description      String           @db.VarChar
   imageAmount      Int              @db.SmallInt
-  height           Int              @db.SmallInt
-  width            Int              @db.SmallInt
-  depth            Int              @db.SmallInt
+  height           Float             @db.Real
+  width            Float              @db.Real
+  depth            Float              @db.Real
   storage          Int?             @db.SmallInt
   cpu              Int?             @db.SmallInt
   gpu              Int?             @db.SmallInt
   memory           Int?             @db.SmallInt
-  magsafe          Boolean?
+  magsafe          Boolean? @db.Boolean
   screenSize       Float?           @db.Real
   screenType       String?          @db.VarChar
   resistanceRating String?          @db.VarChar

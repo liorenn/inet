@@ -1,18 +1,10 @@
-import {
-  Button,
-  ColorSwatch,
-  Container,
-  Group,
-  Tooltip,
-  useMantineColorScheme,
-} from '@mantine/core'
-import { Table, Accordion, Grid, Text } from '@mantine/core'
+import { Button, Container, useMantineColorScheme } from '@mantine/core'
+import { Accordion } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 import FortmatSpecs, { type deviceSpecsType } from './SpecsFormatter'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { useCurrencytore } from '../../utils/CurrencyStore'
-import { convertPrice } from '../../utils/functions'
+import ModelTable from './ModelTable'
 
 type Props = {
   device: deviceSpecsType
@@ -72,7 +64,7 @@ function ModelSpecs({ device }: Props) {
         <Accordion.Item value={category.name} key={category.name}>
           <Accordion.Control>{category.name}</Accordion.Control>
           <Accordion.Panel>
-            <IphoneTable
+            <ModelTable
               category={category.values}
               categoryName={category.name}
             />
@@ -80,93 +72,6 @@ function ModelSpecs({ device }: Props) {
         </Accordion.Item>
       ))}
     </Accordion>
-  )
-}
-
-type TableProps = {
-  category: {
-    label: string
-    info: string
-  }[]
-  categoryName: string
-}
-
-function IphoneTable({ category, categoryName }: TableProps) {
-  const { t } = useTranslation('devices')
-  const { currency } = useCurrencytore()
-  const priceString = category.find(
-    (element) => element.label === 'Release Price'
-  )?.info as string
-  const [price, setPrice] = useState<number>(parseFloat(priceString ?? '0'))
-  const [prevCurrency, setPrevCurrency] = useState<string>(currency.value)
-
-  useEffect(() => {
-    if (categoryName === t('availability') && currency.value !== 'USD') {
-      setPrice(0)
-      convertPrice(price, 'USD', currency.value)
-        .then((data) => {
-          console.log('in use effect' + data)
-          setPrice(data)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!currency || categoryName !== t('availability')) return
-    convertPrice(price, prevCurrency, currency.value).then((price) => {
-      setPrice(price)
-      setPrevCurrency(currency.value)
-    })
-  }, [currency])
-
-  return (
-    <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
-      <tbody>
-        {category &&
-          category.map((element) => (
-            <tr key={element.label}>
-              <td>
-                <Grid>
-                  <Grid.Col span={6} sx={{ fontWeight: 600, fontSize: 20 }}>
-                    <Text>{element.label}</Text>
-                  </Grid.Col>
-                  <Grid.Col span={6} sx={{ fontWeight: 400, fontSize: 20 }}>
-                    <Text>
-                      {element.label === t('colors') ? (
-                        <Group position='left' spacing='xs'>
-                          {element.info.split(' ').map(
-                            (color, index) =>
-                              color !== undefined && (
-                                <Tooltip
-                                  offset={10}
-                                  color='gray'
-                                  label={color.split('/')[1]}
-                                  key={index}>
-                                  <ColorSwatch
-                                    color={color.split('/')[0]}
-                                    withShadow
-                                  />
-                                </Tooltip>
-                              )
-                          )}
-                        </Group>
-                      ) : element.label === t('releasePrice') ||
-                        element.label === t('price') ? (
-                        price.toFixed(2) + currency.symol
-                      ) : (
-                        element.info
-                      )}
-                    </Text>
-                  </Grid.Col>
-                </Grid>
-              </td>
-            </tr>
-          ))}
-      </tbody>
-    </Table>
   )
 }
 

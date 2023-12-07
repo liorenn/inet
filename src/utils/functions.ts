@@ -20,7 +20,6 @@ export async function convertPrice(
   const convertedPrice = price * data.data[targetCurrency]
   return convertedPrice
 }
-
 export async function FormatPrice(priceString: string) {
   if (priceString.includes('$')) {
     const dollarIndex = priceString.indexOf('$')

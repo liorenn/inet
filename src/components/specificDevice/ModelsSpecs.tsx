@@ -1,9 +1,11 @@
 import { ColorSwatch, Tooltip, useMantineColorScheme } from '@mantine/core'
 import { Table, Accordion, Grid, Text, Group } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useViewportSize } from '@mantine/hooks'
 import FortmatSpecs, { type deviceSpecsType } from './SpecsFormatter'
+import ModelTable from './ModelTable'
+import { useLanguageStore } from '../../utils/languageStore'
 
 type Props = {
   device1: deviceSpecsType
@@ -37,6 +39,7 @@ type TableProps = {
 function ModelsSpecs({ device1, device2 }: Props) {
   const { t } = useTranslation('devices')
   const { width } = useViewportSize()
+  const { language } = useLanguageStore()
   const accordionContents = [
     t('name'),
     t('display'),
@@ -100,90 +103,21 @@ function ModelsSpecs({ device1, device2 }: Props) {
         <Accordion.Item value={category.name} key={category.name}>
           <Accordion.Control>{category.name}</Accordion.Control>
           <Accordion.Panel>
-            <IphoneTable category={category.values} />
+            <ModelTable
+              category={category.values.map((item) => ({
+                label: item.label,
+                info: item.info1,
+              }))}
+              secondCatergory={category.values.map((item) => ({
+                label: item.label,
+                info: item.info2,
+              }))}
+              categoryName={category.name}
+            />
           </Accordion.Panel>
         </Accordion.Item>
       ))}
     </Accordion>
-  )
-}
-
-function IphoneTable({ category }: TableProps) {
-  const { t } = useTranslation('devices')
-  const { width } = useViewportSize()
-
-  return (
-    <Table highlightOnHover verticalSpacing='lg'>
-      <tbody>
-        {category.map((element) => (
-          <tr key={element.label}>
-            <td>
-              <Grid>
-                <Grid.Col
-                  span={4}
-                  sx={{ fontWeight: 600, fontSize: width < 500 ? 16 : 20 }}>
-                  <Text>{element.label}</Text>
-                </Grid.Col>
-                <Grid.Col
-                  span={4}
-                  sx={{ fontWeight: 400, fontSize: width < 500 ? 16 : 20 }}>
-                  <Text>
-                    {element.label === t('colors') ? (
-                      <Group position='left' spacing='xs'>
-                        {element.info1.split(' ').map(
-                          (color, index) =>
-                            color !== undefined && (
-                              <Tooltip
-                                offset={10}
-                                color='gray'
-                                label={color.split('/')[1]}
-                                key={index}>
-                                <ColorSwatch
-                                  color={color.split('/')[0]}
-                                  withShadow
-                                />
-                              </Tooltip>
-                            )
-                        )}
-                      </Group>
-                    ) : (
-                      element.info1
-                    )}
-                  </Text>
-                </Grid.Col>
-                <Grid.Col
-                  span={4}
-                  sx={{ fontWeight: 400, fontSize: width < 500 ? 16 : 20 }}>
-                  <Text>
-                    {element.label === t('colors') ? (
-                      <Group position='left' spacing='xs'>
-                        {element.info2.split(' ').map(
-                          (color, index) =>
-                            color !== undefined && (
-                              <Tooltip
-                                offset={10}
-                                color='gray'
-                                label={color.split('/')[1]}
-                                key={index}>
-                                <ColorSwatch
-                                  color={color.split('/')[0]}
-                                  withShadow
-                                />
-                              </Tooltip>
-                            )
-                        )}
-                      </Group>
-                    ) : (
-                      element.info2
-                    )}
-                  </Text>
-                </Grid.Col>
-              </Grid>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
   )
 }
 

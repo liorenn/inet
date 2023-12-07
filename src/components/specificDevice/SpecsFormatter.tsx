@@ -84,7 +84,7 @@ export default function FortmatSpecs(device: deviceSpecsType) {
         },
         {
           label: t('operatingSystem'),
-          info: device.releaseOS ? 'iOS ' + device.releaseOS : t('none'),
+          info: device.releaseOS ? device.releaseOS : t('none'),
         },
         {
           label: t('weight'),
