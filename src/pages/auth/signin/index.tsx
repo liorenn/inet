@@ -10,6 +10,7 @@ import { trpc } from '../../../utils/trpc'
 import { CreateNotification } from '../../../utils/functions'
 import Head from 'next/head'
 import useTranslation from 'next-translate/useTranslation'
+import { usePostHog } from 'posthog-js/react'
 
 type Inputs = {
   email: string
@@ -18,6 +19,7 @@ type Inputs = {
 
 export default function SignIn() {
   const router = useRouter()
+  const posthog = usePostHog()
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
@@ -59,6 +61,7 @@ export default function SignIn() {
             })
             if (!error) {
               CreateNotification(t('signedInSuccessfully'), 'green')
+              posthog.capture('User Signed In', { data: fields })
               router.push('/')
             } else {
               CreateNotification(t('errorAccured'), 'red')

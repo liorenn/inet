@@ -8,14 +8,16 @@ import { useViewportSize } from '@mantine/hooks'
 import Head from 'next/head'
 import ModelComments from '../../../components/specificDevice/ModelComments'
 import { useUser } from '@supabase/auth-helpers-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 import type { DeviceType } from '../../../utils/deviceTypes'
+import { usePostHog } from 'posthog-js/react'
 
 // /device/iphone/iphone13 page
 function ModelPage() {
-  const router = useRouter()
   const user = useUser()
+  const router = useRouter()
+  const posthog = usePostHog()
   const deviceType = router.asPath.split('/')[2] as DeviceType
   const deviceModel = router.asPath.split('/')[3]
   const { height } = useViewportSize()
@@ -28,6 +30,17 @@ function ModelPage() {
     id: user?.id,
   })
   const { t } = useTranslation('common')
+
+  const [captured, setCaptured] = useState(false)
+
+  useEffect(() => {
+    if (!captured && deviceDetails) {
+      posthog.capture('Device Page', {
+        deviceName: deviceDetails.name,
+      })
+      setCaptured(true)
+    }
+  }, [deviceDetails])
 
   if (deviceDetails === undefined) {
     return (

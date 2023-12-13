@@ -22,10 +22,10 @@ export default function ModelTable({
   const { t } = useTranslation('devices')
   const { currency } = useCurrencytore()
   const priceString = category.find(
-    (element) => element.label === 'Release Price'
+    (element) => element.label === t('releasePrice')
   )?.info as string
   const priceString2 = secondCatergory?.find(
-    (element) => element.label === 'Release Price'
+    (element) => element.label === t('releasePrice')
   )?.info
   const [price, setPrice] = useState<number>(parseFloat(priceString ?? '0'))
   const [price2, setPrice2] = useState<number>(parseFloat(priceString2 ?? '0'))

@@ -11,6 +11,11 @@ import {
 } from '../../utils/soap'
 
 export const AdminRouter = router({
+  getUserStatus: publicProcedure.query(async ({ ctx }) => {
+    const user = 'User'
+    console.log(user)
+    return 'User'
+  }),
   getUserColumns: publicProcedure.query(() => {
     return Prisma.dmmf.datamodel.models.find((model) => model.name === 'User')
   }),

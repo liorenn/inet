@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import type { DeviceType } from '../../../utils/deviceTypes'
+import { usePostHog } from 'posthog-js/react'
 
 export interface allProperties {
   model: string
@@ -19,6 +20,7 @@ export interface allProperties {
 // /device/iphone page
 function DeviceTypePage() {
   const router = useRouter()
+  const posthog = usePostHog()
   const deviceType = router.asPath.split('/')[
     router.asPath.split('/').length - 1
   ] as DeviceType
@@ -31,6 +33,7 @@ function DeviceTypePage() {
     deviceType: deviceType,
     userId: user?.id,
   })
+  const [captured, setCaptured] = useState(false)
 
   useEffect(() => {
     if (data) {
@@ -39,6 +42,12 @@ function DeviceTypePage() {
         newArr.push({ isInList: value.isInList })
       })
       setAreInList(newArr)
+    }
+    if (!captured && data) {
+      posthog.capture('Device Type Page', {
+        deviceType,
+      })
+      setCaptured(true)
     }
   }, [data])
 

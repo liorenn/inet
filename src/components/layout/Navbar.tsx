@@ -23,10 +23,12 @@ import NavBarDropdown from './NavbarDropdown'
 import usePublicUrl from '../../utils/usePublicUrl'
 import { trpc } from '../../utils/trpc'
 import { currencies, useCurrencytore } from '../../utils/CurrencyStore'
+import { usePostHog } from 'posthog-js/react'
 
 export const Navbar = () => {
-  const { classes } = useStyles()
   const user = useUser()
+  const posthog = usePostHog()
+  const { classes } = useStyles()
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
   const supabase = useSupabaseClient()
@@ -69,6 +71,7 @@ export const Navbar = () => {
     const { error } = await supabase.auth.signOut()
     if (!error) {
       CreateNotification(authT('signedOutSuccessfully'), 'green')
+      posthog.capture('User Signed Out', { user })
     }
   }
 

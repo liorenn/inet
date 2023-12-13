@@ -2,7 +2,7 @@ import type { Session } from '@supabase/auth-helpers-react'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { trpc } from '../utils/trpc'
 import type { AppProps } from 'next/app'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Layout from '../components/layout/Layout'
 import type { ColorScheme } from '@mantine/core'
 import { MantineProvider, ColorSchemeProvider } from '@mantine/core'
@@ -10,12 +10,26 @@ import { useLocalStorage } from '@mantine/hooks'
 import { RouterTransition } from '../components/layout/RouterTransition'
 import { createClient } from '@supabase/supabase-js'
 import { Notifications } from '@mantine/notifications'
+import posthog from 'posthog-js'
+import { PostHogProvider } from 'posthog-js/react'
+import { useRouter } from 'next/router'
+
+if (typeof window !== 'undefined') {
+  posthog.init('phc_AO6mpklrLXRf3Kynf1oMSBulMDxX90OiiHjKguhxo2t', {
+    api_host: 'https://app.posthog.com',
+    loaded: (posthog) => {
+      if (process.env.NODE_ENV === 'development') posthog.debug(false)
+    },
+  })
+}
+
 function MyApp({
   Component,
   pageProps,
 }: AppProps<{
   initialSession: Session
 }>) {
+  const router = useRouter()
   const [supabase] = useState(() =>
     createClient(
       'https://dwbtkafawtzpzntudwnb.supabase.co',
@@ -27,6 +41,16 @@ function MyApp({
     defaultValue: 'dark',
     getInitialValueInEffect: true,
   })
+
+  // useEffect(() => {
+  //   // Track page views
+  //   const handleRouteChange = () => posthog?.capture('$pageview')
+  //   router.events.on('routeChangeComplete', handleRouteChange)
+  //   return () => {
+  //     router.events.off('routeChangeComplete', handleRouteChange)
+  //   }
+  // }, [])
+
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'))
 
@@ -49,14 +73,16 @@ function MyApp({
           },
         }}>
         <Notifications />
-        <SessionContextProvider
-          supabaseClient={supabase}
-          initialSession={pageProps.initialSession}>
-          <Layout>
-            <RouterTransition />
-            <Component {...pageProps} />
-          </Layout>
-        </SessionContextProvider>
+        <PostHogProvider client={posthog}>
+          <SessionContextProvider
+            supabaseClient={supabase}
+            initialSession={pageProps.initialSession}>
+            <Layout>
+              <RouterTransition />
+              <Component {...pageProps} />
+            </Layout>
+          </SessionContextProvider>
+        </PostHogProvider>
       </MantineProvider>
     </ColorSchemeProvider>
   )
