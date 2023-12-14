@@ -192,7 +192,7 @@ export const Navbar = () => {
                   mt={6}
                   style={{
                     background:
-                      currency.value === Currency.value ? '#1c1c1c' : '',
+                      currency?.value === Currency.value ? '#1c1c1c' : '',
                   }}
                   icon={Currency.icon({})}
                   onClick={() => {

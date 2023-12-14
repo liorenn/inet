@@ -73,7 +73,6 @@ model Device {
   releaseDate      DateTime         @db.Date
   releaseOS        String?          @db.VarChar
   releasePrice     Int              @db.SmallInt
-  price            Float            @db.Real @default(0)
   connector        String           @db.VarChar
   biometrics       String           @db.VarChar
   batterySize      Int?             @db.SmallInt
@@ -81,17 +80,18 @@ model Device {
   weight           Float            @db.Real
   description      String           @db.VarChar
   imageAmount      Int              @db.SmallInt
-  height           Float             @db.Real
-  width            Float              @db.Real
-  depth            Float              @db.Real
+  height           Float            @db.Real
+  width            Float            @db.Real
+  depth            Float            @db.Real
   storage          Int?             @db.SmallInt
   cpu              Int?             @db.SmallInt
   gpu              Int?             @db.SmallInt
   memory           Int?             @db.SmallInt
-  magsafe          Boolean? @db.Boolean
+  magsafe          Boolean?
   screenSize       Float?           @db.Real
   screenType       String?          @db.VarChar
   resistanceRating String?          @db.VarChar
+  price            Float            @default(0) @db.Real
   cameras          Camera[]
   comments         Comment[]
   biometricFeature BiometricFeature @relation(fields: [biometrics], references: [name])

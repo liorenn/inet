@@ -30,12 +30,12 @@ export const currencies: currency[] = [
 ]
 
 interface CurrencyState {
-  currency: currency
+  currency: currency | undefined
   setCurrency: (currency: currency) => void
 }
 
 export const useCurrencytore = create<CurrencyState>()((set) => ({
-  currency: currencies[0],
+  currency: undefined,
   setCurrency: (newCurrency) => {
     set(() => ({ currency: newCurrency }))
     localStorage.setItem('currency', newCurrency.value)

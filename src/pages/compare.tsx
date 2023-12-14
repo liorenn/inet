@@ -13,7 +13,7 @@ import React from 'react'
 import { trpc } from '../utils/trpc'
 import DevicePhotos from '../components/allDevices/DevicePhotos'
 import useTranslation from 'next-translate/useTranslation'
-import {type deviceSpecsType } from '../components/specificDevice/SpecsFormatter'
+import { type deviceSpecsType } from '../utils/SpecsFormatter'
 import ModelsSpecs from '../components/specificDevice/ModelsSpecs'
 
 export default function Compare() {

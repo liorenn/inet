@@ -1,29 +1,8 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '../trpc'
-import { FormatPrice } from '../../utils/functions'
+import { fetchCurrentPrice } from '../../utils/functions'
 
 export const DeviceRouter = router({
-  getPrice: publicProcedure
-    .input(z.object({ name: z.string() }))
-    .query(async ({ input }) => {
-      const gsmarena = require('gsmarena-api')
-      const devices = await gsmarena.catalog.getBrand('apple-phones-48')
-      let deviceID: any = null
-      devices.forEach(async (device: any) => {
-        const deviceName = device.name as string
-        if (
-          deviceName.toLowerCase().replace(' ', '') ===
-          input.name.toLowerCase().replace(' ', '')
-        ) {
-          deviceID = device.id
-        }
-      })
-      const device = await gsmarena.catalog.getDevice(deviceID)
-      const price = device.detailSpec[12].specifications.find(
-        (item: any) => item.name === 'Price'
-      ).value
-      return FormatPrice(price)
-    }),
   getDevice: publicProcedure
     .input(z.object({ model: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -34,6 +13,12 @@ export const DeviceRouter = router({
           colors: { select: { Color: true } },
         },
       })
+      if (device?.price === 0) {
+        const price = await fetchCurrentPrice(device.model)
+        if (price) {
+          device.price = price
+        }
+      }
       return device
     }),
   getDeviceMutation: publicProcedure

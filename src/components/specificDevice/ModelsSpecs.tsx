@@ -1,11 +1,10 @@
-import { ColorSwatch, Tooltip, useMantineColorScheme } from '@mantine/core'
-import { Table, Accordion, Grid, Text, Group } from '@mantine/core'
+import { useMantineColorScheme } from '@mantine/core'
+import { Accordion } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useViewportSize } from '@mantine/hooks'
-import FortmatSpecs, { type deviceSpecsType } from './SpecsFormatter'
+import { FortmatSpecs, type deviceSpecsType } from '../../utils/SpecsFormatter'
 import ModelTable from './ModelTable'
-import { useLanguageStore } from '../../utils/languageStore'
 
 type Props = {
   device1: deviceSpecsType
@@ -29,17 +28,9 @@ type MergedCategoriesType = {
   }[]
 }[]
 
-type TableProps = {
-  category: {
-    label: string
-    info1: string
-    info2: string
-  }[]
-}
 function ModelsSpecs({ device1, device2 }: Props) {
   const { t } = useTranslation('devices')
   const { width } = useViewportSize()
-  const { language } = useLanguageStore()
   const accordionContents = [
     t('name'),
     t('display'),
@@ -112,7 +103,6 @@ function ModelsSpecs({ device1, device2 }: Props) {
                 label: item.label,
                 info: item.info2,
               }))}
-              categoryName={category.name}
             />
           </Accordion.Panel>
         </Accordion.Item>

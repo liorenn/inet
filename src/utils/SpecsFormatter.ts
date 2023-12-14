@@ -1,6 +1,6 @@
 import type { Device } from '@prisma/client'
-import type { categoriesType } from './ModelSpecs'
-import { FormatDate } from '../../utils/functions'
+import type { categoriesType } from '../components/specificDevice/ModelSpecs'
+import { FormatDate } from './functions'
 import useTranslation from 'next-translate/useTranslation'
 
 export const accordionContents = [
@@ -26,7 +26,7 @@ export type deviceSpecsType =
       }[]
     } & Device
 
-export default function FortmatSpecs(device: deviceSpecsType) {
+export function FortmatSpecs(device: deviceSpecsType) {
   const { t } = useTranslation('devices')
 
   const cameras = []
@@ -146,5 +146,16 @@ export default function FortmatSpecs(device: deviceSpecsType) {
       ],
     },
   ]
+
+  if (device.price !== 0) {
+    categories.map((category) => {
+      category.name === t('availability') &&
+        category.values.unshift({
+          label: t('price'),
+          info: device.price.toString(),
+        })
+    })
+  }
+
   return categories
 }

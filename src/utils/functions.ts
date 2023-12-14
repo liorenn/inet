@@ -1,8 +1,38 @@
 import { showNotification } from '@mantine/notifications'
 import { IconCheck, IconX, IconExclamationMark } from '@tabler/icons'
 import { type ReactElement } from 'react'
-import type { Comment } from '@prisma/client'
+import { PrismaClient, type Comment } from '@prisma/client'
 import { deviceType } from './deviceTypes'
+
+export async function fetchCurrentPrice(deviceModel: string) {
+  const prisma = new PrismaClient()
+  const gsmarena = require('gsmarena-api')
+  try {
+    const devices = await gsmarena.catalog.getBrand('apple-phones-48')
+    let deviceID: any = null
+    devices.forEach(async (device: any) => {
+      const deviceName = device.name as string
+      if (
+        deviceName.toLowerCase().replace(/\s/g, '') ===
+        deviceModel.toLowerCase().replace(/\s/g, '')
+      ) {
+        deviceID = device.id
+      }
+    })
+    const device = await gsmarena.catalog.getDevice(deviceID)
+    const price = device.detailSpec[12].specifications.find(
+      (item: any) => item.name === 'Price'
+    ).value
+    const formatterPrice = await FormatPrice(price)
+    await prisma.device.update({
+      where: { model: deviceModel },
+      data: { price: formatterPrice },
+    })
+    return formatterPrice
+  } catch (error) {
+    return undefined
+  }
+}
 
 export async function convertPrice(
   price: number,

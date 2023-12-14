@@ -1,7 +1,7 @@
 import { Button, Container, useMantineColorScheme } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
-import FortmatSpecs, { type deviceSpecsType } from './SpecsFormatter'
+import { FortmatSpecs, type deviceSpecsType } from '../../utils/SpecsFormatter'
 import { useState } from 'react'
 import Link from 'next/link'
 import ModelTable from './ModelTable'
@@ -64,10 +64,7 @@ function ModelSpecs({ device }: Props) {
         <Accordion.Item value={category.name} key={category.name}>
           <Accordion.Control>{category.name}</Accordion.Control>
           <Accordion.Panel>
-            <ModelTable
-              category={category.values}
-              categoryName={category.name}
-            />
+            <ModelTable category={category.values} />
           </Accordion.Panel>
         </Accordion.Item>
       ))}

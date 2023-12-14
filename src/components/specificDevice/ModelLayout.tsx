@@ -4,7 +4,7 @@ import ModelWidgets from './ModelWidgets'
 import { Stack, Grid, Center } from '@mantine/core'
 import DevicePhotos from '../allDevices/DevicePhotos'
 import ModelSpecs from './ModelSpecs'
-import type { deviceSpecsType } from './SpecsFormatter'
+import type { deviceSpecsType } from '../../utils/SpecsFormatter'
 
 type Props = {
   device: deviceSpecsType

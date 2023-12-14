@@ -1,8 +1,6 @@
 import { Table, Grid, Text, Group, Tooltip, ColorSwatch } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
-import { useState, useEffect } from 'react'
-import { useCurrencytore } from '../../utils/CurrencyStore'
-import { convertPrice } from '../../utils/functions'
+import PriceText from '../allDevices/PriceText'
 
 type catergory = {
   label: string
@@ -11,56 +9,10 @@ type catergory = {
 type TableProps = {
   category: catergory[]
   secondCatergory?: catergory[]
-  categoryName: string
 }
 
-export default function ModelTable({
-  category,
-  categoryName,
-  secondCatergory,
-}: TableProps) {
+export default function ModelTable({ category, secondCatergory }: TableProps) {
   const { t } = useTranslation('devices')
-  const { currency } = useCurrencytore()
-  const priceString = category.find(
-    (element) => element.label === t('releasePrice')
-  )?.info as string
-  const priceString2 = secondCatergory?.find(
-    (element) => element.label === t('releasePrice')
-  )?.info
-  const [price, setPrice] = useState<number>(parseFloat(priceString ?? '0'))
-  const [price2, setPrice2] = useState<number>(parseFloat(priceString2 ?? '0'))
-  const [prevCurrency, setPrevCurrency] = useState<string | undefined>(
-    undefined
-  )
-
-  async function setNewPrice() {
-    const newPrice = await convertPrice(price, 'USD', currency.value)
-    setPrice(newPrice)
-    if (secondCatergory) {
-      const newPrice2 = await convertPrice(price2, 'USD', currency.value)
-      setPrice2(newPrice2)
-    }
-    setPrevCurrency('USD')
-  }
-
-  useEffect(() => {
-    if (categoryName === t('availability')) {
-      setNewPrice()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!currency || categoryName !== t('availability') || !prevCurrency) return
-    convertPrice(price, prevCurrency, currency.value).then((price) => {
-      setPrice(price)
-      setPrevCurrency(currency.value)
-    })
-    if (secondCatergory) {
-      convertPrice(price2, prevCurrency, currency.value).then((price) => {
-        setPrice2(price)
-      })
-    }
-  }, [currency])
 
   return (
     <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
@@ -99,7 +51,7 @@ export default function ModelTable({
                         </Group>
                       ) : element.label === t('releasePrice') ||
                         element.label === t('price') ? (
-                        price.toFixed(2) + currency.symol
+                        <PriceText priceString={element.info} />
                       ) : (
                         element.info
                       )}
@@ -129,7 +81,9 @@ export default function ModelTable({
                         ) : secondCatergory[index].label ===
                             t('releasePrice') ||
                           secondCatergory[index].label === t('price') ? (
-                          price2.toFixed(2) + currency.symol
+                          <PriceText
+                            priceString={secondCatergory[index].info}
+                          />
                         ) : (
                           secondCatergory[index].info
                         )}
