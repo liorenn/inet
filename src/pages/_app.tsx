@@ -1,24 +1,29 @@
 import type { Session } from '@supabase/auth-helpers-react'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { trpc } from '../utils/trpc'
+import { trpc } from '../misc/trpc'
 import type { AppProps } from 'next/app'
-import { useEffect, useState } from 'react'
 import Layout from '../components/layout/Layout'
 import type { ColorScheme } from '@mantine/core'
 import { MantineProvider, ColorSchemeProvider } from '@mantine/core'
 import { useLocalStorage } from '@mantine/hooks'
 import { RouterTransition } from '../components/layout/RouterTransition'
-import { createClient } from '@supabase/supabase-js'
 import { Notifications } from '@mantine/notifications'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
-import { useRouter } from 'next/router'
+import {
+  customBreakPoints,
+  defaultColorSchema,
+  posthogApiHost,
+  posthogDebug,
+  posthogToken,
+} from '../../config'
+import { supabase } from '../server/supabase'
 
 if (typeof window !== 'undefined') {
-  posthog.init('phc_AO6mpklrLXRf3Kynf1oMSBulMDxX90OiiHjKguhxo2t', {
-    api_host: 'https://app.posthog.com',
+  posthog.init(posthogToken, {
+    api_host: posthogApiHost,
     loaded: (posthog) => {
-      if (process.env.NODE_ENV === 'development') posthog.debug(false)
+      posthog.debug(posthogDebug)
     },
   })
 }
@@ -29,27 +34,11 @@ function MyApp({
 }: AppProps<{
   initialSession: Session
 }>) {
-  const router = useRouter()
-  const [supabase] = useState(() =>
-    createClient(
-      'https://dwbtkafawtzpzntudwnb.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3YnRrYWZhd3R6cHpudHVkd25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjM2MTc0MDksImV4cCI6MTk3OTE5MzQwOX0.84xKcgBpyzJbRVpQCEm3jASkMyame_hrrcxsLVkPaeo'
-    )
-  )
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'mantine-color-scheme',
-    defaultValue: 'dark',
+    defaultValue: defaultColorSchema,
     getInitialValueInEffect: true,
   })
-
-  // useEffect(() => {
-  //   // Track page views
-  //   const handleRouteChange = () => posthog?.capture('$pageview')
-  //   router.events.on('routeChangeComplete', handleRouteChange)
-  //   return () => {
-  //     router.events.off('routeChangeComplete', handleRouteChange)
-  //   }
-  // }, [])
 
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'))
@@ -62,15 +51,8 @@ function MyApp({
         withGlobalStyles
         withNormalizeCSS
         theme={{
-          loader: 'dots',
           colorScheme,
-          breakpoints: {
-            xs: '30em',
-            sm: '48em',
-            md: '64em',
-            lg: '74em',
-            xl: '90em',
-          },
+          breakpoints: customBreakPoints,
         }}>
         <Notifications />
         <PostHogProvider client={posthog}>

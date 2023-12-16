@@ -6,7 +6,7 @@ import { TextInput, Paper } from '@mantine/core'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useForm } from 'react-hook-form'
 import type { SubmitHandler } from 'react-hook-form'
-import { CreateNotification } from '../../../utils/functions'
+import { CreateNotification } from '../../../misc/functions'
 import Head from 'next/head'
 import useTranslation from 'next-translate/useTranslation'
 

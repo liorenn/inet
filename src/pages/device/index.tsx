@@ -1,10 +1,11 @@
-import Link from 'next/link'
-import { SimpleGrid, Image, Button, Container, Text, Card } from '@mantine/core'
-import { Group, Breadcrumbs, Title, useMantineColorScheme } from '@mantine/core'
-import Head from 'next/head'
+import { Text, Container, Title, useMantineColorScheme } from '@mantine/core'
+import { SimpleGrid, Breadcrumbs, Group } from '@mantine/core'
+import DeviceTypeCard from '../../components/device/DeviceTypeCard'
 import useTranslation from 'next-translate/useTranslation'
-import { deviceType } from '../../utils/deviceTypes'
-// /device page
+import { deviceType } from '../../models/deviceTypes'
+import Link from 'next/link'
+import Head from 'next/head'
+
 export default function Device() {
   const { colorScheme } = useMantineColorScheme()
   const devicesTypes = Object.getOwnPropertyNames(deviceType)
@@ -41,28 +42,7 @@ export default function Device() {
             { minWidth: 'lg', cols: 3 },
           ]}>
           {devicesTypes.map((devicesType) => (
-            <Card key={devicesType}>
-              <Card.Section>
-                <Image
-                  src={'/images/devices/' + devicesType + '.png'}
-                  height={220}
-                  fit={'contain'}
-                  alt='device photo'
-                />
-              </Card.Section>
-              <Link
-                href={'/device/' + devicesType}
-                style={{ textDecoration: 'none' }}>
-                <Button
-                  variant='light'
-                  color='gray'
-                  fullWidth
-                  mt='md'
-                  radius='md'>
-                  {devicesType}
-                </Button>
-              </Link>
-            </Card>
+            <DeviceTypeCard devicesType={devicesType} key={devicesType} />
           ))}
         </SimpleGrid>
       </Container>

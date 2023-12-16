@@ -6,6 +6,8 @@ export default {
   selectDevice: 'בחר מכשיר',
   userManagement: 'ניהול משתמשים',
   deviceManagement: 'ניהול מכשירים',
+  databaseViewer: 'צפייה בבסיס הנתונים',
+  websiteStatistics: 'סטטיסטיקות האתר',
   currencies: 'מטבעות',
   data: 'נתונים',
   all: 'כל',

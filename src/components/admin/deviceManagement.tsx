@@ -1,35 +1,25 @@
-import {
-  Button,
-  Center,
-  Loader,
-  ScrollArea,
-  Table,
-  TextInput,
-} from '@mantine/core'
-import { trpc } from '../../utils/trpc'
-import Head from 'next/head'
+import { trpc } from '../../misc/trpc'
 import useTranslation from 'next-translate/useTranslation'
 import type { User } from '@prisma/client'
 import { Controller, useForm } from 'react-hook-form'
 import debounce from 'lodash.debounce'
-import { CreateNotification } from '../../utils/functions'
+import { CreateNotification } from '../../misc/functions'
 import { useState } from 'react'
+import { adminAccessKey } from '../../../config'
+import { useRouter } from 'next/router'
+import Loader from '../layout/Loader'
+import { Button, ScrollArea, Table, TextInput } from '@mantine/core'
 
-export default function DeviceManagement() {
+export default function DeviceManagement({ accessKey }: { accessKey: number }) {
+  const router = useRouter()
   const { t } = useTranslation('device')
   const { data: tableData } = trpc.admin.getUsersData.useQuery()
+  if (accessKey < adminAccessKey) {
+    router.push('/')
+  }
 
   if (!tableData) {
-    return (
-      <>
-        <Head>
-          <title>{t('account')}</title>
-        </Head>
-        <Center>
-          <Loader color='gray' size={120} variant='dots' />
-        </Center>
-      </>
-    )
+    return <Loader />
   }
   return (
     <>

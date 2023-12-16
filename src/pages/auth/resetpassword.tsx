@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Title, Text, Container, Button } from '@mantine/core'
 import { TextInput, Paper } from '@mantine/core'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { CreateNotification } from '../../utils/functions'
+import { CreateNotification } from '../../misc/functions'
 import Head from 'next/head'
 
 export default function ResetPassword() {

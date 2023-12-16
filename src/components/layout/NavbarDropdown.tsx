@@ -4,7 +4,7 @@ import { Drawer, ActionIcon, Text, createStyles, rem } from '@mantine/core'
 import Link from 'next/link'
 import useTranslation from 'next-translate/useTranslation'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { CreateNotification } from '../../utils/functions'
+import { CreateNotification } from '../../misc/functions'
 
 function NavBarDropdown({ AccessKey }: { AccessKey: number | undefined }) {
   const [opened, setOpened] = useState(false)

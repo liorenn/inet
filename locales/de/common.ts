@@ -6,6 +6,8 @@ export default {
   selectDevice: 'Gerät auswählen',
   userManagement: 'Benutzerverwaltung',
   deviceManagement: 'Geräteverwaltung',
+  databaseViewer: 'DatenbankViewer',
+  websiteStatistics: 'Website Statistiken',
   currencies: 'Währungen',
   data: 'Daten',
   all: 'alle',

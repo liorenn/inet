@@ -1,4 +1,4 @@
-import { Center, Loader, PasswordInput } from '@mantine/core'
+import { Center, PasswordInput } from '@mantine/core'
 import { Text, Container, Stack, Box, Group } from '@mantine/core'
 import { TextInput, Divider, Avatar } from '@mantine/core'
 import { SimpleGrid, UnstyledButton } from '@mantine/core'
@@ -6,21 +6,20 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import Head from 'next/head'
-import { trpc } from '../../utils/trpc'
-import { CreateNotification } from '../../utils/functions'
-import { useViewportSize } from '@mantine/hooks'
+import { trpc } from '../../misc/trpc'
+import { CreateNotification } from '../../misc/functions'
 import { useSession, useUser } from '@supabase/auth-helpers-react'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import UploadAvatar from '../../components/layout/UploadAvatar'
-import usePublicUrl from '../../utils/usePublicUrl'
+import UploadAvatar from '../../components/misc/UploadAvatar'
+import usePublicUrl from '../../hooks/usePublicUrl'
 import useTranslation from 'next-translate/useTranslation'
+import Loader from '../../components/layout/Loader'
 
 export default function Account() {
-  const session = useSession()
   const user = useUser()
-  const supabase = useSupabaseClient()
   const router = useRouter()
-  const { height } = useViewportSize()
+  const session = useSession()
+  const supabase = useSupabaseClient()
   const updateMutation = trpc.auth.updateUserDetails.useMutation()
   const { data: UserDetails } = trpc.auth.getUserDetails.useQuery({
     id: user?.id,
@@ -112,20 +111,7 @@ export default function Account() {
   if (!(user && session)) {
     return <Center>{t('accessDeniedMessageSignIn')}</Center>
   }
-
-  if (!UserDetails) {
-    return (
-      <>
-        <Head>
-          <title>{t('account')}</title>
-        </Head>
-        <Center>
-          <Loader color='gray' size={120} variant='dots' mt={height / 3} />
-        </Center>
-      </>
-    )
-  }
-
+  if (!UserDetails) return <Loader />
   return (
     <>
       <Head>

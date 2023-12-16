@@ -16,6 +16,7 @@
 /build/
 /out/
 next-env.d.ts
+config.ts
 
 # production
 /build

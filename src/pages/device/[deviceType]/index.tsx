@@ -1,30 +1,27 @@
-import { trpc } from '../../../utils/trpc'
-import DeviceCard from '../../../components/allDevices/DeviceCard'
-import { Center, Container, Loader, SimpleGrid } from '@mantine/core'
-import DeviceHeader from '../../../components/allDevices/DeviceHeader'
-import { useViewportSize } from '@mantine/hooks'
+import { trpc } from '../../../misc/trpc'
+import DeviceCard from '../../../components/device/DeviceCard'
+import { Container, SimpleGrid } from '@mantine/core'
+import DeviceHeader from '../../../components/device/DeviceTypeHeader'
 import Head from 'next/head'
-import { CreateNotification } from '../../../utils/functions'
+import { CreateNotification } from '../../../misc/functions'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
-import type { DeviceType } from '../../../utils/deviceTypes'
+import type {
+  DeviceType,
+  devicePropertiesType,
+} from '../../../models/deviceTypes'
 import { usePostHog } from 'posthog-js/react'
+import Loader from '../../../components/layout/Loader'
 
-export interface allProperties {
-  model: string
-  name: string
-  imageAmount: number
-}
 // /device/iphone page
-function DeviceTypePage() {
+export default function DeviceTypePage() {
   const router = useRouter()
   const posthog = usePostHog()
   const deviceType = router.asPath.split('/')[
     router.asPath.split('/').length - 1
   ] as DeviceType
-  const { height } = useViewportSize()
   const user = useUser()
   const { t } = useTranslation('devices')
   const [areInList, setAreInList] = useState<{ isInList: boolean }[]>([])
@@ -52,7 +49,7 @@ function DeviceTypePage() {
   }, [data])
 
   function handleIsInlist(
-    device: allProperties,
+    device: devicePropertiesType,
     isInList: boolean,
     index: number
   ) {
@@ -81,6 +78,8 @@ function DeviceTypePage() {
       setAreInList(newArr)
     } else CreateNotification(t('signInToAdd'), 'green')
   }
+
+  if (!data) return <Loader />
 
   if (data && areInList.length > 0 && areInList[0]?.isInList !== undefined) {
     return (
@@ -111,12 +110,5 @@ function DeviceTypePage() {
         </Container>
       </>
     )
-  } else {
-    return (
-      <Center>
-        <Loader color='gray' size={120} variant='dots' mt={height / 3} />
-      </Center>
-    )
   }
 }
-export default DeviceTypePage

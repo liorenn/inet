@@ -2,11 +2,7 @@ import { Navbar } from './Navbar'
 import type { ReactNode } from 'react'
 import ScrollToTop from './ScrollToTop'
 
-type Props = {
-  children: ReactNode
-}
-
-const Layout = ({ children }: Props) => {
+const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <>
       <Navbar />

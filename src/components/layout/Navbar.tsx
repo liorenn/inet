@@ -14,16 +14,17 @@ import {
   useUser,
 } from '@supabase/auth-helpers-react'
 import { useEffect, useState } from 'react'
-import { CreateNotification } from '../../utils/functions'
+import { CreateNotification } from '../../misc/functions'
 import { DEFlag, ILFlag, GBFlag } from 'mantine-flagpack'
-import { languages, useLanguageStore } from '../../utils/languageStore'
+import { languages, useLanguage } from '../../hooks/useLanguage'
 import setLanguage from 'next-translate/setLanguage'
 import useTranslation from 'next-translate/useTranslation'
 import NavBarDropdown from './NavbarDropdown'
-import usePublicUrl from '../../utils/usePublicUrl'
-import { trpc } from '../../utils/trpc'
-import { currencies, useCurrencytore } from '../../utils/CurrencyStore'
+import usePublicUrl from '../../hooks/usePublicUrl'
+import { trpc } from '../../misc/trpc'
+import { currencies, useCurrency } from '../../hooks/useCurrency'
 import { usePostHog } from 'posthog-js/react'
+import { adminAccessKey, managerAccessKey } from '../../../config'
 
 export const Navbar = () => {
   const user = useUser()
@@ -33,8 +34,8 @@ export const Navbar = () => {
   const dark = colorScheme === 'dark'
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
-  const { currency, setCurrency } = useCurrencytore()
-  const { setLanguage: setlanguageStore } = useLanguageStore()
+  const { currency, setCurrency } = useCurrency()
+  const { setLanguage: setlanguageStore } = useLanguage()
   const { t, lang } = useTranslation('common')
   const { t: authT } = useTranslation('auth')
   const { change } = usePublicUrl()
@@ -42,7 +43,7 @@ export const Navbar = () => {
     userId: user?.id,
   })
   const { data: AccessKey } = trpc.auth.getAccessKey.useQuery({
-    userId: user?.id,
+    email: user?.email,
   })
   useEffect(() => {
     setlanguageStore(
@@ -88,7 +89,6 @@ export const Navbar = () => {
                 <Text style={{ fontSize: '22px', fontWeight: 500 }}>
                   {t('inet')}
                 </Text>
-                {/* <IconDevices height={30} width={30} /> */}
               </Group>
             </Button>
           </Link>
@@ -148,15 +148,7 @@ export const Navbar = () => {
             </>
           ) : (
             <>
-              <Button
-                variant='light'
-                color='gray'
-                radius='md'
-                className={classes.end}
-                onClick={() => signOut()}>
-                {t('signOut')}
-              </Button>
-              {AccessKey && AccessKey >= 5 && (
+              {AccessKey && AccessKey >= adminAccessKey && (
                 <Link href={'/auth/admin'}>
                   <Button
                     variant='light'
@@ -167,8 +159,15 @@ export const Navbar = () => {
                   </Button>
                 </Link>
               )}
+              <Button
+                variant='light'
+                color='gray'
+                radius='md'
+                className={classes.end}
+                onClick={() => signOut()}>
+                {t('signOut')}
+              </Button>
               <Link href={'/auth/account'}>
-                {/* <Avatar src={publicUrl} radius='md' /> */}
                 <Avatar radius='md' />
               </Link>
             </>
@@ -239,38 +238,6 @@ export const Navbar = () => {
                   <Text weight={700}>{language.name}</Text>
                 </Menu.Item>
               ))}
-              {/* <Menu.Item
-                mt={6}
-                style={{ background: lang === 'en' ? '#1c1c1c' : '' }}
-                icon={<GBFlag w={38} />}
-                onClick={() => {
-                  setLanguage('en')
-                  localStorage.setItem('language', 'en')
-                }}>
-                <Text weight={700}>English</Text>
-              </Menu.Item>
-              <Menu.Item
-                mt={6}
-                style={{
-                  background: lang === 'de' ? '#1c1c1c' : '',
-                }}
-                icon={<DEFlag w={38} />}
-                onClick={() => {
-                  setLanguage('de')
-                  localStorage.setItem('language', 'de')
-                }}>
-                <Text weight={700}>Deutsch</Text>
-              </Menu.Item>
-              <Menu.Item
-                mt={6}
-                style={{ background: lang === 'he' ? '#1c1c1c' : '' }}
-                icon={<ILFlag w={38} />}
-                onClick={() => {
-                  setLanguage('he')
-                  localStorage.setItem('language', 'he')
-                }}>
-                <Text weight={700}>עברית</Text>
-              </Menu.Item> */}
             </Menu.Dropdown>
           </Menu>
           <ActionIcon

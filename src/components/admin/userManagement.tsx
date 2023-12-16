@@ -1,59 +1,50 @@
-import {
-  Button,
-  Center,
-  Loader,
-  ScrollArea,
-  Table,
-  TextInput,
-} from '@mantine/core'
-import { trpc } from '../../utils/trpc'
-import Head from 'next/head'
+import { trpc } from '../../misc/trpc'
 import useTranslation from 'next-translate/useTranslation'
 import type { User } from '@prisma/client'
 import { Controller, useForm } from 'react-hook-form'
 import debounce from 'lodash.debounce'
-import { CreateNotification } from '../../utils/functions'
+import { CreateNotification } from '../../misc/functions'
 import { useState } from 'react'
 import { useOs } from '@mantine/hooks'
+import { managerAccessKey } from '../../../config'
+import Loader from '../layout/Loader'
+import { Button, ScrollArea, Table, TextInput } from '@mantine/core'
+import { useRouter } from 'next/router'
 
-export default function UserManagement() {
+export default function UserManagement({ accessKey }: { accessKey: number }) {
+  const router = useRouter()
   const { t } = useTranslation('auth')
   const { data: tableData } = trpc.admin.getUsersData.useQuery()
-
-  if (!tableData) {
-    return (
-      <>
-        <Head>
-          <title>{t('account')}</title>
-        </Head>
-        <Center>
-          <Loader color='gray' size={120} variant='dots' />
-        </Center>
-      </>
-    )
+  if (accessKey < managerAccessKey) {
+    router.push('/')
   }
+
   return (
     <>
-      <ScrollArea>
-        <Table mb='md' withBorder withColumnBorders>
-          <thead>
-            <tr>
-              <th>{t('deleteAccount')}</th>
-              <th>{t('username')}</th>
-              <th>{t('name')}</th>
-              <th>{t('password')}</th>
-              <th>{t('email')}</th>
-              <th>{t('phone')}</th>
-              <th>{t('accessKey')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableData.map((data, index) => {
-              return <UserRow data={data} key={index} />
-            })}
-          </tbody>
-        </Table>
-      </ScrollArea>
+      {!tableData ? (
+        <Loader />
+      ) : (
+        <ScrollArea>
+          <Table mb='md' withBorder withColumnBorders>
+            <thead>
+              <tr>
+                <th>{t('deleteAccount')}</th>
+                <th>{t('username')}</th>
+                <th>{t('name')}</th>
+                <th>{t('password')}</th>
+                <th>{t('email')}</th>
+                <th>{t('phone')}</th>
+                <th>{t('accessKey')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableData.map((data, index) => {
+                return <UserRow data={data} key={index} />
+              })}
+            </tbody>
+          </Table>
+        </ScrollArea>
+      )}
       {/* <Affix position={{ bottom: 20, right: 20 }}>
         <Button
           variant='light'

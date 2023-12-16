@@ -1,21 +1,20 @@
-import { trpc } from '../utils/trpc'
-import { Center, Container, Loader, SimpleGrid } from '@mantine/core'
-import { useViewportSize } from '@mantine/hooks'
-import Head from 'next/head'
+import { Container, SimpleGrid } from '@mantine/core'
 import { useUser } from '@supabase/auth-helpers-react'
 import React, { useEffect, useState } from 'react'
-import type { devicesPropertiesArrType } from '../trpc/routers/auth'
-import ListCard from '../components/allDevices/ListCard'
+import type { devicePropertiesType } from '../models/deviceTypes'
+import ListCard from '../components/device/DeviceListCard'
 import useTranslation from 'next-translate/useTranslation'
+import Loader from '../components/layout/Loader'
+import { trpc } from '../misc/trpc'
+import Head from 'next/head'
 
 export default function Favorites(): JSX.Element {
-  const { height } = useViewportSize()
   const user = useUser()
   const userDevicesQuery = trpc.auth.getUserDevices.useQuery({
     userId: user?.id,
   })
   const [devicesArr, setDevicesArr] = useState<
-    devicesPropertiesArrType | undefined
+    devicePropertiesType[] | undefined
   >(undefined)
   const { t } = useTranslation('common')
 
@@ -42,11 +41,7 @@ export default function Favorites(): JSX.Element {
             {devicesArr &&
               devicesArr.map((value, index) => (
                 <ListCard
-                  device={{
-                    model: value.model,
-                    imageAmount: value.imageAmount,
-                    name: value.name,
-                  }}
+                  device={value}
                   key={index}
                   deviceType={value.type}
                   setDevicesArr={setDevicesArr}
@@ -56,9 +51,7 @@ export default function Favorites(): JSX.Element {
           </SimpleGrid>
         </Container>
       ) : (
-        <Center>
-          <Loader color='gray' size={120} variant='dots' mt={height / 3} />
-        </Center>
+        <Loader />
       )}
     </>
   )

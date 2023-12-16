@@ -1,8 +1,8 @@
-import Head from 'next/head'
 import { Grid, Button, Text, Title } from '@mantine/core'
 import { Group, Stack, Container } from '@mantine/core'
-import Link from 'next/link'
 import useTranslation from 'next-translate/useTranslation'
+import Head from 'next/head'
+import Link from 'next/link'
 
 export default function Index() {
   const { t } = useTranslation('common')
