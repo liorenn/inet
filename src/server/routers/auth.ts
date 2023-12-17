@@ -1,22 +1,8 @@
-import { router, publicProcedure } from '../trpc'
-import { Resend } from 'resend'
-import { z } from 'zod'
-import PriceDropEmail from '../../components/misc/PriceDropEmail'
 import { devicePropertiesType } from '../../models/deviceTypes'
+import { router, publicProcedure } from '../trpc'
+import { z } from 'zod'
 
 export const authRouter = router({
-  getSession: publicProcedure.query(({ ctx }) => {
-    return ctx.session
-  }),
-  sendEmail: publicProcedure.mutation(() => {
-    const resend = new Resend(process.env.RESEND_KEY)
-    resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: 'lior.oren06@gmail.com',
-      subject: 'Hello World Test',
-      react: PriceDropEmail({ name: 'John' }),
-    })
-  }),
   deleteComment: publicProcedure
     .input(z.object({ commentId: z.number() }))
     .mutation(async ({ ctx, input }) => {

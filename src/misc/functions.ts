@@ -135,3 +135,15 @@ export function findObjectByPropertyValue<T>(
 ) {
   return array.find((item) => item[name] === value)
 }
+
+export function calculatePercentageDiff(
+  oldPrice: number,
+  newPrice: number
+): number {
+  if (oldPrice === 0) {
+    return 0
+  }
+  const absoluteDifference = Math.abs(oldPrice - newPrice)
+  const percentageDifference = (absoluteDifference / oldPrice) * 100
+  return percentageDifference
+}

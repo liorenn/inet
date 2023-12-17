@@ -1,9 +1,15 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '../trpc'
 import { Prisma } from '@prisma/client'
-import { sendSoapRequest } from '../../../config'
+import { fromEmail, resendKey, sendSoapRequest } from '../../../config'
 import { deviceSchema, userSchema } from '../../models/schemas'
 import { upsertDeviceSoap, upsertUserSoap } from '../soapFunctions'
+import { Resend } from 'resend'
+import PriceDropEmail from '../../components/misc/PriceDropEmail'
+import {
+  fetchCurrentPrice,
+  calculatePercentageDiff,
+} from '../../misc/functions'
 
 export const AdminRouter = router({
   getUserColumns: publicProcedure.query(({ ctx }) => {
@@ -59,4 +65,47 @@ export const AdminRouter = router({
         return await upsertDeviceSoap({ input })
       }
     }),
+  sendPriceDropsEmails: publicProcedure.mutation(async ({ ctx }) => {
+    const devicesUsers = await ctx.prisma.deviceUser.findMany()
+    devicesUsers.map(async (deviceUser) => {
+      const device = await ctx.prisma.device.findFirst({
+        where: { model: deviceUser.deviceModel },
+      })
+      const user = await ctx.prisma.user.findFirst({
+        where: { id: deviceUser.userId },
+        select: { name: true, email: true },
+      })
+      if (user && device) {
+        const price = await fetchCurrentPrice(device.model)
+        if (price && price != device.price) {
+          await ctx.prisma.device.update({
+            where: { model: device.model },
+            data: { price: price },
+          })
+        }
+        if (price && price < device.price) {
+          const resend = new Resend(resendKey)
+          resend.emails
+            .send({
+              from: fromEmail,
+              to: user.email,
+              subject: `${device.name} Price Drop`,
+              react: PriceDropEmail({
+                name: user.name,
+                newPrice: price,
+                device: device,
+                precentage: calculatePercentageDiff(device.price, price),
+              }),
+            })
+            .then((value) => {
+              if (value.id) {
+                return true
+              }
+            })
+        } else {
+          return false
+        }
+      }
+    })
+  }),
 })

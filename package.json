@@ -55,6 +55,7 @@
     "stylis": "^4.3.0",
     "stylis-plugin-rtl": "^2.1.1",
     "superjson": "1.9.1",
+    "typescript-cookie": "^1.0.6",
     "zod": "^3.18.0",
     "zustand": "^4.3.6"
   },

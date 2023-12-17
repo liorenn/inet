@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '../trpc'
-import { fetchCurrentPrice } from '../../misc/functions'
 import { devicePropertiesType } from '../../models/deviceTypes'
 
 export const DeviceRouter = router({
@@ -14,12 +13,6 @@ export const DeviceRouter = router({
           colors: { select: { Color: true } },
         },
       })
-      if (device?.price === 0) {
-        const price = await fetchCurrentPrice(device.model)
-        if (price) {
-          device.price = price
-        }
-      }
       return device
     }),
   getDeviceMutation: publicProcedure

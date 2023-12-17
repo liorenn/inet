@@ -24,9 +24,11 @@ import usePublicUrl from '../../hooks/usePublicUrl'
 import { trpc } from '../../misc/trpc'
 import { currencies, useCurrency } from '../../hooks/useCurrency'
 import { usePostHog } from 'posthog-js/react'
-import { adminAccessKey, managerAccessKey } from '../../../config'
+import { adminAccessKey } from '../../../config'
+import useAutoTrigger from '../../hooks/useAutoTrigger'
 
 export const Navbar = () => {
+  useAutoTrigger()
   const user = useUser()
   const posthog = usePostHog()
   const { classes } = useStyles()
