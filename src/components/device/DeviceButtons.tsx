@@ -17,7 +17,7 @@ export default function DeviceButtons({ device }: Props) {
   const userDevicesMutation = trpc.auth.handleDeviceToUser.useMutation()
   const { data } = trpc.auth.isDeviceInUser.useQuery({
     deviceModel: device.model,
-    userId: user?.id,
+    userEmail: user?.id,
   })
   const { t } = useTranslation('devices')
 

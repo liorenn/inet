@@ -28,19 +28,24 @@ export const AdminRouter = router({
       return await ctx.prisma.$queryRawUnsafe(query)
     }),
   deleteUser: publicProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ email: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.supabase.auth.admin.deleteUser(input.id)
-      await ctx.prisma.user.delete({
-        where: { id: input.id },
-      })
+      const query = `SELECT id FROM auth.users WHERE email = '${input.email}';`
+      const userId = await ctx.prisma.$queryRawUnsafe(query)
+      console.log(userId)
+      if (typeof userId === 'string') {
+        const { data, error } = await ctx.supabase.auth.admin.deleteUser(userId)
+        await ctx.prisma.user.delete({
+          where: { email: input.email },
+        })
+      }
     }),
   updateUser: publicProcedure
     .input(userSchema)
     .mutation(async ({ ctx, input }) => {
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
       await ctx.prisma.user.update({
-        where: { id: input.id },
+        where: { email: input.email },
         data: {
           ...input,
         },
@@ -72,7 +77,7 @@ export const AdminRouter = router({
         where: { model: deviceUser.deviceModel },
       })
       const user = await ctx.prisma.user.findFirst({
-        where: { id: deviceUser.userId },
+        where: { email: deviceUser.userEmail },
         select: { name: true, email: true },
       })
       if (user && device) {

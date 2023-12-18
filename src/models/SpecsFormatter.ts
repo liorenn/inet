@@ -19,7 +19,7 @@ export type deviceSpecsType =
         megapixel: number
       }[]
       colors: {
-        Color: {
+        color: {
           name: string
           hex: string
         }
@@ -138,7 +138,7 @@ export function FortmatSpecs(device: deviceSpecsType) {
             ? device.colors
                 .map(
                   (value) =>
-                    value.Color.hex + '/' + value.Color.name.replace(/\s/g, '')
+                    value.color.hex + '/' + value.color.name.replace(/\s/g, '')
                 )
                 .join(' ')
             : t('none'),

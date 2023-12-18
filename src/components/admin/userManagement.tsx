@@ -76,13 +76,13 @@ function UserRow({ data }: { data: User }) {
   const { getValues, control } = useForm<User>()
 
   const handleDelete = () => {
-    mutateDelete({ id: data.id })
+    mutateDelete({ email: data.email })
   }
 
   const handleEdit = debounce((fields: User) => {
     fields.accessKey = Number(fields.accessKey)
     mutateUpdate(
-      { ...fields, id: data.id },
+      { ...fields, email: data.email },
       {
         onSuccess: () => {
           CreateNotification(
@@ -105,7 +105,6 @@ function UserRow({ data }: { data: User }) {
   type inputName =
     | 'name'
     | 'accessKey'
-    | 'id'
     | 'phone'
     | 'username'
     | 'password'

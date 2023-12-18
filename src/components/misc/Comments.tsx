@@ -34,7 +34,7 @@ export default function Comments({
   const commentsQuery = trpc.auth.getAllComments.useQuery({
     model: device.model,
   })
-  const { mutate: mutateUsersIds } = trpc.auth.getUsersIds.useMutation()
+  const { mutate: mutateUsersIds } = trpc.auth.getUsersEmails.useMutation()
   const { mutate: mutatePicturesUrls } = trpc.auth.GetPublicUrlArr.useMutation()
   const { t } = useTranslation('devices')
 
@@ -85,7 +85,7 @@ export default function Comments({
       model: device.model,
       username: username,
       updatedAt: new Date(),
-      Rating: rating,
+      rating: rating,
     }
     mutate(newComment, {
       onSuccess(data) {

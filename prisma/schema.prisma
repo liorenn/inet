@@ -12,7 +12,7 @@ model Camera {
   model      String
   megapixel  Int        @db.SmallInt
   device     Device     @relation(fields: [model], references: [model], onDelete: Cascade)
-  CameraType CameraType @relation(fields: [type], references: [name])
+  cameraType CameraType @relation(fields: [type], references: [name])
 
   @@id([model, type])
 }
@@ -24,11 +24,10 @@ model Color {
 }
 
 model User {
-  id         String       @id @unique @db.VarChar
+  email      String       @id @unique @db.VarChar
   username   String       @unique @db.VarChar
   name       String       @db.VarChar
   password   String       @db.VarChar
-  email      String       @unique @db.VarChar
   phone      String       @db.VarChar
   accessKey  Int          @default(1)
   comments   Comment[]
@@ -43,27 +42,27 @@ model Comment {
   updatedAt DateTime
   likes     Int
   username  String   @db.VarChar
-  Rating    Int
+  rating    Int
   device    Device   @relation(fields: [model], references: [model], onDelete: Cascade)
   user      User     @relation(fields: [username], references: [username])
 }
 
 model DeviceUser {
   deviceModel String @db.VarChar
-  userId      String @db.VarChar
+  userEmail   String @db.VarChar
   device      Device @relation(fields: [deviceModel], references: [model], onDelete: Cascade)
-  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
-  @@id([deviceModel, userId])
+  @@id([deviceModel, userEmail])
 }
 
 model DeviceColor {
-  colorName String
-  model     String
-  Color     Color  @relation(fields: [colorName], references: [name], onDelete: Cascade)
-  device    Device @relation(fields: [model], references: [model], onDelete: Cascade)
+  colorName   String
+  deviceModel String
+  color       Color  @relation(fields: [colorName], references: [name], onDelete: Cascade)
+  device      Device @relation(fields: [deviceModel], references: [model], onDelete: Cascade)
 
-  @@id([colorName, model])
+  @@id([deviceModel, colorName])
 }
 
 model Device {
@@ -98,7 +97,7 @@ model Device {
   deviceConnector  DeviceConnector  @relation(fields: [connector], references: [name])
   deviceType       DeviceType       @relation(fields: [type], references: [name])
   colors           DeviceColor[]
-  usersList        DeviceUser[]
+  users            DeviceUser[]
 }
 
 model DeviceConnector {
@@ -111,12 +110,12 @@ model BiometricFeature {
   devices Device[]
 }
 
-model CameraType {
-  name   String   @id @unique
-  Camera Camera[]
-}
-
 model DeviceType {
   name    String   @id @unique
   devices Device[]
+}
+
+model CameraType {
+  name    String   @id @unique
+  cameras Camera[]
 }

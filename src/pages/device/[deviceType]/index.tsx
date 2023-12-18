@@ -28,7 +28,7 @@ export default function DeviceTypePage() {
   const userDevicesMutation = trpc.auth.handleDeviceToUser.useMutation()
   const { data } = trpc.device.getUserDevices.useQuery({
     deviceType: deviceType,
-    userId: user?.id,
+    userEmail: user?.email,
   })
   const [captured, setCaptured] = useState(false)
 

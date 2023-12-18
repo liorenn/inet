@@ -32,7 +32,6 @@ export const deviceSchema = z.object({
 export type deviceSchemaType = z.infer<typeof deviceSchema>
 
 export const userSchema = z.object({
-  id: z.string(),
   name: z.string(),
   email: z.string(),
   phone: z.string(),
@@ -42,3 +41,15 @@ export const userSchema = z.object({
 })
 
 export type userSchemaType = z.infer<typeof userSchema>
+
+export const commentSchema = z.object({
+  likes: z.number(),
+  message: z.string(),
+  rating: z.number(),
+  updatedAt: z.date(),
+  createdAt: z.date(),
+  model: z.string(),
+  username: z.string(),
+})
+
+export type commentSchemaType = z.infer<typeof commentSchema>

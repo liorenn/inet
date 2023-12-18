@@ -26,7 +26,7 @@ export default function Comment({
   setRatingValue,
   pictureUrl,
 }: Props) {
-  const [rating, setRating] = useState(comment.Rating)
+  const [rating, setRating] = useState(comment.rating)
   const { mutate } = trpc.auth.deleteComment.useMutation()
   const { t } = useTranslation('devices')
 

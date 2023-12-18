@@ -22,13 +22,13 @@ export default function UploadAvatar({ setIsHovered }: props) {
   const { change } = usePublicUrl()
 
   const { data: UserDetails } = trpc.auth.getUserDetails.useQuery({
-    id: user?.id,
+    email: user?.email,
   })
   async function SubmitFile(file: File) {
-    if (UserDetails?.id) {
+    if (UserDetails?.email) {
       const { data } = await supabase.storage
         .from('pictures')
-        .list(UserDetails.id)
+        .list(UserDetails.email)
 
       let action = 'upload'
       data?.map((value) => {
@@ -38,12 +38,12 @@ export default function UploadAvatar({ setIsHovered }: props) {
       if (action === 'upload') {
         await supabase.storage
           .from('pictures')
-          .upload(`${UserDetails.id}/profile.png`, file, { upsert: true })
+          .upload(`${UserDetails.email}/profile.png`, file, { upsert: true })
       }
       if (action === 'update') {
         await supabase.storage
           .from('pictures')
-          .update(UserDetails.id + '/profile.png', file, { upsert: true })
+          .update(UserDetails.email + '/profile.png', file, { upsert: true })
       }
       change(URL.createObjectURL(file))
       CreateNotification('Profile Picture Changed', 'green')

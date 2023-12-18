@@ -11,7 +11,7 @@ import Head from 'next/head'
 export default function Favorites(): JSX.Element {
   const user = useUser()
   const userDevicesQuery = trpc.auth.getUserDevices.useQuery({
-    userId: user?.id,
+    userEmail: user?.email,
   })
   const [devicesArr, setDevicesArr] = useState<
     devicePropertiesType[] | undefined

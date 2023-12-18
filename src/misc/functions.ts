@@ -114,7 +114,7 @@ export function CreateNotification(
 export function CalcAverageRating(comments: Comment[]) {
   let AverageRating = 0
   for (let i = 0; i < comments.length; i++) {
-    AverageRating += comments[i].Rating
+    AverageRating += comments[i].rating
   }
   AverageRating /= comments.length
   return AverageRating

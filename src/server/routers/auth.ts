@@ -1,4 +1,5 @@
 import { devicePropertiesType } from '../../models/deviceTypes'
+import { commentSchema } from '../../models/schemas'
 import { router, publicProcedure } from '../trpc'
 import { z } from 'zod'
 
@@ -12,25 +13,15 @@ export const authRouter = router({
       return comments
     }),
   addComment: publicProcedure
-    .input(
-      z.object({
-        likes: z.number(),
-        message: z.string(),
-        Rating: z.number(),
-        updatedAt: z.date(),
-        createdAt: z.date(),
-        model: z.string(),
-        username: z.string(),
-      })
-    )
+    .input(commentSchema)
     .mutation(async ({ ctx, input }) => {
-      const { likes, createdAt, message, model, Rating, updatedAt, username } =
+      const { likes, createdAt, message, model, rating, updatedAt, username } =
         input
       const comment = await ctx.prisma.comment.create({
         data: {
           likes,
           message,
-          Rating,
+          rating,
           updatedAt,
           createdAt,
           model,
@@ -40,12 +31,12 @@ export const authRouter = router({
       return comment
     }),
   GetPublicUrl: publicProcedure
-    .input(z.object({ userId: z.string().optional() }))
+    .input(z.object({ userEmail: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       const { data } = await ctx.supabase.storage
         .from('pictures')
         .createSignedUrl(
-          input.userId ? input.userId.toString() : '' + '/profile.png',
+          input.userEmail ? input.userEmail.toString() : '' + '/profile.png',
           60
         )
       if (data?.signedUrl) {
@@ -70,7 +61,7 @@ export const authRouter = router({
       }
       return UrlArr
     }),
-  getUsersIds: publicProcedure
+  getUsersEmails: publicProcedure
     .input(z.array(z.object({ username: z.string() })))
     .mutation(async ({ ctx, input }) => {
       const arr: string[] = []
@@ -78,7 +69,7 @@ export const authRouter = router({
         const user = await ctx.prisma.user.findFirst({
           where: { username: input[i].username },
         })
-        if (user) arr.push(user.id)
+        if (user) arr.push(user.email)
         else arr.push('error')
       }
       return arr
@@ -96,7 +87,7 @@ export const authRouter = router({
     .input(
       z.object({
         deviceModels: z.array(z.string()),
-        userId: z.string().optional(),
+        userEmail: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -104,7 +95,7 @@ export const authRouter = router({
       for (let i = 0; i < input.deviceModels.length; i++) {
         const device = await ctx.prisma.deviceUser.findFirst({
           where: {
-            userId: input.userId,
+            userEmail: input.userEmail,
             deviceModel: input.deviceModels[i],
           },
         })
@@ -116,13 +107,13 @@ export const authRouter = router({
     .input(
       z.object({
         deviceModel: z.string(),
-        userId: z.string().optional(),
+        userEmail: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
       const device = await ctx.prisma.deviceUser.findFirst({
         where: {
-          userId: input.userId,
+          userEmail: input.userEmail,
           deviceModel: input.deviceModel,
         },
       })
@@ -140,28 +131,28 @@ export const authRouter = router({
       if (input.isInList) {
         await ctx.prisma.deviceUser.delete({
           where: {
-            deviceModel_userId: {
+            deviceModel_userEmail: {
               deviceModel: input.deviceModel,
-              userId: input.userId,
+              userEmail: input.userId,
             },
           },
         })
       } else {
         await ctx.prisma.deviceUser.create({
-          data: { deviceModel: input.deviceModel, userId: input.userId },
+          data: { deviceModel: input.deviceModel, userEmail: input.userId },
         })
       }
     }),
   getUserDevices: publicProcedure
     .input(
       z.object({
-        userId: z.string().optional(),
+        userEmail: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
       const devices = await ctx.prisma.deviceUser.findMany({
         where: {
-          userId: input.userId,
+          userEmail: input.userEmail,
         },
       })
       const devicesArr: devicePropertiesType[] = []
@@ -194,15 +185,15 @@ export const authRouter = router({
         await ctx.prisma.deviceUser.create({
           data: {
             deviceModel: input.deviceModel,
-            userId: input.userId,
+            userEmail: input.userId,
           },
         })
       } else {
         await ctx.prisma.deviceUser.delete({
           where: {
-            deviceModel_userId: {
+            deviceModel_userEmail: {
               deviceModel: input.deviceModel,
-              userId: input.userId,
+              userEmail: input.userId,
             },
           },
         })
@@ -211,9 +202,8 @@ export const authRouter = router({
   updateUserDetails: publicProcedure
     .input(
       z.object({
-        id: z.string().optional(),
         name: z.string(),
-        email: z.string(),
+        email: z.string().optional(),
         phone: z.string(),
         username: z.string(),
         password: z.string(),
@@ -221,7 +211,7 @@ export const authRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const details = await ctx.prisma.user.update({
-        where: { id: input.id },
+        where: { email: input.email },
         data: {
           ...input,
         },
@@ -229,10 +219,10 @@ export const authRouter = router({
       return details
     }),
   getUserDetails: publicProcedure
-    .input(z.object({ id: z.string().optional() }))
+    .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       const details = await ctx.prisma.user.findFirst({
-        where: { id: input.id },
+        where: { email: input.email },
       })
       return details
     }),
@@ -242,6 +232,7 @@ export const authRouter = router({
       const details = await ctx.prisma.user.findFirst({
         where: { email: input.email },
       })
+      console.log(input.email)
       return details?.accessKey
     }),
   CreateUser: publicProcedure
@@ -259,7 +250,6 @@ export const authRouter = router({
       try {
         await ctx.prisma.user.create({
           data: {
-            id: input.id,
             email: input.email,
             name: input.name,
             phone: input.phone,

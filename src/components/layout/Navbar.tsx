@@ -42,7 +42,7 @@ export const Navbar = () => {
   const { t: authT } = useTranslation('auth')
   const { change } = usePublicUrl()
   const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
-    userId: user?.id,
+    userEmail: user?.email,
   })
   const { data: AccessKey } = trpc.auth.getAccessKey.useQuery({
     email: user?.email,

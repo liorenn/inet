@@ -22,13 +22,12 @@ export default function Account() {
   const supabase = useSupabaseClient()
   const updateMutation = trpc.auth.updateUserDetails.useMutation()
   const { data: UserDetails } = trpc.auth.getUserDetails.useQuery({
-    id: user?.id,
+    email: user?.email,
   })
   const { t } = useTranslation('auth')
   const { publicUrl } = usePublicUrl()
   const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' })
   const [IsHovered, setIsHovered] = useState<boolean>(false)
-  const [email, setEmail] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
   const [username, setUsername] = useState<string>('')
   const [usernameLabel, setUsernameLabel] = useState<string>('')
@@ -46,7 +45,6 @@ export default function Account() {
   )
   useEffect(() => {
     if (UserDetails) {
-      setEmail(UserDetails.email)
       setPhone(UserDetails.phone)
       setUsername(UserDetails.username)
       setName(UserDetails.name)
@@ -72,18 +70,16 @@ export default function Account() {
   async function UpdateDetail(
     detail: 'email' | 'username' | 'name' | 'password' | 'phone'
   ) {
-    if (detail === 'email' || detail === 'password' || detail === 'phone') {
+    if (detail === 'password' || detail === 'phone') {
       await supabase.auth.updateUser({
-        email: email,
         password: password,
         phone: phone,
       })
     }
     updateMutation.mutate(
       {
-        email: email,
+        email: user?.email,
         password: password,
-        id: user?.id,
         name: name,
         username: username,
         phone: phone,
@@ -220,38 +216,6 @@ export default function Account() {
               onClick={async () => {
                 try {
                   await UpdateDetail('name')
-                } catch (error) {}
-              }}>
-              <Text
-                sx={{ fontSize: 18 }}
-                weight={500}
-                align='right'
-                color='green'>
-                {t('update')}
-              </Text>
-            </UnstyledButton>
-          </SimpleGrid>
-          <Divider />
-          <SimpleGrid cols={3} sx={{ paddingLeft: 5, paddingRight: 5 }}>
-            <Text
-              sx={{ fontSize: 18, paddingTop: 6 }}
-              weight={500}
-              color='dimmed'>
-              {t('email')}
-            </Text>
-            <TextInput
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t('placeholders.inputPlaceholder', {
-                input: t('email'),
-              })}
-              value={email}
-              radius='md'
-              size='md'
-            />
-            <UnstyledButton
-              onClick={async () => {
-                try {
-                  await UpdateDetail('email')
                 } catch (error) {}
               }}>
               <Text

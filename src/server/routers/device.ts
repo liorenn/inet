@@ -10,7 +10,7 @@ export const DeviceRouter = router({
         where: { model: input.model },
         include: {
           cameras: { select: { type: true, megapixel: true } },
-          colors: { select: { Color: true } },
+          colors: { select: { color: true } },
         },
       })
       return device
@@ -22,7 +22,7 @@ export const DeviceRouter = router({
         where: { model: input.model },
         include: {
           cameras: { select: { type: true, megapixel: true } },
-          colors: { select: { Color: true } },
+          colors: { select: { color: true } },
         },
       })
       return device
@@ -37,7 +37,7 @@ export const DeviceRouter = router({
     .input(
       z.object({
         deviceType: z.string(),
-        userId: z.string().optional(),
+        userEmail: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -49,7 +49,7 @@ export const DeviceRouter = router({
       for (let i = 0; i < iphones.length; i++) {
         const device = await ctx.prisma.deviceUser.findFirst({
           where: {
-            userId: input.userId,
+            userEmail: input.userEmail,
             deviceModel: iphones[i].model,
           },
         })
