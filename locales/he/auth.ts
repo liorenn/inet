@@ -13,6 +13,7 @@ export default {
   update: 'עדכון',
   createdAt: 'נוצר בתאריך',
   updatedAt: 'עודכן בתאריך',
+  commentsCommented: 'תגובות תגובו',
   updatedSuccessfully: 'עודכן בהצלחה',
   accessDeniedMessageSignIn: 'התחבר כדי לגשת לדף זה',
   accessDeniedMessageSignOut: 'התחבר כדי לגשת לדף זה',

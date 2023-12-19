@@ -18,6 +18,8 @@ export default {
   battery: 'סוללה',
   chipset: 'מעבד',
   price: 'מחיר',
+  commentEditedSuccessfully: 'התגובה עודכנה בהצלחה',
+  commentAddedSuccessfully: 'התגובה נוספה בהצלחה',
   commentDeletedSuccessfully: 'התגובה נמחקה בהצלחה',
   commentSection: 'תגובות',
   viewCommentsSentence: 'צפה בתגובות והוסף תגובה משלך',

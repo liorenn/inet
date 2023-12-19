@@ -14,13 +14,12 @@ import {
   useUser,
 } from '@supabase/auth-helpers-react'
 import { useEffect, useState } from 'react'
-import { CreateNotification } from '../../misc/functions'
+import { CreateNotification, encodeEmail } from '../../misc/functions'
 import { DEFlag, ILFlag, GBFlag } from 'mantine-flagpack'
 import { languages, useLanguage } from '../../hooks/useLanguage'
 import setLanguage from 'next-translate/setLanguage'
 import useTranslation from 'next-translate/useTranslation'
 import NavBarDropdown from './NavbarDropdown'
-import usePublicUrl from '../../hooks/usePublicUrl'
 import { trpc } from '../../misc/trpc'
 import { currencies, useCurrency } from '../../hooks/useCurrency'
 import { usePostHog } from 'posthog-js/react'
@@ -40,10 +39,6 @@ export const Navbar = () => {
   const { setLanguage: setlanguageStore } = useLanguage()
   const { t, lang } = useTranslation('common')
   const { t: authT } = useTranslation('auth')
-  const { change } = usePublicUrl()
-  const { data: PublicUrl } = trpc.auth.GetPublicUrl.useQuery({
-    userEmail: user?.email,
-  })
   const { data: AccessKey } = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
   })
@@ -63,12 +58,6 @@ export const Navbar = () => {
       setSession(session)
     })
   }, [])
-
-  useEffect(() => {
-    if (PublicUrl) {
-      change(PublicUrl)
-    }
-  }, [PublicUrl])
 
   async function signOut() {
     const { error } = await supabase.auth.signOut()
@@ -161,6 +150,7 @@ export const Navbar = () => {
                   </Button>
                 </Link>
               )}
+
               <Button
                 variant='light'
                 color='gray'
@@ -169,9 +159,14 @@ export const Navbar = () => {
                 onClick={() => signOut()}>
                 {t('signOut')}
               </Button>
-              <Link href={'/auth/account'}>
-                <Avatar radius='md' />
-              </Link>
+              {user?.email && (
+                <Link href={'/auth/account'}>
+                  <Avatar
+                    src={`/users/${encodeEmail(user.email)}.png`}
+                    radius='md'
+                  />
+                </Link>
+              )}
             </>
           )}
           <Menu shadow='md' width={140} offset={14}>

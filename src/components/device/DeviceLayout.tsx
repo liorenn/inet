@@ -8,15 +8,9 @@ import type { deviceSpecsType } from '../../models/SpecsFormatter'
 
 type Props = {
   device: deviceSpecsType
-  commentsAmout: number
-  ratingValue: number
 }
 
-export default function DeviceLayout({
-  device,
-  commentsAmout,
-  ratingValue,
-}: Props) {
+export default function DeviceLayout({ device }: Props) {
   return (
     <>
       <Center>
@@ -40,11 +34,7 @@ export default function DeviceLayout({
           <Grid.Col xs={12} md={6} lg={8}>
             <Stack align='stretch' justify='space-between'>
               <DeviceWidgets device={device} />
-              <DeviceDescription
-                device={device}
-                commentsAmout={commentsAmout}
-                ratingValue={ratingValue}
-              />
+              <DeviceDescription device={device} />
             </Stack>
           </Grid.Col>
         </Grid>

@@ -39,9 +39,9 @@ function DevicePhotos({ device, miniphotos, withName }: Props) {
   }, [device])
 
   function handleSetActiveLink(index: number) {
-    const img_num_index = activeLink.indexOf('_') + 1
-    const new_link = replaceAt(img_num_index, index, activeLink)
-    setActiveLink(new_link)
+    const imageIndex = activeLink.indexOf('_') + 1
+    const newLink = replaceAt(imageIndex, index, activeLink)
+    setActiveLink(newLink)
   }
 
   function replaceAt(index: number, replacement: number, string: string) {

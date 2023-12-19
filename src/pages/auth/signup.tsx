@@ -26,7 +26,7 @@ export default function SignUp() {
   const posthog = usePostHog()
   const supabase = useSupabaseClient()
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
-  const CreateUserMutation = trpc.auth.CreateUser.useMutation()
+  const { mutate } = trpc.auth.createUser.useMutation()
   const { t } = useTranslation('auth')
   const { t: commonT } = useTranslation('common')
 
@@ -76,7 +76,7 @@ export default function SignUp() {
               CreateNotification(t('accountCreatedSuccessfully'), 'green')
               posthog.capture('User Signed Up', { data })
               if (data.user?.id !== undefined) {
-                CreateUserMutation.mutate({
+                mutate({
                   id: data.user?.id,
                   email: fields.email,
                   phone: fields.phone,

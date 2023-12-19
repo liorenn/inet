@@ -4,22 +4,18 @@ import { useWindowScroll } from '@mantine/hooks'
 import type { Device } from '@prisma/client'
 import { IconArrowDown } from '@tabler/icons'
 import useTranslation from 'next-translate/useTranslation'
+import { useComments } from '../../hooks/useComments'
 
 type Props = {
   device: Device
-  commentsAmout: number
-  ratingValue: number
 }
 
-export default function DeviceDescription({
-  device,
-  commentsAmout,
-  ratingValue,
-}: Props) {
+export default function DeviceDescription({ device }: Props) {
   const [_scroll, scrollTo] = useWindowScroll()
   const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
   const { t } = useTranslation('devices')
+  const { commentsAmout, ratingValue } = useComments()
 
   return (
     <>

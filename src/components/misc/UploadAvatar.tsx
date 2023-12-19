@@ -1,83 +1,68 @@
 import { Group, Button, rem } from '@mantine/core'
-import type { FileInputProps } from '@mantine/core'
 import { ActionIcon, Modal, FileInput, Avatar, Center } from '@mantine/core'
+import { CreateNotification, encodeEmail } from '../../misc/functions'
 import { useDisclosure } from '@mantine/hooks'
 import { IconUpload } from '@tabler/icons'
 import { useState } from 'react'
-import type { Dispatch, SetStateAction } from 'react'
-import { CreateNotification } from '../../misc/functions'
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
-import { trpc } from '../../misc/trpc'
-import usePublicUrl from '../../hooks/usePublicUrl'
 
 type props = {
-  setIsHovered: Dispatch<SetStateAction<boolean>>
+  email: string
 }
 
-export default function UploadAvatar({ setIsHovered }: props) {
+export default function UploadAvatar({ email }: props) {
   const [opened, { open, close }] = useDisclosure(false)
-  const [file, setFile] = useState<File>()
-  const supabase = useSupabaseClient()
-  const user = useUser()
-  const { change } = usePublicUrl()
+  const [file, setFile] = useState<File | undefined>()
 
-  const { data: UserDetails } = trpc.auth.getUserDetails.useQuery({
-    email: user?.email,
-  })
-  async function SubmitFile(file: File) {
-    if (UserDetails?.email) {
-      const { data } = await supabase.storage
-        .from('pictures')
-        .list(UserDetails.email)
-
-      let action = 'upload'
-      data?.map((value) => {
-        if (value.name === 'profile.png') action = 'update'
-      })
-
-      if (action === 'upload') {
-        await supabase.storage
-          .from('pictures')
-          .upload(`${UserDetails.email}/profile.png`, file, { upsert: true })
-      }
-      if (action === 'update') {
-        await supabase.storage
-          .from('pictures')
-          .update(UserDetails.email + '/profile.png', file, { upsert: true })
-      }
-      change(URL.createObjectURL(file))
-      CreateNotification('Profile Picture Changed', 'green')
+  async function deleteImage() {
+    await fetch('/api/file/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        fileName: `public/users/${encodeEmail(email)}.png`,
+      }),
+    }).then((response) => {
+      console.log(response)
+      CreateNotification('Profile Picture Deleted', 'green')
       setFile(undefined)
       close()
-      setIsHovered(false)
+    })
+  }
+
+  async function uploadImage(file: File) {
+    const formData = new FormData()
+    const newFileName = `${encodeEmail(email)}.png`
+    const newFile = new File([file], newFileName, { type: file.type })
+    formData.append('file', newFile)
+    try {
+      await fetch('/api/file/upload', {
+        method: 'POST',
+        body: formData,
+      }).then((response) => {
+        console.log(response)
+        CreateNotification('Profile Picture Changed', 'green')
+        setFile(undefined)
+        close()
+      })
+    } catch (error) {
+      console.log(error)
     }
   }
 
-  function ChangeFile(newFile: File | null) {
+  function changeFile(newFile: File | null) {
     if (newFile) {
       setFile(newFile)
     }
   }
 
-  const ValueComponent: FileInputProps['valueComponent'] = ({ value }) => {
-    if (Array.isArray(value)) {
-      return <div></div>
-    }
-    return <div></div>
-  }
-
   return (
     <>
-      <ActionIcon size={160} radius='xl' onClick={open}>
-        <IconUpload size='5rem' />
-      </ActionIcon>
-
       <Modal opened={opened} onClose={close} title='Upload Your Profile Photo'>
         <FileInput
           multiple={false}
-          valueComponent={ValueComponent}
           icon={<IconUpload size={rem(20)} />}
-          onChange={(e) => ChangeFile(e)}
+          onChange={(e) => changeFile(e)}
         />
 
         {file && (
@@ -85,7 +70,7 @@ export default function UploadAvatar({ setIsHovered }: props) {
             <Center>
               <Avatar
                 mt='xl'
-                radius='50%'
+                radius='xl'
                 size={200}
                 src={URL.createObjectURL(file)}
               />
@@ -94,7 +79,7 @@ export default function UploadAvatar({ setIsHovered }: props) {
               <Button
                 onClick={async () => {
                   try {
-                    await SubmitFile(file)
+                    await uploadImage(file)
                   } catch (error) {}
                 }}
                 variant='light'
@@ -102,17 +87,20 @@ export default function UploadAvatar({ setIsHovered }: props) {
                 radius='md'>
                 Confirm
               </Button>
-              <Button
-                onClick={() => close()}
-                variant='light'
-                color='red'
-                radius='md'>
+              <Button onClick={close} variant='light' color='red' radius='md'>
                 Cancel
               </Button>
             </Group>
           </>
         )}
       </Modal>
+      <ActionIcon size={160} radius='xl' onClick={open}>
+        <Avatar
+          size={160}
+          radius='xl'
+          src={`/users/${encodeEmail(email)}.png`}
+        />
+      </ActionIcon>
     </>
   )
 }

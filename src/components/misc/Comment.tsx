@@ -1,37 +1,50 @@
-import { Paper, Group, Text, ActionIcon, Avatar, Image } from '@mantine/core'
+import {
+  Paper,
+  Group,
+  Text,
+  ActionIcon,
+  Avatar,
+  Image,
+  TextInput,
+  Grid,
+} from '@mantine/core'
 import { Tooltip, Rating } from '@mantine/core'
 import type { Comment } from '@prisma/client'
-import { IconTrash, IconPencil, IconCornerUpLeft } from '@tabler/icons'
+import {
+  IconTrash,
+  IconPencil,
+  IconCornerUpLeft,
+  IconCheck,
+} from '@tabler/icons'
 import { useState } from 'react'
 import { trpc } from '../../misc/trpc'
-import { CalcAverageRating, CreateNotification } from '../../misc/functions'
+import {
+  calculateAverageRating,
+  CreateNotification,
+  encodeEmail,
+} from '../../misc/functions'
 import useTranslation from 'next-translate/useTranslation'
+import { useUser } from '@supabase/auth-helpers-react'
+import { useComments } from '../../hooks/useComments'
 
 type Props = {
   comment: Comment
   comments: Comment[]
-  username: string
-  pictureUrl: string
   setComments: (value: Comment[]) => void
-  setRatingValue: (value: number) => void
-  setCommentsAmout: (value: number) => void
 }
 
-export default function Comment({
-  comment,
-  comments,
-  setComments,
-  username,
-  setCommentsAmout,
-  setRatingValue,
-  pictureUrl,
-}: Props) {
+export default function Comment({ comment, comments, setComments }: Props) {
+  const user = useUser()
   const [rating, setRating] = useState(comment.rating)
-  const { mutate } = trpc.auth.deleteComment.useMutation()
+  const [editing, setEditing] = useState(false)
+  const [editText, setEditText] = useState(comment.message)
+  const { mutateAsync: mutateDelete } = trpc.auth.deleteComment.useMutation()
+  const { mutateAsync: mutateEdit } = trpc.auth.editComment.useMutation()
+  const { setCommentsAmout, setRatingValue, username } = useComments()
   const { t } = useTranslation('devices')
 
-  function DeleteComment() {
-    mutate(
+  async function deleteComment() {
+    await mutateDelete(
       { commentId: comment.id },
       {
         onSuccess() {
@@ -47,26 +60,35 @@ export default function Comment({
     }
     setComments([...newArr])
     setCommentsAmout(newArr.length)
-    setRatingValue(CalcAverageRating(newArr))
+    setRatingValue(calculateAverageRating(newArr))
+  }
+
+  async function editComment() {
+    await mutateEdit(
+      { commentId: comment.id, message: editText, rating: rating },
+      {
+        onSuccess() {
+          CreateNotification(t('commentEditedSuccessfully'), 'green')
+        },
+      }
+    )
+    const newComments = comments.map((comment) =>
+      comment.id === comment.id
+        ? { ...comment, message: editText, rating }
+        : comment
+    )
+    setComments(newComments)
+    setRatingValue(calculateAverageRating(newComments))
+    setEditing(false)
   }
 
   return (
     <Paper withBorder radius='md' sx={{ padding: 10, marginTop: 20 }}>
       <Group position='apart' sx={{ marginBottom: 10 }}>
         <Group sx={{ padding: 10 }}>
-          {pictureUrl !== undefined ? (
-            <Image
-              src={pictureUrl}
-              height={45}
-              width={45}
-              style={{ borderRadius: '50%' }}
-              alt={comment.message}
-              radius='xl'
-            />
-          ) : (
-            <Avatar src={pictureUrl} radius='xl' />
+          {user?.email && (
+            <Avatar src={`/users/${encodeEmail(user.email)}.png`} radius='md' />
           )}
-
           <div>
             <Text size='lg' weight={500}>
               {comment.username}
@@ -77,21 +99,16 @@ export default function Comment({
           </div>
         </Group>
         <Group sx={{ padding: 10 }}>
-          <Rating readOnly value={rating} onChange={setRating} />
-          <Tooltip color='gray' label={t('reply')}>
-            <ActionIcon color='dark'>
-              <IconCornerUpLeft />
-            </ActionIcon>
-          </Tooltip>
+          <Rating readOnly={!editing} value={rating} onChange={setRating} />
           {comment.username === username && (
             <>
               <Tooltip color='gray' label={t('edit')}>
                 <ActionIcon color='dark'>
-                  <IconPencil />
+                  <IconPencil onClick={() => setEditing(!editing)} />
                 </ActionIcon>
               </Tooltip>
               <Tooltip color='gray' label={t('delete')}>
-                <ActionIcon color='dark' onClick={DeleteComment}>
+                <ActionIcon color='dark' onClick={deleteComment}>
                   <IconTrash />
                 </ActionIcon>
               </Tooltip>
@@ -99,7 +116,30 @@ export default function Comment({
           )}
         </Group>
       </Group>
-      <Text>{comment.message}</Text>
+
+      {editing ? (
+        <Grid mr='xs'>
+          <Grid.Col span={11}>
+            <TextInput
+              value={editText}
+              onChange={(event) => setEditText(event.currentTarget.value)}
+            />
+          </Grid.Col>
+          <Grid.Col span={1}>
+            <ActionIcon
+              w='100%'
+              h='100%'
+              variant='light'
+              onClick={() => editComment()}>
+              <IconCheck color='green' />
+            </ActionIcon>
+          </Grid.Col>
+        </Grid>
+      ) : (
+        <Text ml='sm' mb='sm'>
+          {comment.message}
+        </Text>
+      )}
     </Paper>
   )
 }

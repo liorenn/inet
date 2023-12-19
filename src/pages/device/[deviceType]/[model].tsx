@@ -11,23 +11,29 @@ import { useEffect, useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 import { usePostHog } from 'posthog-js/react'
 import Loader from '../../../components/layout/Loader'
+import { useComments } from '../../../hooks/useComments'
 
 // /device/iphone/iphone13 page
 function ModelPage() {
   const user = useUser()
   const router = useRouter()
   const posthog = usePostHog()
+  const { setUsername } = useComments()
   const { t } = useTranslation('common')
   const [captured, setCaptured] = useState(false)
   const deviceModel = router.asPath.split('/')[3]
-  const [ratingValue, setRatingValue] = useState(0)
-  const [commentsAmout, setCommentsAmout] = useState(0)
   const { data: deviceDetails } = trpc.device.getDevice.useQuery({
     model: deviceModel,
   })
   const { data: userDetails } = trpc.auth.getUserDetails.useQuery({
-    id: user?.id,
+    email: user?.email,
   })
+
+  useEffect(() => {
+    if (userDetails) {
+      setUsername(userDetails.username)
+    }
+  }, [userDetails])
 
   useEffect(() => {
     if (!captured && deviceDetails) {
@@ -63,19 +69,8 @@ function ModelPage() {
       </Head>
       <Container size='lg'>
         <DeviceHeader device={deviceDetails} />
-        <DeviceLayout
-          device={deviceDetails}
-          ratingValue={ratingValue}
-          commentsAmout={commentsAmout}
-        />
-        {user && userDetails?.username && (
-          <Comments
-            device={deviceDetails}
-            username={userDetails.username}
-            setRatingValue={setRatingValue}
-            setCommentsAmout={setCommentsAmout}
-          />
-        )}
+        <DeviceLayout device={deviceDetails} />
+        {user && userDetails?.username && <Comments device={deviceDetails} />}
       </Container>
     </>
   )

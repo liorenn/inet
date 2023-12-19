@@ -13,6 +13,7 @@ export default {
   update: 'Update',
   createdAt: 'Created At',
   updatedAt: 'Updated At',
+  commentsCommented: 'Comments Commented',
   updatedSuccessfully: 'Updated Successfully',
   accessDeniedMessageSignIn: 'Sign in To Access This Page',
   accessDeniedMessageSignOut: 'Sign out To Access This Page',

@@ -1,5 +1,5 @@
 import { Grid, Button, Text, Title } from '@mantine/core'
-import { Group, Stack, Container } from '@mantine/core'
+import { Group, Image, Stack, Container } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 import Head from 'next/head'
 import Link from 'next/link'

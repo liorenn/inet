@@ -16,6 +16,8 @@ export default {
   comments: 'Comments',
   description: 'Description',
   release: 'Release',
+  commentEditedSuccessfully: 'Comment edited successfully',
+  commentAddedSuccessfully: 'Comment added successfully',
   commentDeletedSuccessfully: 'Comment deleted successfully',
   commentSection: 'Comment Section',
   viewCommentsSentence: 'view comments and add your own comment',

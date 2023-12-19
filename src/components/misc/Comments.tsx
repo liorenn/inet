@@ -1,79 +1,42 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import Comment from './Comment'
-import { Textarea, Button, Box, Image, Rating } from '@mantine/core'
+import { Textarea, Button, Box, Rating, Avatar } from '@mantine/core'
 import { Text, Divider, Group, Accordion } from '@mantine/core'
 import type { Comment as commentType, Device } from '@prisma/client'
 import { trpc } from '../../misc/trpc'
-import { CalcAverageRating, CreateNotification } from '../../misc/functions'
-import usePublicUrl from '../../hooks/usePublicUrl'
+import {
+  calculateAverageRating,
+  CreateNotification,
+  encodeEmail,
+} from '../../misc/functions'
 import useTranslation from 'next-translate/useTranslation'
+import { useUser } from '@supabase/auth-helpers-react'
+import { useComments } from '../../hooks/useComments'
 
 type Props = {
   device: Device
-  username: string
-  setRatingValue: (value: number) => void
-  setCommentsAmout: (value: number) => void
 }
 
-export default function Comments({
-  device,
-  username,
-  setRatingValue,
-  setCommentsAmout,
-}: Props) {
+export default function Comments({ device }: Props) {
+  const user = useUser()
   const [text, setText] = useState('')
   const [rating, setRating] = useState(0)
-  const [isFetched, setIsFetched] = useState(false)
+  const { t } = useTranslation('devices')
   const [comments, setComments] = useState<commentType[]>([])
-  const [usersIds, setUsersIds] = useState<string[]>([])
-  const [picturesUrls, setPicturesUrls] = useState<string[]>([])
-  const publicUrl = usePublicUrl((state) => state.publicUrl)
-  const date = new Date().toDateString()
   const { mutate } = trpc.auth.addComment.useMutation()
-  const commentsQuery = trpc.auth.getAllComments.useQuery({
+  const { username, setRatingValue, setCommentsAmout } = useComments()
+  const { data } = trpc.auth.getAllComments.useQuery({
     model: device.model,
   })
-  const { mutate: mutateUsersIds } = trpc.auth.getUsersEmails.useMutation()
-  const { mutate: mutatePicturesUrls } = trpc.auth.GetPublicUrlArr.useMutation()
-  const { t } = useTranslation('devices')
 
   useEffect(() => {
-    if (comments.length > 0) {
-      const arr: { username: string }[] = []
-      for (let i = 0; i < comments.length; i++) {
-        const username = comments[i].username
-        if (username) {
-          arr.push({ username: username })
-        }
-        mutateUsersIds(arr, {
-          onSuccess(data) {
-            setUsersIds(data)
-          },
-        })
-      }
+    if (data) {
+      setComments(data)
+      setCommentsAmout(data.length)
+      setRatingValue(calculateAverageRating(data))
     }
-  }, [comments, mutateUsersIds])
-
-  useEffect(() => {
-    if (usersIds.length > 0) {
-      mutatePicturesUrls(usersIds, {
-        onSuccess(data) {
-          setPicturesUrls(data)
-        },
-      })
-    }
-  }, [usersIds, mutatePicturesUrls])
-
-  useEffect(() => {
-    const commentsArr = commentsQuery.data
-    if (commentsArr && !isFetched) {
-      setIsFetched(true)
-      setComments(commentsArr)
-      setCommentsAmout(commentsArr.length)
-      setRatingValue(CalcAverageRating(commentsArr))
-    }
-  }, [commentsQuery, isFetched, setCommentsAmout, setRatingValue])
+  }, [data])
 
   function AddComment(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -89,12 +52,12 @@ export default function Comments({
     }
     mutate(newComment, {
       onSuccess(data) {
-        CreateNotification(t('commentDeletedSuccessfully'), 'green')
+        CreateNotification(t('commentAddedSuccessfully'), 'green')
         setText('')
         setRating(0)
         setComments((prev) => pushComment(prev, data))
-        setCommentsAmout(comments.length)
-        setRatingValue(CalcAverageRating(comments))
+        setCommentsAmout(comments.length + 1)
+        setRatingValue(calculateAverageRating([...comments, data]))
       },
     })
   }
@@ -116,7 +79,7 @@ export default function Comments({
       </div>
       <Divider sx={{ marginBottom: 20 }} />
       <Accordion
-        defaultValue=''
+        defaultValue='comments'
         radius='xl'
         styles={{
           label: { fontSize: 24, fontWeight: 500 },
@@ -127,19 +90,18 @@ export default function Comments({
             <form onSubmit={(e) => AddComment(e)}>
               <Group position='apart'>
                 <Group sx={{ padding: 10 }}>
-                  <Image
-                    src={publicUrl}
-                    height={45}
-                    width={45}
-                    alt='image'
-                    radius='xl'
-                  />
+                  {user?.email && (
+                    <Avatar
+                      src={`../../../users/${encodeEmail(user.email)}.png`}
+                      radius='md'
+                    />
+                  )}
                   <div>
                     <Text size='lg' weight={500}>
                       {username}
                     </Text>
                     <Text size='xs' weight={400}>
-                      {date}
+                      {new Date().toDateString()}
                     </Text>
                   </div>
                 </Group>
@@ -165,13 +127,9 @@ export default function Comments({
       <Box sx={{ marginBottom: 120 }}>
         {comments.map((comment, index) => (
           <Comment
-            pictureUrl={picturesUrls[index]}
             comment={comment}
             comments={comments}
             setComments={setComments}
-            username={username}
-            setCommentsAmout={setCommentsAmout}
-            setRatingValue={setRatingValue}
             key={index}
           />
         ))}

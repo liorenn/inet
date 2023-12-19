@@ -12,6 +12,9 @@ import {
 } from '../../misc/functions'
 
 export const AdminRouter = router({
+  example: publicProcedure.query(() => {
+    return 'Hello world'
+  }),
   getUserColumns: publicProcedure.query(({ ctx }) => {
     return Prisma.dmmf.datamodel.models.find((model) => model.name === 'User')
   }),
@@ -32,7 +35,6 @@ export const AdminRouter = router({
     .mutation(async ({ ctx, input }) => {
       const query = `SELECT id FROM auth.users WHERE email = '${input.email}';`
       const userId = await ctx.prisma.$queryRawUnsafe(query)
-      console.log(userId)
       if (typeof userId === 'string') {
         const { data, error } = await ctx.supabase.auth.admin.deleteUser(userId)
         await ctx.prisma.user.delete({

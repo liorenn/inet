@@ -53,3 +53,14 @@ export const commentSchema = z.object({
 })
 
 export type commentSchemaType = z.infer<typeof commentSchema>
+
+export const updatePropertiesSchema = z.enum([
+  'username',
+  'name',
+  'password',
+  'phone',
+])
+export type updatePropertiesType = z.infer<typeof updatePropertiesSchema>
+export type updatePropertiesObjectType = {
+  [K in updatePropertiesType]: string
+}

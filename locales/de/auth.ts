@@ -13,6 +13,7 @@ export default {
   update: 'Aktualisieren',
   createdAt: 'Erstellt am',
   updatedAt: 'Aktualisiert am',
+  commentsCommented: 'Kommentare kommentiert',
   updatedSuccessfully: 'Erfolgreich aktualisiert',
   accessDeniedMessageSignIn:
     'Melden Sie sich an, um auf diese Seite zuzugreifen',

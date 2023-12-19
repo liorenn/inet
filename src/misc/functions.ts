@@ -111,7 +111,7 @@ export function CreateNotification(
   }
 }
 
-export function CalcAverageRating(comments: Comment[]) {
+export function calculateAverageRating(comments: Comment[]) {
   let AverageRating = 0
   for (let i = 0; i < comments.length; i++) {
     AverageRating += comments[i].rating
@@ -146,4 +146,12 @@ export function calculatePercentageDiff(
   const absoluteDifference = Math.abs(oldPrice - newPrice)
   const percentageDifference = (absoluteDifference / oldPrice) * 100
   return percentageDifference
+}
+
+export function encodeEmail(email: string) {
+  return btoa(email)
+}
+
+export function decodeEmail(encodedEmail: string) {
+  return atob(encodedEmail)
 }

@@ -21,6 +21,8 @@ export default {
   chipset: 'Chipset',
   price: 'Preis',
   releasePrice: 'Veröffentlichungspreis',
+  commentEditedSuccessfully: 'Kommentar erfolgreich bearbeitet',
+  commentAddedSuccessfully: 'Kommentar erfolgreich hinzugefügt',
   commentDeletedSuccessfully: 'Kommentar erfolgreich gelöscht',
   commentSection: 'Kommentarbereich',
   viewCommentsSentence: 'Kommentare anzeigen und eigenen Kommentar hinzufügen',
