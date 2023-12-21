@@ -8,7 +8,7 @@ import Head from 'next/head'
 import { trpc } from '../../misc/trpc'
 import { CreateNotification } from '../../misc/functions'
 import { useSession, useUser } from '@supabase/auth-helpers-react'
-import UploadAvatar from '../../components/misc/UploadAvatar'
+import ImageUploader from '../../components/misc/UploadAvatar'
 import useTranslation from 'next-translate/useTranslation'
 import Loader from '../../components/layout/Loader'
 import { supabase } from '../../server/supabase'
@@ -19,6 +19,7 @@ import {
   updatePropertiesObjectType,
 } from '../../models/schemas'
 import React from 'react'
+import { useProfilePicture } from '../../hooks/useProfilePicture'
 
 export default function Account() {
   const user = useUser()
@@ -103,7 +104,7 @@ export default function Account() {
       <Container size='xl'>
         <Group position='apart' sx={{ padding: 20, marginBottom: 30 }}>
           <Group spacing='xl'>
-            <UploadAvatar email={account.email} />
+            <ImageUploader email={account.email} />
             <Box>
               <Text sx={{ fontSize: 50 }} weight={700}>
                 {account.username}

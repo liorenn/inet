@@ -25,6 +25,7 @@ import { currencies, useCurrency } from '../../hooks/useCurrency'
 import { usePostHog } from 'posthog-js/react'
 import { adminAccessKey } from '../../../config'
 import useAutoTrigger from '../../hooks/useAutoTrigger'
+import { useProfilePicture } from '../../hooks/useProfilePicture'
 
 export const Navbar = () => {
   useAutoTrigger()
@@ -32,6 +33,7 @@ export const Navbar = () => {
   const posthog = usePostHog()
   const { classes } = useStyles()
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
+  const { imagePath, imageExists } = useProfilePicture()
   const dark = colorScheme === 'dark'
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
@@ -161,10 +163,7 @@ export const Navbar = () => {
               </Button>
               {user?.email && (
                 <Link href={'/auth/account'}>
-                  <Avatar
-                    src={`/users/${encodeEmail(user.email)}.png`}
-                    radius='md'
-                  />
+                  <Avatar src={imageExists ? imagePath : ''} radius='md' />
                 </Link>
               )}
             </>
