@@ -26,6 +26,7 @@ import { usePostHog } from 'posthog-js/react'
 import { adminAccessKey } from '../../../config'
 import useAutoTrigger from '../../hooks/useAutoTrigger'
 import { useProfilePicture } from '../../hooks/useProfilePicture'
+import { useFetch } from 'usehooks-ts'
 
 export const Navbar = () => {
   useAutoTrigger()
@@ -33,7 +34,9 @@ export const Navbar = () => {
   const posthog = usePostHog()
   const { classes } = useStyles()
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
-  const { imagePath, imageExists } = useProfilePicture()
+  const { imagePath, imageExists, setImageExists, setImagePath } =
+    useProfilePicture()
+  const { mutate } = trpc.device.isImageExists.useMutation()
   const dark = colorScheme === 'dark'
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
@@ -44,6 +47,7 @@ export const Navbar = () => {
   const { data: AccessKey } = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
   })
+
   useEffect(() => {
     setlanguageStore(
       languages.find(
@@ -60,6 +64,22 @@ export const Navbar = () => {
       setSession(session)
     })
   }, [])
+
+  useEffect(() => {
+    if (user?.email) {
+      mutate(
+        { email: user?.email },
+        {
+          onSuccess(data, params) {
+            if (data) {
+              setImageExists(true)
+              setImagePath(`../users/${encodeEmail(params.email)}.png`)
+            }
+          },
+        }
+      )
+    }
+  }, [user, imageExists, imagePath])
 
   async function signOut() {
     const { error } = await supabase.auth.signOut()

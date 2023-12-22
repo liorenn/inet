@@ -1,10 +1,10 @@
-import { Group, Button, rem } from '@mantine/core'
+import { Group, Button, rem, Text } from '@mantine/core'
 import { ActionIcon, Modal, FileInput, Avatar, Center } from '@mantine/core'
 import { CreateNotification, encodeEmail } from '../../misc/functions'
 import { useDisclosure } from '@mantine/hooks'
-import { IconUpload } from '@tabler/icons'
+import { IconPhoto, IconUpload, IconX } from '@tabler/icons'
 import { useEffect, useState } from 'react'
-import { IMAGE_MIME_TYPE } from '@mantine/dropzone'
+import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { useProfilePicture } from '../../hooks/useProfilePicture'
 
 type props = {
@@ -14,7 +14,6 @@ type props = {
 export default function ImageUploader({ email }: props) {
   const [opened, { open, close }] = useDisclosure(false)
   const [file, setFile] = useState<File | undefined>()
-  const [exsitingFile, setExsitingFile] = useState<boolean>(false)
   const { setImageExists, setImagePath, imageExists, imagePath } =
     useProfilePicture()
 
@@ -36,7 +35,8 @@ export default function ImageUploader({ email }: props) {
     })
   }
 
-  async function uploadImage(file: File) {
+  async function uploadImage() {
+    if (!file) return
     const formData = new FormData()
     const newFileName = `${encodeEmail(email)}.png`
     const newFile = new File([file], newFileName, { type: file.type })
@@ -46,10 +46,11 @@ export default function ImageUploader({ email }: props) {
         method: 'POST',
         body: formData,
       }).then((response) => {
-        console.log(response)
-        CreateNotification('Profile Picture Changed', 'green')
-        setImagePath(`/users/${newFileName}`)
-        setFile(undefined)
+        if (response.ok) {
+          CreateNotification('Profile Picture Changed', 'green')
+          setImagePath(`/users/${newFileName}`)
+          setFile(undefined)
+        }
         close()
       })
     } catch (error) {
@@ -57,36 +58,57 @@ export default function ImageUploader({ email }: props) {
     }
   }
 
-  function changeFile(newFile: File | null) {
-    if (newFile) {
-      setFile(newFile)
-    }
-  }
-
   return (
     <>
-      <Modal opened={opened} onClose={close} title='Upload Your Profile Photo'>
-        <FileInput
-          accept={IMAGE_MIME_TYPE.toString()}
-          multiple={false}
-          icon={<IconUpload size={rem(20)} />}
-          onChange={(e) => changeFile(e)}
-        />
-        {file && (
+      <Modal
+        opened={opened}
+        onClose={close}
+        size='auto'
+        title='Upload Your Profile Photo'>
+        <Dropzone
+          onDrop={(files) => setFile(files[0])}
+          onReject={(file) => console.log('rejected files', file)}
+          accept={IMAGE_MIME_TYPE}
+          multiple={false}>
+          <Group
+            position='center'
+            spacing='xl'
+            style={{ minHeight: rem(80), pointerEvents: 'none' }}>
+            <Dropzone.Accept>
+              <IconUpload size='3.2rem' stroke={1.5} />
+            </Dropzone.Accept>
+            <Dropzone.Reject>
+              <IconX size='3.2rem' stroke={1.5} />
+            </Dropzone.Reject>
+            <Dropzone.Idle>
+              <IconPhoto size='3.2rem' stroke={1.5} />
+            </Dropzone.Idle>
+            <div>
+              <Text size='xl' inline>
+                Drag images here or click to select files
+              </Text>
+              <Text size='sm' color='dimmed' inline mt={7}>
+                Attach as many files as you like, each file should not exceed
+                5mb
+              </Text>
+            </div>
+          </Group>
+        </Dropzone>
+        {(file || imageExists) && (
           <>
             <Center>
               <Avatar
                 mt='xl'
                 radius='xl'
                 size={200}
-                src={URL.createObjectURL(file)}
+                src={file ? URL.createObjectURL(file) : imagePath}
               />
             </Center>
             <Group grow mt='xl'>
               <Button
                 onClick={async () => {
                   try {
-                    await uploadImage(file)
+                    await uploadImage()
                   } catch (error) {}
                 }}
                 variant='light'
@@ -94,7 +116,7 @@ export default function ImageUploader({ email }: props) {
                 radius='md'>
                 Confirm
               </Button>
-              {exsitingFile && (
+              {imageExists && (
                 <Button
                   onClick={() => deleteImage()}
                   variant='light'

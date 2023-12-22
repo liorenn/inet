@@ -1,8 +1,16 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '../trpc'
 import { devicePropertiesType } from '../../models/deviceTypes'
+import { existsSync } from 'fs'
+import { encodeEmail } from '../../misc/functions'
 
 export const DeviceRouter = router({
+  isImageExists: publicProcedure
+    .input(z.object({ email: z.string() }))
+    .mutation(async ({ input }) => {
+      const path = `public/users/${encodeEmail(input.email)}.png`
+      return existsSync(path)
+    }),
   getDevice: publicProcedure
     .input(z.object({ model: z.string() }))
     .query(async ({ ctx, input }) => {
