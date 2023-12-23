@@ -1,50 +1,23 @@
 import { Card, Button, Grid, Text, Space } from '@mantine/core'
-import { trpc } from '../../misc/trpc'
-import { useUser } from '@supabase/auth-helpers-react'
-import { CreateNotification } from '../../misc/functions'
 import useTranslation from 'next-translate/useTranslation'
 import { devicePropertiesType } from '../../models/deviceTypes'
 import DevicePhotos from './DevicePhotos'
 import Link from 'next/link'
+import FavoritesButtons from '../misc/FavoritesButtons'
+import { Dispatch } from 'react'
 
 type AppProps = {
   device: devicePropertiesType
   deviceType: string
-  setDevicesArr: (value: devicePropertiesType[] | undefined) => void
-  devicesArr: devicePropertiesType[]
+  setDevices: Dispatch<React.SetStateAction<devicePropertiesType[] | undefined>>
 }
 
 export default function DeviceListCard({
   device,
   deviceType,
-  setDevicesArr,
-  devicesArr,
+  setDevices,
 }: AppProps) {
-  const user = useUser()
-  const userDevicesMutation = trpc.auth.handleDeviceToUser.useMutation()
   const { t } = useTranslation('devices')
-
-  function RemoveFromList() {
-    CreateNotification(t('removeDeviceSuccessMessage'), 'green')
-    if (setDevicesArr && devicesArr) {
-      const newArr = devicesArr.filter((value) => value.model !== device.model)
-      setDevicesArr([...newArr])
-    }
-    if (user) {
-      userDevicesMutation.mutate(
-        {
-          deviceModel: device.model,
-          userId: user.id,
-          isInList: true,
-        },
-        {
-          onError: () => {
-            CreateNotification(t('removeDeviceErrorMessage'), 'red')
-          },
-        }
-      )
-    }
-  }
 
   return (
     <Card shadow='lg' p='lg' radius='md'>
@@ -76,15 +49,11 @@ export default function DeviceListCard({
           </Link>
         </Grid.Col>
         <Grid.Col span={6}>
-          <Button
-            variant='light'
-            color={'red'}
-            radius='md'
-            size='md'
-            onClick={RemoveFromList}
-            fullWidth>
-            {t('remove')}
-          </Button>
+          <FavoritesButtons
+            model={device.model}
+            setDevices={setDevices}
+            favoritesPage
+          />
         </Grid.Col>
       </Grid>
     </Card>

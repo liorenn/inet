@@ -1,10 +1,86 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '../trpc'
-import { devicePropertiesType } from '../../models/deviceTypes'
 import { existsSync } from 'fs'
 import { encodeEmail } from '../../misc/functions'
 
 export const DeviceRouter = router({
+  getUserDevices: publicProcedure
+    .input(z.object({ email: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.prisma.user.findFirst({
+        where: { email: input.email },
+        select: {
+          deviceList: {
+            select: {
+              device: {
+                select: {
+                  model: true,
+                  name: true,
+                  type: true,
+                  imageAmount: true,
+                },
+              },
+            },
+          },
+        },
+      })
+    }),
+  getDevices: publicProcedure
+    .input(z.object({ deviceType: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.prisma.device.findMany({
+        select: { model: true, name: true, type: true, imageAmount: true },
+        where: {
+          deviceType: {
+            name: input.deviceType,
+          },
+        },
+      })
+    }),
+  isDeviceInUser: publicProcedure
+    .input(z.object({ model: z.string(), email: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.prisma.user.findFirst({
+        where: { email: input.email },
+        select: { deviceList: true },
+      })
+      return (
+        user?.deviceList?.find(
+          (device) => device.deviceModel === input.model
+        ) !== undefined
+      )
+    }),
+  addToFavorites: publicProcedure
+    .input(z.object({ model: z.string(), email: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.user.update({
+        where: { email: input.email },
+        data: {
+          deviceList: {
+            create: {
+              deviceModel: input.model,
+            },
+          },
+        },
+      })
+    }),
+  deleteFromFavorites: publicProcedure
+    .input(z.object({ model: z.string(), email: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.user.update({
+        where: { email: input.email },
+        data: {
+          deviceList: {
+            delete: {
+              deviceModel_userEmail: {
+                deviceModel: input.model,
+                userEmail: input.email,
+              },
+            },
+          },
+        },
+      })
+    }),
   isImageExists: publicProcedure
     .input(z.object({ email: z.string() }))
     .mutation(async ({ input }) => {
@@ -41,39 +117,4 @@ export const DeviceRouter = router({
     })
     return devices
   }),
-  getUserDevices: publicProcedure
-    .input(
-      z.object({
-        deviceType: z.string(),
-        userEmail: z.string().optional(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const iphones = await ctx.prisma.device.findMany({
-        where: { type: input.deviceType },
-        select: { model: true, name: true, type: true, imageAmount: true },
-      })
-      const areInList: boolean[] = []
-      for (let i = 0; i < iphones.length; i++) {
-        const device = await ctx.prisma.deviceUser.findFirst({
-          where: {
-            userEmail: input.userEmail,
-            deviceModel: iphones[i].model,
-          },
-        })
-        areInList[i] = device ? true : false
-      }
-      const devices: (devicePropertiesType & { isInList: boolean })[] = []
-      for (let i = 0; i < iphones.length; i++) {
-        const device = {
-          model: iphones[i].model,
-          isInList: areInList[i],
-          name: iphones[i].name,
-          type: iphones[i].type,
-          imageAmount: iphones[i].imageAmount,
-        }
-        devices.push(device)
-      }
-      return devices
-    }),
 })

@@ -5,7 +5,9 @@ export default {
   photos: 'Photos',
   loading: 'Loading...',
   specs: 'Specs',
-  signInToAdd: 'Sign In To Add',
+  removedFromFavorites: 'Removed From Favorites',
+  addedToFavorites: 'Added To Favorites',
+  signInToAccess: 'Sign In To Access',
   removeDeviceSuccessMessage:
     'device has been successfully removed from Favorites',
   removeDeviceErrorMessage:
@@ -66,9 +68,6 @@ export default {
   wide: 'Wide',
   ultrawind: 'Ultrawide',
   front: 'Front',
-  active_noise_cancellation: 'Active Noise Cancellation',
-  transparency_mode: 'Transparency Mode',
-  spatial_audio: 'Spatial Audio',
   exist: 'Exist',
   mainCamera: 'Main Camera',
   batterySizeUnits: 'mAh',

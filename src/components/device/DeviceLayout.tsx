@@ -1,10 +1,10 @@
 import DeviceDescription from './DeviceDescription'
-import DeviceButtons from './DeviceButtons'
 import DeviceWidgets from './DeviceWidgets'
 import { Stack, Grid, Center } from '@mantine/core'
 import DevicePhotos from './DevicePhotos'
 import DeviceSpecs from './DeviceSpecs'
 import type { deviceSpecsType } from '../../models/SpecsFormatter'
+import FavoritesButtons from '../misc/FavoritesButtons'
 
 type Props = {
   device: deviceSpecsType
@@ -27,7 +27,7 @@ export default function DeviceLayout({ device }: Props) {
                   }}
                   miniphotos={true}
                 />
-                <DeviceButtons device={device} />
+                <FavoritesButtons model={device.model} />
               </Stack>
             </Center>
           </Grid.Col>

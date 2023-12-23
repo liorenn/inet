@@ -3,17 +3,19 @@ import DeviceCard from '../../../components/device/DeviceCard'
 import { Container, SimpleGrid } from '@mantine/core'
 import DeviceHeader from '../../../components/device/DeviceTypeHeader'
 import Head from 'next/head'
-import { CreateNotification } from '../../../misc/functions'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import useTranslation from 'next-translate/useTranslation'
 import type {
   DeviceType,
   devicePropertiesType,
 } from '../../../models/deviceTypes'
 import { usePostHog } from 'posthog-js/react'
 import Loader from '../../../components/layout/Loader'
+
+type devicesType = {
+  isInList?: boolean
+} & devicePropertiesType
 
 // /device/iphone page
 export default function DeviceTypePage() {
@@ -23,65 +25,48 @@ export default function DeviceTypePage() {
     router.asPath.split('/').length - 1
   ] as DeviceType
   const user = useUser()
-  const { t } = useTranslation('devices')
-  const [areInList, setAreInList] = useState<{ isInList: boolean }[]>([])
-  const userDevicesMutation = trpc.auth.handleDeviceToUser.useMutation()
-  const { data } = trpc.device.getUserDevices.useQuery({
+  const [devices, setDevices] = useState<devicesType[] | undefined>(undefined)
+  const { data: devicesQuery } = trpc.device.getDevices.useQuery({
     deviceType: deviceType,
-    userEmail: user?.email,
+  })
+  const { data: userDevicesQuery } = trpc.device.getUserDevices.useQuery({
+    email: user?.email,
   })
   const [captured, setCaptured] = useState(false)
 
   useEffect(() => {
-    if (data) {
-      const newArr: { isInList: boolean }[] = []
-      data.map((value) => {
-        newArr.push({ isInList: value.isInList })
-      })
-      setAreInList(newArr)
+    const userDevices = userDevicesQuery?.deviceList
+    if (userDevices) {
+      setDevices((prev) =>
+        prev?.map((device) => {
+          if (
+            userDevices.find(
+              (userDevice) => userDevice.device.model === device.model
+            )
+          ) {
+            return { ...device, isInList: true }
+          }
+          return device
+        })
+      )
     }
-    if (!captured && data) {
+  }, [])
+
+  useEffect(() => {
+    if (devicesQuery) {
+      setDevices(devicesQuery)
+    }
+    if (!captured && devicesQuery) {
       posthog.capture('Device Type Page', {
         deviceType,
       })
       setCaptured(true)
     }
-  }, [data])
+  }, [devicesQuery])
 
-  function handleIsInlist(
-    device: devicePropertiesType,
-    isInList: boolean,
-    index: number
-  ) {
-    if (user) {
-      const message = !isInList
-        ? t('removeDeviceErrorMessage')
-        : t('removeDeviceSuccessMessage')
-      CreateNotification(message, 'green')
-      userDevicesMutation.mutate(
-        {
-          deviceModel: device.model,
-          userId: user.id,
-          isInList: isInList,
-        },
-        {
-          onError: () => {
-            const message = isInList
-              ? t('removeDeviceErrorMessage')
-              : t('addDeviceErrorMessage')
-            CreateNotification(message, 'red')
-          },
-        }
-      )
-      const newArr = areInList
-      newArr[index].isInList = !isInList
-      setAreInList(newArr)
-    } else CreateNotification(t('signInToAdd'), 'green')
-  }
+  if (!devices) return <Loader />
 
-  if (!data) return <Loader />
-
-  if (data && areInList.length > 0 && areInList[0]?.isInList !== undefined) {
+  if (devices && devices?.length > 0) {
     return (
       <>
         <Head>
@@ -96,15 +81,8 @@ export default function DeviceTypePage() {
               { maxWidth: 'md', cols: 2 },
               { minWidth: 'lg', cols: 3 },
             ]}>
-            {data.map((value, index) => (
-              <DeviceCard
-                handleIsInlist={handleIsInlist}
-                isInList={areInList[index].isInList}
-                index={index}
-                device={value}
-                key={index}
-                deviceType={deviceType}
-              />
+            {devices.map((value, index) => (
+              <DeviceCard device={value} key={index} deviceType={deviceType} />
             ))}
           </SimpleGrid>
         </Container>

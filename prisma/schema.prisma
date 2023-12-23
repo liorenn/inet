@@ -71,13 +71,12 @@ model Device {
   type             String           @db.VarChar
   releaseDate      DateTime         @db.Date
   releaseOS        String?          @db.VarChar
-  releasePrice     Int              @db.SmallInt
+  releasePrice     Float              @db.Real
   connector        String           @db.VarChar
   biometrics       String           @db.VarChar
   batterySize      Int?             @db.SmallInt
   chipset          String           @db.VarChar
   weight           Float            @db.Real
-  description      String           @db.VarChar
   imageAmount      Int              @db.SmallInt
   height           Float            @db.Real
   width            Float            @db.Real
