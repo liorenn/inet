@@ -27,8 +27,8 @@ export default function SignUp() {
   const supabase = useSupabaseClient()
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
   const { mutate } = trpc.auth.createUser.useMutation()
-  const { t } = useTranslation('auth')
-  const { t: commonT } = useTranslation('common')
+  const { t } = useTranslation('translations')
+  const { t: commonT } = useTranslation('translations')
 
   useEffect(() => {
     if (session) {

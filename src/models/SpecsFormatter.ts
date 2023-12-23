@@ -27,7 +27,7 @@ export type deviceSpecsType =
     } & Device
 
 export function FortmatSpecs(device: deviceSpecsType) {
-  const { t } = useTranslation('devices')
+  const { t } = useTranslation('translations')
 
   const cameras = []
   if (device.cameras) {

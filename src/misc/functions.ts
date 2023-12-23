@@ -2,7 +2,8 @@ import { showNotification } from '@mantine/notifications'
 import { IconCheck, IconX, IconExclamationMark } from '@tabler/icons'
 import { type ReactElement } from 'react'
 import { PrismaClient, type Comment } from '@prisma/client'
-import { currencyApiKey } from '../../config'
+import { currencyApiKey, translationFileName } from '../../config'
+import useTranslation from 'next-translate/useTranslation'
 
 export async function fetchCurrentPrice(deviceModel: string) {
   const prisma = new PrismaClient()
@@ -150,8 +151,4 @@ export function calculatePercentageDiff(
 
 export function encodeEmail(email: string) {
   return btoa(email)
-}
-
-export function decodeEmail(encodedEmail: string) {
-  return atob(encodedEmail)
 }

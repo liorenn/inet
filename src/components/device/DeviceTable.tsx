@@ -12,7 +12,7 @@ type TableProps = {
 }
 
 export default function DeviceTable({ category, secondCatergory }: TableProps) {
-  const { t } = useTranslation('devices')
+  const { t } = useTranslation('translations')
 
   return (
     <Table fontSize={16} highlightOnHover verticalSpacing='lg'>

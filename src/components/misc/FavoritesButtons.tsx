@@ -19,7 +19,7 @@ export default function FavoritesButtons({
   setDevices,
 }: props) {
   const user = useUser()
-  const { t } = useTranslation('devices')
+  const { t } = useTranslation('translations')
   const [isInList, setIsInList] = useState<boolean | undefined>(undefined)
   const { mutate: addToFavoritesMutation } =
     trpc.device.addToFavorites.useMutation()

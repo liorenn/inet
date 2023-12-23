@@ -33,6 +33,8 @@ export const Navbar = () => {
   const user = useUser()
   const posthog = usePostHog()
   const { classes } = useStyles()
+  const { lang } = useTranslation()
+  const { t } = useTranslation('translations')
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const { imagePath, imageExists, setImageExists, setImagePath } =
     useProfilePicture()
@@ -42,8 +44,6 @@ export const Navbar = () => {
   const [session, setSession] = useState(useSession())
   const { currency, setCurrency } = useCurrency()
   const { setLanguage: setlanguageStore } = useLanguage()
-  const { t, lang } = useTranslation('common')
-  const { t: authT } = useTranslation('auth')
   const { data: AccessKey } = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
   })
@@ -84,7 +84,7 @@ export const Navbar = () => {
   async function signOut() {
     const { error } = await supabase.auth.signOut()
     if (!error) {
-      CreateNotification(authT('signedOutSuccessfully'), 'green')
+      CreateNotification(t('signedOutSuccessfully'), 'green')
       posthog.capture('User Signed Out', { user })
     }
   }

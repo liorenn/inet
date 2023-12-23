@@ -14,7 +14,7 @@ import WebsiteStatistics from '../../components/admin/WebsiteStatistics'
 export default function Admin() {
   const user = useUser()
   const router = useRouter()
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('translations')
   const [button, setButton] = useState('')
   const { data: accessKey } = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
@@ -55,7 +55,7 @@ export default function Admin() {
           {button === 'databaseViewer' && accessKey >= managerAccessKey && (
             <DatabaseViewer accessKey={accessKey} />
           )}
-          {button === 'deviceManager' && accessKey >= adminAccessKey && (
+          {button === 'deviceManagement' && accessKey >= adminAccessKey && (
             <DeviceManagement accessKey={accessKey} />
           )}
           {button === 'userManagement' && accessKey >= managerAccessKey && (

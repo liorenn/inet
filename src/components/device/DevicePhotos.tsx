@@ -19,7 +19,7 @@ function DevicePhotos({ device, miniphotos, withName }: Props) {
   const [opened, setOpened] = useState(false)
   const { colorScheme } = useMantineColorScheme()
   const { width } = useViewportSize()
-  const { t } = useTranslation('devices')
+  const { t } = useTranslation('translations')
   const dark = colorScheme === 'dark'
   const images_src = []
   for (let i = 0; i < device.imageAmount; i++) {

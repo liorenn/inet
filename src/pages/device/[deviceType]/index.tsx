@@ -29,9 +29,10 @@ export default function DeviceTypePage() {
   const { data: devicesQuery } = trpc.device.getDevices.useQuery({
     deviceType: deviceType,
   })
-  const { data: userDevicesQuery } = trpc.device.getUserDevices.useQuery({
-    email: user?.email,
-  })
+  const { data: userDevicesQuery } =
+    trpc.device.getUserDevicesFromUserTable.useQuery({
+      email: user?.email,
+    })
   const [captured, setCaptured] = useState(false)
 
   useEffect(() => {

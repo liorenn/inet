@@ -22,7 +22,7 @@ export default function Comments({ device }: Props) {
   const user = useUser()
   const [text, setText] = useState('')
   const [rating, setRating] = useState(0)
-  const { t } = useTranslation('devices')
+  const { t } = useTranslation('translations')
   const [comments, setComments] = useState<commentType[]>([])
   const { mutate } = trpc.auth.addComment.useMutation()
   const { username, setRatingValue, setCommentsAmout } = useComments()

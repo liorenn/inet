@@ -19,7 +19,7 @@ function ModelPage() {
   const router = useRouter()
   const posthog = usePostHog()
   const { setUsername } = useComments()
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('translations')
   const [captured, setCaptured] = useState(false)
   const deviceModel = router.asPath.split('/')[3]
   const { data: deviceDetails } = trpc.device.getDevice.useQuery({

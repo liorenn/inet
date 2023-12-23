@@ -8,9 +8,8 @@ export default function WebsiteStatistics({
 }: {
   accessKey: number
 }) {
-  const { colorScheme } = useMantineColorScheme()
-  const dark = colorScheme === 'dark'
   const router = useRouter()
+  const { colorScheme } = useMantineColorScheme()
 
   useEffect(() => {
     if (accessKey && accessKey < managerAccessKey) {
@@ -46,7 +45,7 @@ export default function WebsiteStatistics({
       frameBorder='0'
       className='dark:invert dark:grayscale-[50%]'
       style={{
-        filter: dark ? 'invert(89%) grayscale(5%)' : '',
+        filter: colorScheme === 'dark' ? 'invert(89%) grayscale(5%)' : '',
       }}
       src='https://app.posthog.com/embedded/KJRt4aEDq1jeyaE_X4QvknNun_WZrw'></iframe>
   )

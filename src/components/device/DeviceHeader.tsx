@@ -6,8 +6,7 @@ import Link from 'next/link'
 
 export default function DeviceHeader({ device }: { device: Device }) {
   const { colorScheme } = useMantineColorScheme()
-  const { t } = useTranslation('common')
-  const { t: devicesT } = useTranslation('devices')
+  const { t } = useTranslation('translations')
   const dark = colorScheme === 'dark'
 
   const links = [
@@ -33,7 +32,7 @@ export default function DeviceHeader({ device }: { device: Device }) {
           </Link>
         ))}
       </Breadcrumbs>
-      <Title order={2}>{`${device.name} ${devicesT('specs')}`}</Title>
+      <Title order={2}>{`${device.name} ${t('specs')}`}</Title>
     </Group>
   )
 }

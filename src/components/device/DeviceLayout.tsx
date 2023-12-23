@@ -1,4 +1,4 @@
-import DeviceDescription from './DeviceDescription'
+import CommentsSummary from '../misc/CommentsSummary'
 import DeviceWidgets from './DeviceWidgets'
 import { Stack, Grid, Center } from '@mantine/core'
 import DevicePhotos from './DevicePhotos'
@@ -34,7 +34,7 @@ export default function DeviceLayout({ device }: Props) {
           <Grid.Col xs={12} md={6} lg={8}>
             <Stack align='stretch' justify='space-between'>
               <DeviceWidgets device={device} />
-              <DeviceDescription device={device} />
+              <CommentsSummary />
             </Stack>
           </Grid.Col>
         </Grid>

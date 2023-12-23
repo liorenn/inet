@@ -71,7 +71,7 @@ model Device {
   type             String           @db.VarChar
   releaseDate      DateTime         @db.Date
   releaseOS        String?          @db.VarChar
-  releasePrice     Float              @db.Real
+  releasePrice     Float            @db.Real
   connector        String           @db.VarChar
   biometrics       String           @db.VarChar
   batterySize      Int?             @db.SmallInt

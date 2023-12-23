@@ -10,7 +10,7 @@ export default function Device() {
   const { colorScheme } = useMantineColorScheme()
   const devicesTypes = Object.getOwnPropertyNames(deviceType)
   const dark = colorScheme === 'dark'
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('translations')
 
   return (
     <>

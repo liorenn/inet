@@ -10,13 +10,13 @@ import { Container, Group, Select, SimpleGrid } from '@mantine/core'
 import Loader from '../components/layout/Loader'
 
 export default function Compare() {
+  const { t } = useTranslation('translations')
   const { data: allDevices } = trpc.device.getModelsAndNames.useQuery()
+  const { mutate: deviceMutation } = trpc.device.getDeviceMutation.useMutation()
   const [value1, setValue1] = useState<string | null>(null)
   const [value2, setValue2] = useState<string | null>(null)
   const [device1, setDevice1] = useState<deviceSpecsType | undefined>(undefined)
   const [device2, setDevice2] = useState<deviceSpecsType | undefined>(undefined)
-  const { mutate: deviceMutation } = trpc.device.getDeviceMutation.useMutation()
-  const { t } = useTranslation('common')
 
   useEffect(() => {
     if (value1 && value2) {

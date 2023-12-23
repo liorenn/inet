@@ -1,9 +1,125 @@
-import { devicePropertiesType } from '../../models/deviceTypes'
-import { commentSchema, updatePropertiesSchema } from '../../models/schemas'
+import { Prisma } from '@prisma/client'
+import { Resend } from 'resend'
+import { sendSoapRequest, resendKey, fromEmail } from '../../../config'
+import PriceDropEmail from '../../components/misc/PriceDropEmail'
+import {
+  fetchCurrentPrice,
+  calculatePercentageDiff,
+} from '../../misc/functions'
+import {
+  commentSchema,
+  updatePropertiesSchema,
+  userSchema,
+} from '../../models/schemas'
+import { upsertUserSoap } from '../soapFunctions'
 import { router, publicProcedure } from '../trpc'
 import { z } from 'zod'
 
 export const authRouter = router({
+  example: publicProcedure.query(() => {
+    return 'Hello world'
+  }),
+  getUserColumns: publicProcedure.query(() => {
+    return Prisma.dmmf.datamodel.models.find((model) => model.name === 'User')
+  }),
+  getTablesColumns: publicProcedure.query(() => {
+    return Prisma.dmmf.datamodel.models
+  }),
+  getTableData: publicProcedure
+    .input(z.object({ tableName: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const query = `SELECT * FROM \"${input.tableName}\"`
+      return await ctx.prisma.$queryRawUnsafe(query)
+    }),
+  getUsersData: publicProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.user.findMany()
+  }),
+  insertUser: publicProcedure
+    .input(userSchema)
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.user.create({
+        data: {
+          email: input.email,
+          name: input.name,
+          phone: input.phone,
+          password: input.password,
+          username: input.username,
+          accessKey: input.accessKey,
+          comments: { create: [] },
+          deviceList: { create: [] },
+        },
+      })
+    }),
+  deleteUser: publicProcedure
+    .input(z.object({ email: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.user.delete({
+        where: { email: input.email },
+      })
+      const query = `SELECT id FROM auth.users WHERE email = '${input.email}';`
+      const userId = await ctx.prisma.$queryRawUnsafe(query)
+      if (typeof userId === 'string') {
+        await ctx.supabase.auth.admin.deleteUser(userId)
+      }
+    }),
+  updateUser: publicProcedure
+    .input(userSchema)
+    .mutation(async ({ ctx, input }) => {
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+      await ctx.prisma.user.update({
+        where: { email: input.email },
+        data: {
+          ...input,
+        },
+      })
+
+      if (sendSoapRequest) {
+        return await upsertUserSoap({ input })
+      }
+    }),
+  sendPriceDropsEmails: publicProcedure.mutation(async ({ ctx }) => {
+    const devicesUsers = await ctx.prisma.deviceUser.findMany()
+    devicesUsers.map(async (deviceUser) => {
+      const device = await ctx.prisma.device.findFirst({
+        where: { model: deviceUser.deviceModel },
+      })
+      const user = await ctx.prisma.user.findFirst({
+        where: { email: deviceUser.userEmail },
+        select: { name: true, email: true },
+      })
+      if (user && device) {
+        const price = await fetchCurrentPrice(device.model)
+        if (price && price != device.price) {
+          await ctx.prisma.device.update({
+            where: { model: device.model },
+            data: { price: price },
+          })
+        }
+        if (price && price < device.price) {
+          const resend = new Resend(resendKey)
+          resend.emails
+            .send({
+              from: fromEmail,
+              to: user.email,
+              subject: `${device.name} Price Drop`,
+              react: PriceDropEmail({
+                name: user.name,
+                newPrice: price,
+                device: device,
+                precentage: calculatePercentageDiff(device.price, price),
+              }),
+            })
+            .then((value) => {
+              if (value.id) {
+                return true
+              }
+            })
+        } else {
+          return false
+        }
+      }
+    })
+  }),
   editComment: publicProcedure
     .input(
       z.object({
@@ -56,75 +172,6 @@ export const authRouter = router({
         include: { user: true },
       })
       return comments
-    }),
-  isDeviceInUser: publicProcedure
-    .input(
-      z.object({
-        deviceModel: z.string(),
-        userEmail: z.string().optional(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const device = await ctx.prisma.deviceUser.findFirst({
-        where: {
-          userEmail: input.userEmail,
-          deviceModel: input.deviceModel,
-        },
-      })
-      return device ? { isInList: true } : { isInList: false }
-    }),
-  handleDeviceToUser: publicProcedure
-    .input(
-      z.object({
-        deviceModel: z.string(),
-        userId: z.string(),
-        isInList: z.boolean().optional(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      if (input.isInList) {
-        await ctx.prisma.deviceUser.delete({
-          where: {
-            deviceModel_userEmail: {
-              deviceModel: input.deviceModel,
-              userEmail: input.userId,
-            },
-          },
-        })
-      } else {
-        await ctx.prisma.deviceUser.create({
-          data: { deviceModel: input.deviceModel, userEmail: input.userId },
-        })
-      }
-    }),
-  getUserDevices: publicProcedure
-    .input(
-      z.object({
-        userEmail: z.string().optional(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const devices = await ctx.prisma.deviceUser.findMany({
-        where: {
-          userEmail: input.userEmail,
-        },
-      })
-      const devicesArr: devicePropertiesType[] = []
-      for (let i = 0; i < devices.length; i++) {
-        const device = await ctx.prisma.device.findFirst({
-          where: { model: devices[i].deviceModel },
-          select: {
-            model: true,
-            name: true,
-            imageAmount: true,
-            type: true,
-          },
-        })
-        if (device) {
-          devicesArr.push(device)
-        }
-      }
-      return devicesArr
     }),
   updateUserDetails: publicProcedure
     .input(

@@ -41,7 +41,7 @@ export default function Comment({ comment, comments, setComments }: Props) {
   const { mutateAsync: mutateDelete } = trpc.auth.deleteComment.useMutation()
   const { mutateAsync: mutateEdit } = trpc.auth.editComment.useMutation()
   const { setCommentsAmout, setRatingValue, username } = useComments()
-  const { t } = useTranslation('devices')
+  const { t } = useTranslation('translations')
 
   async function deleteComment() {
     await mutateDelete(

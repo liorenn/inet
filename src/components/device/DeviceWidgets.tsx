@@ -5,7 +5,7 @@ import type { Device } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
 
 export default function DeviceWidgets({ device }: { device: Device }) {
-  const { t } = useTranslation('devices')
+  const { t } = useTranslation('translations')
 
   function FormatDate() {
     const date = new Date(device.releaseDate)

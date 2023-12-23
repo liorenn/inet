@@ -25,7 +25,7 @@ export default function Account() {
   const user = useUser()
   const router = useRouter()
   const session = useSession()
-  const { t } = useTranslation('auth')
+  const { t } = useTranslation('translations')
   const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' })
   const updateMutation = trpc.auth.updateUserDetails.useMutation()
   const { data } = trpc.auth.getUserDetails.useQuery({

@@ -7,18 +7,17 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { CreateNotification } from '../../misc/functions'
 
 function NavBarDropdown({ AccessKey }: { AccessKey: number | undefined }) {
+  const { t } = useTranslation('translations')
+  const [activeLink, setActiveLink] = useState('Settings')
   const [opened, setOpened] = useState(false)
   const { classes, cx } = useStyles()
-  const [activeLink] = useState('Settings')
-  const { t } = useTranslation('common')
-  const { t: authT } = useTranslation('auth')
   const session = useSession()
   const supabase = useSupabaseClient()
 
   async function signOut() {
     const { error } = await supabase.auth.signOut()
     if (!error) {
-      CreateNotification(authT('signedOutSuccessfully'), 'green')
+      CreateNotification(t('signedOutSuccessfully'), 'green')
     }
   }
 
@@ -30,7 +29,7 @@ function NavBarDropdown({ AccessKey }: { AccessKey: number | undefined }) {
   ]
 
   if (session) {
-    Buttons.push({ title: authT('account'), href: '/auth/account' })
+    Buttons.push({ title: t('account'), href: '/auth/account' })
     if (AccessKey && AccessKey >= 5) {
       Buttons.push({ title: t('admin'), href: '/auth/admin' })
     }

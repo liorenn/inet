@@ -5,7 +5,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 
 export default function Index() {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('translations')
   const paragraphs = t('homeParagraph').split('\n')
 
   return (

@@ -15,7 +15,7 @@ export type categoriesType = {
 }[]
 
 export default function DeviceSpecs({ device }: { device: deviceSpecsType }) {
-  const { t } = useTranslation('devices')
+  const { t } = useTranslation('translations')
   const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
   const formattedSpecs = FortmatSpecs(device)

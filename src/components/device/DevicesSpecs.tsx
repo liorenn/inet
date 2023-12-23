@@ -29,7 +29,7 @@ type MergedCategoriesType = {
 }[]
 
 export default function DevicesSpecs({ device1, device2 }: Props) {
-  const { t } = useTranslation('devices')
+  const { t } = useTranslation('translations')
   const { width } = useViewportSize()
   const accordionContents = [
     t('name'),

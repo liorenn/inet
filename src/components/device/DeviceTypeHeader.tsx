@@ -11,7 +11,7 @@ export default function DeviceTypeHeader({
 }) {
   const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('translations')
   const links = [
     { name: t('allDevices'), href: '/device' },
     { name: deviceType, href: '/device/' + deviceType },

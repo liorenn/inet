@@ -18,10 +18,10 @@ export default function DatabaseViewer({ accessKey }: { accessKey: number }) {
   const user = useUser()
   const router = useRouter()
   const session = useSession()
-  const { t } = useTranslation('auth')
+  const { t } = useTranslation('translations')
   const [table, setTable] = useState('')
-  const { data: tableColumns } = trpc.admin.getTablesColumns.useQuery()
-  const { mutate } = trpc.admin.getTableData.useMutation()
+  const { data: tableColumns } = trpc.auth.getTablesColumns.useQuery()
+  const { mutate } = trpc.auth.getTableData.useMutation()
   const [tableData, setTableData] = useState<string[][]>([])
 
   if (accessKey < managerAccessKey) {

@@ -13,7 +13,7 @@ type AppProps = {
 
 export default function DeviceCard({ device, deviceType }: AppProps) {
   const user = useUser()
-  const { t } = useTranslation('devices')
+  const { t } = useTranslation('translations')
 
   return (
     <Card shadow='lg' p='lg' radius='md'>

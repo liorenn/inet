@@ -4,15 +4,15 @@ export const deviceSchema = z.object({
   model: z.string(),
   name: z.string(),
   type: z.string(),
-  releaseDate: z.string(),
+  releaseDate: z.date(),
   releaseOS: z.optional(z.string()),
   releasePrice: z.number(),
+  price: z.number(),
   connector: z.string(),
   biometrics: z.string(),
-  batterySize: z.number(),
+  batterySize: z.optional(z.number()),
   chipset: z.string(),
   weight: z.number(),
-  description: z.string(),
   imageAmount: z.number(),
   height: z.number(),
   width: z.number(),
@@ -21,9 +21,7 @@ export const deviceSchema = z.object({
   cpu: z.optional(z.number()),
   gpu: z.optional(z.number()),
   memory: z.optional(z.number()),
-  wiredCharging: z.optional(z.number()),
-  magsafe: z.boolean(),
-  wirelessCharging: z.optional(z.number()),
+  magsafe: z.optional(z.boolean()),
   screenSize: z.optional(z.number()),
   screenType: z.optional(z.string()),
   resistanceRating: z.optional(z.string()),
@@ -32,11 +30,11 @@ export const deviceSchema = z.object({
 export type deviceSchemaType = z.infer<typeof deviceSchema>
 
 export const userSchema = z.object({
-  name: z.string(),
   email: z.string(),
-  phone: z.string(),
   username: z.string(),
+  name: z.string(),
   password: z.string(),
+  phone: z.string(),
   accessKey: z.number(),
 })
 

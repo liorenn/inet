@@ -18,8 +18,8 @@ export default function ViaEmail() {
   const router = useRouter()
   const supabase = useSupabaseClient()
   const [session, setSession] = useState(useSession())
-  const { t } = useTranslation('auth')
-  const { t: commonT } = useTranslation('common')
+  const { t } = useTranslation('translations')
+  const { t: commonT } = useTranslation('translations')
 
   useEffect(() => {
     if (session) {

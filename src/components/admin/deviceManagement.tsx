@@ -1,194 +1,292 @@
 import { trpc } from '../../misc/trpc'
 import useTranslation from 'next-translate/useTranslation'
-import type { User } from '@prisma/client'
-import { Controller, useForm } from 'react-hook-form'
-import debounce from 'lodash.debounce'
+import type { Device } from '@prisma/client'
 import { CreateNotification } from '../../misc/functions'
-import { useState } from 'react'
-import { adminAccessKey } from '../../../config'
-import { useRouter } from 'next/router'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { useOs } from '@mantine/hooks'
+import { managerAccessKey } from '../../../config'
 import Loader from '../layout/Loader'
-import { Button, ScrollArea, Table, TextInput } from '@mantine/core'
+import { Button, ScrollArea, Table, Text, TextInput } from '@mantine/core'
+import { useRouter } from 'next/router'
+import { deviceSchema } from '../../models/schemas'
+import { UseFormReturnType, useForm } from '@mantine/form'
+import {
+  getDevicesFields,
+  convertFormDeviceValues,
+  convertDeviceValues,
+} from '../../models/forms'
+
+export type formDevice = {
+  [K in keyof Device]: string
+}
 
 export default function DeviceManagement({ accessKey }: { accessKey: number }) {
   const router = useRouter()
-  const { t } = useTranslation('device')
-  const { data: tableData } = trpc.admin.getUsersData.useQuery()
-  if (accessKey < adminAccessKey) {
+  const { t } = useTranslation('translations')
+  const [devices, setDevices] = useState<formDevice[]>([])
+  const fieldNames = Object.keys(deviceSchema.shape)
+  const { data: tableData, isLoading } = trpc.device.getDevicesData.useQuery()
+  if (accessKey < managerAccessKey) {
     router.push('/')
   }
 
-  if (!tableData) {
-    return <Loader />
-  }
+  useEffect(() => {
+    if (tableData) {
+      setDevices(tableData.map((device) => convertDeviceValues(device)))
+    }
+  }, [tableData])
+
   return (
     <>
-      <ScrollArea>
-        <Table mb='md' withBorder withColumnBorders>
-          <thead>
-            <tr>
-              <th>{t('deleteDevice')}</th>
-              <th>{t('model')}</th>
-              <th>{t('name')}</th>
-              <th>{t('type')}</th>
-              <th>{t('releaseDate')}</th>
-              <th>{t('releaseOS')}</th>
-              <th>{t('releasePrice')}</th>
-              <th>{t('connector')}</th>
-              <th>{t('biometrics')}</th>
-              <th>{t('batterySize')}</th>
-              <th>{t('chipset')}</th>
-              <th>{t('weight')}</th>
-              <th>{t('description')}</th>
-              <th>{t('imageAmount')}</th>
-              <th>{t('height')}</th>
-              <th>{t('width')}</th>
-              <th>{t('depth')}</th>
-              <th>{t('storage')}</th>
-              <th>{t('cpu')}</th>
-              <th>{t('gpu')}</th>
-              <th>{t('memory')}</th>
-              <th>{t('wiredCharging')}</th>
-              <th>{t('magsafe')}</th>
-              <th>{t('wirelessCharging')}</th>
-              <th>{t('screenSize')}</th>
-              <th>{t('screenType')}</th>
-              <th>{t('resistanceRating')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableData.map((data, index) => {
-              return <UserRow data={data} key={index} />
-            })}
-          </tbody>
-        </Table>
-      </ScrollArea>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <ScrollArea>
+          <Table mb='md' withBorder withColumnBorders>
+            <thead>
+              <tr>
+                {fieldNames.map((name, index) => {
+                  return <th key={index}>{t(name)}</th>
+                })}
+                <th>{t('updateDevice')}</th>
+                <th>{t('deleteDevice')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {devices.map((data, index) => {
+                return (
+                  <DeviceRow setDevices={setDevices} data={data} key={index} />
+                )
+              })}
+              <InsertRow setUsers={setDevices} />
+            </tbody>
+          </Table>
+        </ScrollArea>
+      )}
     </>
   )
 }
 
-function UserRow({ data }: { data: User }) {
-  const { t } = useTranslation('auth')
-  const { mutate: mutateUpdate } = trpc.admin.updateUser.useMutation()
-  const { mutate: mutateDelete } = trpc.admin.deleteUser.useMutation()
-  const { getValues, control } = useForm<User>()
+function InsertRow({
+  setUsers,
+}: {
+  setUsers: Dispatch<SetStateAction<formDevice[]>>
+}) {
+  const os = useOs()
+  const { t } = useTranslation('translations')
+  const [loading, setLoading] = useState(false)
+  const { mutate: mutateInsert } = trpc.device.insertDevice.useMutation()
+  const { fields, validators, defaultValues } = getDevicesFields()
+  const form = useForm<formDevice>({
+    initialValues: defaultValues,
+    validateInputOnChange: true,
+    validate: validators,
+  })
 
-  const handleDelete = () => {
-    mutateDelete({ email: data.email })
-  }
-
-  const handleEdit = debounce((fields: User) => {
-    fields.accessKey = Number(fields.accessKey)
-    mutateUpdate(
-      { ...fields, email: data.email },
+  const handleInsert = () => {
+    setLoading(true)
+    mutateInsert(
+      { ...convertFormDeviceValues(form.values) },
       {
         onSuccess: () => {
-          CreateNotification(t('updatedSuccessfully'), 'green')
+          setLoading(false)
+          setUsers((prev) => [...prev, form.values])
+          CreateNotification(
+            t('insertedSuccessfully'),
+            'green',
+            os === 'ios' ? true : false
+          )
         },
         onError: () => {
-          CreateNotification(t('errorAccured'), 'red')
+          setLoading(false)
+          CreateNotification(
+            t('errorAccured'),
+            'red',
+            os === 'ios' ? true : false
+          )
         },
       }
-    )
-  }, 1200)
-
-  type inputName =
-    | 'name'
-    | 'accessKey'
-    | 'phone'
-    | 'username'
-    | 'password'
-    | 'email'
-
-  type FormInputProps = {
-    inputName: inputName
-    defaultValue: string
-    regex: RegExp
-  }
-
-  function FormInput({ inputName, defaultValue, regex }: FormInputProps) {
-    const [error, setError] = useState(!regex.test(defaultValue))
-    return (
-      <Controller
-        control={control}
-        name={inputName}
-        defaultValue={defaultValue}
-        render={({ field }) => (
-          <TextInput
-            {...field}
-            w='100%'
-            onChange={(event) => {
-              field.onChange(event)
-              if (regex.test(event.target.value)) {
-                handleEdit(getValues())
-                setError(false)
-              } else {
-                setError(true)
-              }
-            }}
-            error={error && t('wrongPattern')}
-          />
-        )}
-      />
     )
   }
 
   return (
     <>
       <tr>
+        {fields.map((field, index) => (
+          <td key={index}>
+            <FormInput
+              form={form}
+              editMode={true}
+              disabled={false}
+              inputName={field.name}
+            />
+          </td>
+        ))}
+        <td colSpan={2}>
+          <Button
+            fullWidth
+            onClick={handleInsert}
+            disabled={loading}
+            color={loading ? 'gray' : 'orange'}
+            variant='light'
+            type='submit'>
+            {loading ? t('loading') : t('insertDevice')}
+          </Button>
+        </td>
+      </tr>
+    </>
+  )
+}
+
+function DeviceRow({
+  data,
+  setDevices,
+}: {
+  data: formDevice
+  setDevices: Dispatch<SetStateAction<formDevice[]>>
+}) {
+  const os = useOs()
+  const { t } = useTranslation('translations')
+  const [editMode, setEditMode] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const { mutate: mutateDelete } = trpc.device.deleteDevice.useMutation()
+  const { mutate: mutateUpdate } = trpc.device.updateDevice.useMutation()
+  const { fields, validators } = getDevicesFields()
+  const form = useForm<formDevice>({
+    initialValues: data,
+    validateInputOnChange: true,
+    validate: validators,
+  })
+
+  const handleDelete = () => {
+    setLoading(true)
+    mutateDelete(
+      { model: data.model },
+      {
+        onSuccess: () => {
+          setLoading(false)
+          setDevices((prev) =>
+            prev.filter((device) => device.model !== data.model)
+          )
+          CreateNotification(
+            t('deletedSuccessfully'),
+            'green',
+            os === 'ios' ? true : false
+          )
+        },
+        onError: () => {
+          setLoading(false)
+          CreateNotification(
+            t('errorAccured'),
+            'red',
+            os === 'ios' ? true : false
+          )
+        },
+      }
+    )
+  }
+  const handleUpdate = () => {
+    console.log(convertFormDeviceValues(form.values))
+    if (form.isValid()) {
+      setEditMode(false)
+      if (form.values !== data) {
+        mutateUpdate(
+          { ...convertFormDeviceValues(form.values) },
+          {
+            onSuccess: () => {
+              CreateNotification(
+                t('updatedSuccessfully'),
+                'green',
+                os === 'ios' ? true : false
+              )
+            },
+            onError: () => {
+              form.setValues(data)
+              CreateNotification(
+                t('errorAccured'),
+                'red',
+                os === 'ios' ? true : false
+              )
+            },
+          }
+        )
+      }
+    }
+  }
+
+  return (
+    <>
+      <tr>
+        {fields.map((field, index) => (
+          <td key={index}>
+            <FormInput
+              form={form}
+              editMode={editMode}
+              disabled={field.disabled}
+              inputName={field.name}
+            />
+          </td>
+        ))}
+
+        <td>
+          {editMode === false ? (
+            <Button
+              fullWidth
+              onClick={() => setEditMode(true)}
+              color='lime'
+              variant='light'
+              type='button'>
+              {t('editDevice')}
+            </Button>
+          ) : (
+            <Button
+              fullWidth
+              onClick={handleUpdate}
+              color='lime'
+              variant='light'
+              type='submit'>
+              {t('updateDevice')}
+            </Button>
+          )}
+        </td>
         <td>
           <Button
             fullWidth
             onClick={handleDelete}
-            color='red'
+            disabled={loading}
+            color={loading ? 'gray' : 'red'}
             variant='light'
             type='button'>
-            {t('deleteAccount')}
+            {loading ? t('loading') : t('deleteDevice')}
           </Button>
         </td>
-        <td>
-          <FormInput
-            inputName='username'
-            defaultValue={data.username}
-            regex={/^[A-Za-z\d_.]{5,}$/}
-          />
-        </td>
-        <td>
-          <FormInput
-            inputName='name'
-            defaultValue={data.name}
-            regex={/^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/}
-          />
-        </td>
-        <td>
-          <FormInput
-            inputName='password'
-            defaultValue={data.password}
-            regex={/^[A-Za-z\d_.!@#$%^&*]{5,}$/}
-          />
-        </td>
-        <td>
-          <FormInput
-            inputName='email'
-            defaultValue={data.email}
-            regex={/^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/}
-          />
-        </td>
-        <td>
-          <FormInput
-            inputName='phone'
-            defaultValue={data.phone}
-            regex={/^\+\d{13}$/}
-          />
-        </td>
-        <td>
-          <FormInput
-            inputName='accessKey'
-            defaultValue={String(data.accessKey)}
-            regex={/^\d$/}
-          />
-        </td>
       </tr>
+    </>
+  )
+}
+
+type FormInputProps = {
+  editMode: boolean
+  inputName: keyof formDevice
+  disabled?: boolean
+  form: UseFormReturnType<formDevice>
+}
+
+function FormInput({ form, inputName, disabled, editMode }: FormInputProps) {
+  return (
+    <>
+      {editMode && !disabled ? (
+        <TextInput
+          {...form.getInputProps(inputName)}
+          w='120px'
+          style={{
+            pointerEvents: disabled ? 'none' : 'auto',
+            opacity: disabled ? 0.6 : 1,
+          }}
+        />
+      ) : (
+        <Text>{form.values[inputName]}</Text>
+      )}
     </>
   )
 }

@@ -10,13 +10,13 @@ import Head from 'next/head'
 
 export default function Favorites(): JSX.Element {
   const user = useUser()
-  const { data } = trpc.auth.getUserDevices.useQuery({
-    userEmail: user?.email,
+  const { t } = useTranslation('translations')
+  const { data } = trpc.device.getUserDevices.useQuery({
+    email: user?.email,
   })
   const [devices, setDevices] = useState<devicePropertiesType[] | undefined>(
     undefined
   )
-  const { t } = useTranslation('common')
 
   useEffect(() => {
     if (data && devices === undefined) {

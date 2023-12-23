@@ -17,7 +17,7 @@ export default function DeviceListCard({
   deviceType,
   setDevices,
 }: AppProps) {
-  const { t } = useTranslation('devices')
+  const { t } = useTranslation('translations')
 
   return (
     <Card shadow='lg' p='lg' radius='md'>
