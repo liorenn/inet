@@ -32,7 +32,7 @@ export default function DeviceCard({ device, deviceType }: AppProps) {
       <Grid sx={{ marginTop: 2 }}>
         <Grid.Col span={6}>
           <Link
-            href={deviceType + '/' + device.model}
+            href={`${deviceType}/${device.model}`}
             style={{ textDecoration: 'none' }}>
             <Button
               variant='light'

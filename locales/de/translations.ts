@@ -174,4 +174,8 @@ export default {
   wirelessChargingUnits: 'W',
   memoryUnits: 'GB RAM',
   screenSizeUnits: 'Inches',
+  information: 'Informationen',
+  deviceSpecifications: 'Geraet Spezifikationen',
+  viewDeviceSpecifications:
+    'Entdecken Sie die detaillierten Spezifikationen von',
 }

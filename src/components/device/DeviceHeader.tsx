@@ -32,7 +32,7 @@ export default function DeviceHeader({ device }: { device: Device }) {
           </Link>
         ))}
       </Breadcrumbs>
-      <Title order={2}>{`${device.name} ${t('specs')}`}</Title>
+      <Title order={2}>{`${device.name} ${t('information')}`}</Title>
     </Group>
   )
 }

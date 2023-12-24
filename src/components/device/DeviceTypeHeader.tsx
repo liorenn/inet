@@ -14,7 +14,7 @@ export default function DeviceTypeHeader({
   const { t } = useTranslation('translations')
   const links = [
     { name: t('allDevices'), href: '/device' },
-    { name: deviceType, href: '/device/' + deviceType },
+    { name: deviceType, href: `/device/${deviceType}` },
   ]
 
   return (
@@ -34,7 +34,7 @@ export default function DeviceTypeHeader({
           </Link>
         ))}
       </Breadcrumbs>
-      <Title order={2}>{t('all') + ' ' + deviceType}</Title>
+      <Title order={2}>{`${t('all')} ${deviceType}`}</Title>
     </Group>
   )
 }

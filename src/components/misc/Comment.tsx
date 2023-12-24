@@ -53,11 +53,11 @@ export default function Comment({ comment, comments, setComments }: Props) {
       }
     )
     const newArr: Comment[] = []
-    for (let i = 0; i < comments.length; i++) {
-      if (comments[i].id !== comment.id) {
-        newArr.push(comments[i])
+    comments.forEach((iteratedComment) => {
+      if (iteratedComment.id !== comment.id) {
+        newArr.push(iteratedComment)
       }
-    }
+    })
     setComments([...newArr])
     setCommentsAmout(newArr.length)
     setRatingValue(calculateAverageRating(newArr))

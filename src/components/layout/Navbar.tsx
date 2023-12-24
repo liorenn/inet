@@ -97,7 +97,7 @@ export const Navbar = () => {
             <NavBarDropdown AccessKey={AccessKey} />
           </div>
           <Link className={classes.end} href={'/'}>
-            <Button variant='subtle' color={'gray.' + (dark ? '1' : '9')}>
+            <Button variant='subtle' color={`gray.'${dark ? '1' : '9'}`}>
               <Group spacing='xs'>
                 <Text style={{ fontSize: '22px', fontWeight: 500 }}>
                   {t('inet')}

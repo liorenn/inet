@@ -56,16 +56,14 @@ export default function DevicesSpecs({ device1, device2 }: Props) {
       name: t('name'),
       values: [{ label: t('name'), info1: device1.name, info2: device2.name }],
     })
-    for (let i = 0; i < originalCategories.length; i++) {
-      const originalCategory = originalCategories[i]
+    originalCategories.forEach((originalCategory, i) => {
       const additionalCategory = additionalCategories[i]
-
       if (originalCategory && additionalCategory) {
         const mergedValues = originalCategory.values.map(
           (originalValue, index) => ({
             label: originalValue.label,
             info1: originalValue.info,
-            info2: additionalCategory.values[index]?.info || '', // Ensure info2 exists
+            info2: additionalCategory.values[index]?.info || '',
           })
         )
         mergedCategories.push({
@@ -73,7 +71,7 @@ export default function DevicesSpecs({ device1, device2 }: Props) {
           values: mergedValues,
         })
       }
-    }
+    })
     return mergedCategories
   }
 

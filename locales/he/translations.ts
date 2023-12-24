@@ -170,4 +170,7 @@ export default {
   wirelessChargingUnits: 'W',
   memoryUnits: 'GB RAM',
   screenSizeUnits: 'Inches',
+  information: 'מידע',
+  deviceSpecifications: 'מפרט המכשיר',
+  viewDeviceSpecifications: 'גלה את המפרט המפורט של',
 }

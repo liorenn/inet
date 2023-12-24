@@ -146,9 +146,9 @@ export const DeviceRouter = router({
         },
       })
       const devicesArr: devicePropertiesType[] = []
-      for (let i = 0; i < devices.length; i++) {
-        const device = await ctx.prisma.device.findFirst({
-          where: { model: devices[i].deviceModel },
+      devices.forEach(async (device) => {
+        const userDevice = await ctx.prisma.device.findFirst({
+          where: { model: device.deviceModel },
           select: {
             model: true,
             name: true,
@@ -156,10 +156,8 @@ export const DeviceRouter = router({
             type: true,
           },
         })
-        if (device) {
-          devicesArr.push(device)
-        }
-      }
+        userDevice && devicesArr.push(userDevice)
+      })
       return devicesArr
     }),
   getUserDevicesFromUserTable: publicProcedure

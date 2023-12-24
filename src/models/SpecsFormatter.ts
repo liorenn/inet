@@ -29,14 +29,14 @@ export type deviceSpecsType =
 export function FortmatSpecs(device: deviceSpecsType) {
   const { t } = useTranslation('translations')
 
-  const cameras = []
+  const cameras: { label: string; info: string }[] = []
   if (device.cameras) {
-    for (let i = 0; i < device.cameras.length; i++) {
+    device.cameras.forEach((camera) => {
       cameras.push({
-        label: t(device.cameras[i].type.toString()),
-        info: device.cameras[i].megapixel.toString() + ' ' + t('mp'),
+        label: t(camera.type.toString()),
+        info: `${camera.megapixel.toString()} ${t('mp')}`,
       })
-    }
+    })
   }
 
   const categories: categoriesType = [
@@ -46,7 +46,7 @@ export function FortmatSpecs(device: deviceSpecsType) {
         {
           label: t('screenSize'),
           info: device.screenSize
-            ? device.screenSize.toString() + ' ' + t('screenSizeUnits')
+            ? `${device.screenSize.toString()} ${t('screenSizeUnits')}`
             : t('none'),
         },
         {
@@ -61,7 +61,7 @@ export function FortmatSpecs(device: deviceSpecsType) {
         {
           label: t('batterySize'),
           info: device.batterySize
-            ? device.batterySize.toString() + ' ' + t('batterySizeUnits')
+            ? `${device.batterySize.toString()} ${t('batterySizeUnits')}`
             : t('none'),
         },
       ],
@@ -73,13 +73,13 @@ export function FortmatSpecs(device: deviceSpecsType) {
         {
           label: t('memory'),
           info: device.memory
-            ? device.memory.toString() + ' ' + t('memoryUnits')
+            ? `${device.memory.toString()} ${t('memoryUnits')}`
             : t('none'),
         },
         {
           label: t('storage'),
           info: device.storage
-            ? device.storage.toString() + ' ' + t('storageUnits')
+            ? `${device.storage.toString()}  ${t('storageUnits')}`
             : t('none'),
         },
         {
@@ -88,19 +88,19 @@ export function FortmatSpecs(device: deviceSpecsType) {
         },
         {
           label: t('weight'),
-          info: device.weight.toString() + ' ' + t('weightUnits'),
+          info: `${device.weight.toString()} ${t('weightUnits')}`,
         },
         {
           label: t('height'),
-          info: device.height.toString() + ' ' + t('heightUnits'),
+          info: `${device.height.toString()} ${t('heightUnits')}`,
         },
         {
           label: t('width'),
-          info: device.width.toString() + ' ' + t('widthUnits'),
+          info: `${device.width.toString()} ${t('widthUnits')}`,
         },
         {
           label: t('depth'),
-          info: device.depth.toString() + ' ' + t('depthUnits'),
+          info: `${device.depth.toString()} ${t('depthUnits')}`,
         },
       ],
     },
@@ -138,7 +138,7 @@ export function FortmatSpecs(device: deviceSpecsType) {
             ? device.colors
                 .map(
                   (value) =>
-                    value.color.hex + '/' + value.color.name.replace(/\s/g, '')
+                    `${value.color.hex}/${value.color.name.replace(/\s/g, '')}`
                 )
                 .join(' ')
             : t('none'),

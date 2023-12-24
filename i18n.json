@@ -2,9 +2,7 @@
   "locales": ["en", "de", "he"],
   "defaultLocale": "en",
   "pages": {
-    "*": ["common", "auth", "devices"],
-    "/": ["home", "example"],
-    "/about": ["about"]
+    "*": ["translations"]
   },
   "namespaces": {
     "auth": {

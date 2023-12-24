@@ -3,17 +3,10 @@ import { IconCoin, IconBrandApple, IconBattery3 } from '@tabler/icons'
 import { Grid, Card, Text, Group, Title } from '@mantine/core'
 import type { Device } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
+import { FormatDate } from '../../misc/functions'
 
 export default function DeviceWidgets({ device }: { device: Device }) {
   const { t } = useTranslation('translations')
-
-  function FormatDate() {
-    const date = new Date(device.releaseDate)
-    const day = date.getUTCDate()
-    const month = date.getMonth() + 1
-    const year = date.getFullYear()
-    return day.toString() + '/' + month.toString() + '/' + year.toString()
-  }
 
   const cards = [
     {
@@ -23,7 +16,7 @@ export default function DeviceWidgets({ device }: { device: Device }) {
     },
     {
       title: t('release'),
-      spec: FormatDate(),
+      spec: FormatDate(device.releaseDate),
       icon: <IconCalendarTime size={45} />,
     },
     {
@@ -33,13 +26,13 @@ export default function DeviceWidgets({ device }: { device: Device }) {
     },
     {
       title: t('battery'),
-      spec: device.batterySize?.toString() + ' mAh',
+      spec: `${device.batterySize?.toString()} mAh`,
       icon: <IconBattery3 size={45} />,
     },
     { title: t('chipset'), spec: device.chipset, icon: <IconCpu size={45} /> },
     {
       title: t('price'),
-      spec: device.releasePrice.toString() + '$',
+      spec: `${device.releasePrice.toString()} $`,
       icon: <IconCoin size={45} />,
     },
   ]

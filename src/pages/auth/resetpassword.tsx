@@ -26,7 +26,7 @@ export default function ResetPassword() {
     e.preventDefault()
     await supabase.auth.resetPasswordForEmail(email).then((data) => {
       data &&
-        CreateNotification('Check Your Email To Sign In at ' + email, 'yellow')
+        CreateNotification(`Check Your Email To Sign In at ${email}`, 'yellow')
     })
   }
 

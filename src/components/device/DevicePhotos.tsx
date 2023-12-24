@@ -14,28 +14,22 @@ type Props = {
 
 function DevicePhotos({ device, miniphotos, withName }: Props) {
   const [activeLink, setActiveLink] = useState(
-    '/images/' + device.type + '/' + device.model + '_1.png'
+    `/images/${device.type}/${device.model}_1.png`
   )
   const [opened, setOpened] = useState(false)
   const { colorScheme } = useMantineColorScheme()
   const { width } = useViewportSize()
   const { t } = useTranslation('translations')
   const dark = colorScheme === 'dark'
-  const images_src = []
+  const images_src: string[] = []
   for (let i = 0; i < device.imageAmount; i++) {
     images_src.push(
-      '/images/' +
-        device.type +
-        '/' +
-        device.model +
-        '_' +
-        (i + 1).toString() +
-        '.png'
+      `/images/${device.type}/${device.model}_${(i + 1).toString()}.png`
     )
   }
 
   useEffect(() => {
-    setActiveLink('/images/' + device.type + '/' + device.model + '_1.png')
+    setActiveLink(`/images/${device.type}/${device.model}_1.png`)
   }, [device])
 
   function handleSetActiveLink(index: number) {
@@ -59,7 +53,7 @@ function DevicePhotos({ device, miniphotos, withName }: Props) {
           size='85%'
           opened={opened}
           radius='md'
-          title={device.name + ' ' + t('photos')}
+          title={`${device.name} ${t('photos')}`}
           onClose={() => setOpened(false)}>
           <Center>
             <Image
@@ -98,7 +92,7 @@ function DevicePhotos({ device, miniphotos, withName }: Props) {
           caption={
             withName && (
               <Text mb='md' weight={500} size='lg'>
-                {device.name + ' ' + t('photos')}
+                {`${device.name} ${t('photos')}`}
               </Text>
             )
           }

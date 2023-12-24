@@ -2,8 +2,7 @@ import { showNotification } from '@mantine/notifications'
 import { IconCheck, IconX, IconExclamationMark } from '@tabler/icons'
 import { type ReactElement } from 'react'
 import { PrismaClient, type Comment } from '@prisma/client'
-import { currencyApiKey, translationFileName } from '../../config'
-import useTranslation from 'next-translate/useTranslation'
+import { currencyApiKey, currrencyApiHost } from '../../config'
 
 export async function fetchCurrentPrice(deviceModel: string) {
   const prisma = new PrismaClient()
@@ -41,11 +40,7 @@ export async function convertPrice(
   targetCurrency: string
 ) {
   const response = await fetch(
-    'https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_yepX15sCjHvHFsdPr4zLPPWIIQ49wOkQZSGdl8l9' +
-      '&currencies=' +
-      targetCurrency +
-      '&base_currency=' +
-      currency
+    `${currrencyApiHost}&currencies=${targetCurrency}&base_currency=${currency}`
   )
   const data = await response.json()
   const convertedPrice = price * data.data[targetCurrency]
@@ -61,9 +56,7 @@ export async function FormatPrice(priceString: string) {
     return parseFloat(dollarNumber)
   } else {
     const response = await fetch(
-      `https://api.freecurrencyapi.com/v1/latest?apikey=
-        ${currencyApiKey}
-        &currencies=USD&base_currency=EUR`
+      `${currrencyApiHost}&currencies=$USD&base_currency=$EUR`
     )
     const data = await response.json()
     const extractedNumber = parseFloat(priceString.split(' ')[1])
@@ -114,9 +107,9 @@ export function CreateNotification(
 
 export function calculateAverageRating(comments: Comment[]) {
   let AverageRating = 0
-  for (let i = 0; i < comments.length; i++) {
-    AverageRating += comments[i].rating
-  }
+  comments.forEach((comment) => {
+    AverageRating += comment.rating
+  })
   AverageRating /= comments.length
   return AverageRating
 }
@@ -126,7 +119,7 @@ export function FormatDate(releaseDate: Date): string {
   const day = date.getUTCDate()
   const month = date.getMonth() + 1
   const year = date.getFullYear()
-  return day.toString() + '/' + month.toString() + '/' + year.toString()
+  return `${day.toString()}/${month.toString()}/${year.toString()}`
 }
 
 export function findObjectByPropertyValue<T>(

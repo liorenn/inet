@@ -34,7 +34,7 @@ const xmlContent = builder.build({ name: 'hello', value: 'world' })
 export function getResultFromResponse(Method: string, xml: any): string {
   const parser = new XMLParser()
   const json = parser.parse(xml)
-  return json['soap:Envelope']['soap:Body'][Method + 'Response'][
-    Method + 'Result'
+  return json['soap:Envelope']['soap:Body'][`${Method} Response`][
+    `${Method} Result`
   ]
 }

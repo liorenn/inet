@@ -50,7 +50,7 @@ export default function ViaEmail() {
       },
     })
     if (!error) {
-      CreateNotification(t('checkEmail') + ' ' + fields.email, 'yellow')
+      CreateNotification(`${t('checkEmail')} ${fields.email}`, 'yellow')
     } else {
       CreateNotification(t('errorAccured'), 'red')
     }
