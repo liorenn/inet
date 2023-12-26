@@ -11,14 +11,68 @@ import {
   updatePropertiesSchema,
   userSchema,
 } from '../../models/schemas'
-import { upsertUserSoap } from '../soapFunctions'
+import { deleteUserSoap, updateUserSoap } from '../soapFunctions'
 import { router, publicProcedure } from '../trpc'
 import { z } from 'zod'
 
 export const authRouter = router({
-  example: publicProcedure.query(() => {
-    return 'Hello world'
-  }),
+  insertUser: publicProcedure
+    .input(userSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const { FromAsp, ...user } = input
+        await ctx.prisma.user.create({
+          data: {
+            ...user,
+            comments: { create: [] },
+            deviceList: { create: [] },
+          },
+        })
+        return true
+      } catch {
+        return false
+      }
+    }),
+  updateUser: publicProcedure
+    .input(userSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const { FromAsp, ...user } = input
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+        await ctx.prisma.user.update({
+          where: { email: input.email },
+          data: {
+            ...user,
+          },
+        })
+        if (sendSoapRequest && FromAsp !== true) {
+          await updateUserSoap({ input: user })
+        }
+        return true
+      } catch {
+        return false
+      }
+    }),
+  deleteUser: publicProcedure
+    .input(z.object({ email: z.string(), FromAsp: z.boolean().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await ctx.prisma.user.delete({
+          where: { email: input.email },
+        })
+        const query = `SELECT id FROM auth.users WHERE email = '${input.email}';`
+        const userId = await ctx.prisma.$queryRawUnsafe(query)
+        if (typeof userId === 'string') {
+          await ctx.supabase.auth.admin.deleteUser(userId)
+        }
+        if (sendSoapRequest && input.FromAsp !== true) {
+          await deleteUserSoap({ email: input.email })
+        }
+        return true
+      } catch {
+        return false
+      }
+    }),
   getUserColumns: publicProcedure.query(() => {
     return Prisma.dmmf.datamodel.models.find((model) => model.name === 'User')
   }),
@@ -34,49 +88,6 @@ export const authRouter = router({
   getUsersData: publicProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.user.findMany()
   }),
-  insertUser: publicProcedure
-    .input(userSchema)
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.user.create({
-        data: {
-          email: input.email,
-          name: input.name,
-          phone: input.phone,
-          password: input.password,
-          username: input.username,
-          accessKey: input.accessKey,
-          comments: { create: [] },
-          deviceList: { create: [] },
-        },
-      })
-    }),
-  deleteUser: publicProcedure
-    .input(z.object({ email: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.user.delete({
-        where: { email: input.email },
-      })
-      const query = `SELECT id FROM auth.users WHERE email = '${input.email}';`
-      const userId = await ctx.prisma.$queryRawUnsafe(query)
-      if (typeof userId === 'string') {
-        await ctx.supabase.auth.admin.deleteUser(userId)
-      }
-    }),
-  updateUser: publicProcedure
-    .input(userSchema)
-    .mutation(async ({ ctx, input }) => {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-      await ctx.prisma.user.update({
-        where: { email: input.email },
-        data: {
-          ...input,
-        },
-      })
-
-      if (sendSoapRequest) {
-        return await upsertUserSoap({ input })
-      }
-    }),
   sendPriceDropsEmails: publicProcedure.mutation(async ({ ctx }) => {
     const devicesUsers = await ctx.prisma.deviceUser.findMany()
     devicesUsers.map(async (deviceUser) => {

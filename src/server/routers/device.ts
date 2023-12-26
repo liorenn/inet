@@ -4,43 +4,70 @@ import { existsSync } from 'fs'
 import { encodeEmail } from '../../misc/functions'
 import { sendSoapRequest } from '../../../config'
 import { deviceSchema } from '../../models/schemas'
-import { upsertDeviceSoap } from '../soapFunctions'
+import {
+  deleteDeviceSoap,
+  insertDeviceSoap,
+  updateDeviceSoap,
+} from '../soapFunctions'
 import { devicePropertiesType } from '../../models/deviceTypes'
 
 export const DeviceRouter = router({
+  insertDevice: publicProcedure
+    .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const { FromAsp, ...device } = input
+        await ctx.prisma.device.create({
+          data: {
+            ...device,
+          },
+        })
+        if (sendSoapRequest && input.FromAsp !== true) {
+          await insertDeviceSoap({ input: device })
+        }
+        return true
+      } catch {
+        return false
+      }
+    }),
+  updateDevice: publicProcedure
+    .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const { FromAsp, ...device } = input
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+        await ctx.prisma.device.update({
+          where: { model: device.model },
+          data: {
+            ...device,
+          },
+        })
+        if (sendSoapRequest && FromAsp !== true) {
+          await updateDeviceSoap({ input: device })
+        }
+        return true
+      } catch {
+        return false
+      }
+    }),
+  deleteDevice: publicProcedure
+    .input(z.object({ model: z.string(), FromAsp: z.boolean().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await ctx.prisma.device.delete({
+          where: { model: input.model },
+        })
+        if (sendSoapRequest && input.FromAsp !== true) {
+          await deleteDeviceSoap({ model: input.model })
+        }
+        return true
+      } catch {
+        return false
+      }
+    }),
   getDevicesData: publicProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.device.findMany()
   }),
-  insertDevice: publicProcedure
-    .input(deviceSchema)
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.device.create({
-        data: {
-          ...input,
-        },
-      })
-    }),
-  deleteDevice: publicProcedure
-    .input(z.object({ model: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.device.delete({
-        where: { model: input.model },
-      })
-    }),
-  updateDevice: publicProcedure
-    .input(deviceSchema)
-    .mutation(async ({ ctx, input }) => {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-      await ctx.prisma.device.update({
-        where: { model: input.model },
-        data: {
-          ...input,
-        },
-      })
-      if (sendSoapRequest) {
-        return await upsertDeviceSoap({ input })
-      }
-    }),
   getDevices: publicProcedure
     .input(z.object({ deviceType: z.string() }))
     .query(async ({ ctx, input }) => {
