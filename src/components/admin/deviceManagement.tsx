@@ -91,6 +91,7 @@ function InsertRow({
         onSuccess: () => {
           setLoading(false)
           setUsers((prev) => [...prev, form.values])
+          form.setValues(defaultValues)
           CreateNotification(
             t('insertedSuccessfully'),
             'green',
@@ -186,7 +187,6 @@ function DeviceRow({
     )
   }
   const handleUpdate = () => {
-    console.log(convertFormDeviceValues(form.values))
     if (form.isValid()) {
       setEditMode(false)
       if (form.values !== data) {

@@ -11,7 +11,11 @@ import {
   updatePropertiesSchema,
   userSchema,
 } from '../../models/schemas'
-import { deleteUserSoap, updateUserSoap } from '../soapFunctions'
+import {
+  deleteUserSoap,
+  insertUserSoap,
+  updateUserSoap,
+} from '../soapFunctions'
 import { router, publicProcedure } from '../trpc'
 import { z } from 'zod'
 
@@ -28,6 +32,9 @@ export const authRouter = router({
             deviceList: { create: [] },
           },
         })
+        if (sendSoapRequest && FromAsp !== true) {
+          await insertUserSoap({ input: user })
+        }
         return true
       } catch {
         return false
@@ -60,11 +67,11 @@ export const authRouter = router({
         await ctx.prisma.user.delete({
           where: { email: input.email },
         })
-        const query = `SELECT id FROM auth.users WHERE email = '${input.email}';`
-        const userId = await ctx.prisma.$queryRawUnsafe(query)
-        if (typeof userId === 'string') {
-          await ctx.supabase.auth.admin.deleteUser(userId)
-        }
+        // const query = `SELECT id FROM auth.users WHERE email = '${input.email}';`
+        // const userId = await ctx.prisma.$queryRawUnsafe(query)
+        // if (typeof userId === 'string') {
+        //   await ctx.supabase.auth.admin.deleteUser(userId)
+        // }
         if (sendSoapRequest && input.FromAsp !== true) {
           await deleteUserSoap({ email: input.email })
         }

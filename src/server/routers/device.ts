@@ -33,9 +33,9 @@ export const DeviceRouter = router({
   updateDevice: publicProcedure
     .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
       try {
         const { FromAsp, ...device } = input
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
         await ctx.prisma.device.update({
           where: { model: device.model },
           data: {

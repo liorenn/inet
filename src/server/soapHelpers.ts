@@ -11,20 +11,15 @@ type MethodParameter = {
 
 export function createSoapRequestXml(
   Method: string,
-  Parameters: MethodParameter[]
+  Parameters: MethodParameter
 ) {
   return `
   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
-  <soapenv:Header/>
-  <soapenv:Body>
-     <tem:${Method}>
-        ${Parameters.map(
-          (property) =>
-            `<tem:${property.Name}>${property.Value}</tem:${property.Name}>`
-        ).join('')}
-     </tem:${Method}>
-  </soapenv:Body>
-</soapenv:Envelope>
+    <soapenv:Header/>
+    <soapenv:Body>
+      <tem:${Method}><tem:${Parameters.Name}>${Parameters.Value}</tem:${Parameters.Name}></tem:${Method}>
+    </soapenv:Body>
+  </soapenv:Envelope>
   `
 }
 

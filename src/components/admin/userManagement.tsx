@@ -27,6 +27,10 @@ export default function UserManagement({ accessKey }: { accessKey: number }) {
   }
 
   useEffect(() => {
+    console.log(tableData)
+  }, [users])
+
+  useEffect(() => {
     if (tableData) {
       setUsers(
         tableData.map((user) => {
@@ -89,6 +93,7 @@ function InsertRow({
         onSuccess: () => {
           setLoading(false)
           setUsers((prev) => [...prev, form.values])
+          form.setValues(defaultValues)
           CreateNotification(
             t('insertedSuccessfully'),
             'green',
