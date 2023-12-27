@@ -8,6 +8,7 @@ import { devicePropertiesType } from '../../models/deviceTypes'
 
 type props = {
   model: string
+  modelPage?: boolean
   favoritesPage?: boolean
   setDevices?: Dispatch<
     React.SetStateAction<devicePropertiesType[] | undefined>
@@ -15,6 +16,7 @@ type props = {
 }
 export default function FavoritesButtons({
   model,
+  modelPage,
   favoritesPage,
   setDevices,
 }: props) {
@@ -104,7 +106,9 @@ export default function FavoritesButtons({
           disabled={isInList === undefined}
           onClick={() => deleteFromFavorites(model, email)}
           fullWidth>
-          {isInList !== undefined ? t('remove') : t('loading')}
+          {isInList !== undefined
+            ? t(modelPage ? 'removeFromFavorites' : 'remove')
+            : t('loading')}
         </Button>
       ) : (
         <Button
@@ -119,8 +123,8 @@ export default function FavoritesButtons({
           fullWidth>
           {isInList !== undefined
             ? isInList === true
-              ? t('remove')
-              : t('add')
+              ? t(modelPage ? 'removeFromFavorites' : 'remove')
+              : t(modelPage ? 'addToFavorites' : 'add')
             : t('loading')}
         </Button>
       )}

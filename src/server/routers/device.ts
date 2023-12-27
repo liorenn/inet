@@ -98,17 +98,22 @@ export const DeviceRouter = router({
       })
       return device
     }),
-  getDeviceMutation: publicProcedure
-    .input(z.object({ model: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const device = await ctx.prisma.device.findFirst({
-        where: { model: input.model },
+  getDevicesFromArr: publicProcedure
+    .input(z.array(z.string()).optional())
+    .query(async ({ ctx, input }) => {
+      if (!input) return []
+      const devices = await ctx.prisma.device.findMany({
+        where: {
+          model: {
+            in: input,
+          },
+        },
         include: {
           cameras: { select: { type: true, megapixel: true } },
           colors: { select: { color: true } },
         },
       })
-      return device
+      return devices
     }),
   getModelsAndNames: publicProcedure.query(async ({ ctx }) => {
     const devices = await ctx.prisma.device.findMany({

@@ -3,6 +3,7 @@ import {
   IconMoon,
   IconLanguage,
   IconCurrencyDollar,
+  IconSearch,
 } from '@tabler/icons'
 import { createStyles, Container, Avatar, Menu } from '@mantine/core'
 import { Header, Group, Button, Text } from '@mantine/core'
@@ -26,7 +27,7 @@ import { usePostHog } from 'posthog-js/react'
 import { adminAccessKey } from '../../../config'
 import useAutoTrigger from '../../hooks/useAutoTrigger'
 import { useProfilePicture } from '../../hooks/useProfilePicture'
-import { useFetch } from 'usehooks-ts'
+import { useSpotlight } from '@mantine/spotlight'
 
 export const Navbar = () => {
   useAutoTrigger()
@@ -39,8 +40,8 @@ export const Navbar = () => {
   const { imagePath, imageExists, setImageExists, setImagePath } =
     useProfilePicture()
   const { mutate } = trpc.device.isImageExists.useMutation()
-  const dark = colorScheme === 'dark'
   const supabase = useSupabaseClient()
+  const spotlight = useSpotlight()
   const [session, setSession] = useState(useSession())
   const { currency, setCurrency } = useCurrency()
   const { setLanguage: setlanguageStore } = useLanguage()
@@ -96,14 +97,16 @@ export const Navbar = () => {
           <div className={classes.dropdown}>
             <NavBarDropdown AccessKey={AccessKey} />
           </div>
-          <Link className={classes.end} href={'/'}>
-            <Button variant='subtle' color={`gray.'${dark ? '1' : '9'}`}>
-              <Group spacing='xs'>
-                <Text style={{ fontSize: '22px', fontWeight: 500 }}>
-                  {t('inet')}
-                </Text>
-              </Group>
-            </Button>
+          <Link
+            className={classes.end}
+            style={{
+              textDecoration: 'none',
+              fontSize: '22px',
+              fontWeight: 500,
+              color: colorScheme === 'dark' ? '#c1c2c5' : '#a3a8ae',
+            }}
+            href={'/'}>
+            {t('inet')}
           </Link>
         </Group>
         <Group spacing={5} className={classes.buttons}>
@@ -188,6 +191,15 @@ export const Navbar = () => {
               )}
             </>
           )}
+          <ActionIcon
+            variant='light'
+            radius='md'
+            size='lg'
+            color='gray'
+            onClick={() => spotlight.openSpotlight()}
+            title={t('searchDevice')}>
+            <IconSearch size={18} />
+          </ActionIcon>
           <Menu shadow='md' width={140} offset={14}>
             <Menu.Target>
               <ActionIcon
@@ -263,7 +275,11 @@ export const Navbar = () => {
             color='gray'
             onClick={() => toggleColorScheme()}
             title={t('toggleColorScheme')}>
-            {dark ? <IconSun size={18} /> : <IconMoon size={18} />}
+            {colorScheme === 'dark' ? (
+              <IconSun size={18} />
+            ) : (
+              <IconMoon size={18} />
+            )}
           </ActionIcon>
         </Group>
       </Container>

@@ -26,5 +26,10 @@ export function RouterTransition() {
     }
   }, [router.asPath, router.events])
 
-  return <NavigationProgress autoReset={true} size={4} />
+  return router.pathname.includes('compare') ||
+    router.pathname.includes('find') ? (
+    <></>
+  ) : (
+    <NavigationProgress autoReset={true} size={4} />
+  )
 }

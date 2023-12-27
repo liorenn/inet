@@ -178,4 +178,10 @@ export default {
   deviceSpecifications: 'Geraet Spezifikationen',
   viewDeviceSpecifications:
     'Entdecken Sie die detaillierten Spezifikationen von',
+  searchDevice: 'Geraet suchen',
+  deviceRating: 'Geraetbewertung',
+  addToFavorites: 'Gerät zu Favoriten hinzufügen',
+  removeFromFavorites: 'Gerät aus Favoriten entfernen',
+  searchForDevice: 'Nach einem Gerät suchen...',
+  deviceNotFound: 'Gerät nicht gefunden...',
 }

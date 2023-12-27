@@ -1,10 +1,12 @@
 import { Table, Grid, Text, Group, Tooltip, ColorSwatch } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 import PriceText from '../misc/PriceText'
+import { Device } from '@prisma/client'
+import { deviceSpecsType } from '../../models/SpecsFormatter'
 
 type catergory = {
-  label: string
-  info: string
+  property: keyof deviceSpecsType
+  value: string
 }
 type TableProps = {
   category: catergory[]
@@ -19,21 +21,21 @@ export default function DeviceTable({ category, secondCatergory }: TableProps) {
       <tbody>
         {category &&
           category.map((element, index) => (
-            <tr key={element.label}>
+            <tr key={element.property}>
               <td>
                 <Grid>
                   <Grid.Col
                     span={secondCatergory ? 4 : 6}
                     sx={{ fontWeight: 600, fontSize: 20 }}>
-                    <Text>{element.label}</Text>
+                    <Text>{t(element.property)}</Text>
                   </Grid.Col>
                   <Grid.Col
                     span={secondCatergory ? 4 : 6}
                     sx={{ fontWeight: 400, fontSize: 20 }}>
                     <Text>
-                      {element.label === t('colors') ? (
+                      {element.property === 'colors' ? (
                         <Group position='left' spacing='xs'>
-                          {element.info.split(' ').map(
+                          {element.value.split(' ').map(
                             (color, index) =>
                               color !== undefined && (
                                 <Tooltip
@@ -49,20 +51,20 @@ export default function DeviceTable({ category, secondCatergory }: TableProps) {
                               )
                           )}
                         </Group>
-                      ) : element.label === t('releasePrice') ||
-                        element.label === t('price') ? (
-                        <PriceText priceString={element.info} />
+                      ) : element.property === 'releasePrice' ||
+                        element.property === 'price' ? (
+                        <PriceText priceString={element.value} />
                       ) : (
-                        element.info
+                        element.value
                       )}
                     </Text>
                   </Grid.Col>
                   {secondCatergory && (
                     <Grid.Col span={4} sx={{ fontWeight: 400, fontSize: 20 }}>
                       <Text>
-                        {secondCatergory[index].label === t('colors') ? (
+                        {secondCatergory[index].property === 'colors' ? (
                           <Group position='left' spacing='xs'>
-                            {secondCatergory[index].info.split(' ').map(
+                            {secondCatergory[index].value.split(' ').map(
                               (color, index) =>
                                 color !== undefined && (
                                   <Tooltip
@@ -78,14 +80,14 @@ export default function DeviceTable({ category, secondCatergory }: TableProps) {
                                 )
                             )}
                           </Group>
-                        ) : secondCatergory[index].label ===
+                        ) : secondCatergory[index].property ===
                             t('releasePrice') ||
-                          secondCatergory[index].label === t('price') ? (
+                          secondCatergory[index].property === 'price' ? (
                           <PriceText
-                            priceString={secondCatergory[index].info}
+                            priceString={secondCatergory[index].value}
                           />
                         ) : (
-                          secondCatergory[index].info
+                          secondCatergory[index].value
                         )}
                       </Text>
                     </Grid.Col>

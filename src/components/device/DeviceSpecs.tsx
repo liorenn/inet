@@ -6,14 +6,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import DeviceTable from './DeviceTable'
 
-export type categoriesType = {
-  name: string
-  values: {
-    label: string
-    info: string
-  }[]
-}[]
-
 export default function DeviceSpecs({ device }: { device: deviceSpecsType }) {
   const { t } = useTranslation('translations')
   const { colorScheme } = useMantineColorScheme()
@@ -60,7 +52,7 @@ export default function DeviceSpecs({ device }: { device: deviceSpecsType }) {
         <Accordion.Item value={category.name} key={category.name}>
           <Accordion.Control>{category.name}</Accordion.Control>
           <Accordion.Panel>
-            <DeviceTable category={category.values} />
+            <DeviceTable category={category.specs} />
           </Accordion.Panel>
         </Accordion.Item>
       ))}

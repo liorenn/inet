@@ -17,7 +17,7 @@ export default function DeviceLayout({ device }: Props) {
     <>
       <Center>
         <Grid sx={{ marginBottom: 6 }}>
-          <Grid.Col xs={12} md={6} lg={4}>
+          <Grid.Col xs={12} md={6} lg={6}>
             <Center>
               <Stack align='center' spacing='xs'>
                 <DevicePhotos
@@ -29,11 +29,11 @@ export default function DeviceLayout({ device }: Props) {
                   }}
                   miniphotos={true}
                 />
-                <FavoritesButtons model={device.model} />
+                <FavoritesButtons modelPage model={device.model} />
               </Stack>
             </Center>
           </Grid.Col>
-          <Grid.Col xs={12} md={6} lg={8}>
+          <Grid.Col xs={12} md={6} lg={6}>
             <Stack align='stretch' justify='space-between'>
               <DeviceWidgets device={device} />
               <CommentsSummary />

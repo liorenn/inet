@@ -18,6 +18,10 @@ import {
   posthogToken,
 } from '../../config'
 import { supabase } from '../server/supabase'
+import { SpotlightAction, SpotlightProvider } from '@mantine/spotlight'
+import { IconHome, IconDashboard, IconFileText } from '@tabler/icons'
+import { SpotlightControl } from '../components/misc/Spotlight'
+import useTranslation from 'next-translate/useTranslation'
 
 if (typeof window !== 'undefined') {
   posthog.init(posthogToken, {
@@ -42,7 +46,28 @@ function MyApp({
 
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'))
-
+  const actions: SpotlightAction[] = [
+    {
+      title: 'Home',
+      description: 'Get to home page',
+      onTrigger: () => console.log('Home'),
+      icon: <IconHome size='1.2rem' />,
+    },
+    {
+      title: 'Dashboard',
+      description: 'Get full information about current system status',
+      onTrigger: () => {
+        console.log('Dashboard')
+      },
+      icon: <IconDashboard size='1.2rem' />,
+    },
+    {
+      title: 'Documentation',
+      description: 'Visit documentation to lean more about all features',
+      onTrigger: () => console.log('Documentation'),
+      icon: <IconFileText size='1.2rem' />,
+    },
+  ]
   return (
     <ColorSchemeProvider
       colorScheme={colorScheme}
@@ -55,16 +80,18 @@ function MyApp({
           breakpoints: customBreakPoints,
         }}>
         <Notifications />
-        <PostHogProvider client={posthog}>
-          <SessionContextProvider
-            supabaseClient={supabase}
-            initialSession={pageProps.initialSession}>
-            <Layout>
-              <RouterTransition />
-              <Component {...pageProps} />
-            </Layout>
-          </SessionContextProvider>
-        </PostHogProvider>
+        <SpotlightControl>
+          <PostHogProvider client={posthog}>
+            <SessionContextProvider
+              supabaseClient={supabase}
+              initialSession={pageProps.initialSession}>
+              <Layout>
+                <RouterTransition />
+                <Component {...pageProps} />
+              </Layout>
+            </SessionContextProvider>
+          </PostHogProvider>
+        </SpotlightControl>
       </MantineProvider>
     </ColorSchemeProvider>
   )

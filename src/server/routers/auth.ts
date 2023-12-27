@@ -187,7 +187,6 @@ export const authRouter = router({
     .query(async ({ ctx, input }) => {
       const comments = await ctx.prisma.comment.findMany({
         where: { model: input.model },
-        include: { user: true },
       })
       return comments
     }),

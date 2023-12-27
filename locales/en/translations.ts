@@ -176,4 +176,10 @@ export default {
   information: 'Information',
   deviceSpecifications: 'Device Specifications',
   viewDeviceSpecifications: 'Explore Detailed Specifications of',
+  searchDevice: 'Search Device',
+  deviceRating: 'Device Rating',
+  addToFavorites: 'Add Device To Favorites',
+  removeFromFavorites: 'Remove Device From Favorites',
+  searchForDevice: 'Search For A Device...',
+  deviceNotFound: 'Device Not Found...',
 }

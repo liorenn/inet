@@ -1,5 +1,5 @@
-import type { Device } from '@prisma/client'
-import type { categoriesType } from '../components/device/DeviceSpecs'
+import type { CameraType, Device } from '@prisma/client'
+import type { categoriesType } from '../components/device/DevicesSpecs'
 import { FormatDate } from '../misc/functions'
 import useTranslation from 'next-translate/useTranslation'
 
@@ -29,38 +29,38 @@ export type deviceSpecsType =
 export function FortmatSpecs(device: deviceSpecsType) {
   const { t } = useTranslation('translations')
 
-  const cameras: { label: string; info: string }[] = []
+  const cameras: { property: 'cameras'; value: string }[] = []
   if (device.cameras) {
     device.cameras.forEach((camera) => {
       cameras.push({
-        label: t(camera.type.toString()),
-        info: `${camera.megapixel.toString()} ${t('mp')}`,
+        property: t(camera.type.toString()),
+        value: `${camera.megapixel.toString()} ${t('mp')}`,
       })
     })
   }
 
   const categories: categoriesType = [
     {
-      name: t('display'),
-      values: [
+      name: '',
+      specs: [
         {
-          label: t('screenSize'),
-          info: device.screenSize
+          property: t('screenSize'),
+          value: device.screenSize
             ? `${device.screenSize.toString()} ${t('screenSizeUnits')}`
             : t('none'),
         },
         {
-          label: t('screenType'),
-          info: device.screenType ? device.screenType.toString() : t('none'),
+          property: t('screenType'),
+          value: device.screenType ? device.screenType.toString() : t('none'),
         },
       ],
     },
     {
       name: t('battery'),
-      values: [
+      specs: [
         {
-          label: t('batterySize'),
-          info: device.batterySize
+          property: t('batterySize'),
+          value: device.batterySize
             ? `${device.batterySize.toString()} ${t('batterySizeUnits')}`
             : t('none'),
         },
@@ -68,73 +68,76 @@ export function FortmatSpecs(device: deviceSpecsType) {
     },
     {
       name: t('hardware'),
-      values: [
-        { label: t('chipset'), info: device.chipset },
+      specs: [
+        { property: t('chipset'), value: device.chipset },
         {
-          label: t('memory'),
-          info: device.memory
+          property: t('memory'),
+          value: device.memory
             ? `${device.memory.toString()} ${t('memoryUnits')}`
             : t('none'),
         },
         {
-          label: t('storage'),
-          info: device.storage
+          property: t('storage'),
+          value: device.storage
             ? `${device.storage.toString()}  ${t('storageUnits')}`
             : t('none'),
         },
         {
-          label: t('operatingSystem'),
-          info: device.releaseOS ? device.releaseOS : t('none'),
+          property: t('operatingSystem'),
+          value: device.releaseOS ? device.releaseOS : t('none'),
         },
         {
-          label: t('weight'),
-          info: `${device.weight.toString()} ${t('weightUnits')}`,
+          property: t('weight'),
+          value: `${device.weight.toString()} ${t('weightUnits')}`,
         },
         {
-          label: t('height'),
-          info: `${device.height.toString()} ${t('heightUnits')}`,
+          property: t('height'),
+          value: `${device.height.toString()} ${t('heightUnits')}`,
         },
         {
-          label: t('width'),
-          info: `${device.width.toString()} ${t('widthUnits')}`,
+          property: t('width'),
+          value: `${device.width.toString()} ${t('widthUnits')}`,
         },
         {
-          label: t('depth'),
-          info: `${device.depth.toString()} ${t('depthUnits')}`,
+          property: t('depth'),
+          value: `${device.depth.toString()} ${t('depthUnits')}`,
         },
       ],
     },
     {
-      name: t('cameras'),
-      values: cameras.length > 0 ? cameras : t('none'),
+      name: 'camera',
+      specs:
+        cameras.length > 0
+          ? cameras
+          : [{ property: 'cameras', value: t('none') }],
     },
     {
       name: t('features'),
-      values: [
+      specs: [
         {
-          label: t('biometrics'),
-          info: device.biometrics ? device.biometrics : t('none'),
+          property: t('biometrics'),
+          value: device.biometrics ? device.biometrics : t('none'),
         },
         {
-          label: t('resistance'),
-          info: device.resistanceRating ? device.resistanceRating : t('none'),
+          property: t('resistance'),
+          value: device.resistanceRating ? device.resistanceRating : t('none'),
         },
       ],
     },
     {
       name: t('availability'),
-      values: [
+      specs: [
         {
-          label: t('releasePrice'),
-          info: device.releasePrice.toString(),
+          property: t('releasePrice'),
+          value: device.releasePrice.toString(),
         },
         {
-          label: t('releaseDate'),
-          info: FormatDate(device.releaseDate),
+          property: t('releaseDate'),
+          value: FormatDate(device.releaseDate),
         },
         {
-          label: t('colors'),
-          info: device.colors
+          property: t('colors'),
+          value: device.colors
             ? device.colors
                 .map(
                   (value) =>
@@ -150,9 +153,9 @@ export function FortmatSpecs(device: deviceSpecsType) {
   if (device.price !== 0) {
     categories.map((category) => {
       category.name === t('availability') &&
-        category.values.unshift({
-          label: t('price'),
-          info: device.price.toString(),
+        category.specs.unshift({
+          property: t('price'),
+          value: device.price.toString(),
         })
     })
   }

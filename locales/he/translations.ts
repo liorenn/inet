@@ -1,7 +1,7 @@
 export default {
   compare: 'השוואת מכשירים',
   allDevices: 'כל המכשירים',
-  favorites: 'מכשירים אהובים',
+  favorites: 'מכשירים מועדפים',
   pages: 'דפים',
   selectDevice: 'בחר מכשיר',
   userManagement: 'ניהול משתמשים',
@@ -173,4 +173,10 @@ export default {
   information: 'מידע',
   deviceSpecifications: 'מפרט המכשיר',
   viewDeviceSpecifications: 'גלה את המפרט המפורט של',
+  searchDevice: 'חפש מכשיר',
+  deviceRating: 'דירוג המכשיר',
+  addToFavorites: 'הוסף מכשיר למועדפים',
+  removeFromFavorites: 'הסר מכשיר מהמעודפים',
+  searchForDevice: '...חפש מכשיר',
+  deviceNotFound: '...מכשיר לא נמצא',
 }

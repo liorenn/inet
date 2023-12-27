@@ -8,20 +8,19 @@ export default function CommentsSummary() {
   const { t } = useTranslation('translations')
   const [_scroll, scrollTo] = useWindowScroll()
   const { commentsAmout, ratingValue } = useComments()
-
   return (
-    <Group>
+    <Group position='right'>
+      <Text weight={600}>{`${
+        ratingValue === 0 ? 0 : ratingValue.toFixed(1)
+      } ${t('deviceRating')}`}</Text>
+      <Rating value={ratingValue} fractions={2} readOnly />
       <Button
         variant='light'
         color='gray'
-        leftIcon={<IconArrowDown size={16} />}
+        rightIcon={<IconArrowDown size={16} />}
         onClick={() => scrollTo({ y: 2700 })}>
-        {t('goToComments')}
-      </Button>
-      <Text size='xl' weight={600}>
         {`${commentsAmout.toString()} ${t('comments')}`}
-      </Text>
-      <Rating value={ratingValue} fractions={2} readOnly />
+      </Button>
     </Group>
   )
 }

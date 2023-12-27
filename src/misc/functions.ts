@@ -107,6 +107,7 @@ export function CreateNotification(
 
 export function calculateAverageRating(comments: Comment[]) {
   let AverageRating = 0
+  if (comments.length === 0) return 0
   comments.forEach((comment) => {
     AverageRating += comment.rating
   })

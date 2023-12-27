@@ -1,6 +1,6 @@
 import { IconCalendarTime, IconCpu, IconTypography } from '@tabler/icons'
 import { IconCoin, IconBrandApple, IconBattery3 } from '@tabler/icons'
-import { Grid, Card, Text, Group, Title } from '@mantine/core'
+import { Grid, Card, Text, Group, Title, Stack } from '@mantine/core'
 import type { Device } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
 import { FormatDate } from '../../misc/functions'
@@ -41,13 +41,13 @@ export default function DeviceWidgets({ device }: { device: Device }) {
       {cards.map((info, index) => (
         <Grid.Col xs={6} md={6} lg={4} key={index}>
           <Card shadow='sm' radius='lg' p='lg'>
-            <Group position='apart'>
+            <Stack spacing={2} align='center'>
               <Title order={3}>{info.title}</Title>
               {info.icon}
-            </Group>
-            <Text size='xl' weight={500}>
-              {info.spec}
-            </Text>
+              <Text size='xl' weight={500}>
+                {info.spec}
+              </Text>
+            </Stack>
             {/* <Button
               variant='light'
               radius='md'
