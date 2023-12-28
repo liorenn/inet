@@ -10,6 +10,13 @@ import { z } from 'zod'
 import DevicePhotos from '../components/device/DevicePhotos'
 import DevicesSpecs from '../components/device/DevicesSpecs'
 
+const marks = [
+  { value: 0, label: 1 },
+  { value: 100 / 3, label: 2 },
+  { value: 200 / 3, label: 3 },
+  { value: 100, label: 4 },
+]
+
 export default function Compare() {
   const { t } = useTranslation('translations')
   const router = useRouter()
@@ -17,7 +24,9 @@ export default function Compare() {
     .string()
     .parse(router.query.deviceList ?? '')
     .split(',')
-  const [value, setValue] = useState(200 / 3)
+  const [value, setValue] = useState(
+    marks.find((mark) => mark.label === deviceList.length)?.value
+  )
   const { data: allDevices } = trpc.device.getModelsAndNames.useQuery()
   const { data } = trpc.device.getDevicesFromArr.useQuery(deviceList)
 
@@ -29,7 +38,7 @@ export default function Compare() {
 
   useEffect(() => {
     if (allDevices) {
-      const arrayLength = MARKS.find((mark) => mark.value === value)?.label
+      const arrayLength = marks.find((mark) => mark.value === value)?.label
       router.push(
         generateUrlSring(
           allDevices.slice(0, arrayLength).map((device) => device.model)
@@ -49,13 +58,6 @@ export default function Compare() {
     router.push(`?deviceList=${newDeviceList.join(',')}`)
   }
 
-  const MARKS = [
-    { value: 0, label: 1 },
-    { value: 100 / 3, label: 2 },
-    { value: 200 / 3, label: 3 },
-    { value: 100, label: 4 },
-  ]
-
   if (allDevices === undefined) {
     return <Loader />
   }
@@ -70,10 +72,10 @@ export default function Compare() {
           value={value}
           onChange={setValue}
           disabled={data === undefined}
-          label={(val) => MARKS.find((mark) => mark.value === val)?.label}
+          label={(val) => marks.find((mark) => mark.value === val)?.label}
           size='lg'
           step={100 / 3}
-          marks={MARKS}
+          marks={marks}
           styles={{ markLabel: { display: 'none' } }}
           color='gray'
         />
@@ -96,7 +98,7 @@ export default function Compare() {
           <>
             <SimpleGrid
               mb='md'
-              cols={MARKS.find((mark) => mark.value === value)?.label}>
+              cols={marks.find((mark) => mark.value === value)?.label}>
               {deviceList.map((model, index) => {
                 const device = data.find((x) => x.model === model)
                 return (

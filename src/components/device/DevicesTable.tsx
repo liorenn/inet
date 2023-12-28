@@ -1,20 +1,20 @@
 import { Table, Grid, Text, Group, Tooltip, ColorSwatch } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 import PriceText from '../misc/PriceText'
-import { categoryType } from '../../models/SpecsFormatter'
+import { categoriesType, categoryType } from '../../models/SpecsFormatter'
 
 type TableProps = {
-  category: categoryType
+  categories: categoriesType
 }
 
-export default function DeviceTable({ category }: TableProps) {
+export default function DevicesTable({ categories }: TableProps) {
   const { t } = useTranslation('translations')
 
   return (
     <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
-      <tbody>
+      {/* <tbody>
         {category &&
-          category map((element, index) => (
+          category.map((element, index) => (
             <tr key={element.property}>
               <td>
                 <Grid>
@@ -90,7 +90,7 @@ export default function DeviceTable({ category }: TableProps) {
               </td>
             </tr>
           ))}
-      </tbody>
+      </tbody> */}
     </Table>
   )
 }
