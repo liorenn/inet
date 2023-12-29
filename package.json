@@ -25,6 +25,7 @@
     "@mantine/notifications": "^6.0.2",
     "@mantine/nprogress": "^6.0.2",
     "@mantine/spotlight": "^6.0.2",
+    "@mantine/code-highlight": "^6.0.2",
     "@prisma/client": "^5.7.0",
     "@react-email/components": "0.0.6",
     "@splinetool/react-spline": "^2.2.6",

@@ -209,4 +209,5 @@ export default {
   imac: 'iMac',
   macbook: 'MacBook',
   enterYour: 'Geben Sie Ihre',
+  configsEditor: 'Konfigurationen Editor',
 }

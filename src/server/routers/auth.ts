@@ -18,8 +18,20 @@ import {
 } from '../soapFunctions'
 import { router, publicProcedure } from '../trpc'
 import { z } from 'zod'
+import { readFileSync, writeFileSync } from 'fs'
 
 export const authRouter = router({
+  getConfigs: publicProcedure.query(() => {
+    const filePath = 'config.ts'
+    const fileContents = readFileSync(filePath, 'utf8')
+    return fileContents
+  }),
+  saveConfigs: publicProcedure
+    .input(z.object({ configs: z.string() }))
+    .mutation(({ input }) => {
+      const filePath = 'config.ts'
+      writeFileSync(filePath, input.configs)
+    }),
   insertUser: publicProcedure
     .input(userSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
@@ -95,49 +107,73 @@ export const authRouter = router({
   getUsersData: publicProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.user.findMany()
   }),
-  sendPriceDropsEmails: publicProcedure.mutation(async ({ ctx }) => {
-    const devicesUsers = await ctx.prisma.deviceUser.findMany()
-    devicesUsers.map(async (deviceUser) => {
-      const device = await ctx.prisma.device.findFirst({
-        where: { model: deviceUser.deviceModel },
-      })
-      const user = await ctx.prisma.user.findFirst({
-        where: { email: deviceUser.userEmail },
-        select: { name: true, email: true },
-      })
-      if (user && device) {
-        const price = await fetchCurrentPrice(device.model)
-        if (price && price != device.price) {
-          await ctx.prisma.device.update({
-            where: { model: device.model },
-            data: { price: price },
-          })
-        }
-        if (price && price < device.price) {
-          const resend = new Resend(resendKey)
-          await resend.emails
-            .send({
-              from: fromEmail,
-              to: user.email,
-              subject: `${device.name} Price Drop`,
-              react: PriceDropEmail({
-                name: user.name,
-                newPrice: price,
-                device: device,
-                precentage: calculatePercentageDiff(device.price, price),
-              }),
+  sendPriceDropsEmails: publicProcedure
+    .input(z.object({ sendTest: z.boolean().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const devicesUsers = await ctx.prisma.deviceUser.findMany()
+      devicesUsers.map(async (deviceUser) => {
+        const device = await ctx.prisma.device.findFirst({
+          where: { model: deviceUser.deviceModel },
+        })
+        const user = await ctx.prisma.user.findFirst({
+          where: { email: deviceUser.userEmail },
+          select: { name: true, email: true },
+        })
+        if (user && device) {
+          const price = await fetchCurrentPrice(device.model)
+          if (price && price != device.price) {
+            await ctx.prisma.device.update({
+              where: { model: device.model },
+              data: { price: price },
             })
-            .then((value) => {
-              if (value.id) {
-                return true
-              }
-            })
-        } else {
-          return false
+          }
+          if (input.sendTest === true) {
+            const resend = new Resend(resendKey)
+            device.price = 600
+            await resend.emails
+              .send({
+                from: fromEmail,
+                to: user.email,
+                subject: `${device.name} Price Drop`,
+                react: PriceDropEmail({
+                  name: user.name,
+                  newPrice: 400,
+                  device: device,
+                  precentage: calculatePercentageDiff(device.price, 400),
+                }),
+              })
+              .then((value) => {
+                if (value.id) {
+                  return true
+                }
+              })
+          } else {
+            if (price && price < device.price) {
+              const resend = new Resend(resendKey)
+              await resend.emails
+                .send({
+                  from: fromEmail,
+                  to: user.email,
+                  subject: `${device.name} Price Drop`,
+                  react: PriceDropEmail({
+                    name: user.name,
+                    newPrice: price,
+                    device: device,
+                    precentage: calculatePercentageDiff(device.price, price),
+                  }),
+                })
+                .then((value) => {
+                  if (value.id) {
+                    return true
+                  }
+                })
+            } else {
+              return false
+            }
+          }
         }
-      }
-    })
-  }),
+      })
+    }),
   editComment: publicProcedure
     .input(
       z.object({

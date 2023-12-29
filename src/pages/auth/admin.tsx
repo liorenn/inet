@@ -1,5 +1,4 @@
 import { Container, ScrollArea, SegmentedControl } from '@mantine/core'
-import { useEffect, useState } from 'react'
 import DatabaseViewer from '../../components/admin/DatabaseViewer'
 import DeviceManagement from '../../components/admin/DeviceManagement'
 import UserManagement from '../../components/admin/UserManagement'
@@ -10,24 +9,25 @@ import { adminAccessKey, managerAccessKey } from '../../../config'
 import { useUser } from '@supabase/auth-helpers-react'
 import useTranslation from 'next-translate/useTranslation'
 import WebsiteStatistics from '../../components/admin/WebsiteStatistics'
+import ConfigsEditor from '../../components/admin/ConfigsEditor'
+import { useEffect } from 'react'
+import { z } from 'zod'
 
 export default function Admin() {
   const user = useUser()
   const router = useRouter()
   const { t } = useTranslation('translations')
-  const [button, setButton] = useState('')
+  const button = z.string().parse(router.query.dashboard ?? '')
   const { data: accessKey } = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
   })
-  const buttons =
-    accessKey && accessKey < managerAccessKey
-      ? [{ value: 'deviceManagement', label: t('deviceManagement') }]
-      : [
-          { value: 'databaseViewer', label: t('databaseViewer') },
-          { value: 'deviceManagement', label: t('deviceManagement') },
-          { value: 'userManagement', label: t('userManagement') },
-          { value: 'websiteStatistics', label: t('websiteStatistics') },
-        ]
+
+  useEffect(() => {
+    if (!router.query.dashboard) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      router.push(`?dashboard=deviceManagement`)
+    }
+  }, [router])
 
   useEffect(() => {
     if (accessKey && accessKey < adminAccessKey) {
@@ -38,6 +38,17 @@ export default function Admin() {
     }
   }, [accessKey, router])
 
+  const buttons =
+    accessKey && accessKey < managerAccessKey
+      ? [{ value: 'deviceManagement', label: t('deviceManagement') }]
+      : [
+          { value: 'databaseViewer', label: t('databaseViewer') },
+          { value: 'deviceManagement', label: t('deviceManagement') },
+          { value: 'userManagement', label: t('userManagement') },
+          { value: 'websiteStatistics', label: t('websiteStatistics') },
+          { value: 'configsEditor', label: t('configsEditor') },
+        ]
+
   return (
     <>
       {accessKey ? (
@@ -45,7 +56,10 @@ export default function Admin() {
           <ScrollArea>
             <SegmentedControl
               data={buttons}
-              onChange={setButton}
+              onChange={(value: string) => {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                router.push(`?dashboard=${value}`)
+              }}
               value={button}
               fullWidth
               size='md'
@@ -64,6 +78,9 @@ export default function Admin() {
           )}
           {button === 'websiteStatistics' && accessKey >= managerAccessKey && (
             <WebsiteStatistics accessKey={accessKey} />
+          )}
+          {button === 'configsEditor' && accessKey >= managerAccessKey && (
+            <ConfigsEditor accessKey={accessKey} />
           )}
         </Container>
       ) : (

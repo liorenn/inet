@@ -68,7 +68,14 @@ export default function Compare() {
   }
 
   if (allDevices === undefined) {
-    return <Loader />
+    return (
+      <>
+        <Head>
+          <title>{t('compare')}</title>
+        </Head>
+        <Loader />
+      </>
+    )
   }
 
   return (

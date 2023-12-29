@@ -204,4 +204,5 @@ export default {
   imac: 'iMac',
   macbook: 'MacBook',
   enterYour: 'Enter your',
+  configsEditor: 'עורך קונפיגיורציות',
 }

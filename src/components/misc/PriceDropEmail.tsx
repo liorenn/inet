@@ -32,11 +32,11 @@ export default function PriceDropEmail({
             remember that awesome {device.name} you saved to your wishlist a
             while back? Well, get ready for some good news! The price just took
             a dip, and now it's even more irresistible. That's right! You can
-            now snag the {device.name} for {newPrice} which is a sweet{' '}
-            {precentage}% saving off the original price of {device.price}.
-            Here's a quick reminder of what makes this phone so incredible:
-            Stunning {device.screenSize} inches Super Retina XDR display:
-            Immerse yourself in vibrant colors and razor sharp details.
+            now snag the {device.name} for {newPrice} $ which is a sweet{' '}
+            {precentage.toFixed(1)}% saving off the original price of{' '}
+            {device.price}. Here's a quick reminder of what makes this phone so
+            incredible: Stunning {device.screenSize} inches Super Retina XDR
+            display: Immerse yourself in vibrant colors and razor sharp details.
             Blazing-fast {device.chipset} Bionic chip: Power through even the
             most demanding tasks with ease. Don't miss out on this chance to
             finally get your hands on the {device.name} at an amazing price.

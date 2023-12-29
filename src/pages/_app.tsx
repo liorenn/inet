@@ -13,7 +13,6 @@ import { PostHogProvider } from 'posthog-js/react'
 import { supabase } from '../server/supabase'
 import { SpotlightControl } from '../components/misc/Spotlight'
 import {
-  customBreakPoints,
   defaultColorSchema,
   posthogApiHost,
   posthogDebug,
@@ -51,7 +50,13 @@ function MyApp({ Component, pageProps }: props) {
         withNormalizeCSS
         theme={{
           colorScheme,
-          breakpoints: customBreakPoints,
+          breakpoints: {
+            xs: '30em',
+            sm: '48em',
+            md: '64em',
+            lg: '74em',
+            xl: '90em',
+          },
         }}>
         <Notifications />
         <SpotlightControl>
