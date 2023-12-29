@@ -6,21 +6,21 @@ import { useState } from 'react'
 import Link from 'next/link'
 import DeviceTable from './DeviceTable'
 
+const deviceSpecsCategories = [
+  'display',
+  'battery',
+  'hardware',
+  'dimensions',
+  'cameras',
+  'features',
+  'availability',
+]
+
 export default function DeviceSpecs({ device }: { device: deviceSpecsType }) {
   const { t } = useTranslation('translations')
   const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
-  const accordionContents = [
-    t('name'),
-    t('display'),
-    t('battery'),
-    t('hardware'),
-    t('dimensions'),
-    t('cameras'),
-    t('features'),
-    t('availability'),
-  ]
-  const [value, setValue] = useState<string[]>(accordionContents)
+  const [value, setValue] = useState<string[]>(deviceSpecsCategories)
   const categories = formatSpecs(device)
 
   if (!categories)
@@ -49,11 +49,11 @@ export default function DeviceSpecs({ device }: { device: deviceSpecsType }) {
         content: { backgroundColor: dark ? 'gray.9' : 'white' },
         control: { backgroundColor: dark ? 'gray.9' : 'white' },
       }}>
-      {categories.map((category) => (
-        <Accordion.Item value={category.name} key={category.name}>
-          <Accordion.Control>{category.name}</Accordion.Control>
+      {categories.map((category, index) => (
+        <Accordion.Item value={category.name} key={index}>
+          <Accordion.Control>{t(category.name)}</Accordion.Control>
           <Accordion.Panel>
-            <DeviceTable category={category} />
+            <DeviceTable specs={category.specs} name={category.name} />
           </Accordion.Panel>
         </Accordion.Item>
       ))}

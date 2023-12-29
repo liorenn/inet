@@ -27,10 +27,6 @@ export default function UserManagement({ accessKey }: { accessKey: number }) {
   }
 
   useEffect(() => {
-    console.log(tableData)
-  }, [users])
-
-  useEffect(() => {
     if (tableData) {
       setUsers(
         tableData.map((user) => {

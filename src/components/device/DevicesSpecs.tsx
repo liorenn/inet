@@ -5,7 +5,7 @@ import {
 import { useMantineColorScheme } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useViewportSize } from '@mantine/hooks'
 import DevicesTable from './DevicesTable'
 
@@ -13,23 +13,23 @@ type Props = {
   devices: deviceSpecsType[]
 }
 
+const devicesSpecsCategories = [
+  'name',
+  'display',
+  'battery',
+  'hardware',
+  'dimensions',
+  'cameras',
+  'features',
+  'availability',
+]
+
 export default function DevicesSpecs({ devices }: Props) {
   const { t } = useTranslation('translations')
   const { colorScheme } = useMantineColorScheme()
   const { width } = useViewportSize()
-  const accordionContents = [
-    t('name'),
-    t('display'),
-    t('battery'),
-    t('hardware'),
-    t('dimensions'),
-    t('cameras'),
-    t('features'),
-    t('availability'),
-  ]
-  const [value, setValue] = useState<string[]>(accordionContents)
-  const mergedCategories = useMemo(() => formatArrSpecs(devices), [devices])
-
+  const [value, setValue] = useState<string[]>(devicesSpecsCategories)
+  const mergedCategories = formatArrSpecs(devices)
   return (
     <Accordion
       variant='contained'
@@ -49,9 +49,9 @@ export default function DevicesSpecs({ devices }: Props) {
       }}>
       {mergedCategories.map((category, index) => (
         <Accordion.Item value={category.name} key={index}>
-          <Accordion.Control>{category.name}</Accordion.Control>
+          <Accordion.Control>{t(category.name)}</Accordion.Control>
           <Accordion.Panel>
-            <DevicesTable categories={mergedCategories} />
+            <DevicesTable specs={category.specs} name={category.name} />
           </Accordion.Panel>
         </Accordion.Item>
       ))}

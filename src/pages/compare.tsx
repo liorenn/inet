@@ -3,18 +3,23 @@ import { useEffect, useState } from 'react'
 import React from 'react'
 import { trpc } from '../misc/trpc'
 import useTranslation from 'next-translate/useTranslation'
-import { Container, Group, Select, SimpleGrid, Slider } from '@mantine/core'
+import {
+  Container,
+  Group,
+  SegmentedControl,
+  Select,
+  SimpleGrid,
+} from '@mantine/core'
 import Loader from '../components/layout/Loader'
 import { useRouter } from 'next/router'
 import { z } from 'zod'
 import DevicePhotos from '../components/device/DevicePhotos'
 import DevicesSpecs from '../components/device/DevicesSpecs'
 
-const marks = [
-  { value: 0, label: 1 },
-  { value: 100 / 3, label: 2 },
-  { value: 200 / 3, label: 3 },
-  { value: 100, label: 4 },
+const Buttons = [
+  { label: 'Two Devices', value: '2' },
+  { label: 'Three Devices', value: '3' },
+  { label: 'Four Devices', value: '4' },
 ]
 
 export default function Compare() {
@@ -25,27 +30,30 @@ export default function Compare() {
     .parse(router.query.deviceList ?? '')
     .split(',')
   const [value, setValue] = useState(
-    marks.find((mark) => mark.label === deviceList.length)?.value
+    Buttons.find((mark) => Number(mark.value) === deviceList.length)?.value
   )
   const { data: allDevices } = trpc.device.getModelsAndNames.useQuery()
   const { data } = trpc.device.getDevicesFromArr.useQuery(deviceList)
 
   useEffect(() => {
     if (!router.query.deviceList) {
-      router.push(generateUrlSring(['iphone14', 'iphone15pro']))
+      void router.push(generateUrlSring(['iphone14', 'iphone15pro']))
     }
-  }, [])
+  }, [router])
 
   useEffect(() => {
     if (allDevices) {
-      const arrayLength = marks.find((mark) => mark.value === value)?.label
-      router.push(
+      const arrayLength = Number(
+        Buttons.find((mark) => mark.value === value)?.value
+      )
+      void router.push(
         generateUrlSring(
           allDevices.slice(0, arrayLength).map((device) => device.model)
         )
       )
     }
-  }, [value])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allDevices, value])
 
   function generateUrlSring(deviceList: string[]) {
     return `?deviceList=${deviceList.join(',')}`
@@ -55,7 +63,7 @@ export default function Compare() {
     if (model === null) return
     const newDeviceList = deviceList
     newDeviceList[index] = model
-    router.push(`?deviceList=${newDeviceList.join(',')}`)
+    void router.push(`?deviceList=${newDeviceList.join(',')}`)
   }
 
   if (allDevices === undefined) {
@@ -68,16 +76,12 @@ export default function Compare() {
         <title>{t('compare')}</title>
       </Head>
       <Container size='lg'>
-        <Slider
+        <SegmentedControl
           value={value}
           onChange={setValue}
-          disabled={data === undefined}
-          label={(val) => marks.find((mark) => mark.value === val)?.label}
+          data={Buttons}
           size='lg'
-          step={100 / 3}
-          marks={marks}
-          styles={{ markLabel: { display: 'none' } }}
-          color='gray'
+          fullWidth
         />
         <Group grow position='apart' mb='xs' mt='sm'>
           {deviceList.map((_, index) => (
@@ -96,9 +100,7 @@ export default function Compare() {
         </Group>
         {data ? (
           <>
-            <SimpleGrid
-              mb='md'
-              cols={marks.find((mark) => mark.value === value)?.label}>
+            <SimpleGrid mb='md' cols={data.length}>
               {deviceList.map((model, index) => {
                 const device = data.find((x) => x.model === model)
                 return (
