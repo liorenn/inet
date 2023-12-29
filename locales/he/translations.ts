@@ -203,4 +203,5 @@ export default {
   mac: 'Mac',
   imac: 'iMac',
   macbook: 'MacBook',
+  enterYour: 'Enter your',
 }

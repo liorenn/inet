@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Group, Button, rem, Text } from '@mantine/core'
-import { ActionIcon, Modal, FileInput, Avatar, Center } from '@mantine/core'
+import { ActionIcon, Modal, Avatar, Center } from '@mantine/core'
 import { CreateNotification, encodeEmail } from '../../misc/functions'
 import { useDisclosure } from '@mantine/hooks'
 import { IconPhoto, IconUpload, IconX } from '@tabler/icons'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { useProfilePicture } from '../../hooks/useProfilePicture'
 

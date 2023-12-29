@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { SpotlightProvider } from '@mantine/spotlight'
 import type { SpotlightAction } from '@mantine/spotlight'
 import {
@@ -80,7 +81,7 @@ export function SpotlightControl({ children }: { children: ReactNode }) {
     } else {
       return []
     }
-  }, [data])
+  }, [data, router])
 
   return (
     <SpotlightProvider

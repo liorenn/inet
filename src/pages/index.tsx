@@ -1,17 +1,7 @@
-import {
-  Grid,
-  Button,
-  Text,
-  Title,
-  Input,
-  Badge,
-  Card,
-  SimpleGrid,
-} from '@mantine/core'
-import { Group, Stack, Container } from '@mantine/core'
+import { Button, Text, Title, Input, Card, SimpleGrid } from '@mantine/core'
+import { Stack, Container } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 import Head from 'next/head'
-import Link from 'next/link'
 import { useSpotlight } from '@mantine/spotlight'
 import { useState } from 'react'
 import { useViewportSize } from '@mantine/hooks'
@@ -23,8 +13,6 @@ export default function Index() {
   const spotlight = useSpotlight()
   const [value, setValue] = useState('')
   const { width } = useViewportSize()
-  // const { lang } = useTranslation('translations')
-  // document.body.dir = lang === 'he' ? 'rtl' : 'ltr'
 
   return (
     <>
@@ -102,17 +90,4 @@ export default function Index() {
       </Container>
     </>
   )
-}
-
-{
-  /* <Group>
-            <Button color='gray' variant='light' size='lg' radius='md'>
-              {t('findYourDevice')}
-            </Button>
-            <Link href='/compare'>
-              <Button color='gray' variant='light' size='lg' radius='md'>
-                {t('compare')}
-              </Button>
-            </Link>
-          </Group> */
 }

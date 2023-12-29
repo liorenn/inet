@@ -1,6 +1,6 @@
 import soapRequest from 'easy-soap-request'
 import { soapServerUrl } from '../../config'
-import { deviceSchemaType, userSchemaType } from '../models/schemas'
+import type { deviceSchemaType, userSchemaType } from '../models/schemas'
 import {
   soapRequestHeaders,
   createSoapRequestXml,

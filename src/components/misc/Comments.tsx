@@ -36,6 +36,7 @@ export default function Comments({ device }: Props) {
       setCommentsAmout(data.length)
       setRatingValue(calculateAverageRating(data))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
   function AddComment(e: FormEvent<HTMLFormElement>) {

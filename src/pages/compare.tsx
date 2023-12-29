@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import React from 'react'
@@ -37,7 +38,7 @@ export default function Compare() {
 
   useEffect(() => {
     if (!router.query.deviceList) {
-      void router.push(generateUrlSring(['iphone14', 'iphone15pro']))
+      router.push(generateUrlSring(['iphone14', 'iphone15pro']))
     }
   }, [router])
 
@@ -46,7 +47,7 @@ export default function Compare() {
       const arrayLength = Number(
         Buttons.find((mark) => mark.value === value)?.value
       )
-      void router.push(
+      router.push(
         generateUrlSring(
           allDevices.slice(0, arrayLength).map((device) => device.model)
         )
@@ -63,7 +64,7 @@ export default function Compare() {
     if (model === null) return
     const newDeviceList = deviceList
     newDeviceList[index] = model
-    void router.push(`?deviceList=${newDeviceList.join(',')}`)
+    router.push(`?deviceList=${newDeviceList.join(',')}`)
   }
 
   if (allDevices === undefined) {

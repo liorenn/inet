@@ -10,6 +10,8 @@ import { RouterTransition } from '../components/layout/RouterTransition'
 import { Notifications } from '@mantine/notifications'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
+import { supabase } from '../server/supabase'
+import { SpotlightControl } from '../components/misc/Spotlight'
 import {
   customBreakPoints,
   defaultColorSchema,
@@ -17,11 +19,6 @@ import {
   posthogDebug,
   posthogToken,
 } from '../../config'
-import { supabase } from '../server/supabase'
-import { SpotlightAction, SpotlightProvider } from '@mantine/spotlight'
-import { IconHome, IconDashboard, IconFileText } from '@tabler/icons'
-import { SpotlightControl } from '../components/misc/Spotlight'
-import useTranslation from 'next-translate/useTranslation'
 
 if (typeof window !== 'undefined') {
   posthog.init(posthogToken, {
@@ -32,42 +29,19 @@ if (typeof window !== 'undefined') {
   })
 }
 
-function MyApp({
-  Component,
-  pageProps,
-}: AppProps<{
+type props = AppProps<{
   initialSession: Session
-}>) {
+}>
+
+function MyApp({ Component, pageProps }: props) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'mantine-color-scheme',
     defaultValue: defaultColorSchema,
     getInitialValueInEffect: true,
   })
-
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'))
-  const actions: SpotlightAction[] = [
-    {
-      title: 'Home',
-      description: 'Get to home page',
-      onTrigger: () => console.log('Home'),
-      icon: <IconHome size='1.2rem' />,
-    },
-    {
-      title: 'Dashboard',
-      description: 'Get full information about current system status',
-      onTrigger: () => {
-        console.log('Dashboard')
-      },
-      icon: <IconDashboard size='1.2rem' />,
-    },
-    {
-      title: 'Documentation',
-      description: 'Visit documentation to lean more about all features',
-      onTrigger: () => console.log('Documentation'),
-      icon: <IconFileText size='1.2rem' />,
-    },
-  ]
+
   return (
     <ColorSchemeProvider
       colorScheme={colorScheme}

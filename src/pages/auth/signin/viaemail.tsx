@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -76,9 +77,7 @@ export default function ViaEmail() {
             <TextInput
               label={t('email')}
               defaultValue='lior.oren06@gmail.com'
-              placeholder={t('placeholders.inputPlaceholder', {
-                input: t('email'),
-              })}
+              placeholder={`${t('enterYour')} ${t('email')}...`}
               error={errors.email && t('wrongPattern')}
               {...register('email', {
                 required: true,

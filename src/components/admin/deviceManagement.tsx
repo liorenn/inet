@@ -27,6 +27,7 @@ export default function DeviceManagement({ accessKey }: { accessKey: number }) {
   const fieldNames = Object.keys(deviceSchema.shape)
   const { data: tableData, isLoading } = trpc.device.getDevicesData.useQuery()
   if (accessKey < managerAccessKey) {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     router.push('/')
   }
 

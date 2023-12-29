@@ -1,10 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import fs from 'fs'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { fileName } = req.body
   console.log(fileName)
   if (!fileName || typeof fileName !== 'string') {

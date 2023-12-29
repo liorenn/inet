@@ -9,7 +9,7 @@ import {
   insertDeviceSoap,
   updateDeviceSoap,
 } from '../soapFunctions'
-import { devicePropertiesType } from '../../models/deviceTypes'
+import type { devicePropertiesType } from '../../models/deviceTypes'
 
 export const DeviceRouter = router({
   insertDevice: publicProcedure
@@ -22,7 +22,7 @@ export const DeviceRouter = router({
             ...device,
           },
         })
-        if (sendSoapRequest && input.FromAsp !== true) {
+        if (sendSoapRequest && FromAsp !== true) {
           await insertDeviceSoap({ input: device })
         }
         return true
@@ -54,10 +54,11 @@ export const DeviceRouter = router({
     .input(z.object({ model: z.string(), FromAsp: z.boolean().optional() }))
     .mutation(async ({ ctx, input }) => {
       try {
+        const { FromAsp, model } = input
         await ctx.prisma.device.delete({
-          where: { model: input.model },
+          where: { model },
         })
-        if (sendSoapRequest && input.FromAsp !== true) {
+        if (sendSoapRequest && FromAsp !== true) {
           await deleteDeviceSoap({ model: input.model })
         }
         return true
@@ -82,7 +83,7 @@ export const DeviceRouter = router({
     }),
   isImageExists: publicProcedure
     .input(z.object({ email: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(({ input }) => {
       const path = `public/users/${encodeEmail(input.email)}.png`
       return existsSync(path)
     }),
@@ -178,7 +179,7 @@ export const DeviceRouter = router({
         },
       })
       const devicesArr: devicePropertiesType[] = []
-      devices.forEach(async (device) => {
+      for (const device of devices) {
         const userDevice = await ctx.prisma.device.findFirst({
           where: { model: device.deviceModel },
           select: {
@@ -188,8 +189,10 @@ export const DeviceRouter = router({
             type: true,
           },
         })
-        userDevice && devicesArr.push(userDevice)
-      })
+        if (userDevice) {
+          devicesArr.push(userDevice)
+        }
+      }
       return devicesArr
     }),
   getUserDevicesFromUserTable: publicProcedure

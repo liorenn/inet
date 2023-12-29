@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -73,9 +75,7 @@ export default function ViaPhone() {
             <TextInput
               label={t('phone')}
               defaultValue='+9720548853393'
-              placeholder={t('placeholders.inputPlaceholder', {
-                input: t('phone'),
-              })}
+              placeholder={`${t('enterYour')} ${t('phone')}...`}
               error={errors.phone && t('wrongPattern')}
               {...register('phone', {
                 required: true,

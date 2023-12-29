@@ -23,6 +23,7 @@ export default function UserManagement({ accessKey }: { accessKey: number }) {
   const fieldNames = Object.keys(userSchema.shape)
   const { data: tableData, isLoading } = trpc.auth.getUsersData.useQuery()
   if (accessKey < managerAccessKey) {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     router.push('/')
   }
 

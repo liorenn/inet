@@ -31,11 +31,12 @@ export default function Admin() {
 
   useEffect(() => {
     if (accessKey && accessKey < adminAccessKey) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       router.push('/')
     }
     if (accessKey && accessKey >= managerAccessKey) {
     }
-  }, [accessKey])
+  }, [accessKey, router])
 
   return (
     <>

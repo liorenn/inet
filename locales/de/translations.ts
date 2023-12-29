@@ -208,4 +208,5 @@ export default {
   mac: 'Mac',
   imac: 'iMac',
   macbook: 'MacBook',
+  enterYour: 'Geben Sie Ihre',
 }

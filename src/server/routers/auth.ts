@@ -115,7 +115,7 @@ export const authRouter = router({
         }
         if (price && price < device.price) {
           const resend = new Resend(resendKey)
-          resend.emails
+          await resend.emails
             .send({
               from: fromEmail,
               to: user.email,

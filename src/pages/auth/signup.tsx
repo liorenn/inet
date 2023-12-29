@@ -45,7 +45,6 @@ export default function SignUp() {
   } = useForm<Inputs>()
 
   const onSubmit: SubmitHandler<Inputs> = (fields) => {
-    //when form is submitted and passed validation
     IsUserExistsMutation.mutate(
       {
         email: fields.email,
@@ -54,7 +53,6 @@ export default function SignUp() {
       },
       {
         async onSuccess(data) {
-          //if trpc return results
           const IsExist = data
           if (IsExist?.email && !IsExist.username) {
             CreateNotification(t('emailExistMessage'), 'red')
@@ -66,7 +64,6 @@ export default function SignUp() {
             CreateNotification(t('usernameAndEmailExistMessage'), 'red')
           }
           if (!IsExist?.email && !IsExist?.username) {
-            //if user doesnt exist create new user and saves data in user table
             const { data, error } = await supabase.auth.signUp({
               phone: fields.phone,
               email: fields.email,
@@ -114,12 +111,20 @@ export default function SignUp() {
           <Link href='/auth/`signin'>{t('signInYourAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={() => handleSubmit(onSubmit)}>
+            <TextInput
+              label={t('email')}
+              placeholder={`${t('enterYour')} ${t('email')}...`}
+              defaultValue='lior.oren06@gmail.com'
+              error={errors.email && t('wrongPattern')}
+              {...register('email', {
+                required: true,
+                pattern: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
+              })}
+            />
             <TextInput
               label={t('username')}
-              placeholder={t('placeholders.inputPlaceholder', {
-                input: t('username'),
-              })}
+              placeholder={`${t('enterYour')} ${t('username')}...`}
               defaultValue='lioren'
               error={errors.username && t('wrongPattern')}
               {...register('username', {
@@ -129,9 +134,7 @@ export default function SignUp() {
             />
             <TextInput
               label={t('name')}
-              placeholder={t('placeholders.inputPlaceholder', {
-                input: t('name'),
-              })}
+              placeholder={`${t('enterYour')} ${t('name')}...`}
               defaultValue='Lior Oren'
               error={errors.name && t('wrongPattern')}
               {...register('name', {
@@ -140,22 +143,8 @@ export default function SignUp() {
               })}
             />
             <TextInput
-              label={t('email')}
-              placeholder={t('placeholders.inputPlaceholder', {
-                input: t('email'),
-              })}
-              defaultValue='lior.oren06@gmail.com'
-              error={errors.email && t('wrongPattern')}
-              {...register('email', {
-                required: true,
-                pattern: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
-              })}
-            />
-            <TextInput
               label={t('phone')}
-              placeholder={t('placeholders.inputPlaceholder', {
-                input: t('phone'),
-              })}
+              placeholder={`${t('enterYour')} ${t('phone')}...`}
               defaultValue='+9720548853393'
               error={errors.phone && t('wrongPattern')}
               {...register('phone', {
@@ -165,9 +154,7 @@ export default function SignUp() {
             />
             <PasswordInput
               label={t('password')}
-              placeholder={t('placeholders.inputPlaceholder', {
-                input: t('password'),
-              })}
+              placeholder={`${t('enterYour')} ${t('password')}...`}
               defaultValue='123456'
               error={errors.password && t('wrongPattern')}
               mt='md'

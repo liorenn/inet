@@ -13,17 +13,20 @@ export default function WebsiteStatistics({
 
   useEffect(() => {
     if (accessKey && accessKey < managerAccessKey) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       router.push('/')
     }
-  }, [accessKey])
+  }, [accessKey, router])
 
   useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (e.data.event === 'posthog:dimensions') {
         const iframe = document.getElementById(
           'posthog-iframe'
         ) as HTMLIFrameElement
         if (iframe && e.source === iframe.contentWindow) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
           iframe.style.height = `${e.data.height}px`
         }
       }

@@ -1,5 +1,4 @@
 import { Device, User } from '@prisma/client'
-import useTranslation from 'next-translate/useTranslation'
 import { formUser } from '../components/admin/UserManagement'
 import { deviceSchemaType, userSchemaType } from './schemas'
 import { formDevice } from '../components/admin/DeviceManagement'
@@ -11,7 +10,6 @@ type userField = {
 }
 
 export function getUserFields() {
-  const { t } = useTranslation('translations')
   const fields: userField[] = [
     {
       disabled: true,
@@ -36,7 +34,7 @@ export function getUserFields() {
 
   fields.forEach(({ name, regex }) => {
     validators[name] = (value: string | number) =>
-      regex.test(value.toString()) ? null : `${t(name)} is not valid`
+      regex.test(value.toString()) ? null : `${name} is not valid`
   })
 
   const defaultValues = {
@@ -65,7 +63,6 @@ type deviceField = {
 }
 
 export function getDevicesFields() {
-  const { t } = useTranslation('translations')
   const stringRegex = /^[A-Za-z0-9 _,]{3,}$/
   const nullableStringRegex = /^([A-Za-z0-9 _,]{3,})?$/
   const floatRegex = /^[+-]?\d*\.?\d+$/
@@ -175,7 +172,7 @@ export function getDevicesFields() {
 
   fields.forEach(({ name, regex }) => {
     validators[name] = (value: string | number) =>
-      regex.test(value.toString()) ? null : `${t(name)} is not valid`
+      regex.test(value.toString()) ? null : `${name} is not valid`
   })
 
   const defaultValues: formDevice = {

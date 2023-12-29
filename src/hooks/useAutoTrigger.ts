@@ -11,7 +11,7 @@ const useAutoTrigger = () => {
       console.log('triggered function')
       Cookies.set('triggeredFunction', true, { expires: 7 })
     }
-  }, [])
+  }, [mutate])
 }
 
 export default useAutoTrigger

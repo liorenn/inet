@@ -1,21 +1,16 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import {
   Paper,
   Group,
   Text,
   ActionIcon,
   Avatar,
-  Image,
   TextInput,
   Grid,
 } from '@mantine/core'
 import { Tooltip, Rating } from '@mantine/core'
 import type { Comment } from '@prisma/client'
-import {
-  IconTrash,
-  IconPencil,
-  IconCornerUpLeft,
-  IconCheck,
-} from '@tabler/icons'
+import { IconTrash, IconPencil, IconCheck } from '@tabler/icons'
 import { useState } from 'react'
 import { trpc } from '../../misc/trpc'
 import {

@@ -1,10 +1,9 @@
 import DevicePhotos from './DevicePhotos'
 import { Card, Button, Grid, Text, Space } from '@mantine/core'
 import type { DeviceType, devicePropertiesType } from '../../models/deviceTypes'
-import Link from 'next/link'
-import { useUser } from '@supabase/auth-helpers-react'
 import useTranslation from 'next-translate/useTranslation'
 import FavoritesButtons from '../misc/FavoritesButtons'
+import Link from 'next/link'
 
 type AppProps = {
   device: devicePropertiesType
@@ -12,7 +11,6 @@ type AppProps = {
 }
 
 export default function DeviceCard({ device, deviceType }: AppProps) {
-  const user = useUser()
   const { t } = useTranslation('translations')
 
   return (

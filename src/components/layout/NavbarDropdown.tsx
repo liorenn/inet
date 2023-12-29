@@ -60,6 +60,7 @@ function NavBarDropdown({ AccessKey }: { AccessKey: number | undefined }) {
             href={link.href}
             onClick={() => {
               link.title === t('signOut') && signOut()
+              setActiveLink(link.title)
               setOpened(false)
             }}
             key={link.title}>

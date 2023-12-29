@@ -33,7 +33,7 @@ function ModelPage() {
     if (userDetails) {
       setUsername(userDetails.username)
     }
-  }, [userDetails])
+  }, [setUsername, userDetails])
 
   useEffect(() => {
     if (!captured && deviceDetails) {
@@ -42,7 +42,7 @@ function ModelPage() {
       })
       setCaptured(true)
     }
-  }, [deviceDetails])
+  }, [captured, deviceDetails, posthog])
 
   if (deviceDetails === undefined) {
     return <Loader />

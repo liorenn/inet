@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Center,
   Container,
@@ -25,6 +30,7 @@ export default function DatabaseViewer({ accessKey }: { accessKey: number }) {
   const [tableData, setTableData] = useState<string[][]>([])
 
   if (accessKey < managerAccessKey) {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     router.push('/')
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Device } from '@prisma/client'
 import { Html, Preview, Link, Text } from '@react-email/components'
 import { Body, Container, Head, Hr } from '@react-email/components'

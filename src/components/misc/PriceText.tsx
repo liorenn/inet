@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { useState, useEffect } from 'react'
 import { convertPrice } from '../../misc/functions'
 import { useCurrency } from '../../hooks/useCurrency'
@@ -9,11 +10,6 @@ export default function PriceText({ priceString }: { priceString: string }) {
   const [prevCurrency, setPrevCurrency] = useState<string | undefined>(
     undefined
   )
-  async function setNewPrice(currencyValue: string) {
-    const newPrice = await convertPrice(price, 'USD', currencyValue)
-    setPrice(newPrice)
-    setPrevCurrency(currencyValue)
-  }
 
   useEffect(() => {
     if (!currency) return
@@ -27,7 +23,14 @@ export default function PriceText({ priceString }: { priceString: string }) {
         setPrevCurrency(currency.value)
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency])
+
+  async function setNewPrice(currencyValue: string) {
+    const newPrice = await convertPrice(price, 'USD', currencyValue)
+    setPrice(newPrice)
+    setPrevCurrency(currencyValue)
+  }
 
   if (!currency) {
     return <Loader />

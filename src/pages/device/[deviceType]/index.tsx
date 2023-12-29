@@ -6,12 +6,12 @@ import Head from 'next/head'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { usePostHog } from 'posthog-js/react'
+import Loader from '../../../components/layout/Loader'
 import type {
   DeviceType,
   devicePropertiesType,
 } from '../../../models/deviceTypes'
-import { usePostHog } from 'posthog-js/react'
-import Loader from '../../../components/layout/Loader'
 
 type devicesType = {
   isInList?: boolean
@@ -51,7 +51,7 @@ export default function DeviceTypePage() {
         })
       )
     }
-  }, [])
+  }, [userDevicesQuery?.deviceList])
 
   useEffect(() => {
     if (devicesQuery) {
@@ -63,7 +63,7 @@ export default function DeviceTypePage() {
       })
       setCaptured(true)
     }
-  }, [devicesQuery])
+  }, [captured, deviceType, devicesQuery, posthog])
 
   if (!devices) return <Loader />
 

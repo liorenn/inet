@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { IconCalendarTime, IconCpu, IconTypography } from '@tabler/icons'
 import { IconCoin, IconBrandApple, IconBattery3 } from '@tabler/icons'
-import { Grid, Card, Text, Group, Title, Stack } from '@mantine/core'
+import { Grid, Card, Text, Title, Stack } from '@mantine/core'
 import type { Device } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
 import { FormatDate } from '../../misc/functions'

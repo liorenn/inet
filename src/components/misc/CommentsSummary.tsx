@@ -6,6 +6,7 @@ import { useComments } from '../../hooks/useComments'
 
 export default function CommentsSummary() {
   const { t } = useTranslation('translations')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_scroll, scrollTo] = useWindowScroll()
   const { commentsAmout, ratingValue } = useComments()
   return (

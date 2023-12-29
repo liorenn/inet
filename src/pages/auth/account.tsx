@@ -12,14 +12,13 @@ import ImageUploader from '../../components/misc/UploadAvatar'
 import useTranslation from 'next-translate/useTranslation'
 import Loader from '../../components/layout/Loader'
 import { supabase } from '../../server/supabase'
-import {
+import type {
   updatePropertiesType,
   userSchemaType,
-  updatePropertiesSchema,
   updatePropertiesObjectType,
 } from '../../models/schemas'
+import { updatePropertiesSchema } from '../../models/schemas'
 import React from 'react'
-import { useProfilePicture } from '../../hooks/useProfilePicture'
 
 export default function Account() {
   const user = useUser()
@@ -50,11 +49,12 @@ export default function Account() {
         }
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
-  supabase.auth.onAuthStateChange((_event, session) => {
+  supabase.auth.onAuthStateChange(async (_event, session) => {
     if (!session) {
-      router.push('/')
+      await router.push('/')
     }
   })
 
@@ -156,7 +156,7 @@ export default function Account() {
           </div>
           <Divider />
           {updatePropertiesSchema._def.values.map((property, index) => (
-            <React.Fragment key={property}>
+            <React.Fragment key={index}>
               <SimpleGrid cols={3} sx={{ paddingLeft: 5, paddingRight: 5 }}>
                 <Text
                   sx={{ fontSize: 18, paddingTop: 6 }}
@@ -171,18 +171,15 @@ export default function Account() {
                       [property]: e.target.value,
                     }))
                   }
-                  placeholder={t('placeholders.inputPlaceholder', {
-                    input: t(property),
-                  })}
+                  placeholder={`${t('enterYour')} ${t(property)}...`}
                   value={inputs[property]}
                   radius='md'
                   size='md'
                 />
                 <UnstyledButton
-                  onClick={async () => {
-                    try {
-                      await updateProperty(property, account)
-                    } catch (error) {}
+                  onClick={() => {
+                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                    updateProperty(property, account)
                   }}>
                   <Text
                     sx={{ fontSize: 18 }}

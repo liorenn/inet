@@ -1,4 +1,4 @@
-import { XMLBuilder, XMLParser } from 'fast-xml-parser'
+import { XMLParser } from 'fast-xml-parser'
 
 export const soapRequestHeaders = {
   'Content-Type': 'text/xml;charset=UTF-8',
@@ -23,9 +23,12 @@ export function createSoapRequestXml(
   `
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getResultFromResponse(Method: string, xml: any): string {
   const parser = new XMLParser()
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
   const json = parser.parse(xml)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
   return json['soap:Envelope']['soap:Body'][`${Method} Response`][
     `${Method} Result`
   ]

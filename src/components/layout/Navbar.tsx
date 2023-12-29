@@ -36,6 +36,7 @@ export const Navbar = () => {
   const { classes } = useStyles()
   const { lang } = useTranslation()
   const { t } = useTranslation('translations')
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const { imagePath, imageExists, setImageExists, setImagePath } =
     useProfilePicture()
@@ -55,6 +56,7 @@ export const Navbar = () => {
         (lang) => lang.value === localStorage.getItem('language')
       ) ?? languages[0]
     )
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     setLanguage(localStorage.getItem('language') ?? 'en')
     setCurrency(
       currencies.find(
@@ -64,6 +66,7 @@ export const Navbar = () => {
     supabase.auth.onAuthStateChange((_e, session) => {
       setSession(session)
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -80,6 +83,7 @@ export const Navbar = () => {
         }
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, imageExists, imagePath])
 
   async function signOut() {
@@ -181,6 +185,7 @@ export const Navbar = () => {
                 color='gray'
                 radius='md'
                 className={classes.end}
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onClick={() => signOut()}>
                 {t('signOut')}
               </Button>
@@ -260,6 +265,7 @@ export const Navbar = () => {
                     )
                   }
                   onClick={() => {
+                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
                     setLanguage(language.value)
                     setlanguageStore(language)
                   }}>

@@ -15,11 +15,5 @@
     "project": "./tsconfig.json"
   },
   "plugins": ["@typescript-eslint"],
-  "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended"],
-  "rules": {
-    "@typescript-eslint/consistent-type-imports": "warn",
-    "@typescript-eslint/no-unsafe-assignment": "off",
-    "@typescript-eslint/no-misused-promises": "off",
-    "@typescript-eslint/restrict-plus-operands": "off"
-  }
+  "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended"]
 }

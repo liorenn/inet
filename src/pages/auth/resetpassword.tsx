@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Title, Text, Container, Button } from '@mantine/core'
@@ -113,7 +114,7 @@ export default function ResetPassword() {
         <Title
           align='center'
           sx={(theme) => ({
-            fontFamily: `Greycliff CF, ${theme.fontFamily}`,
+            fontFamily: `Greycliff CF, ${theme.fontFamily ?? ''}`,
             fontWeight: 900,
           })}>
           {currentForm === 'email'

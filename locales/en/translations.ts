@@ -62,10 +62,7 @@ export default {
   accountCreatedSuccessfully: 'Account Created Successfully',
   accountInformation: 'Account Information',
   accountInformationDescription: 'update and change your account information',
-  placeholders: {
-    inputPlaceholder: 'Enter Your {{input}}...',
-    selectDevice: 'Select {{input}} For Comparison',
-  },
+  enterYour: 'Enter Your',
   welcomeBack: 'Welcome Back',
   dontHaveAnAccount: "Don't Have An Account?",
   viaEmail: 'Via Email',

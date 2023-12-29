@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -96,9 +98,7 @@ export default function SignIn() {
             <TextInput
               label={t('email')}
               defaultValue='lior.oren06@gmail.com'
-              placeholder={t('placeholders.inputPlaceholder', {
-                input: t('email'),
-              })}
+              placeholder={`${t('enterYour')} ${t('email')}...`}
               error={errors.email && t('wrongPattern')}
               {...register('email', {
                 required: true,
@@ -108,9 +108,7 @@ export default function SignIn() {
             <PasswordInput
               label={t('password')}
               defaultValue='123456'
-              placeholder={t('placeholders.inputPlaceholder', {
-                input: t('password'),
-              })}
+              placeholder={`${t('enterYour')} ${t('password')}...`}
               error={errors.password && t('wrongPattern')}
               mt='md'
               {...register('password', {

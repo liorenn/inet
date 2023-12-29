@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import multer from 'multer'
 import { NextApiRequest, NextApiResponse } from 'next'
 
@@ -16,7 +20,7 @@ const uploadProvider = multer({
   }),
 })
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const upload = uploadProvider.single('file')
     upload(req as any, res as any, (err: any) => {
