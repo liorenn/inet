@@ -2,8 +2,13 @@
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import React from 'react'
-import { trpc } from '../misc/trpc'
+import { trpc } from '../../misc/trpc'
 import useTranslation from 'next-translate/useTranslation'
+import Loader from '../../components/layout/Loader'
+import { useRouter } from 'next/router'
+import DevicePhotos from '../../components/device/DevicePhotos'
+import DevicesSpecs from '../../components/device/DevicesSpecs'
+import { z } from 'zod'
 import {
   Container,
   Group,
@@ -11,11 +16,6 @@ import {
   Select,
   SimpleGrid,
 } from '@mantine/core'
-import Loader from '../components/layout/Loader'
-import { useRouter } from 'next/router'
-import { z } from 'zod'
-import DevicePhotos from '../components/device/DevicePhotos'
-import DevicesSpecs from '../components/device/DevicesSpecs'
 
 const Buttons = [
   { label: 'Two Devices', value: '2' },

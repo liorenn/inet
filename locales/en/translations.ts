@@ -204,4 +204,5 @@ export default {
   imac: 'iMac',
   macbook: 'MacBook',
   configsEditor: 'Configurations Editor',
+  find: 'Find Your Device',
 }

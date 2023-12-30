@@ -210,4 +210,5 @@ export default {
   macbook: 'MacBook',
   enterYour: 'Geben Sie Ihre',
   configsEditor: 'Konfigurationen Editor',
+  find: 'Finden Sie Ihr Gerät',
 }

@@ -114,13 +114,22 @@ export const Navbar = () => {
           </Link>
         </Group>
         <Group spacing={5} className={classes.buttons}>
-          <Link href={'/compare'}>
+          <Link href={'/device/compare'}>
             <Button
               variant='light'
               color='gray'
               radius='md'
               className={classes.end}>
               {t('compare')}
+            </Button>
+          </Link>
+          <Link href={'/device/find'}>
+            <Button
+              variant='light'
+              color='gray'
+              radius='md'
+              className={classes.end}>
+              {t('find')}
             </Button>
           </Link>
           <Link href={'/device'}>
@@ -133,7 +142,7 @@ export const Navbar = () => {
             </Button>
           </Link>
           {session && (
-            <Link href={'/favorites'}>
+            <Link href={'/device/favorites'}>
               <Button
                 variant='light'
                 color='gray'

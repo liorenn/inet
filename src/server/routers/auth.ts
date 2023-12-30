@@ -2,6 +2,9 @@ import { Prisma } from '@prisma/client'
 import { Resend } from 'resend'
 import { sendSoapRequest, resendKey, fromEmail } from '../../../config'
 import PriceDropEmail from '../../components/misc/PriceDropEmail'
+import { router, publicProcedure } from '../trpc'
+import { readFileSync, writeFileSync } from 'fs'
+import { z } from 'zod'
 import {
   fetchCurrentPrice,
   calculatePercentageDiff,
@@ -16,9 +19,6 @@ import {
   insertUserSoap,
   updateUserSoap,
 } from '../soapFunctions'
-import { router, publicProcedure } from '../trpc'
-import { z } from 'zod'
-import { readFileSync, writeFileSync } from 'fs'
 
 export const authRouter = router({
   getConfigs: publicProcedure.query(() => {

@@ -3,7 +3,7 @@ import { trpc } from '../../misc/trpc'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { managerAccessKey } from '../../../config'
 import Loader from '../layout/Loader'
-import { SimpleGrid, TextInput, Button, Group } from '@mantine/core'
+import { SimpleGrid, TextInput, Button } from '@mantine/core'
 import { CreateNotification } from '../../misc/functions'
 
 export default function ConfigsEditor({ accessKey }: { accessKey: number }) {

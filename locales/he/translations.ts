@@ -205,4 +205,5 @@ export default {
   macbook: 'MacBook',
   enterYour: 'Enter your',
   configsEditor: 'עורך קונפיגיורציות',
+  find: 'מצא את המכשיר שלך',
 }

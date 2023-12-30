@@ -1,4 +1,12 @@
-import { Button, Text, Title, Input, Card, SimpleGrid } from '@mantine/core'
+import {
+  Button,
+  Text,
+  Title,
+  Input,
+  Card,
+  SimpleGrid,
+  SegmentedControl,
+} from '@mantine/core'
 import { Stack, Container } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 import Head from 'next/head'
