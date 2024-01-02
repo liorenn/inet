@@ -2,7 +2,7 @@
 import { Device } from '@prisma/client'
 import { Html, Preview, Link, Text } from '@react-email/components'
 import { Body, Container, Head, Hr } from '@react-email/components'
-import { websiteUrl } from '../../../config'
+import { developmentWebsiteUrl } from '../../../config'
 import * as React from 'react'
 
 type PriceDropEmailProps = {
@@ -41,7 +41,8 @@ export default function PriceDropEmail({
             most demanding tasks with ease. Don't miss out on this chance to
             finally get your hands on the {device.name} at an amazing price.
             This offer won't last forever, so head over to{' '}
-            <Link href={`${websiteUrl}/device/${device.type}/${device.model}`}>
+            <Link
+              href={`${developmentWebsiteUrl}/device/${device.type}/${device.model}`}>
               Click me
             </Link>{' '}
             now and make it yours! But hurry! This price drop is only for a
