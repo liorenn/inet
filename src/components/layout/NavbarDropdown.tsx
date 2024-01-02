@@ -6,7 +6,9 @@ import useTranslation from 'next-translate/useTranslation'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { CreateNotification } from '../../misc/functions'
 
-function NavBarDropdown({ AccessKey }: { AccessKey: number | undefined }) {
+type props = { AccessKey: number | undefined }
+
+function NavBarDropdown({ AccessKey }: props) {
   const { t } = useTranslation('translations')
   const [activeLink, setActiveLink] = useState('Settings')
   const [opened, setOpened] = useState(false)

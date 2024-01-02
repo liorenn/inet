@@ -12,6 +12,7 @@ import { trpc } from '../../misc/trpc'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { z } from 'zod'
+import Head from 'next/head'
 
 export default function Admin() {
   const user = useUser()
@@ -51,6 +52,12 @@ export default function Admin() {
 
   return (
     <>
+      <Head>
+        <title>
+          {buttons.find((b) => b.value === button)?.label ??
+            t('deviceManagement')}
+        </title>
+      </Head>
       {accessKey ? (
         <Container size='xl'>
           <ScrollArea>

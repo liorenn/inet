@@ -1,14 +1,14 @@
 import { Container, SimpleGrid } from '@mantine/core'
 import { useUser } from '@supabase/auth-helpers-react'
 import React, { useEffect, useState } from 'react'
-import type { devicePropertiesType } from '../models/deviceTypes'
-import ListCard from '../components/device/DeviceListCard'
+import type { devicePropertiesType } from '../../models/deviceTypes'
+import ListCard from '../../components/device/DeviceListCard'
 import useTranslation from 'next-translate/useTranslation'
-import Loader from '../components/layout/Loader'
-import { trpc } from '../misc/trpc'
+import Loader from '../../components/layout/Loader'
+import { trpc } from '../../misc/trpc'
 import Head from 'next/head'
 
-export default function Favorites(): JSX.Element {
+export default function Favorites() {
   const user = useUser()
   const { t } = useTranslation('translations')
   const { data } = trpc.device.getUserDevices.useQuery({

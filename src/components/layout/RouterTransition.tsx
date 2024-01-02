@@ -1,4 +1,3 @@
-// components/RouterTransition.tsx
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import {
@@ -7,7 +6,7 @@ import {
   NavigationProgress,
 } from '@mantine/nprogress'
 
-export function RouterTransition() {
+export default function RouterTransition() {
   const router = useRouter()
 
   useEffect(() => {

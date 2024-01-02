@@ -1,95 +1,95 @@
-import { Container, Group, SegmentedControl, Stack, Text } from '@mantine/core'
+import { Container, SegmentedControl, Stack, Text } from '@mantine/core'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import Head from 'next/head'
 import { z } from 'zod'
 
 type inputType = { value: string; label: string }[]
-function generateUrlString(buttons: string[][]) {
-  return `?preferences=${buttons
-    .map(([key, value]) => {
-      return `${key}-${value}`
+type preferenceType = {
+  name: string
+  value: string
+}
+
+const preferencesNames = ['display', 'battery', 'price']
+const inputsNames = ['a', 'b', 'c', 'd']
+
+function generateUrlString(preferences: preferenceType[]) {
+  return `?preferences=${preferences
+    .map((preference) => {
+      return `${preference.name}-${preference.value}`
     })
     .join(',')}`
 }
 
 export default function Find() {
+  const inputs = Array.from({ length: 3 }, () =>
+    inputsNames.map((value) => ({ value, label: value }))
+  )
   const router = useRouter()
-  console.log(router.query)
-  const buttons = z
+  const preferences = z
     .string()
-    .parse(router.query.preferences ?? '')
+    .parse(
+      router.query.preferences ??
+        generateUrlString(preferencesNames.map((name) => ({ name, value: '' })))
+    )
     .split(',')
-    .map((value) => value.split('-'))
+    .map((value) => {
+      return { name: value.split('-')[0], value: value.split('-')[1] }
+    })
 
   useEffect(() => {
-    if (!router.query.deviceList) {
+    if (!router.query.preferences) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       router.push(
-        generateUrlString([
-          ['display', ''],
-          ['battery', ''],
-          ['price', ''],
-        ])
+        generateUrlString(preferencesNames.map((name) => ({ name, value: '' })))
       )
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [router])
 
-  const inputs: inputType[] = [
-    [
-      { value: 'small', label: 'small' },
-      { value: 'medium', label: 'medium' },
-      { value: 'large', label: 'large' },
-    ],
-    [
-      { value: 'small', label: 'small' },
-      { value: 'medium', label: 'medium' },
-      { value: 'large', label: 'large' },
-    ],
-    [
-      { value: 'small', label: 'small' },
-      { value: 'medium', label: 'medium' },
-      { value: 'large', label: 'large' },
-    ],
-  ]
+  console.log(preferences)
 
   return (
-    <Container size={1000}>
-      {buttons.length > 0 &&
-        inputs.map((input, index) => (
-          <PreferenceInput
-            value={input}
-            buttons={buttons}
-            index={index}
-            key={index}
-          />
-        ))}
-    </Container>
+    <>
+      <Head>
+        <title>Find</title>
+      </Head>
+      <Container size={1000}>
+        {preferences &&
+          inputs.map((input: inputType, index: number) => (
+            <PreferenceInput
+              value={input}
+              preferences={preferences}
+              index={index}
+              key={index}
+            />
+          ))}
+      </Container>
+    </>
   )
 }
 
 type preferenceInputType = {
   value: inputType
   index: number
-  buttons: string[][]
+  preferences: preferenceType[]
 }
 
-function PreferenceInput({ value, index, buttons }: preferenceInputType) {
+function PreferenceInput({ value, index, preferences }: preferenceInputType) {
   const router = useRouter()
+  //console.log(preferences[index].value)
   return (
     <>
       <Stack mt='md' spacing={0}>
-        <Text>{buttons[index][0]}</Text>
+        <Text>{preferences[index].name}</Text>
         <SegmentedControl
           data={value}
           defaultValue=''
-          value={buttons[index][1]}
-          onChange={(newValue) => {
-            const x = buttons
-            x[index][1] = newValue
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            router.push(generateUrlString(x))
-          }}
+          value={preferences[index].value}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onChange={(newValue) => (
+            (preferences[index].value = newValue),
+            router.push(generateUrlString(preferences))
+          )}
         />
       </Stack>
     </>

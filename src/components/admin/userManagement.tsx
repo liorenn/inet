@@ -16,7 +16,11 @@ export type formUser = {
   [K in keyof User]: string
 }
 
-export default function UserManagement({ accessKey }: { accessKey: number }) {
+type props = {
+  accessKey: number
+}
+
+export default function UserManagement({ accessKey }: props) {
   const router = useRouter()
   const { t } = useTranslation('translations')
   const [users, setUsers] = useState<formUser[]>([])
@@ -66,11 +70,11 @@ export default function UserManagement({ accessKey }: { accessKey: number }) {
   )
 }
 
-function InsertRow({
-  setUsers,
-}: {
+type insertRowProps = {
   setUsers: Dispatch<SetStateAction<formUser[]>>
-}) {
+}
+
+function InsertRow({ setUsers }: insertRowProps) {
   const os = useOs()
   const { t } = useTranslation('translations')
   const [loading, setLoading] = useState(false)
@@ -138,13 +142,12 @@ function InsertRow({
   )
 }
 
-function UserRow({
-  data,
-  setUsers,
-}: {
+type userRowProps = {
   data: formUser
   setUsers: Dispatch<SetStateAction<formUser[]>>
-}) {
+}
+
+function UserRow({ data, setUsers }: userRowProps) {
   const os = useOs()
   const { t } = useTranslation('translations')
   const [editMode, setEditMode] = useState(false)

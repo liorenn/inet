@@ -29,7 +29,7 @@ import useAutoTrigger from '../../hooks/useAutoTrigger'
 import { useProfilePicture } from '../../hooks/useProfilePicture'
 import { useSpotlight } from '@mantine/spotlight'
 
-export const Navbar = () => {
+export default function Navbar() {
   useAutoTrigger()
   const user = useUser()
   const posthog = usePostHog()

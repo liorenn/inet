@@ -1,13 +1,20 @@
-import { Device, User } from '@prisma/client'
-import { formUser } from '../components/admin/UserManagement'
+import type { formUser } from '../components/admin/UserManagement'
+import type { formDevice } from '../components/admin/DeviceManagement'
 import { deviceSchemaType, userSchemaType } from './schemas'
-import { formDevice } from '../components/admin/DeviceManagement'
+import { Device, User } from '@prisma/client'
 
 type userField = {
   name: keyof User
   regex: RegExp
   disabled?: boolean
 }
+
+const nullableStringRegex = /^([A-Za-z0-9 _,]{3,})?$/
+const floatRegex = /^[+-]?\d*\.?\d+$/
+const nullableFloatRegex = /^([+-]?\d*\.?\d+)?$/
+const stringRegex = /^[A-Za-z0-9 _,]{3,}$/
+const booleanRegex = /^(true|false)?$/
+const numberRegex = /^(-?\d+)?$/
 
 export function getUserFields() {
   const fields: userField[] = [
@@ -63,12 +70,6 @@ type deviceField = {
 }
 
 export function getDevicesFields() {
-  const stringRegex = /^[A-Za-z0-9 _,]{3,}$/
-  const nullableStringRegex = /^([A-Za-z0-9 _,]{3,})?$/
-  const floatRegex = /^[+-]?\d*\.?\d+$/
-  const nullableFloatRegex = /^([+-]?\d*\.?\d+)?$/
-  const booleanRegex = /^(true|false)?$/
-  const numberRegex = /^(-?\d+)?$/
   const fields: deviceField[] = [
     {
       disabled: true,

@@ -6,7 +6,78 @@ import Loader from '../layout/Loader'
 import { SimpleGrid, TextInput, Button } from '@mantine/core'
 import { CreateNotification } from '../../misc/functions'
 
-export default function ConfigsEditor({ accessKey }: { accessKey: number }) {
+const breakpoints = [
+  { minWidth: 300, cols: 1 },
+  { minWidth: 500, cols: 2 },
+  { minWidth: 800, cols: 3 },
+]
+
+type props = {
+  accessKey: number
+}
+
+type configType = {
+  name: string
+  value: string
+}
+
+function isStringBoolean(value: string) {
+  return value === 'true' || value === 'false'
+}
+
+function isStringNumber(value: string) {
+  return !Number.isNaN(Number(value))
+}
+
+type validationType = 'number' | 'boolean' | 'string'
+const stringRegex = /^[A-Za-z0-9 _,/@.:?]{3,}$/
+const booleanRegex = /^(true|false)?$/
+const numberRegex = /^-?\d+$/
+
+function validateString(value: string, validation: validationType) {
+  switch (validation) {
+    case 'number':
+      return numberRegex.test(value) ? null : 'Must be a number'
+    case 'boolean':
+      return booleanRegex.test(value) ? null : 'Must be a boolean'
+    case 'string':
+      return stringRegex.test(value) ? null : 'Must be a string'
+    default:
+      return null
+  }
+}
+
+function getValidation(value: string): validationType {
+  return isStringNumber(value)
+    ? 'number'
+    : isStringBoolean(value)
+    ? 'boolean'
+    : 'string'
+}
+
+function getConfigsArray(configs: string) {
+  return configs
+    .replace(/\r?\n|\'|\s+/g, '')
+    .split('exportconst')
+    .map((value) => {
+      return { name: value.split('=')[0], value: value.split('=')[1] }
+    })
+    .filter((value) => value.value !== undefined)
+}
+
+function stringifyConfigsArray(configsArray: configType[]): string {
+  return configsArray
+    .map((value) => {
+      const parsedValue =
+        isStringNumber(value.value) || isStringBoolean(value.value)
+          ? value.value
+          : `'${value.value}'`
+      return `export const ${value.name} = ${parsedValue}\r\n`
+    })
+    .join('')
+}
+
+export default function ConfigsEditor({ accessKey }: props) {
   const router = useRouter()
   useEffect(() => {
     if (accessKey && accessKey < managerAccessKey) {
@@ -17,7 +88,7 @@ export default function ConfigsEditor({ accessKey }: { accessKey: number }) {
   const { data } = trpc.auth.getConfigs.useQuery()
   const { mutate } = trpc.auth.saveConfigs.useMutation()
   const { mutate: sendEmails } = trpc.auth.sendPriceDropsEmails.useMutation()
-  const [configs, setConfigs] = useState<string[][]>([])
+  const [configs, setConfigs] = useState<configType[]>([])
 
   useEffect(() => {
     if (data) {
@@ -25,49 +96,37 @@ export default function ConfigsEditor({ accessKey }: { accessKey: number }) {
     }
   }, [data, router])
 
-  if (!data) return <Loader />
-
-  function getConfigsArray(configs: string) {
-    return configs
-      .replace(/\r?\n|\'|\s+/g, '')
-      .split('exportconst')
-      .map((value) => value.split('='))
-      .filter((value) => value.length > 1)
-  }
-
-  function isBooleanString(value: string): value is 'true' | 'false' {
-    return value === 'true' || value === 'false'
-  }
-
-  function stringifyConfigsArray(configsArray: string[][]): string {
-    return configsArray
-      .map(([key, value]) => {
-        const parsedValue =
-          !Number.isNaN(Number(value)) || isBooleanString(value)
-            ? value
-            : `'${value}'`
-        return `export const ${key} = ${parsedValue}\r\n`
+  function validateValues(values: configType[]) {
+    if (!data) return false
+    return values
+      .map((value, index) => {
+        return validateString(
+          value.value,
+          getValidation(getConfigsArray(data)[index].value)
+        )
       })
-      .join('')
+      .every((value) => value === null)
   }
 
   function saveConfigs() {
-    console.log(stringifyConfigsArray(configs))
-    mutate({ configs: stringifyConfigsArray(configs) })
-    //router.reload()
+    if (validateValues(configs)) {
+      mutate({ configs: stringifyConfigsArray(configs) })
+      //router.reload()
+    }
   }
 
-  const breakpoints = [
-    { minWidth: 300, cols: 1 },
-    { minWidth: 500, cols: 2 },
-    { minWidth: 800, cols: 3 },
-  ]
+  if (!data) return <Loader />
 
   return (
     <>
       <SimpleGrid breakpoints={breakpoints}>
         {configs.map((config, index) => (
-          <ConfigInput key={index} config={config} setConfigs={setConfigs} />
+          <ConfigInput
+            key={index}
+            config={config}
+            originalValue={getConfigsArray(data)[index].value}
+            setConfigs={setConfigs}
+          />
         ))}
       </SimpleGrid>
       <SimpleGrid breakpoints={breakpoints} mt='md'>
@@ -118,20 +177,26 @@ export default function ConfigsEditor({ accessKey }: { accessKey: number }) {
 }
 
 type configInputProps = {
-  config: string[]
-  setConfigs: Dispatch<SetStateAction<string[][]>>
+  config: configType
+  originalValue: string
+  setConfigs: Dispatch<SetStateAction<configType[]>>
 }
 
-function ConfigInput({ config, setConfigs }: configInputProps) {
+function ConfigInput({ config, originalValue, setConfigs }: configInputProps) {
+  const validation = getValidation(originalValue)
+
   return (
     <TextInput
       placeholder='Enter Config Value...'
-      label={config[0]}
-      value={config[1]}
+      label={config.name}
+      value={config.value}
+      error={validateString(config.value, validation)}
       onChange={(event) =>
         setConfigs((prev) =>
           prev.map((value) =>
-            value[0] === config[0] ? [config[0], event.target.value] : value
+            value.name === config.name
+              ? { name: config.name, value: event.target.value }
+              : value
           )
         )
       }

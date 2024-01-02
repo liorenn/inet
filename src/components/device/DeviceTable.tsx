@@ -8,12 +8,12 @@ import type {
   specsType,
 } from '../../models/SpecsFormatter'
 
-type TableProps = {
+type props = {
   specs: specsType
   name: string
 }
 
-export default function DeviceTable({ specs, name }: TableProps) {
+export default function DeviceTable({ specs, name }: props) {
   const { t } = useTranslation('translations')
 
   if (name === 'cameras') {

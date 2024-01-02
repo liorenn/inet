@@ -14,11 +14,11 @@ import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useComments } from '../../hooks/useComments'
 
-type Props = {
+type props = {
   device: Device
 }
 
-export default function Comments({ device }: Props) {
+export default function Comments({ device }: props) {
   const user = useUser()
   const [text, setText] = useState('')
   const [rating, setRating] = useState(0)

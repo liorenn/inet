@@ -6,13 +6,13 @@ import { useViewportSize } from '@mantine/hooks'
 import useTranslation from 'next-translate/useTranslation'
 import { devicePropertiesType } from '../../models/deviceTypes'
 
-type Props = {
+type props = {
   device: devicePropertiesType
   miniphotos: boolean
   withName?: boolean
 }
 
-function DevicePhotos({ device, miniphotos, withName }: Props) {
+function DevicePhotos({ device, miniphotos, withName }: props) {
   const [activeLink, setActiveLink] = useState(
     `/images/${device.type}/${device.model}_1.png`
   )

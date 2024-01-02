@@ -5,12 +5,12 @@ import useTranslation from 'next-translate/useTranslation'
 import FavoritesButtons from '../misc/FavoritesButtons'
 import Link from 'next/link'
 
-type AppProps = {
+type props = {
   device: devicePropertiesType
   deviceType: DeviceType
 }
 
-export default function DeviceCard({ device, deviceType }: AppProps) {
+export default function DeviceCard({ device, deviceType }: props) {
   const { t } = useTranslation('translations')
 
   return (

@@ -3,11 +3,11 @@ import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
 import { managerAccessKey } from '../../../config'
 
-export default function WebsiteStatistics({
-  accessKey,
-}: {
+type props = {
   accessKey: number
-}) {
+}
+
+export default function WebsiteStatistics({ accessKey }: props) {
   const router = useRouter()
   const { colorScheme } = useMantineColorScheme()
 

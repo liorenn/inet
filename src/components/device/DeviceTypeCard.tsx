@@ -1,11 +1,11 @@
 import { Card, Button, Image } from '@mantine/core'
 import Link from 'next/link'
 
-export default function DeviceTypeCard({
-  devicesType,
-}: {
+type props = {
   devicesType: string
-}) {
+}
+
+export default function DeviceTypeCard({ devicesType }: props) {
   return (
     <Card key={devicesType}>
       <Card.Section>

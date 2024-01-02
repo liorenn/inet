@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { useViewportSize } from '@mantine/hooks'
 import DevicesTable from './DevicesTable'
 
-type Props = {
+type props = {
   devices: deviceSpecsType[]
 }
 
@@ -24,7 +24,7 @@ const devicesSpecsCategories = [
   'availability',
 ]
 
-export default function DevicesSpecs({ devices }: Props) {
+export default function DevicesSpecs({ devices }: props) {
   const { t } = useTranslation('translations')
   const { colorScheme } = useMantineColorScheme()
   const { width } = useViewportSize()

@@ -4,11 +4,11 @@ import Link from 'next/link'
 import type { DeviceType } from '../../models/deviceTypes'
 import useTranslation from 'next-translate/useTranslation'
 
-export default function DeviceTypeHeader({
-  deviceType,
-}: {
+type props = {
   deviceType: DeviceType
-}) {
+}
+
+export default function DeviceTypeHeader({ deviceType }: props) {
   const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'
   const { t } = useTranslation('translations')

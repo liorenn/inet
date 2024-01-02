@@ -20,7 +20,11 @@ export type formDevice = {
   [K in keyof Device]: string
 }
 
-export default function DeviceManagement({ accessKey }: { accessKey: number }) {
+type props = {
+  accessKey: number
+}
+
+export default function DeviceManagement({ accessKey }: props) {
   const router = useRouter()
   const { t } = useTranslation('translations')
   const [devices, setDevices] = useState<formDevice[]>([])

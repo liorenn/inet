@@ -4,7 +4,9 @@ import type { Device } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
 import Link from 'next/link'
 
-export default function DeviceHeader({ device }: { device: Device }) {
+type props = { device: Device }
+
+export default function DeviceHeader({ device }: props) {
   const { colorScheme } = useMantineColorScheme()
   const { t } = useTranslation('translations')
   const dark = colorScheme === 'dark'

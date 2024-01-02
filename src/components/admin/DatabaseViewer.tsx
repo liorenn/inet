@@ -19,7 +19,11 @@ import { findObjectByPropertyValue } from '../../misc/functions'
 import { managerAccessKey } from '../../../config'
 import { useRouter } from 'next/router'
 
-export default function DatabaseViewer({ accessKey }: { accessKey: number }) {
+type props = {
+  accessKey: number
+}
+
+export default function DatabaseViewer({ accessKey }: props) {
   const user = useUser()
   const router = useRouter()
   const session = useSession()

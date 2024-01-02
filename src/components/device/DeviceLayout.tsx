@@ -7,11 +7,11 @@ import type { deviceSpecsType } from '../../models/SpecsFormatter'
 import FavoritesButtons from '../misc/FavoritesButtons'
 import useTranslation from 'next-translate/useTranslation'
 
-type Props = {
+type props = {
   device: deviceSpecsType
 }
 
-export default function DeviceLayout({ device }: Props) {
+export default function DeviceLayout({ device }: props) {
   const { t } = useTranslation('translations')
   return (
     <>

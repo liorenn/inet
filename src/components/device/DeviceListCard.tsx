@@ -6,7 +6,7 @@ import Link from 'next/link'
 import FavoritesButtons from '../misc/FavoritesButtons'
 import { Dispatch } from 'react'
 
-type AppProps = {
+type props = {
   device: devicePropertiesType
   deviceType: string
   setDevices: Dispatch<React.SetStateAction<devicePropertiesType[] | undefined>>
@@ -16,7 +16,7 @@ export default function DeviceListCard({
   device,
   deviceType,
   setDevices,
-}: AppProps) {
+}: props) {
   const { t } = useTranslation('translations')
 
   return (

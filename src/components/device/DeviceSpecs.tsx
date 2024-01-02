@@ -16,7 +16,9 @@ const deviceSpecsCategories = [
   'availability',
 ]
 
-export default function DeviceSpecs({ device }: { device: deviceSpecsType }) {
+type props = { device: deviceSpecsType }
+
+export default function DeviceSpecs({ device }: props) {
   const { t } = useTranslation('translations')
   const { colorScheme } = useMantineColorScheme()
   const dark = colorScheme === 'dark'

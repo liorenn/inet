@@ -1,13 +1,13 @@
 import { create } from 'zustand'
 
-type imageType = {
+type imageInfo = {
   imageExists: boolean
   imagePath: string
   setImageExists: (imageExists: boolean) => void
   setImagePath: (imagePath: string) => void
 }
 
-export const useProfilePicture = create<imageType>()((set) => ({
+export const useProfilePicture = create<imageInfo>()((set) => ({
   imageExists: false,
   imagePath: '',
   setImageExists(imageExists) {

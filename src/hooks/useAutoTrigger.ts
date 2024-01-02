@@ -7,7 +7,7 @@ const useAutoTrigger = () => {
   useEffect(() => {
     const existingCookie = Cookies.get('triggeredFunction')
     if (!existingCookie) {
-      mutate()
+      mutate({})
       console.log('triggered function')
       Cookies.set('triggeredFunction', true, { expires: 7 })
     }
