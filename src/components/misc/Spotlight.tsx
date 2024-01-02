@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { SpotlightProvider } from '@mantine/spotlight'
 import type { SpotlightAction } from '@mantine/spotlight'
+import { ReactNode, useMemo } from 'react'
+import { trpc } from '../../misc/trpc'
+import { Device } from '@prisma/client'
+import { NextRouter, useRouter } from 'next/router'
+import useTranslation from 'next-translate/useTranslation'
 import {
   IconSearch,
   IconDeviceTablet,
@@ -11,11 +16,6 @@ import {
   IconDeviceDesktop,
   IconDevicesPc,
 } from '@tabler/icons'
-import { ReactNode, useMemo } from 'react'
-import { trpc } from '../../misc/trpc'
-import { Device } from '@prisma/client'
-import { NextRouter, useRouter } from 'next/router'
-import useTranslation from 'next-translate/useTranslation'
 
 function createActionsArray(
   devices: Device[],
@@ -52,7 +52,7 @@ function getDeviceDescription(device: Device) {
 }
 
 function getActionIcon(deviceType: string) {
-  const size = 32
+  const size = 28
   switch (deviceType) {
     case 'iphone':
       return <IconDeviceMobile size={size} />
@@ -87,7 +87,7 @@ export function SpotlightControl({ children }: { children: ReactNode }) {
     <SpotlightProvider
       actions={actions}
       highlightColor='dark'
-      searchIcon={<IconSearch size='1.2rem' />}
+      searchIcon={<IconSearch size={22} stroke={2.8} />}
       searchPlaceholder={t('searchForDevice')}
       nothingFoundMessage={t('deviceNotFound')}
       limit={5}>

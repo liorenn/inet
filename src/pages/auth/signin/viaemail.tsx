@@ -4,21 +4,13 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Title, Text, Container, Button, SimpleGrid } from '@mantine/core'
 import { TextInput, Paper } from '@mantine/core'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { useForm } from 'react-hook-form'
-import type { SubmitHandler } from 'react-hook-form'
-import { CreateNotification } from '../../../misc/functions'
+import { useSession } from '@supabase/auth-helpers-react'
 import Head from 'next/head'
 import useTranslation from 'next-translate/useTranslation'
 
-type Inputs = {
-  email: string
-}
-
 export default function ViaEmail() {
   const router = useRouter()
-  const supabase = useSupabaseClient()
-  const [session, setSession] = useState(useSession())
+  const session = useState(useSession())
   const { t } = useTranslation('translations')
   const { t: commonT } = useTranslation('translations')
 
@@ -30,32 +22,20 @@ export default function ViaEmail() {
     }
   }, [session, router])
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>({})
-
-  supabase.auth.onAuthStateChange((_e, session) => {
-    if (session) {
-      setSession(session)
-    }
-  })
-
-  const onSubmit: SubmitHandler<Inputs> = async (fields) => {
-    //when form is submitted and passed validation
-    const { error } = await supabase.auth.signInWithOtp({
-      email: fields.email,
-      options: {
-        emailRedirectTo: 'http://localhost:3000/',
-      },
-    })
-    if (!error) {
-      CreateNotification(`${t('checkEmail')} ${fields.email}`, 'yellow')
-    } else {
-      CreateNotification(t('errorAccured'), 'red')
-    }
-  }
+  // async function signInWithEmail() {
+  //   const fields = { email: 'lior.oren06@gmail.com' }
+  //   const { error } = await supabase.auth.signInWithOtp({
+  //     email: fields.email,
+  //     options: {
+  //       emailRedirectTo: 'http://localhost:3000/',
+  //     },
+  //   })
+  //   if (!error) {
+  //     CreateNotification(`${t('checkEmail')} ${fields.email}`, 'yellow')
+  //   } else {
+  //     CreateNotification(t('errorAccured'), 'red')
+  //   }
+  // }
 
   if (session) {
     return <>{t('accessDeniedMessageSignOut')}</>
@@ -73,16 +53,11 @@ export default function ViaEmail() {
           <Link href='/auth/signup'>{t('createAnAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form>
             <TextInput
               label={t('email')}
               defaultValue='lior.oren06@gmail.com'
               placeholder={`${t('enterYour')} ${t('email')}...`}
-              error={errors.email && t('wrongPattern')}
-              {...register('email', {
-                required: true,
-                pattern: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
-              })}
             />
             <Button
               color='gray'

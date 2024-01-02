@@ -35,8 +35,6 @@ export default function Admin() {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       router.push('/')
     }
-    if (accessKey && accessKey >= managerAccessKey) {
-    }
   }, [accessKey, router])
 
   const buttons =

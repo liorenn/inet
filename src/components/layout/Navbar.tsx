@@ -116,6 +116,7 @@ export default function Navbar() {
             href={'/'}>
             {t('inet')}
           </Link>
+          {/* <button onClick={() => signOut()}>click me</button> */}
         </Group>
         <Group spacing={5} className={classes.buttons}>
           <Link href={'/device/compare'}>
@@ -181,7 +182,7 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              {AccessKey && AccessKey >= adminAccessKey && (
+              {AccessKey !== undefined && AccessKey >= adminAccessKey && (
                 <Link href={'/auth/admin'}>
                   <Button
                     variant='light'
@@ -192,7 +193,6 @@ export default function Navbar() {
                   </Button>
                 </Link>
               )}
-
               <Button
                 variant='light'
                 color='gray'

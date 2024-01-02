@@ -1,20 +1,121 @@
-import type { formUser } from '../components/admin/UserManagement'
-import type { formDevice } from '../components/admin/DeviceManagement'
+import type { formType as formUser } from '../components/admin/UserManagement'
+import type { formType as formDevice } from '../components/admin/DeviceManagement'
 import { deviceSchemaType, userSchemaType } from './schemas'
 import { Device, User } from '@prisma/client'
+import { accountFieldsNames } from '../pages/auth/account'
+
+export type accountField = {
+  name: accountFieldsNames
+  regex: RegExp
+  validator: (value: string) => string | null
+}
+
+export function getAccountFields() {
+  const omitFields: Omit<accountField, 'validator'>[] = [
+    { name: 'username', regex: /^[A-Za-z\d_.]{5,}$/ },
+    {
+      name: 'name',
+      regex: /^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/,
+    },
+
+    {
+      name: 'password',
+      regex: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
+    },
+    { name: 'phone', regex: /^0\d{1,2}-?\d{7}$/ },
+  ]
+
+  const fields: accountField[] = omitFields.map((field) => {
+    return {
+      ...field,
+      validator: (value: string | number) =>
+        field.regex.test(value.toString())
+          ? null
+          : `${field.name} is not valid`,
+    }
+  })
+
+  const defaultValues = {
+    username: '',
+    name: '',
+    password: '',
+    phone: '',
+  }
+
+  return { fields, defaultValues }
+}
+
+export type signField = {
+  name: keyof User
+  regex: RegExp
+}
+
+export function getSignInFields() {
+  const fields: signField[] = [
+    {
+      name: 'email',
+      regex: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
+    },
+    {
+      name: 'password',
+      regex: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
+    },
+  ]
+  const validators: { [key: string]: (value: string) => string | null } = {}
+
+  fields.forEach(({ name, regex }) => {
+    validators[name] = (value: string | number) =>
+      regex.test(value.toString()) ? null : `${name} is not valid`
+  })
+
+  const defaultValues = {
+    email: 'lior.oren06@gmail.com',
+    password: '123456',
+  }
+
+  return { fields, validators, defaultValues }
+}
+
+export function getSignUpFields() {
+  const fields: signField[] = [
+    {
+      name: 'email',
+      regex: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
+    },
+    { name: 'username', regex: /^[A-Za-z\d_.]{5,}$/ },
+    {
+      name: 'name',
+      regex: /^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/,
+    },
+    {
+      name: 'password',
+      regex: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
+    },
+    { name: 'phone', regex: /^0\d{1,2}-?\d{7}$/ },
+  ]
+  const validators: { [key: string]: (value: string) => string | null } = {}
+
+  fields.forEach(({ name, regex }) => {
+    validators[name] = (value: string | number) =>
+      regex.test(value.toString()) ? null : `${name} is not valid`
+  })
+
+  const defaultValues = {
+    email: 'lior.oren10@gmail.com',
+    name: 'Lior Oren',
+    phone: '0548853393',
+    username: 'lioren10',
+    password: '123456',
+  }
+
+  return { fields, validators, defaultValues }
+}
 
 type userField = {
   name: keyof User
   regex: RegExp
   disabled?: boolean
 }
-
-const nullableStringRegex = /^([A-Za-z0-9 _,]{3,})?$/
-const floatRegex = /^[+-]?\d*\.?\d+$/
-const nullableFloatRegex = /^([+-]?\d*\.?\d+)?$/
-const stringRegex = /^[A-Za-z0-9 _,]{3,}$/
-const booleanRegex = /^(true|false)?$/
-const numberRegex = /^(-?\d+)?$/
 
 export function getUserFields() {
   const fields: userField[] = [
@@ -70,6 +171,13 @@ type deviceField = {
 }
 
 export function getDevicesFields() {
+  const nullableStringRegex = /^([A-Za-z0-9 _,]{3,})?$/
+  const floatRegex = /^[+-]?\d*\.?\d+$/
+  const nullableFloatRegex = /^([+-]?\d*\.?\d+)?$/
+  const stringRegex = /^[A-Za-z0-9 _,]{3,}$/
+  const booleanRegex = /^(true|false)?$/
+  const numberRegex = /^(-?\d+)?$/
+
   const fields: deviceField[] = [
     {
       disabled: true,

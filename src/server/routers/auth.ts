@@ -10,11 +10,7 @@ import {
   calculatePercentageDiff,
   encodeEmail,
 } from '../../misc/functions'
-import {
-  commentSchema,
-  updatePropertiesSchema,
-  userSchema,
-} from '../../models/schemas'
+import { commentSchema, updateSchema, userSchema } from '../../models/schemas'
 import {
   deleteUserSoap,
   insertUserSoap,
@@ -252,7 +248,7 @@ export const authRouter = router({
   updateUserDetails: publicProcedure
     .input(
       z.object({
-        property: updatePropertiesSchema,
+        property: updateSchema,
         email: z.string(),
         value: z.string(),
       })
@@ -268,6 +264,7 @@ export const authRouter = router({
   getUserDetails: publicProcedure
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
+      if (input.email === undefined) return null
       const details = await ctx.prisma.user.findFirst({
         where: { email: input.email },
         include: { comments: true },
@@ -286,15 +283,15 @@ export const authRouter = router({
   getAccessKey: publicProcedure
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
-      const details = await ctx.prisma.user.findFirst({
+      if (input.email === undefined) return 0
+      const user = await ctx.prisma.user.findFirst({
         where: { email: input.email },
       })
-      return details?.accessKey
+      return user?.accessKey
     }),
   createUser: publicProcedure
     .input(
       z.object({
-        id: z.string(),
         name: z.string(),
         email: z.string(),
         phone: z.string(),
@@ -303,21 +300,17 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      try {
-        await ctx.prisma.user.create({
-          data: {
-            email: input.email,
-            name: input.name,
-            phone: input.phone,
-            password: input.password,
-            username: input.username,
-            comments: { create: [] },
-            deviceList: { create: [] },
-          },
-        })
-      } catch (e) {
-        return e
-      }
+      return await ctx.prisma.user.create({
+        data: {
+          email: input.email,
+          name: input.name,
+          phone: input.phone,
+          password: input.password,
+          username: input.username,
+          comments: { create: [] },
+          deviceList: { create: [] },
+        },
+      })
     }),
   IsUserExists: publicProcedure
     .input(
@@ -328,26 +321,17 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const emailUser = await ctx.prisma.user.findFirst({
-        where: {
-          email: input.email,
-          password: input.password,
-        },
+      const userEmail = await ctx.prisma.user.findFirst({
+        where: { email: input.email },
       })
       const usernameUser = await ctx.prisma.user.findFirst({
         where: { username: input?.username },
       })
-      if (!emailUser && !usernameUser) {
-        return { email: false, username: false }
-      }
-      if (!emailUser && usernameUser) {
-        return { email: false, username: true }
-      }
-      if (emailUser && emailUser.username === input?.username) {
-        return { email: true, username: true }
-      }
-      if (emailUser && emailUser.username !== input?.username) {
-        return { email: true, username: false }
+      return {
+        email: !!userEmail,
+        username:
+          !!usernameUser &&
+          (userEmail ? userEmail.username === input?.username : true),
       }
     }),
 })

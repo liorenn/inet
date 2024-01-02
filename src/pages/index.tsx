@@ -73,7 +73,7 @@ export default function Index() {
                 Find Your Device
               </Text>
               <Text size='md' mt='xs' color='dimmed'>
-                Find Your Device that suits your needs best based on your
+                Find Your Device that suits your needs best based on your exact
                 Preferences.
               </Text>
               <Button

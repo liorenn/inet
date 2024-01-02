@@ -16,7 +16,7 @@ import {
   convertDeviceValues,
 } from '../../models/forms'
 
-export type formDevice = {
+export type formType = {
   [K in keyof Device]: string
 }
 
@@ -27,7 +27,7 @@ type props = {
 export default function DeviceManagement({ accessKey }: props) {
   const router = useRouter()
   const { t } = useTranslation('translations')
-  const [devices, setDevices] = useState<formDevice[]>([])
+  const [devices, setDevices] = useState<formType[]>([])
   const fieldNames = Object.keys(deviceSchema.shape)
   const { data: tableData, isLoading } = trpc.device.getDevicesData.useQuery()
   if (accessKey < managerAccessKey) {
@@ -75,14 +75,14 @@ export default function DeviceManagement({ accessKey }: props) {
 function InsertRow({
   setUsers,
 }: {
-  setUsers: Dispatch<SetStateAction<formDevice[]>>
+  setUsers: Dispatch<SetStateAction<formType[]>>
 }) {
   const os = useOs()
   const { t } = useTranslation('translations')
   const [loading, setLoading] = useState(false)
   const { mutate: mutateInsert } = trpc.device.insertDevice.useMutation()
   const { fields, validators, defaultValues } = getDevicesFields()
-  const form = useForm<formDevice>({
+  const form = useForm<formType>({
     initialValues: defaultValues,
     validateInputOnChange: true,
     validate: validators,
@@ -148,8 +148,8 @@ function DeviceRow({
   data,
   setDevices,
 }: {
-  data: formDevice
-  setDevices: Dispatch<SetStateAction<formDevice[]>>
+  data: formType
+  setDevices: Dispatch<SetStateAction<formType[]>>
 }) {
   const os = useOs()
   const { t } = useTranslation('translations')
@@ -158,7 +158,7 @@ function DeviceRow({
   const { mutate: mutateDelete } = trpc.device.deleteDevice.useMutation()
   const { mutate: mutateUpdate } = trpc.device.updateDevice.useMutation()
   const { fields, validators } = getDevicesFields()
-  const form = useForm<formDevice>({
+  const form = useForm<formType>({
     initialValues: data,
     validateInputOnChange: true,
     validate: validators,
@@ -272,9 +272,9 @@ function DeviceRow({
 
 type FormInputProps = {
   editMode: boolean
-  inputName: keyof formDevice
+  inputName: keyof formType
   disabled?: boolean
-  form: UseFormReturnType<formDevice>
+  form: UseFormReturnType<formType>
 }
 
 function FormInput({ form, inputName, disabled, editMode }: FormInputProps) {

@@ -5,21 +5,13 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Title, Text, Container, Button, SimpleGrid } from '@mantine/core'
 import { TextInput, Paper } from '@mantine/core'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { useForm } from 'react-hook-form'
-import type { SubmitHandler } from 'react-hook-form'
-import { CreateNotification } from '../../../misc/functions'
+import { useSession } from '@supabase/auth-helpers-react'
 import Head from 'next/head'
 import useTranslation from 'next-translate/useTranslation'
 
-type Inputs = {
-  phone: string
-}
-
 export default function ViaPhone() {
   const router = useRouter()
-  const supabase = useSupabaseClient()
-  const [session, setSession] = useState(useSession())
+  const session = useState(useSession())
   const { t } = useTranslation('translations')
   const { t: commonT } = useTranslation('translations')
 
@@ -29,31 +21,19 @@ export default function ViaPhone() {
     }
   }, [session, router])
 
-  const {
-    reset,
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>({})
-
-  supabase.auth.onAuthStateChange((_e, session) => {
-    if (session) {
-      setSession(session)
-    }
-  })
-
-  const onSubmit: SubmitHandler<Inputs> = async (fields) => {
-    //when form is submitted and passed validation
-    const { error } = await supabase.auth.signInWithOtp({
-      phone: fields.phone,
-    })
-    if (!error) {
-      CreateNotification(t('signedInSuccessfully'), 'green')
-    } else {
-      CreateNotification(t('errorAccured'), 'red')
-      reset()
-    }
-  }
+  // async function signInWithPhone() {
+  //   const fields = {
+  //     phone: '+9720548853393',
+  //   }
+  //   const { error } = await supabase.auth.signInWithOtp({
+  //     phone: fields.phone,
+  //   })
+  //   if (!error) {
+  //     CreateNotification(t('signedInSuccessfully'), 'green')
+  //   } else {
+  //     CreateNotification(t('errorAccured'), 'red')
+  //   }
+  // }
 
   if (session) {
     return <>{t('accessDeniedMessageSignOut')}</>
@@ -71,16 +51,11 @@ export default function ViaPhone() {
           <Link href='/auth/signup'>{t('createAnAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form>
             <TextInput
               label={t('phone')}
               defaultValue='+9720548853393'
               placeholder={`${t('enterYour')} ${t('phone')}...`}
-              error={errors.phone && t('wrongPattern')}
-              {...register('phone', {
-                required: true,
-                pattern: /^\+\d{13}$/,
-              })}
             />
             <Button
               color='gray'

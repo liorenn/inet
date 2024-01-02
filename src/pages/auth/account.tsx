@@ -11,14 +11,13 @@ import { useSession, useUser } from '@supabase/auth-helpers-react'
 import ImageUploader from '../../components/misc/UploadAvatar'
 import useTranslation from 'next-translate/useTranslation'
 import Loader from '../../components/layout/Loader'
-import { supabase } from '../../server/supabase'
-import type {
-  updatePropertiesType,
-  userSchemaType,
-  updatePropertiesObjectType,
-} from '../../models/schemas'
-import { updatePropertiesSchema } from '../../models/schemas'
+import type { userSchemaType } from '../../models/schemas'
 import React from 'react'
+import { User } from '@prisma/client'
+import { getAccountFields } from '../../models/forms'
+
+export type accountFields = Omit<User, 'email' | 'accessKey'>
+export type accountFieldsNames = keyof accountFields
 
 export default function Account() {
   const user = useUser()
@@ -31,43 +30,45 @@ export default function Account() {
     email: user?.email,
   })
   const [account, setAccount] = useState<userSchemaType | undefined>()
-  const [inputs, setInputs] = useState<updatePropertiesObjectType>({
-    name: '',
-    password: '',
-    phone: '',
-    username: '',
-  })
+  const { fields, defaultValues } = getAccountFields()
+  const [inputs, setInputs] = useState<accountFields>(defaultValues)
+
   useEffect(() => {
-    if (data) {
-      setAccount(data)
-      Object.keys(inputs).forEach((key) => {
-        if (key in data) {
-          setInputs((prevInputs) => ({
-            ...prevInputs,
-            [key]: data[key as keyof typeof data],
-          }))
-        }
-      })
+    if (data !== undefined) {
+      if (data === null) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        router.push('/')
+      } else {
+        setAccount(data)
+        Object.keys(inputs).forEach((key) => {
+          if (key in data) {
+            setInputs((prevInputs) => ({
+              ...prevInputs,
+              [key]: data[key as keyof typeof data],
+            }))
+          }
+        })
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
-  supabase.auth.onAuthStateChange(async (_event, session) => {
-    if (!session) {
-      await router.push('/')
-    }
-  })
-
-  async function updateProperty(
-    property: updatePropertiesType,
+  function updateProperty(
+    property: accountFieldsNames,
     account: userSchemaType
   ) {
-    if (property === 'password' || property === 'phone') {
-      await supabase.auth.updateUser({
-        password: account.password,
-        phone: account.phone,
-      })
-    }
+    if (
+      fields
+        .find((field) => field.name === property)
+        ?.validator(inputs[property]) !== null
+    )
+      return
+    // if (property === 'password' || property === 'phone') {
+    //   await supabase.auth.updateUser({
+    //     password: account.password,
+    //     phone: account.phone,
+    //   })
+    // }
     updateMutation.mutate(
       {
         email: account.email,
@@ -155,31 +156,32 @@ export default function Account() {
             </Text>
           </div>
           <Divider />
-          {updatePropertiesSchema._def.values.map((property, index) => (
+          {fields.map((field, index) => (
             <React.Fragment key={index}>
               <SimpleGrid cols={3} sx={{ paddingLeft: 5, paddingRight: 5 }}>
                 <Text
                   sx={{ fontSize: 18, paddingTop: 6 }}
                   weight={500}
                   color='dimmed'>
-                  {t(property)}
+                  {t(field.name)}
                 </Text>
                 <TextInput
                   onChange={(e) =>
                     setInputs((prev) => ({
                       ...prev,
-                      [property]: e.target.value,
+                      [field.name]: e.target.value,
                     }))
                   }
-                  placeholder={`${t('enterYour')} ${t(property)}...`}
-                  value={inputs[property]}
+                  placeholder={`${t('enterYour')} ${t(field.name)}...`}
+                  error={field.validator(inputs[field.name])}
+                  value={inputs[field.name]}
                   radius='md'
                   size='md'
                 />
                 <UnstyledButton
                   onClick={() => {
                     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                    updateProperty(property, account)
+                    updateProperty(field.name, account)
                   }}>
                   <Text
                     sx={{ fontSize: 18 }}

@@ -12,7 +12,7 @@ import { userSchema } from '../../models/schemas'
 import { getUserFields, convertFormUserValues } from '../../models/forms'
 import { UseFormReturnType, useForm } from '@mantine/form'
 
-export type formUser = {
+export type formType = {
   [K in keyof User]: string
 }
 
@@ -23,7 +23,7 @@ type props = {
 export default function UserManagement({ accessKey }: props) {
   const router = useRouter()
   const { t } = useTranslation('translations')
-  const [users, setUsers] = useState<formUser[]>([])
+  const [users, setUsers] = useState<formType[]>([])
   const fieldNames = Object.keys(userSchema.shape)
   const { data: tableData, isLoading } = trpc.auth.getUsersData.useQuery()
   if (accessKey < managerAccessKey) {
@@ -71,7 +71,7 @@ export default function UserManagement({ accessKey }: props) {
 }
 
 type insertRowProps = {
-  setUsers: Dispatch<SetStateAction<formUser[]>>
+  setUsers: Dispatch<SetStateAction<formType[]>>
 }
 
 function InsertRow({ setUsers }: insertRowProps) {
@@ -80,7 +80,7 @@ function InsertRow({ setUsers }: insertRowProps) {
   const [loading, setLoading] = useState(false)
   const { mutate: mutateInsert } = trpc.auth.insertUser.useMutation()
   const { fields, validators, defaultValues } = getUserFields()
-  const form = useForm<formUser>({
+  const form = useForm<formType>({
     initialValues: defaultValues,
     validateInputOnChange: true,
     validate: validators,
@@ -143,8 +143,8 @@ function InsertRow({ setUsers }: insertRowProps) {
 }
 
 type userRowProps = {
-  data: formUser
-  setUsers: Dispatch<SetStateAction<formUser[]>>
+  data: formType
+  setUsers: Dispatch<SetStateAction<formType[]>>
 }
 
 function UserRow({ data, setUsers }: userRowProps) {
@@ -155,7 +155,7 @@ function UserRow({ data, setUsers }: userRowProps) {
   const { mutate: mutateDelete } = trpc.auth.deleteUser.useMutation()
   const { mutate: mutateUpdate } = trpc.auth.updateUser.useMutation()
   const { fields, validators } = getUserFields()
-  const form = useForm<formUser>({
+  const form = useForm<formType>({
     initialValues: data,
     validateInputOnChange: true,
     validate: validators,
@@ -267,9 +267,9 @@ function UserRow({ data, setUsers }: userRowProps) {
 
 type FormInputProps = {
   editMode: boolean
-  inputName: keyof formUser
+  inputName: keyof formType
   disabled?: boolean
-  form: UseFormReturnType<formUser>
+  form: UseFormReturnType<formType>
 }
 
 function FormInput({ form, inputName, disabled, editMode }: FormInputProps) {

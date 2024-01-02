@@ -1,9 +1,7 @@
 import Link from 'next/link'
-import { useEffect } from 'react'
-import { Title, Text, Container, Button } from '@mantine/core'
-import { TextInput, PasswordInput, Paper } from '@mantine/core'
-import { useForm } from 'react-hook-form'
-import type { SubmitHandler } from 'react-hook-form'
+import { Title, Text, Container, Button, Center } from '@mantine/core'
+import { TextInput, Paper } from '@mantine/core'
+import { useForm } from '@mantine/form'
 import { useRouter } from 'next/router'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { trpc } from '../../misc/trpc'
@@ -11,13 +9,12 @@ import { CreateNotification } from '../../misc/functions'
 import Head from 'next/head'
 import useTranslation from 'next-translate/useTranslation'
 import { usePostHog } from 'posthog-js/react'
+import { User } from '@prisma/client'
+import { getSignUpFields } from '../../models/forms'
+import { useEffect, useState } from 'react'
 
-type Inputs = {
-  username: string
-  name: string
-  email: string
-  password: string
-  phone: string
+export type formType = {
+  [K in keyof Omit<User, 'accessKey'>]: string
 }
 
 export default function SignUp() {
@@ -25,26 +22,27 @@ export default function SignUp() {
   const session = useSession()
   const posthog = usePostHog()
   const supabase = useSupabaseClient()
+  const [loading, setLoading] = useState(false)
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
   const { mutate } = trpc.auth.createUser.useMutation()
   const { t } = useTranslation('translations')
-  const { t: commonT } = useTranslation('translations')
 
+  const { data, isLoading } = trpc.auth.getAccessKey.useQuery({
+    email: session?.user.email,
+  })
   useEffect(() => {
-    if (session) {
-      router.push('/').catch((error) => {
-        console.error('Navigation error:', error)
-      })
-    }
-  }, [session, router])
+    data && data >= 1 && router.push('/')
+  }, [data, router])
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>()
+  const { defaultValues, fields, validators } = getSignUpFields()
+  const form = useForm<formType>({
+    initialValues: defaultValues,
+    validateInputOnChange: true,
+    validate: validators,
+  })
 
-  const onSubmit: SubmitHandler<Inputs> = (fields) => {
+  function signUp(fields: formType) {
+    setLoading(true)
     IsUserExistsMutation.mutate(
       {
         email: fields.email,
@@ -52,7 +50,7 @@ export default function SignUp() {
         username: fields.username,
       },
       {
-        async onSuccess(data) {
+        onSuccess(data) {
           const IsExist = data
           if (IsExist?.email && !IsExist.username) {
             CreateNotification(t('emailExistMessage'), 'red')
@@ -64,44 +62,48 @@ export default function SignUp() {
             CreateNotification(t('usernameAndEmailExistMessage'), 'red')
           }
           if (!IsExist?.email && !IsExist?.username) {
-            const { data, error } = await supabase.auth.signUp({
-              phone: fields.phone,
-              email: fields.email,
-              password: fields.password,
-            })
-            if (!error) {
-              CreateNotification(t('accountCreatedSuccessfully'), 'green')
-              posthog.capture('User Signed Up', { data })
-              if (data.user?.id !== undefined) {
-                mutate({
-                  id: data.user?.id,
-                  email: fields.email,
-                  phone: fields.phone,
-                  name: fields.name,
-                  password: fields.password,
-                  username: fields.username,
-                })
-                if (error) {
-                  CreateNotification('Error Couldnt Retrive Account Id', 'red')
-                }
+            mutate(
+              {
+                email: fields.email,
+                phone: fields.phone,
+                name: fields.name,
+                password: fields.password,
+                username: fields.username,
+              },
+              {
+                async onSuccess() {
+                  const { data, error } = await supabase.auth.signUp({
+                    phone: fields.phone,
+                    email: fields.email,
+                    password: fields.password,
+                  })
+                  if (!error) {
+                    CreateNotification(t('accountCreatedSuccessfully'), 'green')
+                    posthog.capture('User Signed Up', { data })
+                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                    router.push('/')
+                    setLoading(false)
+                  } else {
+                    CreateNotification('Error Couldnt Create Account', 'red')
+                  }
+                },
               }
-            } else {
-              CreateNotification('Error Couldnt Create Account', 'red')
-            }
+            )
           }
+          setLoading(false)
         },
       }
     )
   }
 
-  if (session) {
-    return <>{t('accessDeniedMessageSignOut')}</>
+  if (session || isLoading) {
+    return <Center>{t('accessDeniedMessageSignOut')}</Center>
   }
 
   return (
     <>
       <Head>
-        <title>{commonT('signUp')}</title>
+        <title>{t('signUp')}</title>
       </Head>
       <Container size={420} my={40}>
         <Title align='center'>{t('createAnAccount')}</Title>
@@ -111,65 +113,23 @@ export default function SignUp() {
           <Link href='/auth/`signin'>{t('signInYourAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
-          <form onSubmit={() => handleSubmit(onSubmit)}>
-            <TextInput
-              label={t('email')}
-              placeholder={`${t('enterYour')} ${t('email')}...`}
-              defaultValue='lior.oren06@gmail.com'
-              error={errors.email && t('wrongPattern')}
-              {...register('email', {
-                required: true,
-                pattern: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
-              })}
-            />
-            <TextInput
-              label={t('username')}
-              placeholder={`${t('enterYour')} ${t('username')}...`}
-              defaultValue='lioren'
-              error={errors.username && t('wrongPattern')}
-              {...register('username', {
-                required: true,
-                pattern: /^[A-Za-z\d_.]{5,}$/,
-              })}
-            />
-            <TextInput
-              label={t('name')}
-              placeholder={`${t('enterYour')} ${t('name')}...`}
-              defaultValue='Lior Oren'
-              error={errors.name && t('wrongPattern')}
-              {...register('name', {
-                required: true,
-                pattern: /^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/,
-              })}
-            />
-            <TextInput
-              label={t('phone')}
-              placeholder={`${t('enterYour')} ${t('phone')}...`}
-              defaultValue='+9720548853393'
-              error={errors.phone && t('wrongPattern')}
-              {...register('phone', {
-                required: true,
-                pattern: /^0\d{1,2}-?\d{7}$/,
-              })}
-            />
-            <PasswordInput
-              label={t('password')}
-              placeholder={`${t('enterYour')} ${t('password')}...`}
-              defaultValue='123456'
-              error={errors.password && t('wrongPattern')}
-              mt='md'
-              {...register('password', {
-                required: true,
-                pattern: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
-              })}
-            />
+          <form onSubmit={form.onSubmit((values) => signUp(values))}>
+            {fields.map((field, index) => (
+              <TextInput
+                key={index}
+                label={t(field.name)}
+                placeholder={`${t('enterYour')} ${t(field.name)}...`}
+                {...form.getInputProps(field.name)}
+              />
+            ))}
             <Button
               fullWidth
+              disabled={loading}
               color='gray'
               variant='light'
               mt='xl'
               type='submit'>
-              {t('createAccount')}
+              {loading ? t('loading') : t('createAccount')}
             </Button>
           </form>
         </Paper>

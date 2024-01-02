@@ -2,19 +2,26 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { Title, Text, Container, Button, SimpleGrid } from '@mantine/core'
+import {
+  Title,
+  Text,
+  Container,
+  Button,
+  SimpleGrid,
+  Center,
+} from '@mantine/core'
 import { TextInput, PasswordInput, Paper } from '@mantine/core'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { useForm } from 'react-hook-form'
-import type { SubmitHandler } from 'react-hook-form'
+import { useForm } from '@mantine/form'
 import { trpc } from '../../../misc/trpc'
 import { CreateNotification } from '../../../misc/functions'
 import Head from 'next/head'
 import useTranslation from 'next-translate/useTranslation'
 import { usePostHog } from 'posthog-js/react'
+import { getSignInFields } from '../../../models/forms'
+import { useEffect, useState } from 'react'
 
-type Inputs = {
+type formType = {
   email: string
   password: string
 }
@@ -22,70 +29,63 @@ type Inputs = {
 export default function SignIn() {
   const router = useRouter()
   const posthog = usePostHog()
+  const session = useSession()
   const supabase = useSupabaseClient()
-  const [session, setSession] = useState(useSession())
+  const [loading, setLoading] = useState(false)
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
   const { t } = useTranslation('translations')
-  const { t: commonT } = useTranslation('translations')
 
+  const { data, isLoading } = trpc.auth.getAccessKey.useQuery({
+    email: session?.user.email,
+  })
   useEffect(() => {
-    if (session) {
-      router.push('/')
-    }
-  }, [session, router])
+    data && data >= 1 && router.push('/')
+  }, [data, router])
 
-  const {
-    reset,
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>({})
-
-  supabase.auth.onAuthStateChange((_e, session) => {
-    if (session) {
-      setSession(session)
-    }
+  const { defaultValues, validators } = getSignInFields()
+  const form = useForm<formType>({
+    initialValues: defaultValues,
+    validateInputOnChange: true,
+    validate: validators,
   })
 
-  const onSubmit: SubmitHandler<Inputs> = (fields) => {
-    //when form is submitted and passed validation
+  function signIn(values: formType) {
+    setLoading(true)
     IsUserExistsMutation.mutate(
-      {
-        email: fields.email,
-        password: fields.password,
-      },
+      { email: values.email, password: values.password },
       {
         async onSuccess(data) {
-          if (data) {
-            const { error } = await supabase.auth.signInWithPassword({
-              email: fields.email,
-              password: fields.password,
+          if (data.email) {
+            const { data: user } = await supabase.auth.signInWithPassword({
+              email: values.email,
+              password: values.password,
             })
-            if (!error) {
+            if (user.user) {
               CreateNotification(t('signedInSuccessfully'), 'green')
-              posthog.capture('User Signed In', { data: fields })
+              posthog.capture('User Signed In', { data: values })
               router.push('/')
+              setLoading(false)
             } else {
+              setLoading(false)
               CreateNotification(t('errorAccured'), 'red')
-              reset()
             }
           } else {
+            setLoading(false)
             CreateNotification(t('userDoesNotExist'), 'red')
-            reset()
           }
         },
       }
     )
   }
 
-  if (session) {
-    return <>{t('accessDeniedMessageSignOut')}</>
+  if (session || isLoading) {
+    return <Center>{t('accessDeniedMessageSignOut')}</Center>
   }
 
   return (
     <>
       <Head>
-        <title>{commonT('signIn')}</title>
+        <title>{t('signIn')}</title>
       </Head>
       <Container size={420} my={40}>
         <Title align='center'>{t('welcomeBack')}</Title>
@@ -93,36 +93,30 @@ export default function SignIn() {
           {t('dontHaveAnAccount')}{' '}
           <Link href='/auth/signup'>{t('createAnAccount')}</Link>
         </Text>
+        <Text color='dimmed' size='sm' align='center' mt={5}>
+          Forgot Your Password?{' '}
+          <Link href='/auth/resetPassword'>Reset Password</Link>
+        </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={form.onSubmit((values) => signIn(values))}>
             <TextInput
               label={t('email')}
-              defaultValue='lior.oren06@gmail.com'
               placeholder={`${t('enterYour')} ${t('email')}...`}
-              error={errors.email && t('wrongPattern')}
-              {...register('email', {
-                required: true,
-                pattern: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
-              })}
+              {...form.getInputProps('email')}
             />
             <PasswordInput
               label={t('password')}
-              defaultValue='123456'
               placeholder={`${t('enterYour')} ${t('password')}...`}
-              error={errors.password && t('wrongPattern')}
-              mt='md'
-              {...register('password', {
-                required: true,
-                pattern: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
-              })}
+              {...form.getInputProps('password')}
             />
             <Button
+              fullWidth
+              disabled={loading}
               color='gray'
               variant='light'
-              fullWidth
-              mt='lg'
+              mt='xl'
               type='submit'>
-              {commonT('signIn')}
+              {loading ? t('loading') : t('signIn')}
             </Button>
           </form>
           <SimpleGrid cols={2}>
@@ -141,9 +135,6 @@ export default function SignIn() {
               </Button>
             </Link>
           </SimpleGrid>
-          {/* <Link href={'/auth/resetpassword'} style={{ textDecoration: 'none' }}>
-            <Text size='sm'>Forgot password?</Text>
-          </Link> */}
         </Paper>
       </Container>
     </>
