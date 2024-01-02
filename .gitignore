@@ -16,7 +16,7 @@
 /build/
 /out/
 next-env.d.ts
-config.ts
+# config.ts
 public/users
 
 # production
