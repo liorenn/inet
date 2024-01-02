@@ -3,21 +3,21 @@ import { create } from 'zustand'
 type CommentsStats = {
   username: string
   ratingValue: number
-  commentsAmout: number
+  commentsAmount: number
   setUsername: (value: string) => void
   setRatingValue: (value: number) => void
-  setCommentsAmout: (value: number) => void
+  setCommentsAmount: (value: number) => void
 }
 
 export const useComments = create<CommentsStats>()((set) => ({
   username: '',
-  commentsAmout: 0,
+  commentsAmount: 0,
   ratingValue: 0,
   setUsername(value) {
     set({ username: value })
   },
-  setCommentsAmout(value) {
-    set({ commentsAmout: value })
+  setCommentsAmount(value) {
+    set({ commentsAmount: value })
   },
   setRatingValue(value) {
     set({ ratingValue: value })

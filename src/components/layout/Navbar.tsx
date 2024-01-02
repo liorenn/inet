@@ -40,7 +40,7 @@ export default function Navbar() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const { imagePath, imageExists, setImageExists, setImagePath } =
     useProfilePicture()
-  const { mutate } = trpc.device.isImageExists.useMutation()
+  const { mutate: isImageExists } = trpc.auth.isImageExists.useMutation()
   const supabase = useSupabaseClient()
   const spotlight = useSpotlight()
   const [session, setSession] = useState(useSession())
@@ -71,11 +71,11 @@ export default function Navbar() {
 
   useEffect(() => {
     if (user?.email) {
-      mutate(
+      isImageExists(
         { email: user?.email },
         {
           onSuccess(data, params) {
-            if (data) {
+            if (data === true) {
               setImageExists(true)
               setImagePath(`../users/${encodeEmail(params.email)}.png`)
             }
@@ -84,13 +84,17 @@ export default function Navbar() {
       )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, imageExists, imagePath])
+  }, [user])
 
   async function signOut() {
     const { error } = await supabase.auth.signOut()
     if (!error) {
       CreateNotification(t('signedOutSuccessfully'), 'green')
       posthog.capture('User Signed Out', { user })
+      setTimeout(() => {
+        setImageExists(false)
+        setImagePath('')
+      }, 500)
     }
   }
 

@@ -41,7 +41,6 @@ export const userSchema = z.object({
 export type userSchemaType = z.infer<typeof userSchema>
 
 export const commentSchema = z.object({
-  likes: z.number(),
   message: z.string(),
   rating: z.number(),
   updatedAt: z.date(),

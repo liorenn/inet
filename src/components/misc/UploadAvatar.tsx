@@ -7,12 +7,14 @@ import { IconPhoto, IconUpload, IconX } from '@tabler/icons'
 import { useState } from 'react'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { useProfilePicture } from '../../hooks/useProfilePicture'
+import { useRouter } from 'next/router'
 
 type props = {
   email: string
 }
 
 export default function ImageUploader({ email }: props) {
+  const router = useRouter()
   const [opened, { open, close }] = useDisclosure(false)
   const [file, setFile] = useState<File | undefined>()
   const { setImageExists, setImagePath, imageExists, imagePath } =
@@ -50,7 +52,8 @@ export default function ImageUploader({ email }: props) {
         if (response.ok) {
           CreateNotification('Profile Picture Changed', 'green')
           setImagePath(`/users/${newFileName}`)
-          setFile(undefined)
+          setFile(newFile)
+          router.reload()
         }
         close()
       })

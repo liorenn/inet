@@ -8,11 +8,11 @@ import { trpc } from '../../misc/trpc'
 import {
   calculateAverageRating,
   CreateNotification,
-  encodeEmail,
 } from '../../misc/functions'
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useComments } from '../../hooks/useComments'
+import { useProfilePicture } from '../../hooks/useProfilePicture'
 
 type props = {
   device: Device
@@ -25,15 +25,16 @@ export default function Comments({ device }: props) {
   const { t } = useTranslation('translations')
   const [comments, setComments] = useState<commentType[]>([])
   const { mutate } = trpc.auth.addComment.useMutation()
-  const { username, setRatingValue, setCommentsAmout } = useComments()
+  const { username, setRatingValue, setCommentsAmount } = useComments()
   const { data } = trpc.auth.getAllComments.useQuery({
     model: device.model,
   })
+  const { imageExists, imagePath } = useProfilePicture()
 
   useEffect(() => {
     if (data) {
       setComments(data)
-      setCommentsAmout(data.length)
+      setCommentsAmount(data.length)
       setRatingValue(calculateAverageRating(data))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,7 +58,7 @@ export default function Comments({ device }: props) {
         setText('')
         setRating(0)
         setComments((prev) => pushComment(prev, data))
-        setCommentsAmout(comments.length + 1)
+        setCommentsAmount(comments.length + 1)
         setRatingValue(calculateAverageRating([...comments, data]))
       },
     })
@@ -93,7 +94,7 @@ export default function Comments({ device }: props) {
                 <Group sx={{ padding: 10 }}>
                   {user?.email && (
                     <Avatar
-                      src={`../../../users/${encodeEmail(user.email)}.png`}
+                      src={imageExists ? `../${imagePath}` : ''}
                       radius='md'
                     />
                   )}

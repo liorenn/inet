@@ -3,11 +3,12 @@ import { Resend } from 'resend'
 import { sendSoapRequest, resendKey, fromEmail } from '../../../config'
 import PriceDropEmail from '../../components/misc/PriceDropEmail'
 import { router, publicProcedure } from '../trpc'
-import { readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { z } from 'zod'
 import {
   fetchCurrentPrice,
   calculatePercentageDiff,
+  encodeEmail,
 } from '../../misc/functions'
 import {
   commentSchema,
@@ -174,6 +175,30 @@ export const authRouter = router({
         }
       })
     }),
+  isImageExists: publicProcedure
+    .input(z.object({ email: z.string() }))
+    .mutation(({ input }) => {
+      const path = `public/users/${encodeEmail(input.email)}.png`
+      return existsSync(path)
+    }),
+  getCommentEmail: publicProcedure
+    .input(z.object({ username: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const comment = await ctx.prisma.user.findFirst({
+        where: { username: input.username },
+      })
+      return comment?.email
+    }),
+  isCommentImageExists: publicProcedure
+    .input(z.object({ username: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const comment = await ctx.prisma.user.findFirst({
+        where: { username: input.username },
+      })
+      return comment?.email
+        ? existsSync(`public/users/${encodeEmail(comment?.email)}.png`)
+        : false
+    }),
   editComment: publicProcedure
     .input(
       z.object({
@@ -203,11 +228,9 @@ export const authRouter = router({
   addComment: publicProcedure
     .input(commentSchema)
     .mutation(async ({ ctx, input }) => {
-      const { likes, createdAt, message, model, rating, updatedAt, username } =
-        input
+      const { createdAt, message, model, rating, updatedAt, username } = input
       const comment = await ctx.prisma.comment.create({
         data: {
-          likes,
           message,
           rating,
           updatedAt,

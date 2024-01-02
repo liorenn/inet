@@ -21,6 +21,7 @@ import {
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useComments } from '../../hooks/useComments'
+import { adminAccessKey } from '../../../config'
 
 type props = {
   comment: Comment
@@ -33,9 +34,18 @@ export default function Comment({ comment, comments, setComments }: props) {
   const [rating, setRating] = useState(comment.rating)
   const [editing, setEditing] = useState(false)
   const [editText, setEditText] = useState(comment.message)
+  const { data: accessKey } = trpc.auth.getAccessKey.useQuery({
+    email: user?.email,
+  })
+  const { data: imageExists } = trpc.auth.isCommentImageExists.useQuery({
+    username: comment.username,
+  })
+  const { data: commentEmail } = trpc.auth.getCommentEmail.useQuery({
+    username: comment.username,
+  })
   const { mutateAsync: mutateDelete } = trpc.auth.deleteComment.useMutation()
   const { mutateAsync: mutateEdit } = trpc.auth.editComment.useMutation()
-  const { setCommentsAmout, setRatingValue, username } = useComments()
+  const { setCommentsAmount, setRatingValue, username } = useComments()
   const { t } = useTranslation('translations')
 
   async function deleteComment() {
@@ -54,7 +64,7 @@ export default function Comment({ comment, comments, setComments }: props) {
       }
     })
     setComments([...newArr])
-    setCommentsAmout(newArr.length)
+    setCommentsAmount(newArr.length)
     setRatingValue(calculateAverageRating(newArr))
   }
 
@@ -82,7 +92,14 @@ export default function Comment({ comment, comments, setComments }: props) {
       <Group position='apart' sx={{ marginBottom: 10 }}>
         <Group sx={{ padding: 10 }}>
           {user?.email && (
-            <Avatar src={`/users/${encodeEmail(user.email)}.png`} radius='md' />
+            <Avatar
+              src={
+                imageExists && commentEmail
+                  ? `/users/${encodeEmail(commentEmail)}.png`
+                  : ''
+              }
+              radius='md'
+            />
           )}
           <div>
             <Text size='lg' weight={500}>
@@ -95,7 +112,8 @@ export default function Comment({ comment, comments, setComments }: props) {
         </Group>
         <Group sx={{ padding: 10 }}>
           <Rating readOnly={!editing} value={rating} onChange={setRating} />
-          {comment.username === username && (
+          {(comment.username === username ||
+            (accessKey && accessKey >= adminAccessKey)) && (
             <>
               <Tooltip color='gray' label={t('edit')}>
                 <ActionIcon color='dark'>

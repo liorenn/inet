@@ -1,7 +1,5 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '../trpc'
-import { existsSync } from 'fs'
-import { encodeEmail } from '../../misc/functions'
 import { sendSoapRequest } from '../../../config'
 import { deviceSchema } from '../../models/schemas'
 import {
@@ -80,12 +78,6 @@ export const DeviceRouter = router({
           },
         },
       })
-    }),
-  isImageExists: publicProcedure
-    .input(z.object({ email: z.string() }))
-    .mutation(({ input }) => {
-      const path = `public/users/${encodeEmail(input.email)}.png`
-      return existsSync(path)
     }),
   getDevice: publicProcedure
     .input(z.object({ model: z.string() }))

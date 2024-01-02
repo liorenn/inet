@@ -11,7 +11,7 @@ type preferenceType = {
 }
 
 const preferencesNames = ['display', 'battery', 'price']
-const inputsNames = ['a', 'b', 'c', 'd']
+const inputsNames = ['1', '2', '3', '4']
 
 function generateUrlString(preferences: preferenceType[]) {
   return `?preferences=${preferences

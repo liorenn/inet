@@ -8,7 +8,7 @@ export default function CommentsSummary() {
   const { t } = useTranslation('translations')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_scroll, scrollTo] = useWindowScroll()
-  const { commentsAmout, ratingValue } = useComments()
+  const { commentsAmount, ratingValue } = useComments()
   return (
     <Group position='right'>
       <Text weight={600}>{`${
@@ -20,7 +20,7 @@ export default function CommentsSummary() {
         color='gray'
         rightIcon={<IconArrowDown size={16} />}
         onClick={() => scrollTo({ y: 2700 })}>
-        {`${commentsAmout.toString()} ${t('comments')}`}
+        {`${commentsAmount.toString()} ${t('comments')}`}
       </Button>
     </Group>
   )
