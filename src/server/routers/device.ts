@@ -8,8 +8,53 @@ import {
   updateDeviceSoap,
 } from '../soapFunctions'
 import type { devicePropertiesType } from '../../models/deviceTypes'
+import { getMatchedDevices, matchDeviceType, preferenceType } from '../match'
 
 export const DeviceRouter = router({
+  test: publicProcedure.query(() => {
+    const userPreferences: preferenceType[] = [
+      { name: 'screenSize', value: 3 },
+      { name: 'batterySize', value: 1 },
+      { name: 'price', value: 4 },
+    ]
+    const devicesData: matchDeviceType[] = [
+      {
+        model: 'Bad Device',
+        screenSize: 50,
+        batterySize: 3000,
+        price: 500,
+        storage: 16,
+        memory: 8,
+        weight: 2,
+        cpu: null,
+        gpu: null,
+      },
+      {
+        model: 'Medium Device',
+        screenSize: 6,
+        batterySize: 5000,
+        price: 800,
+        storage: 16,
+        memory: 8,
+        weight: 2,
+        cpu: null,
+        gpu: null,
+      },
+      {
+        model: 'Best Device',
+        screenSize: 7.2,
+        batterySize: 3600,
+        price: 1400,
+        storage: 16,
+        memory: 8,
+        weight: 2,
+        cpu: null,
+        gpu: null,
+      },
+    ]
+    const matches = getMatchedDevices(userPreferences, devicesData)
+    return matches
+  }),
   insertDevice: publicProcedure
     .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
