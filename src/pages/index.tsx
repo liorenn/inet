@@ -6,6 +6,7 @@ import { useSpotlight } from '@mantine/spotlight'
 import { useState } from 'react'
 import { useViewportSize } from '@mantine/hooks'
 import { IconDevices } from '@tabler/icons'
+import similarity from 'compute-cosine-similarity'
 
 export default function Index() {
   const { t } = useTranslation('translations')
@@ -13,6 +14,7 @@ export default function Index() {
   const spotlight = useSpotlight()
   const [value, setValue] = useState('')
   const { width } = useViewportSize()
+  console.log(similarity([2, 4, 6], [2, 4, 6]))
 
   return (
     <>
