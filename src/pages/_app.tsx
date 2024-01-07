@@ -4,7 +4,11 @@ import { trpc } from '../misc/trpc'
 import type { AppProps } from 'next/app'
 import Layout from '../components/layout/Layout'
 import type { ColorScheme } from '@mantine/core'
-import { MantineProvider, ColorSchemeProvider } from '@mantine/core'
+import {
+  MantineProvider,
+  ColorSchemeProvider,
+  createEmotionCache,
+} from '@mantine/core'
 import { useLocalStorage } from '@mantine/hooks'
 import RouterTransition from '../components/layout/RouterTransition'
 import { Notifications } from '@mantine/notifications'
@@ -18,6 +22,9 @@ import {
   posthogDebug,
   posthogToken,
 } from '../../config'
+import rtlPlugin from 'stylis-plugin-rtl'
+import useTranslation from 'next-translate/useTranslation'
+import { useEffect } from 'react'
 
 if (typeof window !== 'undefined') {
   posthog.init(posthogToken, {
@@ -32,6 +39,11 @@ type props = AppProps<{
   initialSession: Session
 }>
 
+const rtlCache = createEmotionCache({
+  key: 'mantine-rtl',
+  stylisPlugins: [rtlPlugin],
+})
+
 function MyApp({ Component, pageProps }: props) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'mantine-color-scheme',
@@ -40,6 +52,11 @@ function MyApp({ Component, pageProps }: props) {
   })
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'))
+  const { lang } = useTranslation('translations')
+
+  useEffect(() => {
+    document.body.dir = lang === 'he' ? 'rtl' : 'ltr'
+  }, [lang])
 
   return (
     <ColorSchemeProvider
@@ -48,8 +65,10 @@ function MyApp({ Component, pageProps }: props) {
       <MantineProvider
         withGlobalStyles
         withNormalizeCSS
+        emotionCache={lang === 'he' ? rtlCache : undefined}
         theme={{
           colorScheme,
+          dir: lang === 'he' ? 'rtl' : 'ltr',
           breakpoints: {
             xs: '30em',
             sm: '48em',

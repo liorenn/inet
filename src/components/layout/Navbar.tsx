@@ -24,7 +24,7 @@ import NavBarDropdown from './NavbarDropdown'
 import { trpc } from '../../misc/trpc'
 import { currencies, useCurrency } from '../../hooks/useCurrency'
 import { usePostHog } from 'posthog-js/react'
-import { adminAccessKey } from '../../../config'
+import { adminAccessKey, websiteUrl } from '../../../config'
 import useAutoTrigger from '../../hooks/useAutoTrigger'
 import { useProfilePicture } from '../../hooks/useProfilePicture'
 import { useSpotlight } from '@mantine/spotlight'
@@ -77,7 +77,9 @@ export default function Navbar() {
           onSuccess(data, params) {
             if (data === true) {
               setImageExists(true)
-              setImagePath(`../users/${encodeEmail(params.email)}.png`)
+              setImagePath(
+                `${websiteUrl}/users/${encodeEmail(params.email)}.png`
+              )
             }
           },
         }

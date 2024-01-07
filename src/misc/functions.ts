@@ -7,6 +7,7 @@ import { IconCheck, IconX, IconExclamationMark } from '@tabler/icons'
 import { type ReactElement } from 'react'
 import { PrismaClient, type Comment } from '@prisma/client'
 import { currrencyApiHost } from '../../config'
+import { Translate } from 'next-translate'
 
 export async function fetchCurrentPrice(deviceModel: string) {
   const prisma = new PrismaClient()
@@ -150,4 +151,13 @@ export function calculatePercentageDiff(
 
 export function encodeEmail(email: string) {
   return btoa(email)
+}
+
+export function translateDeviceName(t: Translate, name: string) {
+  return name
+    .split(' ')
+    .map((word) =>
+      Number.isNaN(parseFloat(word)) ? t(word.toLowerCase()) : word
+    )
+    .join(' ')
 }

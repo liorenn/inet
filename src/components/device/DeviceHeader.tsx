@@ -1,20 +1,21 @@
 import { useMantineColorScheme } from '@mantine/core'
 import { Group, Breadcrumbs, Text, Title } from '@mantine/core'
-import type { Device } from '@prisma/client'
 import useTranslation from 'next-translate/useTranslation'
+import { translateDeviceName } from '../../misc/functions'
+import type { Device } from '@prisma/client'
 import Link from 'next/link'
 
 type props = { device: Device }
 
 export default function DeviceHeader({ device }: props) {
   const { colorScheme } = useMantineColorScheme()
-  const { t } = useTranslation('translations')
+  const { t, lang } = useTranslation('translations')
   const dark = colorScheme === 'dark'
 
   const links = [
     { name: t('allDevices'), href: '/device' },
-    { name: device.type, href: `/device/${device.type}` },
-    { name: device.name, href: '#' },
+    { name: t(device.type), href: `/device/${device.type}` },
+    { name: translateDeviceName(t, device.name), href: '#' },
   ]
 
   return (
@@ -34,7 +35,11 @@ export default function DeviceHeader({ device }: props) {
           </Link>
         ))}
       </Breadcrumbs>
-      <Title order={2}>{`${device.name} ${t('information')}`}</Title>
+      <Title order={2}>
+        {lang === 'he'
+          ? `${t('information')} ${translateDeviceName(t, device.name)}`
+          : `${translateDeviceName(t, device.name)} ${t('information')}`}
+      </Title>
     </Group>
   )
 }

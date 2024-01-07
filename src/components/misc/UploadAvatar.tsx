@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { useProfilePicture } from '../../hooks/useProfilePicture'
 import { useRouter } from 'next/router'
+import { websiteUrl } from '../../../config'
 
 type props = {
   email: string
@@ -51,7 +52,7 @@ export default function ImageUploader({ email }: props) {
       }).then((response) => {
         if (response.ok) {
           CreateNotification('Profile Picture Changed', 'green')
-          setImagePath(`/users/${newFileName}`)
+          setImagePath(`${websiteUrl}/users/${newFileName}`)
           setFile(newFile)
           router.reload()
         }

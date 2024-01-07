@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import DevicePhotos from '../../components/device/DevicePhotos'
 import DevicesSpecs from '../../components/device/DevicesSpecs'
 import { z } from 'zod'
+import { translateDeviceName } from '../../misc/functions'
 import {
   Container,
   Group,
@@ -101,7 +102,7 @@ export default function Compare() {
               onChange={(e) => updateDeviceList(e, index)}
               data={allDevices.map((value) => ({
                 value: value.model,
-                label: value.name,
+                label: translateDeviceName(t, value.name),
               }))}
             />
           ))}

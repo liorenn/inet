@@ -50,17 +50,17 @@ export default function UserManagement({ accessKey }: props) {
           <Table mb='md' withBorder withColumnBorders>
             <thead>
               <tr>
-                {fieldNames.map((name, index) => {
-                  return <th key={index}>{t(name)}</th>
-                })}
+                {fieldNames.map((name, index) => (
+                  <th key={index}>{t(name)}</th>
+                ))}
                 <th>{t('updateAccount')}</th>
                 <th>{t('deleteAccount')}</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((data, index) => {
-                return <UserRow setUsers={setUsers} data={data} key={index} />
-              })}
+              {users.map((data, index) => (
+                <UserRow setUsers={setUsers} data={data} key={index} />
+              ))}
               <InsertRow setUsers={setUsers} />
             </tbody>
           </Table>

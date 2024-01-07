@@ -1,8 +1,8 @@
 import { useMantineColorScheme } from '@mantine/core'
 import { Group, Breadcrumbs, Text, Title } from '@mantine/core'
-import Link from 'next/link'
 import type { DeviceType } from '../../models/deviceTypes'
 import useTranslation from 'next-translate/useTranslation'
+import Link from 'next/link'
 
 type props = {
   deviceType: DeviceType
@@ -14,7 +14,7 @@ export default function DeviceTypeHeader({ deviceType }: props) {
   const { t } = useTranslation('translations')
   const links = [
     { name: t('allDevices'), href: '/device' },
-    { name: deviceType, href: `/device/${deviceType}` },
+    { name: t(deviceType), href: `/device/${deviceType}` },
   ]
 
   return (
@@ -34,7 +34,7 @@ export default function DeviceTypeHeader({ deviceType }: props) {
           </Link>
         ))}
       </Breadcrumbs>
-      <Title order={2}>{`${t('all')} ${deviceType}`}</Title>
+      <Title order={2}>{`${t('all')} ${t(`${deviceType}Plural`)}`}</Title>
     </Group>
   )
 }

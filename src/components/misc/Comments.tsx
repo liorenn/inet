@@ -93,10 +93,7 @@ export default function Comments({ device }: props) {
               <Group position='apart'>
                 <Group sx={{ padding: 10 }}>
                   {user?.email && (
-                    <Avatar
-                      src={imageExists ? `../${imagePath}` : ''}
-                      radius='md'
-                    />
+                    <Avatar src={imageExists ? imagePath : ''} radius='md' />
                   )}
                   <div>
                     <Text size='lg' weight={500}>

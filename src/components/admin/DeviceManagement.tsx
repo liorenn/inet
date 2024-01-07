@@ -50,19 +50,17 @@ export default function DeviceManagement({ accessKey }: props) {
           <Table mb='md' withBorder withColumnBorders>
             <thead>
               <tr>
-                {fieldNames.map((name, index) => {
-                  return <th key={index}>{t(name)}</th>
-                })}
+                {fieldNames.map((name, index) => (
+                  <th key={index}>{t(name)}</th>
+                ))}
                 <th>{t('updateDevice')}</th>
                 <th>{t('deleteDevice')}</th>
               </tr>
             </thead>
             <tbody>
-              {devices.map((data, index) => {
-                return (
-                  <DeviceRow setDevices={setDevices} data={data} key={index} />
-                )
-              })}
+              {devices.map((data, index) => (
+                <DeviceRow setDevices={setDevices} data={data} key={index} />
+              ))}
               <InsertRow setUsers={setDevices} />
             </tbody>
           </Table>

@@ -27,7 +27,7 @@ export default function ViaEmail() {
   //   const { error } = await supabase.auth.signInWithOtp({
   //     email: fields.email,
   //     options: {
-  //       emailRedirectTo: 'http://localhost:3000/',
+  //       emailRedirectTo: '${websiteUrl}/',
   //     },
   //   })
   //   if (!error) {

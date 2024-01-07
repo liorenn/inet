@@ -9,7 +9,7 @@ export const posthogApiHost = 'https://app.posthog.com'
 export const supabaseUrl = 'https://dwbtkafawtzpzntudwnb.supabase.co'
 export const resendKey = 're_NYkzJuoA_HKpebBG3fLp81SB688GPnej4'
 export const fromEmail = 'onboarding@resend.dev'
-export const developmentWebsiteUrl = 'http://localhost:3000'
+export const websiteUrl = 'http://localhost:3000'
 export const supabaseAnonKey =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3YnRrYWZhd3R6cHpudHVkd25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjM2MTc0MDksImV4cCI6MTk3OTE5MzQwOX0.84xKcgBpyzJbRVpQCEm3jASkMyame_hrrcxsLVkPaeo'
 export const currrencyApiHost =

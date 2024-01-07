@@ -203,6 +203,13 @@ export default {
   mac: 'Mac',
   imac: 'iMac',
   macbook: 'MacBook',
+  iphonePlural: 'iPhones',
+  ipadPlural: 'iPad',
+  airpodsPlural: 'Airpods',
+  macPlural: 'Macs',
+  imacPlural: 'iMacs',
+  macbookPlural: 'Macbooks',
   configsEditor: 'Configurations Editor',
   find: 'Find Your Device',
+  pro: 'Pro',
 }

@@ -4,6 +4,7 @@ import type { DeviceType, devicePropertiesType } from '../../models/deviceTypes'
 import useTranslation from 'next-translate/useTranslation'
 import FavoritesButtons from '../misc/FavoritesButtons'
 import Link from 'next/link'
+import { translateDeviceName } from '../../misc/functions'
 
 type props = {
   device: devicePropertiesType
@@ -19,14 +20,12 @@ export default function DeviceCard({ device, deviceType }: props) {
         <Space h='lg' />
         <DevicePhotos device={device} miniphotos={false} />
       </Card.Section>
-
       <Text
         weight={500}
         style={{ marginBottom: 10, fontSize: 30 }}
         align='center'>
-        {device.name}
+        {translateDeviceName(t, device.name)}
       </Text>
-
       <Grid sx={{ marginTop: 2 }}>
         <Grid.Col span={6}>
           <Link

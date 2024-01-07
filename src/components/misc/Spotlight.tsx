@@ -16,19 +16,51 @@ import {
   IconDeviceDesktop,
   IconDevicesPc,
 } from '@tabler/icons'
+import { Translate } from 'next-translate'
+import { translateDeviceName } from '../../misc/functions'
 
 function createActionsArray(
+  t: Translate,
   devices: Device[],
   router: NextRouter
 ): SpotlightAction[] {
   return devices.map((device) => ({
-    title: device.name,
-    group: device.type,
+    title: translateDeviceName(t, device.name),
+    group: t(device.type),
     description: getDeviceDescription(device),
     onTrigger: () => router.push(`/device/${device.type}/${device.model}`),
-    icon: getActionIcon(device.type),
+    icon: icons.find((icon) => icon.type === device.type)?.icon ?? (
+      <IconDevices size={28} />
+    ),
   }))
 }
+
+const icons = [
+  {
+    type: 'iphone',
+    icon: <IconDeviceMobile size={28} />,
+  },
+  {
+    type: 'ipad',
+    icon: <IconDeviceTablet size={28} />,
+  },
+  {
+    type: 'airpods',
+    icon: <IconDeviceAirpods size={28} />,
+  },
+  {
+    type: 'mac',
+    icon: <IconDevicesPc size={28} />,
+  },
+  {
+    type: 'imac',
+    icon: <IconDeviceDesktop size={28} />,
+  },
+  {
+    type: 'macbook',
+    icon: <IconDeviceLaptop size={28} />,
+  },
+]
 
 function getDeviceDescription(device: Device) {
   switch (device.type) {
@@ -51,36 +83,17 @@ function getDeviceDescription(device: Device) {
   }
 }
 
-function getActionIcon(deviceType: string) {
-  const size = 28
-  switch (deviceType) {
-    case 'iphone':
-      return <IconDeviceMobile size={size} />
-    case 'ipad':
-      return <IconDeviceTablet size={size} />
-    case 'airpods':
-      return <IconDeviceAirpods size={size} />
-    case 'mac':
-      return <IconDevicesPc size={size} />
-    case 'imac':
-      return <IconDeviceDesktop size={size} />
-    case 'macbook':
-      return <IconDeviceLaptop size={size} />
-    default:
-      return <IconDevices size={size} />
-  }
-}
-
 export function SpotlightControl({ children }: { children: ReactNode }) {
   const { t } = useTranslation('translations')
   const { data } = trpc.device.getDevicesData.useQuery()
   const router = useRouter()
   const actions = useMemo(() => {
     if (data) {
-      return createActionsArray(data, router)
+      return createActionsArray(t, data, router)
     } else {
       return []
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, router])
 
   return (

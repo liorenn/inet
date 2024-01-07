@@ -48,7 +48,7 @@ export default function WebsiteStatistics({ accessKey }: props) {
       frameBorder='0'
       className='dark:invert dark:grayscale-[50%]'
       style={{
-        filter: colorScheme === 'dark' ? 'invert(89%) grayscale(5%)' : '',
+        filter: colorScheme === 'dark' ? 'invert(93%) grayscale(5%)' : '',
       }}
       src='https://app.posthog.com/embedded/KJRt4aEDq1jeyaE_X4QvknNun_WZrw'></iframe>
   )

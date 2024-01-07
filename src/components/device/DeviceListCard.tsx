@@ -5,6 +5,7 @@ import DevicePhotos from './DevicePhotos'
 import Link from 'next/link'
 import FavoritesButtons from '../misc/FavoritesButtons'
 import { Dispatch } from 'react'
+import { translateDeviceName } from '../../misc/functions'
 
 type props = {
   device: devicePropertiesType
@@ -30,7 +31,7 @@ export default function DeviceListCard({
         weight={500}
         style={{ marginBottom: 10, fontSize: 30 }}
         align='center'>
-        {device.name}
+        {translateDeviceName(t, device.name)}
       </Text>
 
       <Grid sx={{ marginTop: 2 }}>
