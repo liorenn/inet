@@ -2,7 +2,7 @@ import { type inferAsyncReturnType } from '@trpc/server'
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next'
 import type { SupabaseClient, Session } from '@supabase/supabase-js'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import { prisma } from './prisma'
+import { prisma } from '@/server/client'
 
 type CreateContextOptions = {
   session: Session | null

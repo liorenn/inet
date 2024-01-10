@@ -1,12 +1,13 @@
 import { Container, SimpleGrid } from '@mantine/core'
-import { useUser } from '@supabase/auth-helpers-react'
 import React, { useEffect, useState } from 'react'
-import type { devicePropertiesType } from '../../models/deviceTypes'
-import ListCard from '../../components/device/DeviceListCard'
-import useTranslation from 'next-translate/useTranslation'
-import Loader from '../../components/layout/Loader'
-import { trpc } from '../../misc/trpc'
+
 import Head from 'next/head'
+import ListCard from '@/components/device/DeviceListCard'
+import Loader from '@/components/layout/Loader'
+import type { devicePropertiesType } from '@/models/deviceTypes'
+import { trpc } from '@/server/client'
+import useTranslation from 'next-translate/useTranslation'
+import { useUser } from '@supabase/auth-helpers-react'
 
 export default function Favorites() {
   const user = useUser()
@@ -14,9 +15,7 @@ export default function Favorites() {
   const { data } = trpc.device.getUserDevices.useQuery({
     email: user?.email,
   })
-  const [devices, setDevices] = useState<devicePropertiesType[] | undefined>(
-    undefined
-  )
+  const [devices, setDevices] = useState<devicePropertiesType[] | undefined>(undefined)
 
   useEffect(() => {
     if (data && devices === undefined) {

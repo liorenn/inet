@@ -1,31 +1,25 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import {
-  Title,
-  Text,
-  Container,
-  Button,
-  SimpleGrid,
-  Center,
-} from '@mantine/core'
-import { TextInput, PasswordInput, Paper } from '@mantine/core'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { useForm } from '@mantine/form'
-import { trpc } from '../../../misc/trpc'
-import { CreateNotification } from '../../../misc/functions'
-import Head from 'next/head'
-import useTranslation from 'next-translate/useTranslation'
-import { usePostHog } from 'posthog-js/react'
-import { getSignInFields } from '../../../models/forms'
+import { Button, Center, Container, SimpleGrid, Text, Title } from '@mantine/core'
+import { Paper, PasswordInput, TextInput } from '@mantine/core'
 import { useEffect, useState } from 'react'
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
+
+import { CreateNotification } from '@/utils/utils'
+import Head from 'next/head'
+import Link from 'next/link'
+import { getSignInFields } from '@/models/forms'
+import { trpc } from '@/server/client'
+import { useForm } from '@mantine/form'
+import { usePostHog } from 'posthog-js/react'
+import { useRouter } from 'next/router'
+import useTranslation from 'next-translate/useTranslation'
 
 type formType = {
   email: string
   password: string
 }
 
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 export default function SignIn() {
   const router = useRouter()
   const posthog = usePostHog()
@@ -90,12 +84,7 @@ export default function SignIn() {
       <Container size={420} my={40}>
         <Title align='center'>{t('welcomeBack')}</Title>
         <Text color='dimmed' size='sm' align='center' mt={5}>
-          {t('dontHaveAnAccount')}{' '}
-          <Link href='/auth/signup'>{t('createAnAccount')}</Link>
-        </Text>
-        <Text color='dimmed' size='sm' align='center' mt={5}>
-          Forgot Your Password?{' '}
-          <Link href='/auth/resetPassword'>Reset Password</Link>
+          {t('dontHaveAnAccount')} <Link href='/auth/signUp'>{t('createAnAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
           <form onSubmit={form.onSubmit((values) => signIn(values))}>
@@ -109,27 +98,17 @@ export default function SignIn() {
               placeholder={`${t('enterYour')} ${t('password')}...`}
               {...form.getInputProps('password')}
             />
-            <Button
-              fullWidth
-              disabled={loading}
-              color='gray'
-              variant='light'
-              mt='xl'
-              type='submit'>
+            <Button fullWidth disabled={loading} color='gray' variant='light' mt='xl' type='submit'>
               {loading ? t('loading') : t('signIn')}
             </Button>
           </form>
           <SimpleGrid cols={2}>
-            <Link
-              href={'/auth/signin/viaemail'}
-              style={{ textDecoration: 'none' }}>
+            <Link href={'/auth/signin/viaemail'} style={{ textDecoration: 'none' }}>
               <Button color='gray' variant='light' fullWidth mt='lg'>
                 {t('viaEmail')}
               </Button>
             </Link>
-            <Link
-              href={'/auth/signin/viaphone'}
-              style={{ textDecoration: 'none' }}>
+            <Link href={'/auth/signin/viaphone'} style={{ textDecoration: 'none' }}>
               <Button color='gray' variant='light' fullWidth mt='lg' mb='sm'>
                 {t('viaPhone')}
               </Button>

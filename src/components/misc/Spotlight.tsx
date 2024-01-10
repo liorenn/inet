@@ -1,24 +1,25 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { SpotlightProvider } from '@mantine/spotlight'
-import type { SpotlightAction } from '@mantine/spotlight'
-import { ReactNode, useMemo } from 'react'
-import { trpc } from '../../misc/trpc'
-import { Device } from '@prisma/client'
-import { NextRouter, useRouter } from 'next/router'
-import useTranslation from 'next-translate/useTranslation'
 import {
-  IconSearch,
+  IconDeviceAirpods,
+  IconDeviceDesktop,
+  IconDeviceLaptop,
+  IconDeviceMobile,
   IconDeviceTablet,
   IconDevices,
-  IconDeviceAirpods,
-  IconDeviceMobile,
-  IconDeviceLaptop,
-  IconDeviceDesktop,
   IconDevicesPc,
+  IconSearch,
 } from '@tabler/icons'
-import { Translate } from 'next-translate'
-import { translateDeviceName } from '../../misc/functions'
+import { NextRouter, useRouter } from 'next/router'
+import { ReactNode, useMemo } from 'react'
 
+import { Device } from '@prisma/client'
+import type { SpotlightAction } from '@mantine/spotlight'
+import { SpotlightProvider } from '@mantine/spotlight'
+import { Translate } from 'next-translate'
+import { translateDeviceName } from '@/utils/utils'
+import { trpc } from '@/server/client'
+import useTranslation from 'next-translate/useTranslation'
+
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 function createActionsArray(
   t: Translate,
   devices: Device[],
@@ -29,9 +30,7 @@ function createActionsArray(
     group: t(device.type),
     description: getDeviceDescription(device),
     onTrigger: () => router.push(`/device/${device.type}/${device.model}`),
-    icon: icons.find((icon) => icon.type === device.type)?.icon ?? (
-      <IconDevices size={28} />
-    ),
+    icon: icons.find((icon) => icon.type === device.type)?.icon ?? <IconDevices size={28} />,
   }))
 }
 

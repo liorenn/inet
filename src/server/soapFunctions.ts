@@ -1,11 +1,12 @@
-import soapRequest from 'easy-soap-request'
-import { soapServerUrl } from '../../config'
-import type { deviceSchemaType, userSchemaType } from '../models/schemas'
 import {
-  soapRequestHeaders,
   createSoapRequestXml,
   getResultFromResponse,
-} from './soapHelpers'
+  soapRequestHeaders,
+} from '@/server/soapHelpers'
+import type { deviceSchemaType, userSchemaType } from '@/models/schemas'
+
+import soapRequest from 'easy-soap-request'
+import { soapServerUrl } from 'config'
 
 function convertObjectToJson(object: deviceSchemaType | userSchemaType) {
   return { Name: 'json', Value: JSON.stringify(object) }

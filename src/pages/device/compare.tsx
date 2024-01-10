@@ -1,22 +1,16 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import Head from 'next/head'
+import { Container, Group, SegmentedControl, Select, SimpleGrid } from '@mantine/core'
 import { useEffect, useState } from 'react'
+
+import DevicePhotos from '@/components/device/DevicePhotos'
+import DevicesSpecs from '@/components/device/DevicesSpecs'
+import Head from 'next/head'
+import Loader from '@/components/layout/Loader'
 import React from 'react'
-import { trpc } from '../../misc/trpc'
-import useTranslation from 'next-translate/useTranslation'
-import Loader from '../../components/layout/Loader'
+import { translateDeviceName } from '@/utils/utils'
+import { trpc } from '@/server/client'
 import { useRouter } from 'next/router'
-import DevicePhotos from '../../components/device/DevicePhotos'
-import DevicesSpecs from '../../components/device/DevicesSpecs'
+import useTranslation from 'next-translate/useTranslation'
 import { z } from 'zod'
-import { translateDeviceName } from '../../misc/functions'
-import {
-  Container,
-  Group,
-  SegmentedControl,
-  Select,
-  SimpleGrid,
-} from '@mantine/core'
 
 const Buttons = [
   { label: 'Two Devices', value: '2' },
@@ -24,6 +18,7 @@ const Buttons = [
   { label: 'Four Devices', value: '4' },
 ]
 
+/* eslint-disable @typescript-eslint/no-floating-promises */
 export default function Compare() {
   const { t } = useTranslation('translations')
   const router = useRouter()
@@ -45,14 +40,8 @@ export default function Compare() {
 
   useEffect(() => {
     if (allDevices) {
-      const arrayLength = Number(
-        Buttons.find((mark) => mark.value === value)?.value
-      )
-      router.push(
-        generateUrlSring(
-          allDevices.slice(0, arrayLength).map((device) => device.model)
-        )
-      )
+      const arrayLength = Number(Buttons.find((mark) => mark.value === value)?.value)
+      router.push(generateUrlSring(allDevices.slice(0, arrayLength).map((device) => device.model)))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allDevices, value])
@@ -85,13 +74,7 @@ export default function Compare() {
         <title>{t('compare')}</title>
       </Head>
       <Container size='lg'>
-        <SegmentedControl
-          value={value}
-          onChange={setValue}
-          data={Buttons}
-          size='lg'
-          fullWidth
-        />
+        <SegmentedControl value={value} onChange={setValue} data={Buttons} size='lg' fullWidth />
         <Group grow position='apart' mb='xs' mt='sm'>
           {deviceList.map((_, index) => (
             <Select

@@ -1,10 +1,11 @@
-import { useState } from 'react'
-import { IconMenu2 } from '@tabler/icons'
-import { Drawer, ActionIcon, Text, createStyles, rem } from '@mantine/core'
-import Link from 'next/link'
-import useTranslation from 'next-translate/useTranslation'
+import { ActionIcon, Drawer, Text, createStyles, rem } from '@mantine/core'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { CreateNotification } from '../../misc/functions'
+
+import { CreateNotification } from '@/utils/utils'
+import { IconMenu2 } from '@tabler/icons'
+import Link from 'next/link'
+import { useState } from 'react'
+import useTranslation from 'next-translate/useTranslation'
 
 type props = { AccessKey: number | undefined }
 
@@ -86,10 +87,7 @@ const useStyles = createStyles((theme) => ({
     textDecoration: 'none',
     borderTopRightRadius: theme.radius.md,
     borderBottomRightRadius: theme.radius.md,
-    color:
-      theme.colorScheme === 'dark'
-        ? theme.colors.dark[0]
-        : theme.colors.gray[7],
+    color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.colors.gray[7],
     padding: `0 ${theme.spacing.md}`,
     fontSize: theme.fontSizes.sm,
     marginRight: theme.spacing.md,
@@ -98,10 +96,7 @@ const useStyles = createStyles((theme) => ({
     lineHeight: rem(44),
 
     '&:hover': {
-      backgroundColor:
-        theme.colorScheme === 'dark'
-          ? theme.colors.dark[5]
-          : theme.colors.gray[1],
+      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
       color: theme.colorScheme === 'dark' ? theme.white : theme.black,
     },
   },

@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+
+import { Card, Grid, Stack, Text, Title } from '@mantine/core'
+import { IconBattery3, IconBrandApple, IconCoin } from '@tabler/icons'
 import { IconCalendarTime, IconCpu, IconTypography } from '@tabler/icons'
-import { IconCoin, IconBrandApple, IconBattery3 } from '@tabler/icons'
-import { Grid, Card, Text, Title, Stack } from '@mantine/core'
+
 import type { Device } from '@prisma/client'
+import { FormatDate } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
-import { FormatDate } from '../../misc/functions'
 
 type props = { device: Device }
 

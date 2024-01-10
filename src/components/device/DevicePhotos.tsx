@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
-import { Center, Stack, Group, Text, SimpleGrid, Grid } from '@mantine/core'
-import { Modal, useMantineColorScheme, Container } from '@mantine/core'
 import { ActionIcon, Image } from '@mantine/core'
-import { useViewportSize } from '@mantine/hooks'
+import { Center, Grid, Group, SimpleGrid, Stack, Text } from '@mantine/core'
+import { Container, Modal, useMantineColorScheme } from '@mantine/core'
+import { useEffect, useState } from 'react'
+
+import { devicePropertiesType } from '@/models/deviceTypes'
+import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
-import { devicePropertiesType } from '../../models/deviceTypes'
+import { useViewportSize } from '@mantine/hooks'
 
 type props = {
   device: devicePropertiesType
@@ -13,9 +15,7 @@ type props = {
 }
 
 function DevicePhotos({ device, miniphotos, withName }: props) {
-  const [activeLink, setActiveLink] = useState(
-    `/images/${device.type}/${device.model}_1.png`
-  )
+  const [activeLink, setActiveLink] = useState(`/images/${device.type}/${device.model}_1.png`)
   const [opened, setOpened] = useState(false)
   const { colorScheme } = useMantineColorScheme()
   const { width } = useViewportSize()
@@ -23,9 +23,7 @@ function DevicePhotos({ device, miniphotos, withName }: props) {
   const dark = colorScheme === 'dark'
   const images_src: string[] = []
   for (let i = 0; i < device.imageAmount; i++) {
-    images_src.push(
-      `/images/${device.type}/${device.model}_${(i + 1).toString()}.png`
-    )
+    images_src.push(`/images/${device.type}/${device.model}_${(i + 1).toString()}.png`)
   }
 
   useEffect(() => {
@@ -53,16 +51,10 @@ function DevicePhotos({ device, miniphotos, withName }: props) {
           size='85%'
           opened={opened}
           radius='md'
-          title={`${device.name} ${t('photos')}`}
+          title={`${translateDeviceName(t, device.name)} ${t('photos')}`}
           onClose={() => setOpened(false)}>
           <Center>
-            <Image
-              src={activeLink}
-              fit='contain'
-              alt={'photo'}
-              width={430}
-              height={550}
-            />
+            <Image src={activeLink} fit='contain' alt={'photo'} width={430} height={550} />
           </Center>
           <Container>
             <Group position='apart' spacing='md'>
@@ -94,7 +86,7 @@ function DevicePhotos({ device, miniphotos, withName }: props) {
                 caption={
                   withName && (
                     <Text mb='md' weight={500} size='lg'>
-                      {`${device.name} ${t('photos')}`}
+                      {`${translateDeviceName(t, device.name)} ${t('photos')}`}
                     </Text>
                   )
                 }

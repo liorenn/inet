@@ -1,18 +1,16 @@
+import { Accordion, Divider, Group, Text } from '@mantine/core'
+import { Avatar, Box, Button, Rating, Textarea } from '@mantine/core'
+import { CreateNotification, calculateAverageRating } from '@/utils/utils'
+import type { Device, Comment as commentType } from '@prisma/client'
 import { useEffect, useState } from 'react'
+
+import Comment from '@/components/misc/Comment'
 import type { FormEvent } from 'react'
-import Comment from './Comment'
-import { Textarea, Button, Box, Rating, Avatar } from '@mantine/core'
-import { Text, Divider, Group, Accordion } from '@mantine/core'
-import type { Comment as commentType, Device } from '@prisma/client'
-import { trpc } from '../../misc/trpc'
-import {
-  calculateAverageRating,
-  CreateNotification,
-} from '../../misc/functions'
+import { trpc } from '@/server/client'
+import { useComments } from '@/hooks/useComments'
+import { useProfilePicture } from '@/hooks/useProfilePicture'
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
-import { useComments } from '../../hooks/useComments'
-import { useProfilePicture } from '../../hooks/useProfilePicture'
 
 type props = {
   device: Device
@@ -92,9 +90,7 @@ export default function Comments({ device }: props) {
             <form onSubmit={(e) => AddComment(e)}>
               <Group position='apart'>
                 <Group sx={{ padding: 10 }}>
-                  {user?.email && (
-                    <Avatar src={imageExists ? imagePath : ''} radius='md' />
-                  )}
+                  {user?.email && <Avatar src={imageExists ? imagePath : ''} radius='md' />}
                   <div>
                     <Text size='lg' weight={500}>
                       {username}
@@ -114,23 +110,14 @@ export default function Comments({ device }: props) {
                   </Button>
                 </Group>
               </Group>
-              <Textarea
-                minRows={4}
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-              />
+              <Textarea minRows={4} value={text} onChange={(e) => setText(e.target.value)} />
             </form>
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>
       <Box sx={{ marginBottom: 120 }}>
         {comments.map((comment, index) => (
-          <Comment
-            comment={comment}
-            comments={comments}
-            setComments={setComments}
-            key={index}
-          />
+          <Comment comment={comment} comments={comments} setComments={setComments} key={index} />
         ))}
       </Box>
     </Box>

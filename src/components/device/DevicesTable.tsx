@@ -1,12 +1,9 @@
-import { Table, Grid, Text, Group, Tooltip, ColorSwatch } from '@mantine/core'
+import { ColorSwatch, Grid, Group, Table, Text, Tooltip } from '@mantine/core'
+import type { colorsSpecsType, mergedCameraType } from '@/models/SpecsFormatter'
+import type { specsArrayType, specsDataType } from '@/models/SpecsFormatter'
+
+import PriceText from '@/components/misc/PriceText'
 import useTranslation from 'next-translate/useTranslation'
-import PriceText from '../misc/PriceText'
-import type {
-  colorsSpecsType,
-  mergedCameraType,
-  specsArrayType,
-  specsDataType,
-} from '../../models/SpecsFormatter'
 
 type props = {
   name: string
@@ -30,23 +27,19 @@ export default function DevicesTable({ specs, name }: props) {
                     sx={{ fontWeight: 600, fontSize: 20 }}>
                     <Text>{t(element.type)}</Text>
                   </Grid.Col>
-                  {Array.from({ length: element.megapixels.length }).map(
-                    (_, index) => {
-                      const megapixel = element.megapixels[index]
-                      return (
-                        <Grid.Col
-                          key={`b${index}`}
-                          span={60 / (element.megapixels.length + 1)}
-                          sx={{ fontWeight: 400, fontSize: 20 }}>
-                          <Text>
-                            {megapixel !== null
-                              ? `${megapixel} ${t('megapixelUnits')}`
-                              : t('none')}
-                          </Text>
-                        </Grid.Col>
-                      )
-                    }
-                  )}
+                  {Array.from({ length: element.megapixels.length }).map((_, index) => {
+                    const megapixel = element.megapixels[index]
+                    return (
+                      <Grid.Col
+                        key={`b${index}`}
+                        span={60 / (element.megapixels.length + 1)}
+                        sx={{ fontWeight: 400, fontSize: 20 }}>
+                        <Text>
+                          {megapixel !== null ? `${megapixel} ${t('megapixelUnits')}` : t('none')}
+                        </Text>
+                      </Grid.Col>
+                    )
+                  })}
                 </Grid>
               </td>
             </tr>
@@ -83,10 +76,7 @@ export default function DevicesTable({ specs, name }: props) {
                                 color='gray'
                                 label={color.color.name}
                                 key={`e${index}`}>
-                                <ColorSwatch
-                                  color={color.color.hex}
-                                  withShadow
-                                />
+                                <ColorSwatch color={color.color.hex} withShadow />
                               </Tooltip>
                             ))}
                           </Group>
@@ -115,9 +105,7 @@ export default function DevicesTable({ specs, name }: props) {
                           <Text>
                             {value === null ? (
                               t('none')
-                            ) : element.property
-                                .toLowerCase()
-                                .includes('price') ? (
+                            ) : element.property.toLowerCase().includes('price') ? (
                               <PriceText priceString={value} />
                             ) : (
                               `${value} ${t(`${element.property}Units`)}`

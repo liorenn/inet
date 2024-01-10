@@ -1,15 +1,14 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import { useState, useEffect } from 'react'
-import { convertPrice } from '../../misc/functions'
-import { useCurrency } from '../../hooks/useCurrency'
-import { Loader } from '@mantine/core'
+import { useEffect, useState } from 'react'
 
+import { Loader } from '@mantine/core'
+import { convertPrice } from '@/utils/price'
+import { useCurrency } from '@/hooks/useCurrency'
+
+/* eslint-disable @typescript-eslint/no-floating-promises */
 export default function PriceText({ priceString }: { priceString: string }) {
   const { currency } = useCurrency()
   const [price, setPrice] = useState<number>(parseFloat(priceString ?? '0'))
-  const [prevCurrency, setPrevCurrency] = useState<string | undefined>(
-    undefined
-  )
+  const [prevCurrency, setPrevCurrency] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     if (!currency) return

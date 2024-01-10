@@ -1,35 +1,27 @@
+import { calculatePercentageDiff, encodeEmail } from '@/utils/utils'
+import { commentSchema, updateSchema, userSchema } from '@/models/schemas'
+import { deleteUserSoap, insertUserSoap, updateUserSoap } from '../soapFunctions'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { fromEmail, resendKey, sendSoapRequest } from 'config'
+import { method, router } from '@/server/trpc'
+
+import PriceDropEmail from '@/components/misc/PriceDropEmail'
 import { Prisma } from '@prisma/client'
 import { Resend } from 'resend'
-import { sendSoapRequest, resendKey, fromEmail } from '../../../config'
-import PriceDropEmail from '../../components/misc/PriceDropEmail'
-import { router, publicProcedure } from '../trpc'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { fetchCurrentPrice } from '@/utils/price'
 import { z } from 'zod'
-import {
-  fetchCurrentPrice,
-  calculatePercentageDiff,
-  encodeEmail,
-} from '../../misc/functions'
-import { commentSchema, updateSchema, userSchema } from '../../models/schemas'
-import {
-  deleteUserSoap,
-  insertUserSoap,
-  updateUserSoap,
-} from '../soapFunctions'
 
 export const authRouter = router({
-  getConfigs: publicProcedure.query(() => {
+  getConfigs: method.query(() => {
     const filePath = 'config.ts'
     const fileContents = readFileSync(filePath, 'utf8')
     return fileContents
   }),
-  saveConfigs: publicProcedure
-    .input(z.object({ configs: z.string() }))
-    .mutation(({ input }) => {
-      const filePath = 'config.ts'
-      writeFileSync(filePath, input.configs)
-    }),
-  insertUser: publicProcedure
+  saveConfigs: method.input(z.object({ configs: z.string() })).mutation(({ input }) => {
+    const filePath = 'config.ts'
+    writeFileSync(filePath, input.configs)
+  }),
+  insertUser: method
     .input(userSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
       try {
@@ -49,7 +41,7 @@ export const authRouter = router({
         return false
       }
     }),
-  updateUser: publicProcedure
+  updateUser: method
     .input(userSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
       try {
@@ -69,7 +61,7 @@ export const authRouter = router({
         return false
       }
     }),
-  deleteUser: publicProcedure
+  deleteUser: method
     .input(z.object({ email: z.string(), FromAsp: z.boolean().optional() }))
     .mutation(async ({ ctx, input }) => {
       try {
@@ -89,22 +81,22 @@ export const authRouter = router({
         return false
       }
     }),
-  getUserColumns: publicProcedure.query(() => {
+  getUserColumns: method.query(() => {
     return Prisma.dmmf.datamodel.models.find((model) => model.name === 'User')
   }),
-  getTablesColumns: publicProcedure.query(() => {
+  getTablesColumns: method.query(() => {
     return Prisma.dmmf.datamodel.models
   }),
-  getTableData: publicProcedure
+  getTableData: method
     .input(z.object({ tableName: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const query = `SELECT * FROM \"${input.tableName}\"`
       return await ctx.prisma.$queryRawUnsafe(query)
     }),
-  getUsersData: publicProcedure.query(async ({ ctx }) => {
+  getUsersData: method.query(async ({ ctx }) => {
     return await ctx.prisma.user.findMany()
   }),
-  sendPriceDropsEmails: publicProcedure
+  sendPriceDropsEmails: method
     .input(z.object({ sendTest: z.boolean().optional() }))
     .mutation(async ({ ctx, input }) => {
       const devicesUsers = await ctx.prisma.deviceUser.findMany()
@@ -171,13 +163,11 @@ export const authRouter = router({
         }
       })
     }),
-  isImageExists: publicProcedure
-    .input(z.object({ email: z.string() }))
-    .mutation(({ input }) => {
-      const path = `public/users/${encodeEmail(input.email)}.png`
-      return existsSync(path)
-    }),
-  getCommentEmail: publicProcedure
+  isImageExists: method.input(z.object({ email: z.string() })).mutation(({ input }) => {
+    const path = `public/users/${encodeEmail(input.email)}.png`
+    return existsSync(path)
+  }),
+  getCommentEmail: method
     .input(z.object({ username: z.string() }))
     .query(async ({ ctx, input }) => {
       const comment = await ctx.prisma.user.findFirst({
@@ -185,17 +175,15 @@ export const authRouter = router({
       })
       return comment?.email
     }),
-  isCommentImageExists: publicProcedure
+  isCommentImageExists: method
     .input(z.object({ username: z.string() }))
     .query(async ({ ctx, input }) => {
       const comment = await ctx.prisma.user.findFirst({
         where: { username: input.username },
       })
-      return comment?.email
-        ? existsSync(`public/users/${encodeEmail(comment?.email)}.png`)
-        : false
+      return comment?.email ? existsSync(`public/users/${encodeEmail(comment?.email)}.png`) : false
     }),
-  editComment: publicProcedure
+  editComment: method
     .input(
       z.object({
         commentId: z.number(),
@@ -213,7 +201,7 @@ export const authRouter = router({
       })
       return comments
     }),
-  deleteComment: publicProcedure
+  deleteComment: method
     .input(z.object({ commentId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const comments = await ctx.prisma.comment.delete({
@@ -221,31 +209,27 @@ export const authRouter = router({
       })
       return comments
     }),
-  addComment: publicProcedure
-    .input(commentSchema)
-    .mutation(async ({ ctx, input }) => {
-      const { createdAt, message, model, rating, updatedAt, username } = input
-      const comment = await ctx.prisma.comment.create({
-        data: {
-          message,
-          rating,
-          updatedAt,
-          createdAt,
-          model,
-          username,
-        },
-      })
-      return comment
-    }),
-  getAllComments: publicProcedure
-    .input(z.object({ model: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const comments = await ctx.prisma.comment.findMany({
-        where: { model: input.model },
-      })
-      return comments
-    }),
-  updateUserDetails: publicProcedure
+  addComment: method.input(commentSchema).mutation(async ({ ctx, input }) => {
+    const { createdAt, message, model, rating, updatedAt, username } = input
+    const comment = await ctx.prisma.comment.create({
+      data: {
+        message,
+        rating,
+        updatedAt,
+        createdAt,
+        model,
+        username,
+      },
+    })
+    return comment
+  }),
+  getAllComments: method.input(z.object({ model: z.string() })).query(async ({ ctx, input }) => {
+    const comments = await ctx.prisma.comment.findMany({
+      where: { model: input.model },
+    })
+    return comments
+  }),
+  updateUserDetails: method
     .input(
       z.object({
         property: updateSchema,
@@ -261,7 +245,7 @@ export const authRouter = router({
       })
       return details
     }),
-  getUserDetails: publicProcedure
+  getUserDetails: method
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       if (input.email === undefined) return null
@@ -271,7 +255,7 @@ export const authRouter = router({
       })
       return details
     }),
-  getUserComments: publicProcedure
+  getUserComments: method
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       const details = await ctx.prisma.user.findFirst({
@@ -280,7 +264,7 @@ export const authRouter = router({
       })
       return details
     }),
-  getAccessKey: publicProcedure
+  getAccessKey: method
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       if (input.email === undefined) return 0
@@ -289,7 +273,7 @@ export const authRouter = router({
       })
       return user?.accessKey
     }),
-  createUser: publicProcedure
+  createUser: method
     .input(
       z.object({
         name: z.string(),
@@ -312,7 +296,7 @@ export const authRouter = router({
         },
       })
     }),
-  IsUserExists: publicProcedure
+  IsUserExists: method
     .input(
       z.object({
         email: z.string(),
@@ -329,9 +313,7 @@ export const authRouter = router({
       })
       return {
         email: !!userEmail,
-        username:
-          !!usernameUser &&
-          (userEmail ? userEmail.username === input?.username : true),
+        username: !!usernameUser && (userEmail ? userEmail.username === input?.username : true),
       }
     }),
 })

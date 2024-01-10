@@ -1,17 +1,18 @@
-import Link from 'next/link'
-import { Title, Text, Container, Button, Center } from '@mantine/core'
-import { TextInput, Paper } from '@mantine/core'
-import { useForm } from '@mantine/form'
-import { useRouter } from 'next/router'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { trpc } from '../../misc/trpc'
-import { CreateNotification } from '../../misc/functions'
-import Head from 'next/head'
-import useTranslation from 'next-translate/useTranslation'
-import { usePostHog } from 'posthog-js/react'
-import { User } from '@prisma/client'
-import { getSignUpFields } from '../../models/forms'
+import { Button, Center, Container, Text, Title } from '@mantine/core'
+import { Paper, TextInput } from '@mantine/core'
 import { useEffect, useState } from 'react'
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
+
+import { CreateNotification } from '@/utils/utils'
+import Head from 'next/head'
+import Link from 'next/link'
+import { User } from '@prisma/client'
+import { getSignUpFields } from '@/models/forms'
+import { trpc } from '@/server/client'
+import { useForm } from '@mantine/form'
+import { usePostHog } from 'posthog-js/react'
+import { useRouter } from 'next/router'
+import useTranslation from 'next-translate/useTranslation'
 
 export type formType = {
   [K in keyof Omit<User, 'accessKey'>]: string
@@ -110,7 +111,7 @@ export default function SignUp() {
         <Text color='dimmed' size='sm' align='center' mt={5}>
           {t('alreadyHaveAnAccount')}
           <br />
-          <Link href='/auth/`signin'>{t('signInYourAccount')}</Link>
+          <Link href='/auth/signIn'>{t('signInYourAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
           <form onSubmit={form.onSubmit((values) => signUp(values))}>
@@ -122,13 +123,7 @@ export default function SignUp() {
                 {...form.getInputProps(field.name)}
               />
             ))}
-            <Button
-              fullWidth
-              disabled={loading}
-              color='gray'
-              variant='light'
-              mt='xl'
-              type='submit'>
+            <Button fullWidth disabled={loading} color='gray' variant='light' mt='xl' type='submit'>
               {loading ? t('loading') : t('createAccount')}
             </Button>
           </form>

@@ -1,16 +1,17 @@
-import { trpc } from '../../misc/trpc'
-import useTranslation from 'next-translate/useTranslation'
-import type { User } from '@prisma/client'
-import { CreateNotification } from '../../misc/functions'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { useOs } from '@mantine/hooks'
-import { managerAccessKey } from '../../../config'
-import Loader from '../layout/Loader'
 import { Button, ScrollArea, Table, Text, TextInput } from '@mantine/core'
-import { useRouter } from 'next/router'
-import { userSchema } from '../../models/schemas'
-import { getUserFields, convertFormUserValues } from '../../models/forms'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
+import { convertFormUserValues, getUserFields } from '@/models/forms'
+
+import { CreateNotification } from '@/utils/utils'
+import Loader from '@/components/layout/Loader'
+import type { User } from '@prisma/client'
+import { managerAccessKey } from 'config'
+import { trpc } from '@/server/client'
+import { useOs } from '@mantine/hooks'
+import { useRouter } from 'next/router'
+import useTranslation from 'next-translate/useTranslation'
+import { userSchema } from '@/models/schemas'
 
 export type formType = {
   [K in keyof User]: string
@@ -95,19 +96,11 @@ function InsertRow({ setUsers }: insertRowProps) {
           setLoading(false)
           setUsers((prev) => [...prev, form.values])
           form.setValues(defaultValues)
-          CreateNotification(
-            t('insertedSuccessfully'),
-            'green',
-            os === 'ios' ? true : false
-          )
+          CreateNotification(t('insertedSuccessfully'), 'green', os === 'ios' ? true : false)
         },
         onError: () => {
           setLoading(false)
-          CreateNotification(
-            t('errorAccured'),
-            'red',
-            os === 'ios' ? true : false
-          )
+          CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false)
         },
       }
     )
@@ -118,12 +111,7 @@ function InsertRow({ setUsers }: insertRowProps) {
       <tr>
         {fields.map((field, index) => (
           <td key={index}>
-            <FormInput
-              form={form}
-              editMode={true}
-              disabled={false}
-              inputName={field.name}
-            />
+            <FormInput form={form} editMode={true} disabled={false} inputName={field.name} />
           </td>
         ))}
         <td colSpan={2}>
@@ -169,19 +157,11 @@ function UserRow({ data, setUsers }: userRowProps) {
         onSuccess: () => {
           setLoading(false)
           setUsers((prev) => prev.filter((user) => user.email !== data.email))
-          CreateNotification(
-            t('deletedSuccessfully'),
-            'green',
-            os === 'ios' ? true : false
-          )
+          CreateNotification(t('deletedSuccessfully'), 'green', os === 'ios' ? true : false)
         },
         onError: () => {
           setLoading(false)
-          CreateNotification(
-            t('errorAccured'),
-            'red',
-            os === 'ios' ? true : false
-          )
+          CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false)
         },
       }
     )
@@ -194,19 +174,11 @@ function UserRow({ data, setUsers }: userRowProps) {
           { ...convertFormUserValues(form.values) },
           {
             onSuccess: () => {
-              CreateNotification(
-                t('updatedSuccessfully'),
-                'green',
-                os === 'ios' ? true : false
-              )
+              CreateNotification(t('updatedSuccessfully'), 'green', os === 'ios' ? true : false)
             },
             onError: () => {
               form.setValues(data)
-              CreateNotification(
-                t('errorAccured'),
-                'red',
-                os === 'ios' ? true : false
-              )
+              CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false)
             },
           }
         )
@@ -239,12 +211,7 @@ function UserRow({ data, setUsers }: userRowProps) {
               {t('editAccount')}
             </Button>
           ) : (
-            <Button
-              fullWidth
-              onClick={handleUpdate}
-              color='lime'
-              variant='light'
-              type='submit'>
+            <Button fullWidth onClick={handleUpdate} color='lime' variant='light' type='submit'>
               {t('updateAccount')}
             </Button>
           )}

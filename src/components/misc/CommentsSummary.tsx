@@ -1,8 +1,9 @@
-import { Text, Group, Rating, Button } from '@mantine/core'
-import { useWindowScroll } from '@mantine/hooks'
+import { Button, Group, Rating, Text } from '@mantine/core'
+
 import { IconArrowDown } from '@tabler/icons'
+import { useComments } from '@/hooks/useComments'
 import useTranslation from 'next-translate/useTranslation'
-import { useComments } from '../../hooks/useComments'
+import { useWindowScroll } from '@mantine/hooks'
 
 export default function CommentsSummary() {
   const { t } = useTranslation('translations')
@@ -11,9 +12,9 @@ export default function CommentsSummary() {
   const { commentsAmount, ratingValue } = useComments()
   return (
     <Group position='right'>
-      <Text weight={600}>{`${
-        ratingValue === 0 ? 0 : ratingValue.toFixed(1)
-      } ${t('deviceRating')}`}</Text>
+      <Text weight={600}>{`${ratingValue === 0 ? 0 : ratingValue.toFixed(1)} ${t(
+        'deviceRating'
+      )}`}</Text>
       <Rating value={ratingValue} fractions={2} readOnly />
       <Button
         variant='light'

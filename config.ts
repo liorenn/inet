@@ -12,5 +12,4 @@ export const fromEmail = 'onboarding@resend.dev'
 export const websiteUrl = 'http://localhost:3000'
 export const supabaseAnonKey =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3YnRrYWZhd3R6cHpudHVkd25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjM2MTc0MDksImV4cCI6MTk3OTE5MzQwOX0.84xKcgBpyzJbRVpQCEm3jASkMyame_hrrcxsLVkPaeo'
-export const currrencyApiHost =
-  'https://api.freecurrencyapi.com/v1/latest?apikey'
+export const currrencyApiHost = 'https://api.freecurrencyapi.com/v1/latest?apikey'

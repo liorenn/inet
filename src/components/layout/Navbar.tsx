@@ -1,33 +1,24 @@
-import {
-  IconSun,
-  IconMoon,
-  IconLanguage,
-  IconCurrencyDollar,
-  IconSearch,
-} from '@tabler/icons'
-import { createStyles, Container, Avatar, Menu } from '@mantine/core'
-import { Header, Group, Button, Text } from '@mantine/core'
 import { ActionIcon, useMantineColorScheme } from '@mantine/core'
-import Link from 'next/link'
-import {
-  useSession,
-  useSupabaseClient,
-  useUser,
-} from '@supabase/auth-helpers-react'
+import { Avatar, Container, Menu, createStyles } from '@mantine/core'
+import { Button, Group, Header, Text } from '@mantine/core'
+import { CreateNotification, encodeEmail } from '@/utils/utils'
+import { DEFlag, GBFlag, ILFlag } from 'mantine-flagpack'
+import { IconCurrencyDollar, IconLanguage, IconMoon, IconSearch, IconSun } from '@tabler/icons'
+import { adminAccessKey, websiteUrl } from 'config'
+import { currencies, useCurrency } from '@/hooks/useCurrency'
+import { languages, useLanguage } from '@/hooks/useLanguage'
 import { useEffect, useState } from 'react'
-import { CreateNotification, encodeEmail } from '../../misc/functions'
-import { DEFlag, ILFlag, GBFlag } from 'mantine-flagpack'
-import { languages, useLanguage } from '../../hooks/useLanguage'
+import { useSession, useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
+
+import Link from 'next/link'
+import NavBarDropdown from '@/components/layout/NavbarDropdown'
 import setLanguage from 'next-translate/setLanguage'
-import useTranslation from 'next-translate/useTranslation'
-import NavBarDropdown from './NavbarDropdown'
-import { trpc } from '../../misc/trpc'
-import { currencies, useCurrency } from '../../hooks/useCurrency'
+import { trpc } from '@/server/client'
+import useAutoTrigger from '@/hooks/useAutoTrigger'
 import { usePostHog } from 'posthog-js/react'
-import { adminAccessKey, websiteUrl } from '../../../config'
-import useAutoTrigger from '../../hooks/useAutoTrigger'
-import { useProfilePicture } from '../../hooks/useProfilePicture'
+import { useProfilePicture } from '@/hooks/useProfilePicture'
 import { useSpotlight } from '@mantine/spotlight'
+import useTranslation from 'next-translate/useTranslation'
 
 export default function Navbar() {
   useAutoTrigger()
@@ -38,8 +29,7 @@ export default function Navbar() {
   const { t } = useTranslation('translations')
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
-  const { imagePath, imageExists, setImageExists, setImagePath } =
-    useProfilePicture()
+  const { imagePath, imageExists, setImageExists, setImagePath } = useProfilePicture()
   const { mutate: isImageExists } = trpc.auth.isImageExists.useMutation()
   const supabase = useSupabaseClient()
   const spotlight = useSpotlight()
@@ -52,16 +42,13 @@ export default function Navbar() {
 
   useEffect(() => {
     setlanguageStore(
-      languages.find(
-        (lang) => lang.value === localStorage.getItem('language')
-      ) ?? languages[0]
+      languages.find((lang) => lang.value === localStorage.getItem('language')) ?? languages[0]
     )
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     setLanguage(localStorage.getItem('language') ?? 'en')
     setCurrency(
-      currencies.find(
-        (Currency) => Currency.value === localStorage.getItem('currency')
-      ) ?? currencies[0]
+      currencies.find((Currency) => Currency.value === localStorage.getItem('currency')) ??
+        currencies[0]
     )
     supabase.auth.onAuthStateChange((_e, session) => {
       setSession(session)
@@ -77,9 +64,7 @@ export default function Navbar() {
           onSuccess(data, params) {
             if (data === true) {
               setImageExists(true)
-              setImagePath(
-                `${websiteUrl}/users/${encodeEmail(params.email)}.png`
-              )
+              setImagePath(`${websiteUrl}/users/${encodeEmail(params.email)}.png`)
             }
           },
         }
@@ -122,39 +107,23 @@ export default function Navbar() {
         </Group>
         <Group spacing={5} className={classes.buttons}>
           <Link href={'/device/compare'}>
-            <Button
-              variant='light'
-              color='gray'
-              radius='md'
-              className={classes.end}>
+            <Button variant='light' color='gray' radius='md' className={classes.end}>
               {t('compare')}
             </Button>
           </Link>
           <Link href={'/device/find'}>
-            <Button
-              variant='light'
-              color='gray'
-              radius='md'
-              className={classes.end}>
+            <Button variant='light' color='gray' radius='md' className={classes.end}>
               {t('find')}
             </Button>
           </Link>
           <Link href={'/device'}>
-            <Button
-              variant='light'
-              color='gray'
-              radius='md'
-              className={classes.end}>
+            <Button variant='light' color='gray' radius='md' className={classes.end}>
               {t('allDevices')}
             </Button>
           </Link>
           {session && (
             <Link href={'/device/favorites'}>
-              <Button
-                variant='light'
-                color='gray'
-                radius='md'
-                className={classes.end}>
+              <Button variant='light' color='gray' radius='md' className={classes.end}>
                 {t('favorites')}
               </Button>
             </Link>
@@ -163,21 +132,13 @@ export default function Navbar() {
         <Group>
           {!session ? (
             <>
-              <Link href={'/auth/signin'}>
-                <Button
-                  variant='light'
-                  color='gray'
-                  radius='md'
-                  className={classes.end}>
+              <Link href={'/auth/signIn'}>
+                <Button variant='light' color='gray' radius='md' className={classes.end}>
                   {t('signIn')}
                 </Button>
               </Link>
-              <Link href={'/auth/signup'}>
-                <Button
-                  variant='light'
-                  color='gray'
-                  radius='md'
-                  className={classes.end}>
+              <Link href={'/auth/signUp'}>
+                <Button variant='light' color='gray' radius='md' className={classes.end}>
                   {t('signUp')}
                 </Button>
               </Link>
@@ -186,11 +147,7 @@ export default function Navbar() {
             <>
               {AccessKey !== undefined && AccessKey >= adminAccessKey && (
                 <Link href={'/auth/admin'}>
-                  <Button
-                    variant='light'
-                    color='gray'
-                    radius='md'
-                    className={classes.end}>
+                  <Button variant='light' color='gray' radius='md' className={classes.end}>
                     {t('admin')}
                   </Button>
                 </Link>
@@ -238,8 +195,7 @@ export default function Navbar() {
                   key={Currency.value}
                   mt={6}
                   style={{
-                    background:
-                      currency?.value === Currency.value ? '#1c1c1c' : '',
+                    background: currency?.value === Currency.value ? '#1c1c1c' : '',
                   }}
                   icon={Currency.icon({})}
                   onClick={() => {
@@ -296,11 +252,7 @@ export default function Navbar() {
             color='gray'
             onClick={() => toggleColorScheme()}
             title={t('toggleColorScheme')}>
-            {colorScheme === 'dark' ? (
-              <IconSun size={18} />
-            ) : (
-              <IconMoon size={18} />
-            )}
+            {colorScheme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
           </ActionIcon>
         </Group>
       </Container>

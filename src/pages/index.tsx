@@ -1,11 +1,13 @@
-import { Button, Text, Title, Input, Card, SimpleGrid } from '@mantine/core'
-import { Stack, Container } from '@mantine/core'
-import useTranslation from 'next-translate/useTranslation'
+import { Button, Card, Input, SimpleGrid, Text, Title } from '@mantine/core'
+import { Container, Stack } from '@mantine/core'
+
 import Head from 'next/head'
+import { IconDevices } from '@tabler/icons'
+import { trpc } from '@/server/client'
 import { useSpotlight } from '@mantine/spotlight'
 import { useState } from 'react'
+import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
-import { IconDevices } from '@tabler/icons'
 
 export default function Index() {
   const { t } = useTranslation('translations')
@@ -13,6 +15,8 @@ export default function Index() {
   const spotlight = useSpotlight()
   const [value, setValue] = useState('')
   const { width } = useViewportSize()
+  const { data } = trpc.device.test.useQuery()
+  console.log(data)
 
   return (
     <>
@@ -56,15 +60,9 @@ export default function Index() {
                 Compare Phone Models
               </Text>
               <Text size='md' mt='xs' color='dimmed'>
-                Compare different phone models to find the one that suits your
-                needs best.
+                Compare different phone models to find the one that suits your needs best.
               </Text>
-              <Button
-                variant='light'
-                color='gray'
-                mt='md'
-                fullWidth
-                radius='md'>
+              <Button variant='light' color='gray' mt='md' fullWidth radius='md'>
                 Compare Now
               </Button>
             </Card>
@@ -73,15 +71,9 @@ export default function Index() {
                 Find Your Device
               </Text>
               <Text size='md' mt='xs' color='dimmed'>
-                Find Your Device that suits your needs best based on your exact
-                Preferences.
+                Find Your Device that suits your needs best based on your exact Preferences.
               </Text>
-              <Button
-                variant='light'
-                color='gray'
-                mt='md'
-                fullWidth
-                radius='md'>
+              <Button variant='light' color='gray' mt='md' fullWidth radius='md'>
                 Find Now
               </Button>
             </Card>

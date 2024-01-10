@@ -1,22 +1,15 @@
+import { convertPreferencesToValues, preferenceType } from '@/server/match'
+import { deleteDeviceSoap, insertDeviceSoap, updateDeviceSoap } from '@/server/soapFunctions'
+import { getMatchedDevices, matchDeviceType } from '@/server/match'
+import { method, router } from '@/server/trpc'
+
+import type { devicePropertiesType } from '@/models/deviceTypes'
+import { deviceSchema } from '@/models/schemas'
+import { sendSoapRequest } from 'config'
 import { z } from 'zod'
-import { router, publicProcedure } from '../trpc'
-import { sendSoapRequest } from '../../../config'
-import { deviceSchema } from '../../models/schemas'
-import {
-  deleteDeviceSoap,
-  insertDeviceSoap,
-  updateDeviceSoap,
-} from '../soapFunctions'
-import type { devicePropertiesType } from '../../models/deviceTypes'
-import {
-  getMatchedDevices,
-  matchDeviceType,
-  preferenceType,
-  convertPreferencesToValues,
-} from '../match'
 
 export const DeviceRouter = router({
-  test: publicProcedure.query(async ({ ctx }) => {
+  test: method.query(async ({ ctx }) => {
     const userPreferences: preferenceType[] = [
       { name: 'screenSize', value: 4 },
       { name: 'batterySize', value: 4 },
@@ -50,7 +43,7 @@ export const DeviceRouter = router({
       }),
     ]
   }),
-  insertDevice: publicProcedure
+  insertDevice: method
     .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
       try {
@@ -68,7 +61,7 @@ export const DeviceRouter = router({
         return false
       }
     }),
-  updateDevice: publicProcedure
+  updateDevice: method
     .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
@@ -88,7 +81,7 @@ export const DeviceRouter = router({
         return false
       }
     }),
-  deleteDevice: publicProcedure
+  deleteDevice: method
     .input(z.object({ model: z.string(), FromAsp: z.boolean().optional() }))
     .mutation(async ({ ctx, input }) => {
       try {
@@ -104,70 +97,60 @@ export const DeviceRouter = router({
         return false
       }
     }),
-  getDevicesData: publicProcedure.query(async ({ ctx }) => {
+  getDevicesData: method.query(async ({ ctx }) => {
     return await ctx.prisma.device.findMany()
   }),
-  getDevices: publicProcedure
-    .input(z.object({ deviceType: z.string() }))
-    .query(async ({ ctx, input }) => {
-      return await ctx.prisma.device.findMany({
-        select: { model: true, name: true, type: true, imageAmount: true },
-        where: {
-          deviceType: {
-            name: input.deviceType,
-          },
+  getDevices: method.input(z.object({ deviceType: z.string() })).query(async ({ ctx, input }) => {
+    return await ctx.prisma.device.findMany({
+      select: { model: true, name: true, type: true, imageAmount: true },
+      where: {
+        deviceType: {
+          name: input.deviceType,
         },
-      })
-    }),
-  getDevice: publicProcedure
-    .input(z.object({ model: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const device = await ctx.prisma.device.findFirst({
-        where: { model: input.model },
-        include: {
-          cameras: { select: { type: true, megapixel: true } },
-          colors: { select: { color: true } },
+      },
+    })
+  }),
+  getDevice: method.input(z.object({ model: z.string() })).query(async ({ ctx, input }) => {
+    const device = await ctx.prisma.device.findFirst({
+      where: { model: input.model },
+      include: {
+        cameras: { select: { type: true, megapixel: true } },
+        colors: { select: { color: true } },
+      },
+    })
+    return device
+  }),
+  getDevicesFromArr: method.input(z.array(z.string()).optional()).query(async ({ ctx, input }) => {
+    if (!input) return []
+    const devices = await ctx.prisma.device.findMany({
+      where: {
+        model: {
+          in: input,
         },
-      })
-      return device
-    }),
-  getDevicesFromArr: publicProcedure
-    .input(z.array(z.string()).optional())
-    .query(async ({ ctx, input }) => {
-      if (!input) return []
-      const devices = await ctx.prisma.device.findMany({
-        where: {
-          model: {
-            in: input,
-          },
-        },
-        include: {
-          cameras: { select: { type: true, megapixel: true } },
-          colors: { select: { color: true } },
-        },
-      })
-      return devices
-    }),
-  getModelsAndNames: publicProcedure.query(async ({ ctx }) => {
+      },
+      include: {
+        cameras: { select: { type: true, megapixel: true } },
+        colors: { select: { color: true } },
+      },
+    })
+    return devices
+  }),
+  getModelsAndNames: method.query(async ({ ctx }) => {
     const devices = await ctx.prisma.device.findMany({
       select: { model: true, name: true },
     })
     return devices
   }),
-  isDeviceInUser: publicProcedure
+  isDeviceInUser: method
     .input(z.object({ model: z.string(), email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       const user = await ctx.prisma.user.findFirst({
         where: { email: input.email },
         select: { deviceList: true },
       })
-      return (
-        user?.deviceList?.find(
-          (device) => device.deviceModel === input.model
-        ) !== undefined
-      )
+      return user?.deviceList?.find((device) => device.deviceModel === input.model) !== undefined
     }),
-  addToFavorites: publicProcedure
+  addToFavorites: method
     .input(z.object({ model: z.string(), email: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.user.update({
@@ -181,7 +164,7 @@ export const DeviceRouter = router({
         },
       })
     }),
-  deleteFromFavorites: publicProcedure
+  deleteFromFavorites: method
     .input(z.object({ model: z.string(), email: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.user.update({
@@ -198,7 +181,7 @@ export const DeviceRouter = router({
         },
       })
     }),
-  getUserDevices: publicProcedure
+  getUserDevices: method
     .input(
       z.object({
         email: z.string().optional(),
@@ -227,7 +210,7 @@ export const DeviceRouter = router({
       }
       return devicesArr
     }),
-  getUserDevicesFromUserTable: publicProcedure
+  getUserDevicesFromUserTable: method
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       return await ctx.prisma.user.findFirst({

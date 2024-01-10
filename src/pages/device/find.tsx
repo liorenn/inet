@@ -1,7 +1,8 @@
 import { Container, SegmentedControl, Stack, Text } from '@mantine/core'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+
 import Head from 'next/head'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { z } from 'zod'
 
 type inputType = { value: string; label: string }[]
@@ -40,9 +41,7 @@ export default function Find() {
   useEffect(() => {
     if (!router.query.preferences) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      router.push(
-        generateUrlString(preferencesNames.map((name) => ({ name, value: '' })))
-      )
+      router.push(generateUrlString(preferencesNames.map((name) => ({ name, value: '' }))))
     }
   }, [router])
 
@@ -56,12 +55,7 @@ export default function Find() {
       <Container size={1000}>
         {preferences &&
           inputs.map((input: inputType, index: number) => (
-            <PreferenceInput
-              value={input}
-              preferences={preferences}
-              index={index}
-              key={index}
-            />
+            <PreferenceInput value={input} preferences={preferences} index={index} key={index} />
           ))}
       </Container>
     </>
@@ -87,8 +81,7 @@ function PreferenceInput({ value, index, preferences }: preferenceInputType) {
           value={preferences[index].value}
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onChange={(newValue) => (
-            (preferences[index].value = newValue),
-            router.push(generateUrlString(preferences))
+            (preferences[index].value = newValue), router.push(generateUrlString(preferences))
           )}
         />
       </Stack>

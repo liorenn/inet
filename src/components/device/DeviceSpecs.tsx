@@ -1,10 +1,10 @@
-import { formatSpecs, type deviceSpecsType } from '../../models/SpecsFormatter'
+import { formatSpecs, type deviceSpecsType } from '@/models/SpecsFormatter'
 import { Button, Container, useMantineColorScheme } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 import { useState } from 'react'
 import Link from 'next/link'
-import DeviceTable from './DeviceTable'
+import DeviceTable from '@/components/device/DeviceTable'
 
 const deviceSpecsCategories = [
   'display',

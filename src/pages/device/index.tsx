@@ -1,10 +1,11 @@
-import { Text, Container, Title, useMantineColorScheme } from '@mantine/core'
-import { SimpleGrid, Breadcrumbs, Group } from '@mantine/core'
-import DeviceTypeCard from '../../components/device/DeviceTypeCard'
-import useTranslation from 'next-translate/useTranslation'
-import { deviceType } from '../../models/deviceTypes'
-import Link from 'next/link'
+import { Breadcrumbs, Group, SimpleGrid } from '@mantine/core'
+import { Container, Text, Title, useMantineColorScheme } from '@mantine/core'
+
+import DeviceTypeCard from '@/components/device/DeviceTypeCard'
 import Head from 'next/head'
+import Link from 'next/link'
+import { deviceType } from '@/models/deviceTypes'
+import useTranslation from 'next-translate/useTranslation'
 
 export default function Device() {
   const { colorScheme } = useMantineColorScheme()

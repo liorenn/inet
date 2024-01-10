@@ -1,10 +1,12 @@
-import CommentsSummary from '../misc/CommentsSummary'
-import DeviceWidgets from './DeviceWidgets'
-import { Stack, Grid, Center, Text, Divider } from '@mantine/core'
-import DevicePhotos from './DevicePhotos'
-import DeviceSpecs from './DeviceSpecs'
-import type { deviceSpecsType } from '../../models/SpecsFormatter'
-import FavoritesButtons from '../misc/FavoritesButtons'
+import { Center, Divider, Grid, Stack, Text } from '@mantine/core'
+
+import CommentsSummary from '@/components/misc/CommentsSummary'
+import DevicePhotos from '@/components/device/DevicePhotos'
+import DeviceSpecs from '@/components/device/DeviceSpecs'
+import DeviceWidgets from '@/components/device/DeviceWidgets'
+import FavoritesButtons from '@/components/misc/FavoritesButtons'
+import type { deviceSpecsType } from '@/models/SpecsFormatter'
+import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 
 type props = {
@@ -46,7 +48,7 @@ export default function DeviceLayout({ device }: props) {
           {t('deviceSpecifications')}
         </Text>
         <Text sx={{ fontSize: 18 }} weight={500}>
-          {`${t('viewDeviceSpecifications')} ${device.name}`}
+          {`${t('viewDeviceSpecifications')} ${translateDeviceName(t, device.name)}`}
         </Text>
       </div>
       <Divider sx={{ marginBottom: 10 }} />

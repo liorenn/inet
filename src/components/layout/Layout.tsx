@@ -1,6 +1,6 @@
-import Navbar from './Navbar'
+import Navbar from '@/components/layout/Navbar'
 import type { ReactNode } from 'react'
-import ScrollToTop from './ScrollToTop'
+import ScrollToTop from '@/components/layout/ScrollToTop'
 
 type props = { children: ReactNode }
 

@@ -1,7 +1,8 @@
+import React, { useEffect } from 'react'
+
+import { managerAccessKey } from 'config'
 import { useMantineColorScheme } from '@mantine/core'
 import { useRouter } from 'next/router'
-import React, { useEffect } from 'react'
-import { managerAccessKey } from '../../../config'
 
 type props = {
   accessKey: number
@@ -22,9 +23,7 @@ export default function WebsiteStatistics({ accessKey }: props) {
     const handleMessage = (e: MessageEvent) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (e.data.event === 'posthog:dimensions') {
-        const iframe = document.getElementById(
-          'posthog-iframe'
-        ) as HTMLIFrameElement
+        const iframe = document.getElementById('posthog-iframe') as HTMLIFrameElement
         if (iframe && e.source === iframe.contentWindow) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
           iframe.style.height = `${e.data.height}px`

@@ -1,20 +1,21 @@
+import { Box, Container, Group, Stack, Text } from '@mantine/core'
 import { Center, SimpleGrid, TextInput, UnstyledButton } from '@mantine/core'
-import { Text, Container, Stack, Box, Group } from '@mantine/core'
+import { useSession, useUser } from '@supabase/auth-helpers-react'
+
+import { CreateNotification } from '@/utils/utils'
 import { Divider } from '@mantine/core'
+import Head from 'next/head'
+import ImageUploader from '@/components/misc/UploadAvatar'
+import Loader from '@/components/layout/Loader'
+import React from 'react'
+import { User } from '@prisma/client'
+import { getAccountFields } from '@/models/forms'
+import { trpc } from '@/server/client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import Head from 'next/head'
-import { trpc } from '../../misc/trpc'
-import { CreateNotification } from '../../misc/functions'
-import { useSession, useUser } from '@supabase/auth-helpers-react'
-import ImageUploader from '../../components/misc/UploadAvatar'
 import useTranslation from 'next-translate/useTranslation'
-import Loader from '../../components/layout/Loader'
-import type { userSchemaType } from '../../models/schemas'
-import React from 'react'
-import { User } from '@prisma/client'
-import { getAccountFields } from '../../models/forms'
+import type { userSchemaType } from '@/models/schemas'
 
 export type accountFields = Omit<User, 'email' | 'accessKey'>
 export type accountFieldsNames = keyof accountFields
@@ -53,15 +54,8 @@ export default function Account() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
-  function updateProperty(
-    property: accountFieldsNames,
-    account: userSchemaType
-  ) {
-    if (
-      fields
-        .find((field) => field.name === property)
-        ?.validator(inputs[property]) !== null
-    )
+  function updateProperty(property: accountFieldsNames, account: userSchemaType) {
+    if (fields.find((field) => field.name === property)?.validator(inputs[property]) !== null)
       return
     // if (property === 'password' || property === 'phone') {
     //   await supabase.auth.updateUser({
@@ -77,10 +71,7 @@ export default function Account() {
       },
       {
         onSuccess(data) {
-          CreateNotification(
-            `${t(property)} ${t('updatedSuccessfully')}`,
-            'green'
-          )
+          CreateNotification(`${t(property)} ${t('updatedSuccessfully')}`, 'green')
           setAccount({
             ...data,
             [property]: inputs[property],
@@ -119,29 +110,17 @@ export default function Account() {
             </Box>
           </Group>
           <Stack sx={{ marginTop: 28 }}>
-            <Text
-              sx={{ fontSize: 18 }}
-              weight={500}
-              color='dimmed'
-              align='right'>
+            <Text sx={{ fontSize: 18 }} weight={500} color='dimmed' align='right'>
               {`${t('createdAt')} ${dateFormmater.format(
                 new Date(user?.updated_at ?? new Date())
               )}`}
             </Text>
-            <Text
-              sx={{ fontSize: 18 }}
-              weight={500}
-              color='dimmed'
-              align='right'>
+            <Text sx={{ fontSize: 18 }} weight={500} color='dimmed' align='right'>
               {`${t('updatedAt')} ${dateFormmater.format(
                 new Date(user?.created_at ?? new Date())
               )}`}
             </Text>
-            <Text
-              sx={{ fontSize: 18 }}
-              weight={500}
-              color='dimmed'
-              align='right'>
+            <Text sx={{ fontSize: 18 }} weight={500} color='dimmed' align='right'>
               {`${data?.comments.length ?? 0} ${t('commentsCommented')}`}
             </Text>
           </Stack>
@@ -159,10 +138,7 @@ export default function Account() {
           {fields.map((field, index) => (
             <React.Fragment key={index}>
               <SimpleGrid cols={3} sx={{ paddingLeft: 5, paddingRight: 5 }}>
-                <Text
-                  sx={{ fontSize: 18, paddingTop: 6 }}
-                  weight={500}
-                  color='dimmed'>
+                <Text sx={{ fontSize: 18, paddingTop: 6 }} weight={500} color='dimmed'>
                   {t(field.name)}
                 </Text>
                 <TextInput
@@ -183,11 +159,7 @@ export default function Account() {
                     // eslint-disable-next-line @typescript-eslint/no-floating-promises
                     updateProperty(field.name, account)
                   }}>
-                  <Text
-                    sx={{ fontSize: 18 }}
-                    weight={500}
-                    align='right'
-                    color='green'>
+                  <Text sx={{ fontSize: 18 }} weight={500} align='right' color='green'>
                     {t('update')}
                   </Text>
                 </UnstyledButton>

@@ -1,26 +1,25 @@
+import { Center, Container, ScrollArea, SegmentedControl, Table } from '@mantine/core'
+import { useSession, useUser } from '@supabase/auth-helpers-react'
+
+import Loader from '@/components/layout/Loader'
+import { managerAccessKey } from 'config'
+import { trpc } from '@/server/client'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import useTranslation from 'next-translate/useTranslation'
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import {
-  Center,
-  Container,
-  ScrollArea,
-  SegmentedControl,
-  Table,
-} from '@mantine/core'
-import { useUser, useSession } from '@supabase/auth-helpers-react'
-import { trpc } from '../../misc/trpc'
-import useTranslation from 'next-translate/useTranslation'
-import { useState } from 'react'
-import Loader from '../layout/Loader'
-import { findObjectByPropertyValue } from '../../misc/functions'
-import { managerAccessKey } from '../../../config'
-import { useRouter } from 'next/router'
 
 type props = {
   accessKey: number
+}
+
+export function findObjectByPropertyValue<T>(array: T[], name: keyof T, value: T[keyof T]) {
+  return array.find((item) => item[name] === value)
 }
 
 export default function DatabaseViewer({ accessKey }: props) {
@@ -91,14 +90,11 @@ export default function DatabaseViewer({ accessKey }: props) {
             <thead>
               <tr>
                 {tableData.length > 0 &&
-                  findObjectByPropertyValue(
-                    tableColumns,
-                    'name',
-                    table
-                  )?.fields.map((value, index) => {
-                    if (!value.relationName)
-                      return <th key={index}>{value.name}</th>
-                  })}
+                  findObjectByPropertyValue(tableColumns, 'name', table)?.fields.map(
+                    (value, index) => {
+                      if (!value.relationName) return <th key={index}>{value.name}</th>
+                    }
+                  )}
               </tr>
             </thead>
             <tbody>

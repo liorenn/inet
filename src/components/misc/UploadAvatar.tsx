@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { Group, Button, rem, Text } from '@mantine/core'
-import { ActionIcon, Modal, Avatar, Center } from '@mantine/core'
-import { CreateNotification, encodeEmail } from '../../misc/functions'
-import { useDisclosure } from '@mantine/hooks'
-import { IconPhoto, IconUpload, IconX } from '@tabler/icons'
-import { useState } from 'react'
+
+import { ActionIcon, Avatar, Center, Modal } from '@mantine/core'
+import { Button, Group, Text, rem } from '@mantine/core'
+import { CreateNotification, encodeEmail } from '@/utils/utils'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
-import { useProfilePicture } from '../../hooks/useProfilePicture'
+import { IconPhoto, IconUpload, IconX } from '@tabler/icons'
+
+import { useDisclosure } from '@mantine/hooks'
+import { useProfilePicture } from '@/hooks/useProfilePicture'
 import { useRouter } from 'next/router'
-import { websiteUrl } from '../../../config'
+import { useState } from 'react'
+import { websiteUrl } from 'config'
 
 type props = {
   email: string
@@ -18,8 +20,7 @@ export default function ImageUploader({ email }: props) {
   const router = useRouter()
   const [opened, { open, close }] = useDisclosure(false)
   const [file, setFile] = useState<File | undefined>()
-  const { setImageExists, setImagePath, imageExists, imagePath } =
-    useProfilePicture()
+  const { setImageExists, setImagePath, imageExists, imagePath } = useProfilePicture()
 
   async function deleteImage() {
     await fetch('/api/file/delete', {
@@ -65,11 +66,7 @@ export default function ImageUploader({ email }: props) {
 
   return (
     <>
-      <Modal
-        opened={opened}
-        onClose={close}
-        size='auto'
-        title='Upload Your Profile Photo'>
+      <Modal opened={opened} onClose={close} size='auto' title='Upload Your Profile Photo'>
         <Dropzone
           onDrop={(files) => setFile(files[0])}
           onReject={(file) => console.log('rejected files', file)}
@@ -93,8 +90,7 @@ export default function ImageUploader({ email }: props) {
                 Drag images here or click to select files
               </Text>
               <Text size='sm' color='dimmed' inline mt={7}>
-                Attach as many files as you like, each file should not exceed
-                5mb
+                Attach as many files as you like, each file should not exceed 5mb
               </Text>
             </div>
           </Group>
@@ -122,11 +118,7 @@ export default function ImageUploader({ email }: props) {
                 Confirm
               </Button>
               {imageExists && (
-                <Button
-                  onClick={() => deleteImage()}
-                  variant='light'
-                  color='red'
-                  radius='md'>
+                <Button onClick={() => deleteImage()} variant='light' color='red' radius='md'>
                   Delete
                 </Button>
               )}

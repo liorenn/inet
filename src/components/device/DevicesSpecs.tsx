@@ -1,13 +1,10 @@
-import {
-  type deviceSpecsType,
-  formatArrSpecs,
-} from '../../models/SpecsFormatter'
+import { type deviceSpecsType, formatArrSpecs } from '@/models/SpecsFormatter'
 import { useMantineColorScheme } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 import { useState } from 'react'
 import { useViewportSize } from '@mantine/hooks'
-import DevicesTable from './DevicesTable'
+import DevicesTable from '@/components/device/DevicesTable'
 
 type props = {
   devices: deviceSpecsType[]

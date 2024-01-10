@@ -1,10 +1,11 @@
-import { useRouter } from 'next/router'
-import { trpc } from '../../misc/trpc'
+import { Button, SimpleGrid, TextInput } from '@mantine/core'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { managerAccessKey } from '../../../config'
-import Loader from '../layout/Loader'
-import { SimpleGrid, TextInput, Button } from '@mantine/core'
-import { CreateNotification } from '../../misc/functions'
+
+import { CreateNotification } from '@/utils/utils'
+import Loader from '@/components/layout/Loader'
+import { managerAccessKey } from 'config'
+import { trpc } from 'src/utils/trpc'
+import { useRouter } from 'next/router'
 
 const breakpoints = [
   { minWidth: 300, cols: 1 },
@@ -48,11 +49,7 @@ function validateString(value: string, validation: validationType) {
 }
 
 function getValidation(value: string): validationType {
-  return isStringNumber(value)
-    ? 'number'
-    : isStringBoolean(value)
-    ? 'boolean'
-    : 'string'
+  return isStringNumber(value) ? 'number' : isStringBoolean(value) ? 'boolean' : 'string'
 }
 
 function getConfigsArray(configs: string) {
@@ -100,10 +97,7 @@ export default function ConfigsEditor({ accessKey }: props) {
     if (!data) return false
     return values
       .map((value, index) => {
-        return validateString(
-          value.value,
-          getValidation(getConfigsArray(data)[index].value)
-        )
+        return validateString(value.value, getValidation(getConfigsArray(data)[index].value))
       })
       .every((value) => value === null)
   }
@@ -194,9 +188,7 @@ function ConfigInput({ config, originalValue, setConfigs }: configInputProps) {
       onChange={(event) =>
         setConfigs((prev) =>
           prev.map((value) =>
-            value.name === config.name
-              ? { name: config.name, value: event.target.value }
-              : value
+            value.name === config.name ? { name: config.name, value: event.target.value } : value
           )
         )
       }

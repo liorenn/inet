@@ -9,10 +9,7 @@ type MethodParameter = {
   Value: string
 }
 
-export function createSoapRequestXml(
-  Method: string,
-  Parameters: MethodParameter
-) {
+export function createSoapRequestXml(Method: string, Parameters: MethodParameter) {
   return `
   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
     <soapenv:Header/>
@@ -29,7 +26,5 @@ export function getResultFromResponse(Method: string, xml: any): string {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
   const json = parser.parse(xml)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-  return json['soap:Envelope']['soap:Body'][`${Method} Response`][
-    `${Method} Result`
-  ]
+  return json['soap:Envelope']['soap:Body'][`${Method} Response`][`${Method} Result`]
 }

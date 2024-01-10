@@ -24,6 +24,7 @@ public/users
 
 # misc
 .DS_Store
+.counter
 *.pem
 
 # debug

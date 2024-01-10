@@ -1,12 +1,9 @@
-import { Table, Grid, Text, Group, Tooltip, ColorSwatch } from '@mantine/core'
+import { ColorSwatch, Grid, Group, Table, Text, Tooltip } from '@mantine/core'
+import type { camerasSpecsType, specsType } from '@/models/SpecsFormatter'
+import type { colorsSpecsType, specDataType } from '@/models/SpecsFormatter'
+
+import PriceText from '@/components/misc/PriceText'
 import useTranslation from 'next-translate/useTranslation'
-import PriceText from '../misc/PriceText'
-import type {
-  camerasSpecsType,
-  colorsSpecsType,
-  specDataType,
-  specsType,
-} from '../../models/SpecsFormatter'
 
 type props = {
   specs: specsType
@@ -62,10 +59,7 @@ export default function DeviceTable({ specs, name }: props) {
                                 color='gray'
                                 label={value.color.name}
                                 key={index}>
-                                <ColorSwatch
-                                  color={value.color.hex}
-                                  withShadow
-                                />
+                                <ColorSwatch color={value.color.hex} withShadow />
                               </Tooltip>
                             ))}
                           </Group>

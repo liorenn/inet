@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { z } from 'zod'
 
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 export const deviceSchema = z.object({
   model: z.string(),
   name: z.string(),

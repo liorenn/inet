@@ -1,6 +1,6 @@
 import { Cookies } from 'typescript-cookie'
+import { trpc } from '@/server/client'
 import { useEffect } from 'react'
-import { trpc } from '../misc/trpc'
 
 const useAutoTrigger = () => {
   const { mutate } = trpc.auth.sendPriceDropsEmails.useMutation()

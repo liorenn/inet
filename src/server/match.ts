@@ -25,15 +25,7 @@ const weightsValues: weightValueType[] = [
 
 export type matchDeviceType = Pick<
   Device,
-  | 'model'
-  | 'screenSize'
-  | 'batterySize'
-  | 'price'
-  | 'storage'
-  | 'memory'
-  | 'weight'
-  | 'cpu'
-  | 'gpu'
+  'model' | 'screenSize' | 'batterySize' | 'price' | 'storage' | 'memory' | 'weight' | 'cpu' | 'gpu'
 >
 type matchProperty = keyof Omit<matchDeviceType, 'model'>
 
@@ -51,10 +43,7 @@ type mergedValuesType = {
   }[]
 }[]
 
-export function getRelatedDevices(
-  device: matchDeviceType,
-  devices: matchDeviceType[]
-) {
+export function getRelatedDevices(device: matchDeviceType, devices: matchDeviceType[]) {
   const preferencesValues: preferenceType[] = []
   Object.keys(device).forEach((key) => {
     const property = key as keyof matchDeviceType
@@ -83,10 +72,8 @@ export function getMatchedDevices(
   })
   const normilizedValues: mergedValuesType = mergedValues.map((value) => {
     console.log(value.name)
-    const minValue =
-      weightsValues.find((weight) => weight.name === value.name)?.minValue ?? 0
-    const maxValue =
-      weightsValues.find((weight) => weight.name === value.name)?.maxValue ?? 0
+    const minValue = weightsValues.find((weight) => weight.name === value.name)?.minValue ?? 0
+    const maxValue = weightsValues.find((weight) => weight.name === value.name)?.maxValue ?? 0
     const devicesValues = value.devicesValues.map((value) => value.value)
     const prefValue = normalizeValue(value.prefValue, minValue, maxValue)
     const devicesNormalizedValues = devicesValues.map((deviceValue) =>
@@ -104,13 +91,10 @@ export function getMatchedDevices(
     }
   })
   const totalPrefsValues = normilizedValues.map((value) => value.prefValue)
-  const totalDevicesValues: totalDevicesType[] =
-    convertToTotalDevicesValues(normilizedValues)
+  const totalDevicesValues: totalDevicesType[] = convertToTotalDevicesValues(normilizedValues)
   const recommendedDevices = totalDevicesValues.map((device) => ({
     model: device.model,
-    match: parseFloat(
-      calculateMatch(totalPrefsValues, device.values).toFixed(2)
-    ),
+    match: parseFloat(calculateMatch(totalPrefsValues, device.values).toFixed(2)),
   }))
   return recommendedDevices
 }
@@ -120,26 +104,20 @@ type totalDevicesType = {
   values: number[]
 }
 
-function convertToTotalDevicesValues(
-  merged: mergedValuesType
-): totalDevicesType[] {
+function convertToTotalDevicesValues(merged: mergedValuesType): totalDevicesType[] {
   const totalDevices: totalDevicesType[] = []
   const models = merged[0].devicesValues.map((device) => device.model)
   models.forEach((model) => {
     const values: number[] = []
     merged.map((value) => {
-      values.push(
-        value.devicesValues.find((device) => device.model === model)?.value ?? 0
-      )
+      values.push(value.devicesValues.find((device) => device.model === model)?.value ?? 0)
     })
     totalDevices.push({ model: model, values: values })
   })
   return totalDevices
 }
 
-export function convertPreferencesToValues(
-  preferences: preferenceType[]
-): preferenceType[] {
+export function convertPreferencesToValues(preferences: preferenceType[]): preferenceType[] {
   return preferences.map((pref) => {
     return {
       name: pref.name,

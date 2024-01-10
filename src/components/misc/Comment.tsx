@@ -1,27 +1,15 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import {
-  Paper,
-  Group,
-  Text,
-  ActionIcon,
-  Avatar,
-  TextInput,
-  Grid,
-} from '@mantine/core'
+import { Paper, Group, Text, ActionIcon, Avatar, TextInput, Grid } from '@mantine/core'
 import { Tooltip, Rating } from '@mantine/core'
 import type { Comment } from '@prisma/client'
 import { IconTrash, IconPencil, IconCheck } from '@tabler/icons'
 import { useState } from 'react'
-import { trpc } from '../../misc/trpc'
-import {
-  calculateAverageRating,
-  CreateNotification,
-  encodeEmail,
-} from '../../misc/functions'
+import { trpc } from '@/server/client'
+import { calculateAverageRating, CreateNotification, encodeEmail } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
-import { useComments } from '../../hooks/useComments'
-import { adminAccessKey } from '../../../config'
+import { useComments } from '@/hooks/useComments'
+import { adminAccessKey } from 'config'
 
 type props = {
   comment: Comment
@@ -78,9 +66,7 @@ export default function Comment({ comment, comments, setComments }: props) {
       }
     )
     const newComments = comments.map((comment) =>
-      comment.id === comment.id
-        ? { ...comment, message: editText, rating }
-        : comment
+      comment.id === comment.id ? { ...comment, message: editText, rating } : comment
     )
     setComments(newComments)
     setRatingValue(calculateAverageRating(newComments))
@@ -93,11 +79,7 @@ export default function Comment({ comment, comments, setComments }: props) {
         <Group sx={{ padding: 10 }}>
           {user?.email && (
             <Avatar
-              src={
-                imageExists && commentEmail
-                  ? `/users/${encodeEmail(commentEmail)}.png`
-                  : ''
-              }
+              src={imageExists && commentEmail ? `/users/${encodeEmail(commentEmail)}.png` : ''}
               radius='md'
             />
           )}
@@ -112,8 +94,7 @@ export default function Comment({ comment, comments, setComments }: props) {
         </Group>
         <Group sx={{ padding: 10 }}>
           <Rating readOnly={!editing} value={rating} onChange={setRating} />
-          {(comment.username === username ||
-            (accessKey && accessKey >= adminAccessKey)) && (
+          {(comment.username === username || (accessKey && accessKey >= adminAccessKey)) && (
             <>
               <Tooltip color='gray' label={t('edit')}>
                 <ActionIcon color='dark'>
@@ -139,11 +120,7 @@ export default function Comment({ comment, comments, setComments }: props) {
             />
           </Grid.Col>
           <Grid.Col span={1}>
-            <ActionIcon
-              w='100%'
-              h='100%'
-              variant='light'
-              onClick={() => editComment()}>
+            <ActionIcon w='100%' h='100%' variant='light' onClick={() => editComment()}>
               <IconCheck color='green' />
             </ActionIcon>
           </Grid.Col>

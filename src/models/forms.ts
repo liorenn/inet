@@ -1,8 +1,9 @@
-import type { formType as formUser } from '../components/admin/UserManagement'
-import type { formType as formDevice } from '../components/admin/DeviceManagement'
-import { deviceSchemaType, userSchemaType } from './schemas'
 import { Device, User } from '@prisma/client'
-import { accountFieldsNames } from '../pages/auth/account'
+import { deviceSchemaType, userSchemaType } from '@/models/schemas'
+
+import { accountFieldsNames } from '@/pages/auth/account'
+import type { formType as formDevice } from '@/components/admin/DeviceManagement'
+import type { formType as formUser } from '@/components/admin/UserManagement'
 
 export type accountField = {
   name: accountFieldsNames
@@ -29,9 +30,7 @@ export function getAccountFields() {
     return {
       ...field,
       validator: (value: string | number) =>
-        field.regex.test(value.toString())
-          ? null
-          : `${field.name} is not valid`,
+        field.regex.test(value.toString()) ? null : `${field.name} is not valid`,
     }
   })
 
@@ -326,18 +325,15 @@ export function convertFormDeviceValues(values: formDevice): deviceSchemaType {
     depth: Number(values.depth),
     imageAmount: Number(values.imageAmount),
     releaseOS: values.releaseOS === '' ? undefined : values.releaseOS,
-    batterySize:
-      values.batterySize === '' ? undefined : Number(values.batterySize),
+    batterySize: values.batterySize === '' ? undefined : Number(values.batterySize),
     storage: values.storage === '' ? undefined : Number(values.storage),
     cpu: values.cpu === '' ? undefined : Number(values.cpu),
     gpu: values.gpu === '' ? undefined : Number(values.gpu),
     memory: values.memory === '' ? undefined : Number(values.memory),
     magsafe: values.magsafe === '' ? undefined : Boolean(values.magsafe),
-    screenSize:
-      values.screenSize === '' ? undefined : Number(values.screenSize),
+    screenSize: values.screenSize === '' ? undefined : Number(values.screenSize),
     screenType: values.screenType === '' ? undefined : values.screenType,
-    resistanceRating:
-      values.resistanceRating === '' ? undefined : values.resistanceRating,
+    resistanceRating: values.resistanceRating === '' ? undefined : values.resistanceRating,
   }
 }
 
@@ -358,8 +354,7 @@ export function convertDeviceValues(values: Device): formDevice {
     depth: values.depth.toString(),
     imageAmount: values.imageAmount.toString(),
     releaseOS: values.releaseOS === null ? '' : values.releaseOS,
-    batterySize:
-      values.batterySize === null ? '' : values.batterySize.toString(),
+    batterySize: values.batterySize === null ? '' : values.batterySize.toString(),
     storage: values.storage === null ? '' : values.storage.toString(),
     cpu: values.cpu === null ? '' : values.cpu.toString(),
     gpu: values.gpu === null ? '' : values.gpu.toString(),
@@ -367,7 +362,6 @@ export function convertDeviceValues(values: Device): formDevice {
     magsafe: values.magsafe === null ? '' : values.magsafe.toString(),
     screenSize: values.screenSize === null ? '' : values.screenSize.toString(),
     screenType: values.screenType === null ? '' : values.screenType,
-    resistanceRating:
-      values.resistanceRating === null ? '' : values.resistanceRating,
+    resistanceRating: values.resistanceRating === null ? '' : values.resistanceRating,
   }
 }

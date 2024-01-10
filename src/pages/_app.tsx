@@ -1,30 +1,22 @@
+import { ColorSchemeProvider, MantineProvider, createEmotionCache } from '@mantine/core'
+import { defaultColorSchema, posthogApiHost, posthogDebug, posthogToken } from 'config'
+
+import type { AppProps } from 'next/app'
+import type { ColorScheme } from '@mantine/core'
+import Layout from '@/components/layout/Layout'
+import { Notifications } from '@mantine/notifications'
+import { PostHogProvider } from 'posthog-js/react'
+import RouterTransition from '@/components/layout/RouterTransition'
 import type { Session } from '@supabase/auth-helpers-react'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { trpc } from '../misc/trpc'
-import type { AppProps } from 'next/app'
-import Layout from '../components/layout/Layout'
-import type { ColorScheme } from '@mantine/core'
-import {
-  MantineProvider,
-  ColorSchemeProvider,
-  createEmotionCache,
-} from '@mantine/core'
-import { useLocalStorage } from '@mantine/hooks'
-import RouterTransition from '../components/layout/RouterTransition'
-import { Notifications } from '@mantine/notifications'
+import { SpotlightControl } from '@/components/misc/Spotlight'
 import posthog from 'posthog-js'
-import { PostHogProvider } from 'posthog-js/react'
-import { supabase } from '../server/supabase'
-import { SpotlightControl } from '../components/misc/Spotlight'
-import {
-  defaultColorSchema,
-  posthogApiHost,
-  posthogDebug,
-  posthogToken,
-} from '../../config'
 import rtlPlugin from 'stylis-plugin-rtl'
-import useTranslation from 'next-translate/useTranslation'
+import { supabase } from '@/server/client'
+import { trpc } from '@/server/client'
 import { useEffect } from 'react'
+import { useLocalStorage } from '@mantine/hooks'
+import useTranslation from 'next-translate/useTranslation'
 
 if (typeof window !== 'undefined') {
   posthog.init(posthogToken, {
@@ -59,9 +51,7 @@ function MyApp({ Component, pageProps }: props) {
   }, [lang])
 
   return (
-    <ColorSchemeProvider
-      colorScheme={colorScheme}
-      toggleColorScheme={toggleColorScheme}>
+    <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
       <MantineProvider
         withGlobalStyles
         withNormalizeCSS

@@ -1,11 +1,12 @@
-import { Card, Button, Grid, Text, Space } from '@mantine/core'
-import useTranslation from 'next-translate/useTranslation'
-import { devicePropertiesType } from '../../models/deviceTypes'
+import { Button, Card, Grid, Space, Text } from '@mantine/core'
+
 import DevicePhotos from './DevicePhotos'
-import Link from 'next/link'
-import FavoritesButtons from '../misc/FavoritesButtons'
 import { Dispatch } from 'react'
-import { translateDeviceName } from '../../misc/functions'
+import FavoritesButtons from '@/components/misc/FavoritesButtons'
+import Link from 'next/link'
+import { devicePropertiesType } from '@/models/deviceTypes'
+import { translateDeviceName } from '@/utils/utils'
+import useTranslation from 'next-translate/useTranslation'
 
 type props = {
   device: devicePropertiesType
@@ -13,11 +14,7 @@ type props = {
   setDevices: Dispatch<React.SetStateAction<devicePropertiesType[] | undefined>>
 }
 
-export default function DeviceListCard({
-  device,
-  deviceType,
-  setDevices,
-}: props) {
+export default function DeviceListCard({ device, deviceType, setDevices }: props) {
   const { t } = useTranslation('translations')
 
   return (
@@ -27,34 +24,20 @@ export default function DeviceListCard({
         <DevicePhotos device={device} miniphotos={false} />
       </Card.Section>
 
-      <Text
-        weight={500}
-        style={{ marginBottom: 10, fontSize: 30 }}
-        align='center'>
+      <Text weight={500} style={{ marginBottom: 10, fontSize: 30 }} align='center'>
         {translateDeviceName(t, device.name)}
       </Text>
 
       <Grid sx={{ marginTop: 2 }}>
         <Grid.Col span={6}>
-          <Link
-            href={`device/${deviceType}/${device.model}`}
-            style={{ textDecoration: 'none' }}>
-            <Button
-              variant='light'
-              color='gray'
-              radius='md'
-              size='md'
-              fullWidth>
+          <Link href={`device/${deviceType}/${device.model}`} style={{ textDecoration: 'none' }}>
+            <Button variant='light' color='gray' radius='md' size='md' fullWidth>
               {t('moreDetails')}
             </Button>
           </Link>
         </Grid.Col>
         <Grid.Col span={6}>
-          <FavoritesButtons
-            model={device.model}
-            setDevices={setDevices}
-            favoritesPage
-          />
+          <FavoritesButtons model={device.model} setDevices={setDevices} favoritesPage />
         </Grid.Col>
       </Grid>
     </Card>

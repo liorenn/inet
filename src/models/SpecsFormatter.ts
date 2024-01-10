@@ -1,5 +1,5 @@
 import type { Device } from '@prisma/client'
-import { FormatDate } from '../misc/functions'
+import { FormatDate } from '@/utils/utils'
 
 export type categoriesType = {
   name: string
@@ -73,9 +73,7 @@ export function formatArrSpecs(devices: deviceSpecsType[]): categoriesType {
   const mergedCameras: categoriesType = [
     {
       name: 'name',
-      specs: [
-        { property: 'name', values: devices.map((device) => device.name) },
-      ],
+      specs: [{ property: 'name', values: devices.map((device) => device.name) }],
     },
     {
       name: 'display',
@@ -110,27 +108,19 @@ export function formatArrSpecs(devices: deviceSpecsType[]): categoriesType {
       specs: [
         {
           property: 'chipset',
-          values: devices.map((device) =>
-            device.chipset ? device.chipset.toString() : null
-          ),
+          values: devices.map((device) => (device.chipset ? device.chipset.toString() : null)),
         },
         {
           property: 'memory',
-          values: devices.map((device) =>
-            device.memory ? device.memory.toString() : null
-          ),
+          values: devices.map((device) => (device.memory ? device.memory.toString() : null)),
         },
         {
           property: 'storage',
-          values: devices.map((device) =>
-            device.storage ? device.storage.toString() : null
-          ),
+          values: devices.map((device) => (device.storage ? device.storage.toString() : null)),
         },
         {
           property: 'releaseOS',
-          values: devices.map((device) =>
-            device.releaseOS ? device.releaseOS.toString() : null
-          ),
+          values: devices.map((device) => (device.releaseOS ? device.releaseOS.toString() : null)),
         },
       ],
     },
@@ -139,27 +129,19 @@ export function formatArrSpecs(devices: deviceSpecsType[]): categoriesType {
       specs: [
         {
           property: 'weight',
-          values: devices.map((device) =>
-            device.weight ? device.weight.toString() : null
-          ),
+          values: devices.map((device) => (device.weight ? device.weight.toString() : null)),
         },
         {
           property: 'height',
-          values: devices.map((device) =>
-            device.height ? device.height.toString() : null
-          ),
+          values: devices.map((device) => (device.height ? device.height.toString() : null)),
         },
         {
           property: 'width',
-          values: devices.map((device) =>
-            device.width ? device.width.toString() : null
-          ),
+          values: devices.map((device) => (device.width ? device.width.toString() : null)),
         },
         {
           property: 'depth',
-          values: devices.map((device) =>
-            device.depth ? device.depth.toString() : null
-          ),
+          values: devices.map((device) => (device.depth ? device.depth.toString() : null)),
         },
       ],
     },
@@ -201,9 +183,7 @@ export function formatArrSpecs(devices: deviceSpecsType[]): categoriesType {
         },
         {
           property: 'price',
-          values: devices.map((device) =>
-            device.price >= 0 ? device.price.toString() : null
-          ),
+          values: devices.map((device) => (device.price >= 0 ? device.price.toString() : null)),
         },
         {
           property: 'colors',
@@ -294,9 +274,7 @@ export function formatSpecs(device: deviceSpecsType): categoryType[] {
         },
         {
           property: 'resistanceRating',
-          value: device.resistanceRating
-            ? device.resistanceRating.toString()
-            : null,
+          value: device.resistanceRating ? device.resistanceRating.toString() : null,
         },
       ],
     },

@@ -1,9 +1,10 @@
-import { useMantineColorScheme } from '@mantine/core'
-import { Group, Breadcrumbs, Text, Title } from '@mantine/core'
-import useTranslation from 'next-translate/useTranslation'
-import { translateDeviceName } from '../../misc/functions'
+import { Breadcrumbs, Group, Text, Title } from '@mantine/core'
+
 import type { Device } from '@prisma/client'
 import Link from 'next/link'
+import { translateDeviceName } from '@/utils/utils'
+import { useMantineColorScheme } from '@mantine/core'
+import useTranslation from 'next-translate/useTranslation'
 
 type props = { device: Device }
 

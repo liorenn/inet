@@ -1,18 +1,19 @@
 import { Container, ScrollArea, SegmentedControl } from '@mantine/core'
-import DatabaseViewer from '../../components/admin/DatabaseViewer'
-import DeviceManagement from '../../components/admin/DeviceManagement'
-import UserManagement from '../../components/admin/UserManagement'
-import { adminAccessKey, managerAccessKey } from '../../../config'
-import Loader from '../../components/layout/Loader'
-import { useUser } from '@supabase/auth-helpers-react'
-import useTranslation from 'next-translate/useTranslation'
-import WebsiteStatistics from '../../components/admin/WebsiteStatistics'
-import ConfigsEditor from '../../components/admin/ConfigsEditor'
-import { trpc } from '../../misc/trpc'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { z } from 'zod'
+import { adminAccessKey, managerAccessKey } from 'config'
+
+import ConfigsEditor from '@/components/admin/ConfigsEditor'
+import DatabaseViewer from '@/components/admin/DatabaseViewer'
+import DeviceManagement from '@/components/admin/DeviceManagement'
 import Head from 'next/head'
+import Loader from '@/components/layout/Loader'
+import UserManagement from '@/components/admin/UserManagement'
+import WebsiteStatistics from '@/components/admin/WebsiteStatistics'
+import { trpc } from '@/server/client'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
+import useTranslation from 'next-translate/useTranslation'
+import { useUser } from '@supabase/auth-helpers-react'
+import { z } from 'zod'
 
 export default function Admin() {
   const user = useUser()
@@ -51,10 +52,7 @@ export default function Admin() {
   return (
     <>
       <Head>
-        <title>
-          {buttons.find((b) => b.value === button)?.label ??
-            t('deviceManagement')}
-        </title>
+        <title>{buttons.find((b) => b.value === button)?.label ?? t('deviceManagement')}</title>
       </Head>
       {accessKey ? (
         <Container size='xl'>

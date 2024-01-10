@@ -1,17 +1,14 @@
+import { NavigationProgress, startNavigationProgress } from '@mantine/nprogress'
+
+import { completeNavigationProgress } from '@mantine/nprogress'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import {
-  startNavigationProgress,
-  completeNavigationProgress,
-  NavigationProgress,
-} from '@mantine/nprogress'
 
 export default function RouterTransition() {
   const router = useRouter()
 
   useEffect(() => {
-    const handleStart = (url: string) =>
-      url !== router.asPath && startNavigationProgress()
+    const handleStart = (url: string) => url !== router.asPath && startNavigationProgress()
     const handleComplete = () => completeNavigationProgress()
 
     router.events.on('routeChangeStart', handleStart)
@@ -25,8 +22,7 @@ export default function RouterTransition() {
     }
   }, [router.asPath, router.events])
 
-  return router.pathname.includes('compare') ||
-    router.pathname.includes('find') ? (
+  return router.pathname.includes('compare') || router.pathname.includes('find') ? (
     <></>
   ) : (
     <NavigationProgress autoReset={true} size={4} />

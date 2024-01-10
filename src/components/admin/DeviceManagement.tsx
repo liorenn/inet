@@ -1,20 +1,17 @@
-import { trpc } from '../../misc/trpc'
-import useTranslation from 'next-translate/useTranslation'
-import type { Device } from '@prisma/client'
-import { CreateNotification } from '../../misc/functions'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { useOs } from '@mantine/hooks'
-import { managerAccessKey } from '../../../config'
-import Loader from '../layout/Loader'
 import { Button, ScrollArea, Table, Text, TextInput } from '@mantine/core'
-import { useRouter } from 'next/router'
-import { deviceSchema } from '../../models/schemas'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
-import {
-  getDevicesFields,
-  convertFormDeviceValues,
-  convertDeviceValues,
-} from '../../models/forms'
+import { convertDeviceValues, convertFormDeviceValues, getDevicesFields } from '../../models/forms'
+
+import { CreateNotification } from '../../utils/utils'
+import type { Device } from '@prisma/client'
+import Loader from '../layout/Loader'
+import { deviceSchema } from '../../models/schemas'
+import { managerAccessKey } from '../../../config'
+import { trpc } from '../../utils/trpc'
+import { useOs } from '@mantine/hooks'
+import { useRouter } from 'next/router'
+import useTranslation from 'next-translate/useTranslation'
 
 export type formType = {
   [K in keyof Device]: string
@@ -70,11 +67,7 @@ export default function DeviceManagement({ accessKey }: props) {
   )
 }
 
-function InsertRow({
-  setUsers,
-}: {
-  setUsers: Dispatch<SetStateAction<formType[]>>
-}) {
+function InsertRow({ setUsers }: { setUsers: Dispatch<SetStateAction<formType[]>> }) {
   const os = useOs()
   const { t } = useTranslation('translations')
   const [loading, setLoading] = useState(false)
@@ -95,19 +88,11 @@ function InsertRow({
           setLoading(false)
           setUsers((prev) => [...prev, form.values])
           form.setValues(defaultValues)
-          CreateNotification(
-            t('insertedSuccessfully'),
-            'green',
-            os === 'ios' ? true : false
-          )
+          CreateNotification(t('insertedSuccessfully'), 'green', os === 'ios' ? true : false)
         },
         onError: () => {
           setLoading(false)
-          CreateNotification(
-            t('errorAccured'),
-            'red',
-            os === 'ios' ? true : false
-          )
+          CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false)
         },
       }
     )
@@ -118,12 +103,7 @@ function InsertRow({
       <tr>
         {fields.map((field, index) => (
           <td key={index}>
-            <FormInput
-              form={form}
-              editMode={true}
-              disabled={false}
-              inputName={field.name}
-            />
+            <FormInput form={form} editMode={true} disabled={false} inputName={field.name} />
           </td>
         ))}
         <td colSpan={2}>
@@ -169,22 +149,12 @@ function DeviceRow({
       {
         onSuccess: () => {
           setLoading(false)
-          setDevices((prev) =>
-            prev.filter((device) => device.model !== data.model)
-          )
-          CreateNotification(
-            t('deletedSuccessfully'),
-            'green',
-            os === 'ios' ? true : false
-          )
+          setDevices((prev) => prev.filter((device) => device.model !== data.model))
+          CreateNotification(t('deletedSuccessfully'), 'green', os === 'ios' ? true : false)
         },
         onError: () => {
           setLoading(false)
-          CreateNotification(
-            t('errorAccured'),
-            'red',
-            os === 'ios' ? true : false
-          )
+          CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false)
         },
       }
     )
@@ -197,19 +167,11 @@ function DeviceRow({
           { ...convertFormDeviceValues(form.values) },
           {
             onSuccess: () => {
-              CreateNotification(
-                t('updatedSuccessfully'),
-                'green',
-                os === 'ios' ? true : false
-              )
+              CreateNotification(t('updatedSuccessfully'), 'green', os === 'ios' ? true : false)
             },
             onError: () => {
               form.setValues(data)
-              CreateNotification(
-                t('errorAccured'),
-                'red',
-                os === 'ios' ? true : false
-              )
+              CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false)
             },
           }
         )
@@ -242,12 +204,7 @@ function DeviceRow({
               {t('editDevice')}
             </Button>
           ) : (
-            <Button
-              fullWidth
-              onClick={handleUpdate}
-              color='lime'
-              variant='light'
-              type='submit'>
+            <Button fullWidth onClick={handleUpdate} color='lime' variant='light' type='submit'>
               {t('updateDevice')}
             </Button>
           )}

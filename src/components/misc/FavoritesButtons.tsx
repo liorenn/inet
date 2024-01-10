@@ -1,32 +1,24 @@
-import { Button } from '@mantine/core'
-import { useUser } from '@supabase/auth-helpers-react'
-import useTranslation from 'next-translate/useTranslation'
-import { trpc } from '../../misc/trpc'
 import { Dispatch, useEffect, useState } from 'react'
-import { CreateNotification } from '../../misc/functions'
-import { devicePropertiesType } from '../../models/deviceTypes'
+
+import { Button } from '@mantine/core'
+import { CreateNotification } from '@/utils/utils'
+import { devicePropertiesType } from '@/models/deviceTypes'
+import { trpc } from '@/server/client'
+import useTranslation from 'next-translate/useTranslation'
+import { useUser } from '@supabase/auth-helpers-react'
 
 type props = {
   model: string
   modelPage?: boolean
   favoritesPage?: boolean
-  setDevices?: Dispatch<
-    React.SetStateAction<devicePropertiesType[] | undefined>
-  >
+  setDevices?: Dispatch<React.SetStateAction<devicePropertiesType[] | undefined>>
 }
-export default function FavoritesButtons({
-  model,
-  modelPage,
-  favoritesPage,
-  setDevices,
-}: props) {
+export default function FavoritesButtons({ model, modelPage, favoritesPage, setDevices }: props) {
   const user = useUser()
   const { t } = useTranslation('translations')
   const [isInList, setIsInList] = useState<boolean | undefined>(undefined)
-  const { mutate: addToFavoritesMutation } =
-    trpc.device.addToFavorites.useMutation()
-  const { mutate: deleteFromFavoritesMutation } =
-    trpc.device.deleteFromFavorites.useMutation()
+  const { mutate: addToFavoritesMutation } = trpc.device.addToFavorites.useMutation()
+  const { mutate: deleteFromFavoritesMutation } = trpc.device.deleteFromFavorites.useMutation()
   const { data } = trpc.device.isDeviceInUser.useQuery({
     email: user?.email,
     model: model,
@@ -38,11 +30,7 @@ export default function FavoritesButtons({
     }
   }, [data])
 
-  function handleIsInlist(
-    model: string,
-    email: string,
-    method: 'add' | 'remove'
-  ) {
+  function handleIsInlist(model: string, email: string, method: 'add' | 'remove') {
     if (method === 'add') {
       addToFavorites(model, email)
     } else if (method === 'remove') {
@@ -58,9 +46,7 @@ export default function FavoritesButtons({
           setIsInList(false)
           CreateNotification(t('removedFromFavorites'), 'green')
           if (favoritesPage && setDevices) {
-            setDevices((prev) =>
-              prev?.filter((device) => device.model !== model)
-            )
+            setDevices((prev) => prev?.filter((device) => device.model !== model))
           }
         },
       }
@@ -83,13 +69,7 @@ export default function FavoritesButtons({
 
   if (!email) {
     return (
-      <Button
-        variant='light'
-        color={'gray'}
-        radius='md'
-        size='md'
-        disabled={true}
-        fullWidth>
+      <Button variant='light' color={'gray'} radius='md' size='md' disabled={true} fullWidth>
         {t('signInToAccess')}
       </Button>
     )
@@ -106,9 +86,7 @@ export default function FavoritesButtons({
           disabled={isInList === undefined}
           onClick={() => deleteFromFavorites(model, email)}
           fullWidth>
-          {isInList !== undefined
-            ? t(modelPage ? 'removeFromFavorites' : 'remove')
-            : t('loading')}
+          {isInList !== undefined ? t(modelPage ? 'removeFromFavorites' : 'remove') : t('loading')}
         </Button>
       ) : (
         <Button
@@ -117,9 +95,7 @@ export default function FavoritesButtons({
           radius='md'
           size='md'
           disabled={isInList === undefined}
-          onClick={() =>
-            handleIsInlist(model, email, isInList ? 'remove' : 'add')
-          }
+          onClick={() => handleIsInlist(model, email, isInList ? 'remove' : 'add')}
           fullWidth>
           {isInList !== undefined
             ? isInList === true
