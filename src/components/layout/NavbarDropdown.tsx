@@ -9,7 +9,7 @@ import useTranslation from 'next-translate/useTranslation'
 
 type props = { AccessKey: number | undefined }
 
-function NavBarDropdown({ AccessKey }: props) {
+export default function NavBarDropdown({ AccessKey }: props) {
   const { t } = useTranslation('translations')
   const [activeLink, setActiveLink] = useState('Settings')
   const [opened, setOpened] = useState(false)
@@ -77,8 +77,6 @@ function NavBarDropdown({ AccessKey }: props) {
     </>
   )
 }
-
-export default NavBarDropdown
 
 const useStyles = createStyles((theme) => ({
   link: {

@@ -9,7 +9,7 @@ import { PostHogProvider } from 'posthog-js/react'
 import RouterTransition from '@/components/layout/RouterTransition'
 import type { Session } from '@supabase/auth-helpers-react'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { SpotlightControl } from '@/components/misc/Spotlight'
+import SpotlightControl from '@/components/misc/Spotlight'
 import posthog from 'posthog-js'
 import rtlPlugin from 'stylis-plugin-rtl'
 import { supabase } from '@/server/client'
@@ -36,7 +36,7 @@ const rtlCache = createEmotionCache({
   stylisPlugins: [rtlPlugin],
 })
 
-function MyApp({ Component, pageProps }: props) {
+function App({ Component, pageProps }: props) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'mantine-color-scheme',
     defaultValue: defaultColorSchema,
@@ -85,4 +85,4 @@ function MyApp({ Component, pageProps }: props) {
   )
 }
 
-export default trpc.withTRPC(MyApp)
+export default trpc.withTRPC(App)

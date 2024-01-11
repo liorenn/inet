@@ -11,7 +11,6 @@ type props = { device: Device }
 export default function DeviceHeader({ device }: props) {
   const { colorScheme } = useMantineColorScheme()
   const { t, lang } = useTranslation('translations')
-  const dark = colorScheme === 'dark'
 
   const links = [
     { name: t('allDevices'), href: '/device' },
@@ -25,7 +24,7 @@ export default function DeviceHeader({ device }: props) {
       sx={{
         marginTop: 50,
         marginBottom: 15,
-        borderBottom: dark ? '1px solid #333333' : '1px solid #dee2e6',
+        borderBottom: colorScheme === 'dark' ? '1px solid #333333' : '1px solid #dee2e6',
       }}>
       <Breadcrumbs separator='>'>
         {links.map((item, index) => (

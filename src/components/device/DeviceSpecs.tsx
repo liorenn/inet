@@ -21,7 +21,6 @@ type props = { device: deviceSpecsType }
 export default function DeviceSpecs({ device }: props) {
   const { t } = useTranslation('translations')
   const { colorScheme } = useMantineColorScheme()
-  const dark = colorScheme === 'dark'
   const [value, setValue] = useState<string[]>(deviceSpecsCategories)
   const categories = formatSpecs(device)
 
@@ -48,8 +47,8 @@ export default function DeviceSpecs({ device }: props) {
       sx={{ marginBottom: 100 }}
       styles={{
         label: { fontSize: 28, fontWeight: 500 },
-        content: { backgroundColor: dark ? 'gray.9' : 'white' },
-        control: { backgroundColor: dark ? 'gray.9' : 'white' },
+        content: { backgroundColor: colorScheme === 'dark' ? 'gray.9' : 'white' },
+        control: { backgroundColor: colorScheme === 'dark' ? 'gray.9' : 'white' },
       }}>
       {categories.map((category, index) => (
         <Accordion.Item value={category.name} key={index}>

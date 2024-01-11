@@ -15,7 +15,7 @@ import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 
 // /device/iphone/iphone13 page
-function ModelPage() {
+export default function Device() {
   const user = useUser()
   const router = useRouter()
   const posthog = usePostHog()
@@ -76,4 +76,3 @@ function ModelPage() {
     </>
   )
 }
-export default ModelPage

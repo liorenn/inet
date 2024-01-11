@@ -1,5 +1,5 @@
 import { Button, Card, Grid, Space, Text } from '@mantine/core'
-import type { DeviceType, devicePropertiesType } from '@/models/deviceTypes'
+import type { DeviceType, devicePropertiesType } from '@/models/enums'
 
 import DevicePhotos from '@/components/device/DevicePhotos'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'

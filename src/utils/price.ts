@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 import { PrismaClient } from '@prisma/client'
 import { currrencyApiHost } from 'config'
 
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 export async function fetchCurrentPrice(deviceModel: string) {
   const prisma = new PrismaClient()
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const gsmarena = require('gsmarena-api')
   try {
     const devices = await gsmarena.catalog.getBrand('apple-phones-48')
@@ -43,6 +42,7 @@ export async function convertPrice(price: number, currency: string, targetCurren
   const convertedPrice = price * data.data[targetCurrency]
   return convertedPrice
 }
+
 export async function FormatPrice(priceString: string) {
   if (priceString.includes('$')) {
     const dollarIndex = priceString.indexOf('$')

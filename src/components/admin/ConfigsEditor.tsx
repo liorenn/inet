@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { CreateNotification } from '@/utils/utils'
 import Loader from '@/components/layout/Loader'
 import { managerAccessKey } from 'config'
-import { trpc } from 'src/utils/trpc'
+import { trpc } from '@/server/client'
 import { useRouter } from 'next/router'
 
 const breakpoints = [

@@ -4,13 +4,12 @@ import { Container, Text, Title, useMantineColorScheme } from '@mantine/core'
 import DeviceTypeCard from '@/components/device/DeviceTypeCard'
 import Head from 'next/head'
 import Link from 'next/link'
-import { deviceType } from '@/models/deviceTypes'
+import { deviceType } from '@/models/enums'
 import useTranslation from 'next-translate/useTranslation'
 
-export default function Device() {
+export default function DeviceType() {
   const { colorScheme } = useMantineColorScheme()
   const devicesTypes = Object.getOwnPropertyNames(deviceType)
-  const dark = colorScheme === 'dark'
   const { t } = useTranslation('translations')
 
   return (
@@ -24,7 +23,7 @@ export default function Device() {
           sx={{
             marginTop: 50,
             marginBottom: 15,
-            borderBottom: dark ? '1px solid #333333' : '1px solid #dee2e6',
+            borderBottom: colorScheme === 'dark' ? '1px solid #333333' : '1px solid #dee2e6',
           }}>
           <Breadcrumbs separator='>'>
             <Link href={'/'} style={{ textDecoration: 'none' }}>

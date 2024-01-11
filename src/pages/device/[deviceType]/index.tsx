@@ -1,5 +1,5 @@
 import { Container, SimpleGrid } from '@mantine/core'
-import type { DeviceType, devicePropertiesType } from '@/models/deviceTypes'
+import type { DeviceType, devicePropertiesType } from '@/models/enums'
 import { useEffect, useState } from 'react'
 
 import DeviceCard from '@/components/device/DeviceCard'
@@ -16,7 +16,7 @@ type devicesType = {
 } & devicePropertiesType
 
 // /device/iphone page
-export default function DeviceTypePage() {
+export default function Devices() {
   const router = useRouter()
   const posthog = usePostHog()
   const deviceType = router.asPath.split('/')[router.asPath.split('/').length - 1] as DeviceType

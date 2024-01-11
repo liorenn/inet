@@ -4,7 +4,7 @@ import DevicePhotos from './DevicePhotos'
 import { Dispatch } from 'react'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import Link from 'next/link'
-import { devicePropertiesType } from '@/models/deviceTypes'
+import { devicePropertiesType } from '@/models/enums'
 import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 

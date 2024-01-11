@@ -9,11 +9,6 @@ type CreateContextOptions = {
   supabase: SupabaseClient
 }
 
-/** Use this helper for:
- * - testing, so we dont have to mock Next.js' req/res
- * - trpc's `createSSGHelpers` where we don't have req/res
- * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
- **/
 export const createContextInner = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
@@ -22,10 +17,6 @@ export const createContextInner = (opts: CreateContextOptions) => {
   }
 }
 
-/**
- * This is the actual context you'll use in your router
- * @link https://trpc.io/docs/context
- **/
 export const createContext = async (opts: CreateNextContextOptions) => {
   const { req, res } = opts
   const supabase = createPagesServerClient({ req, res })

@@ -16,7 +16,6 @@
 /build/
 /out/
 next-env.d.ts
-config.ts
 public/users
 
 # production
@@ -24,8 +23,9 @@ public/users
 
 # misc
 .DS_Store
-.counter
 *.pem
+.counter
+config.ts
 
 # debug
 npm-debug.log*

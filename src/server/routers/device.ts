@@ -3,7 +3,7 @@ import { deleteDeviceSoap, insertDeviceSoap, updateDeviceSoap } from '@/server/s
 import { getMatchedDevices, matchDeviceType } from '@/server/match'
 import { method, router } from '@/server/trpc'
 
-import type { devicePropertiesType } from '@/models/deviceTypes'
+import type { devicePropertiesType } from '@/models/enums'
 import { deviceSchema } from '@/models/schemas'
 import { sendSoapRequest } from 'config'
 import { z } from 'zod'

@@ -4,7 +4,7 @@ import ScrollToTop from '@/components/layout/ScrollToTop'
 
 type props = { children: ReactNode }
 
-const Layout = ({ children }: props) => {
+export default function layout({ children }: props) {
   return (
     <>
       <Navbar />
@@ -13,5 +13,3 @@ const Layout = ({ children }: props) => {
     </>
   )
 }
-
-export default Layout

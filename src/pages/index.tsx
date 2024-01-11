@@ -9,7 +9,7 @@ import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 
-export default function Index() {
+export default function Home() {
   const { t } = useTranslation('translations')
   const paragraphs = t('homeParagraph').split('\n')
   const spotlight = useSpotlight()

@@ -1,6 +1,7 @@
-import { Card, Button, Image } from '@mantine/core'
-import useTranslation from 'next-translate/useTranslation'
+import { Button, Card, Image } from '@mantine/core'
+
 import Link from 'next/link'
+import useTranslation from 'next-translate/useTranslation'
 
 type props = {
   devicesType: string
@@ -8,6 +9,7 @@ type props = {
 
 export default function DeviceTypeCard({ devicesType }: props) {
   const { t } = useTranslation('translations')
+
   return (
     <Card key={devicesType}>
       <Card.Section>

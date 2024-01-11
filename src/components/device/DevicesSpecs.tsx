@@ -27,6 +27,7 @@ export default function DevicesSpecs({ devices }: props) {
   const { width } = useViewportSize()
   const [value, setValue] = useState<string[]>(devicesSpecsCategories)
   const mergedCategories = formatArrSpecs(devices)
+
   return (
     <Accordion
       variant='contained'

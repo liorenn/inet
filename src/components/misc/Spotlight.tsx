@@ -82,7 +82,7 @@ function getDeviceDescription(device: Device) {
   }
 }
 
-export function SpotlightControl({ children }: { children: ReactNode }) {
+export default function SpotlightControl({ children }: { children: ReactNode }) {
   const { t } = useTranslation('translations')
   const { data } = trpc.device.getDevicesData.useQuery()
   const router = useRouter()

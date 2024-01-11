@@ -3,7 +3,7 @@ import { Center, Grid, Group, SimpleGrid, Stack, Text } from '@mantine/core'
 import { Container, Modal, useMantineColorScheme } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
-import { devicePropertiesType } from '@/models/deviceTypes'
+import { devicePropertiesType } from '@/models/enums'
 import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
@@ -14,16 +14,15 @@ type props = {
   withName?: boolean
 }
 
-function DevicePhotos({ device, miniphotos, withName }: props) {
+export default function DevicePhotos({ device, miniphotos, withName }: props) {
   const [activeLink, setActiveLink] = useState(`/images/${device.type}/${device.model}_1.png`)
   const [opened, setOpened] = useState(false)
   const { colorScheme } = useMantineColorScheme()
   const { width } = useViewportSize()
   const { t } = useTranslation('translations')
-  const dark = colorScheme === 'dark'
-  const images_src: string[] = []
+  const imagesLinks: string[] = []
   for (let i = 0; i < device.imageAmount; i++) {
-    images_src.push(`/images/${device.type}/${device.model}_${(i + 1).toString()}.png`)
+    imagesLinks.push(`/images/${device.type}/${device.model}_${(i + 1).toString()}.png`)
   }
 
   useEffect(() => {
@@ -58,11 +57,11 @@ function DevicePhotos({ device, miniphotos, withName }: props) {
           </Center>
           <Container>
             <Group position='apart' spacing='md'>
-              {images_src.map((src, index) => (
+              {imagesLinks.map((src, index) => (
                 <ActionIcon
                   size={width <= 500 ? 100 : 140}
                   key={index}
-                  color={dark ? 'gray.9' : 'gray.2'}
+                  color={colorScheme === 'dark' ? 'gray.9' : 'gray.2'}
                   variant={src === activeLink ? 'filled' : 'subtle'}>
                   <Image
                     src={src}
@@ -108,11 +107,11 @@ function DevicePhotos({ device, miniphotos, withName }: props) {
               ]}
               spacing='md'>
               {miniphotos
-                ? images_src.map((src, index) => (
+                ? imagesLinks.map((src, index) => (
                     <Center key={index}>
                       <ActionIcon
                         size={92}
-                        color={dark ? 'gray.9' : 'gray.2'}
+                        color={colorScheme === 'dark' ? 'gray.9' : 'gray.2'}
                         variant={src === activeLink ? 'filled' : 'subtle'}>
                         <Image
                           alt={'photo'}
@@ -135,5 +134,3 @@ function DevicePhotos({ device, miniphotos, withName }: props) {
     </Center>
   )
 }
-
-export default DevicePhotos

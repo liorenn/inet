@@ -8,16 +8,15 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 
+type props = {
+  accessKey: number
+}
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
-type props = {
-  accessKey: number
-}
-
 export function findObjectByPropertyValue<T>(array: T[], name: keyof T, value: T[keyof T]) {
   return array.find((item) => item[name] === value)
 }
