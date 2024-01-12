@@ -14,7 +14,6 @@ import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 
-// /device/iphone/iphone13 page
 export default function Device() {
   const user = useUser()
   const router = useRouter()

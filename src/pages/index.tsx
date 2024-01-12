@@ -3,20 +3,14 @@ import { Container, Stack } from '@mantine/core'
 
 import Head from 'next/head'
 import { IconDevices } from '@tabler/icons'
-import { trpc } from '@/server/client'
 import { useSpotlight } from '@mantine/spotlight'
-import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 
 export default function Home() {
   const { t } = useTranslation('translations')
-  const paragraphs = t('homeParagraph').split('\n')
   const spotlight = useSpotlight()
-  const [value, setValue] = useState('')
   const { width } = useViewportSize()
-  const { data } = trpc.device.test.useQuery()
-  console.log(data)
 
   return (
     <>
@@ -31,18 +25,19 @@ export default function Home() {
             Find the Perfect Device
           </Title>
           <Text align='center' size={30}>
-            {paragraphs.map((line, index) => (
-              <Text key={index}>{line}</Text>
-            ))}
+            {t('homeParagraph')
+              .split('\n')
+              .map((line, index) => (
+                <Text key={index}>{line}</Text>
+              ))}
           </Text>
           <Input
+            readOnly
             placeholder={t('searchForDevice')}
             onClick={() => spotlight.openSpotlight()}
             onChange={() => {
               spotlight.openSpotlight()
-              setValue('')
             }}
-            value={value}
             icon={<IconDevices />}
             w={width < 900 ? '100%' : '50%'}
             mt='lg'

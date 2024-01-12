@@ -44,7 +44,7 @@ export default function DeviceSpecs({ device }: props) {
       multiple
       value={value}
       onChange={setValue}
-      sx={{ marginBottom: 100 }}
+      sx={{ marginBottom: 20 }}
       styles={{
         label: { fontSize: 28, fontWeight: 500 },
         content: { backgroundColor: colorScheme === 'dark' ? 'gray.9' : 'white' },

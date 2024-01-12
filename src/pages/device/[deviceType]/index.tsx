@@ -15,7 +15,6 @@ type devicesType = {
   isInList?: boolean
 } & devicePropertiesType
 
-// /device/iphone page
 export default function Devices() {
   const router = useRouter()
   const posthog = usePostHog()
@@ -74,7 +73,7 @@ export default function Devices() {
               { minWidth: 'lg', cols: 3 },
             ]}>
             {devices.map((value, index) => (
-              <DeviceCard device={value} key={index} deviceType={deviceType} />
+              <DeviceCard device={value} key={index} />
             ))}
           </SimpleGrid>
         </Container>

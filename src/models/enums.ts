@@ -33,6 +33,8 @@ export type devicePropertiesType = {
   imageAmount: number
 }
 
+export const selectProprties = { model: true, name: true, type: true, imageAmount: true }
+
 export type DeviceType = keyof typeof deviceType
 export type CameraType = keyof typeof cameraType
 export type DeviceConnectorType = keyof typeof deviceConnector

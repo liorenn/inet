@@ -1,27 +1,68 @@
 import { Device } from '@prisma/client'
+import { DeviceType } from '@/models/enums'
+import { preferenceRange } from 'config'
 
-type weightValueType = {
-  name: string
+const preferenceRange = 4
+
+type weight = {
+  name: matchProperty
   minValue: number
   maxValue: number
 }
 
-const preferenceRange = 4 //from 0 to value
+type weights = {
+  deviceType: string
+  weights: weight[]
+}
+
 export type preferenceType = {
   name: matchProperty
   value: number
 }
 
-const weightsValues: weightValueType[] = [
+export const selectParams = {
+  model: true,
+  price: true,
+  batterySize: true,
+  weight: true,
+  storage: true,
+  cpu: true,
+  gpu: true,
+  memory: true,
+  screenSize: true,
+}
+
+const weightsValues: weight[] = [
   { name: 'screenSize', minValue: 5, maxValue: 6.7 },
-  { name: 'batterySize', minValue: 2800, maxValue: 3400 },
+  { name: 'batterySize', minValue: 2800, maxValue: 3300 },
   { name: 'price', minValue: 600, maxValue: 1200 },
-  { name: 'memory', minValue: 8, maxValue: 64 },
+  { name: 'memory', minValue: 2, maxValue: 8 },
   { name: 'cpu', minValue: 2, maxValue: 8 },
   { name: 'gpu', minValue: 2, maxValue: 8 },
-  { name: 'weight', minValue: 2, maxValue: 8 },
-  { name: 'storage', minValue: 8, maxValue: 64 },
+  { name: 'weight', minValue: 100, maxValue: 210 },
+  { name: 'storage', minValue: 64, maxValue: 128 },
 ]
+
+type deviceTypeProperties = {
+  deviceType: DeviceType
+  properties: matchProperty[]
+}
+
+const deviceTypeProperties: deviceTypeProperties[] = [
+  {
+    deviceType: 'iphone',
+    properties: ['screenSize', 'batterySize', 'price'],
+  },
+]
+
+export const weights: weights[] = deviceTypeProperties.map((value) => {
+  return {
+    deviceType: value.deviceType,
+    weights: value.properties.map(
+      (property) => weightsValues.find((weight) => weight.name === property) ?? weightsValues[0]
+    ),
+  }
+})
 
 export type matchDeviceType = Pick<
   Device,
@@ -43,7 +84,11 @@ type mergedValuesType = {
   }[]
 }[]
 
-export function getRelatedDevices(device: matchDeviceType, devices: matchDeviceType[]) {
+export function getRecommendedDevices(
+  device: matchDeviceType,
+  deviceType: string,
+  devices: matchDeviceType[]
+) {
   const preferencesValues: preferenceType[] = []
   Object.keys(device).forEach((key) => {
     const property = key as keyof matchDeviceType
@@ -54,11 +99,12 @@ export function getRelatedDevices(device: matchDeviceType, devices: matchDeviceT
       })
     }
   })
-  return getMatchedDevices(preferencesValues, devices)
+  return getMatchedDevices(preferencesValues, deviceType, devices)
 }
 
 export function getMatchedDevices(
   preferencesValues: preferenceType[],
+  deviceType: string,
   devices: matchDeviceType[]
 ): recommendedDevice[] {
   const mergedValues: mergedValuesType = preferencesValues.map((pref) => {
@@ -70,10 +116,13 @@ export function getMatchedDevices(
       }),
     }
   })
+  console.dir(mergedValues, { depth: null })
   const normilizedValues: mergedValuesType = mergedValues.map((value) => {
-    console.log(value.name)
-    const minValue = weightsValues.find((weight) => weight.name === value.name)?.minValue ?? 0
-    const maxValue = weightsValues.find((weight) => weight.name === value.name)?.maxValue ?? 0
+    const weight = weights
+      .find((val) => val.deviceType === deviceType)
+      ?.weights.find((weight) => weight.name === value.name)
+    const minValue = weight?.minValue ?? 0
+    const maxValue = weight?.maxValue ?? 0
     const devicesValues = value.devicesValues.map((value) => value.value)
     const prefValue = normalizeValue(value.prefValue, minValue, maxValue)
     const devicesNormalizedValues = devicesValues.map((deviceValue) =>
@@ -117,15 +166,19 @@ function convertToTotalDevicesValues(merged: mergedValuesType): totalDevicesType
   return totalDevices
 }
 
-export function convertPreferencesToValues(preferences: preferenceType[]): preferenceType[] {
+export function convertPreferencesToValues(
+  preferences: preferenceType[],
+  deviceType: string
+): preferenceType[] {
   return preferences.map((pref) => {
+    const weight = weights
+      .find((val) => val.deviceType === deviceType)
+      ?.weights.find((weight) => weight.name === pref.name)
+    const minValue = weight?.minValue ?? 0
+    const maxValue = weight?.maxValue ?? 0
     return {
       name: pref.name,
-      value: getValueWithinRange(
-        pref.value,
-        weightsValues.find((value) => value.name === pref.name)?.minValue ?? 0,
-        weightsValues.find((value) => value.name === pref.name)?.maxValue ?? 0
-      ),
+      value: getValueWithinRange(pref.value, minValue, maxValue),
     }
   })
 }
@@ -147,14 +200,14 @@ function calculateMatch(prefValues: number[], deviceValue: number[]): number {
   return Math.max(0, 1 - totalDifference / prefValues.length) * 100
 }
 
-// const devicesData: matchDeviceType[] = [
+// const devices: matchDeviceType[] = [
 //   ...Array(6)
 //     .fill(null)
 //     .map(() => ({
 //       model: `Device ${Math.floor(Math.random() * 100) + 1}`, // Unique model name
-//       screenSize: getRandomValueFromOptions([5, 8]),
-//       batterySize: getRandomValueFromOptions([3800, 5000]),
-//       price: getRandomValueFromOptions([600, 1300]),
+//       screenSize: getRandomValueFromOptions([5, 6.7]),
+//       batterySize: getRandomValueFromOptions([2800, 3400]),
+//       price: getRandomValueFromOptions([600, 1200]),
 //       storage: 16,
 //       memory: 8,
 //       weight: 2,

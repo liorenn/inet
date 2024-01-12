@@ -5,6 +5,7 @@ import DevicePhotos from '@/components/device/DevicePhotos'
 import DeviceSpecs from '@/components/device/DeviceSpecs'
 import DeviceWidgets from '@/components/device/DeviceWidgets'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
+import RecommendedDevices from './RecommendedDevices'
 import type { deviceSpecsType } from '@/models/SpecsFormatter'
 import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
@@ -53,6 +54,7 @@ export default function DeviceLayout({ device }: props) {
       </div>
       <Divider sx={{ marginBottom: 10 }} />
       <DeviceSpecs device={device} />
+      <RecommendedDevices model={device.model} />
     </>
   )
 }

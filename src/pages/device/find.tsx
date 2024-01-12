@@ -1,6 +1,7 @@
 import { Container, SegmentedControl, Stack, Text } from '@mantine/core'
 
 import Head from 'next/head'
+import { deviceType } from '@/models/enums'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { z } from 'zod'
@@ -37,6 +38,12 @@ export default function Find() {
     .map((value) => {
       return { name: value.split('-')[0], value: value.split('-')[1] }
     })
+  const deviceType = z
+    .string()
+    .parse(
+      router.query.deviceType ??
+        generateUrlString(preferencesNames.map((name) => ({ name, value: '' })))
+    )
 
   useEffect(() => {
     if (!router.query.preferences) {
@@ -53,6 +60,7 @@ export default function Find() {
         <title>Find</title>
       </Head>
       <Container size={1000}>
+        <SegmentedControl fullWidth defaultValue='' data={Object.keys(deviceType)} />
         {preferences &&
           inputs.map((input: inputType, index: number) => (
             <PreferenceInput value={input} preferences={preferences} index={index} key={index} />
