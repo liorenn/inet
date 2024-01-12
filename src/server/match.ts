@@ -1,14 +1,5 @@
-import { Device } from '@prisma/client'
-import { DeviceType } from '@/models/enums'
-import { preferenceRange } from 'config'
-
-const preferenceRange = 4
-
-type weight = {
-  name: matchProperty
-  minValue: number
-  maxValue: number
-}
+import { deviceTypeProperties, weight, weightsValues } from '@/models/deviceProperties'
+import { matchDeviceType, preprtiesSchemaType } from '@/models/schemas'
 
 type weights = {
   deviceType: string
@@ -16,7 +7,7 @@ type weights = {
 }
 
 export type preferenceType = {
-  name: matchProperty
+  name: preprtiesSchemaType
   value: number
 }
 
@@ -30,30 +21,8 @@ export const selectParams = {
   gpu: true,
   memory: true,
   screenSize: true,
+  releaseDate: true,
 }
-
-const weightsValues: weight[] = [
-  { name: 'screenSize', minValue: 5, maxValue: 6.7 },
-  { name: 'batterySize', minValue: 2800, maxValue: 3300 },
-  { name: 'price', minValue: 600, maxValue: 1200 },
-  { name: 'memory', minValue: 2, maxValue: 8 },
-  { name: 'cpu', minValue: 2, maxValue: 8 },
-  { name: 'gpu', minValue: 2, maxValue: 8 },
-  { name: 'weight', minValue: 100, maxValue: 210 },
-  { name: 'storage', minValue: 64, maxValue: 128 },
-]
-
-type deviceTypeProperties = {
-  deviceType: DeviceType
-  properties: matchProperty[]
-}
-
-const deviceTypeProperties: deviceTypeProperties[] = [
-  {
-    deviceType: 'iphone',
-    properties: ['screenSize', 'batterySize', 'price'],
-  },
-]
 
 export const weights: weights[] = deviceTypeProperties.map((value) => {
   return {
@@ -64,19 +33,13 @@ export const weights: weights[] = deviceTypeProperties.map((value) => {
   }
 })
 
-export type matchDeviceType = Pick<
-  Device,
-  'model' | 'screenSize' | 'batterySize' | 'price' | 'storage' | 'memory' | 'weight' | 'cpu' | 'gpu'
->
-type matchProperty = keyof Omit<matchDeviceType, 'model'>
-
 export type recommendedDevice = {
   model: string
   match: number
 }
 
 type mergedValuesType = {
-  name: matchProperty
+  name: preprtiesSchemaType
   prefValue: number
   devicesValues: {
     model: string
@@ -99,24 +62,28 @@ export function getRecommendedDevices(
       })
     }
   })
-  return getMatchedDevices(preferencesValues, deviceType, devices)
+  return getMatchedDevices(preferencesValues, devices, deviceType, 4)
 }
 
 export function getMatchedDevices(
   preferencesValues: preferenceType[],
+  devices: matchDeviceType[],
   deviceType: string,
-  devices: matchDeviceType[]
+  limit: number
 ): recommendedDevice[] {
   const mergedValues: mergedValuesType = preferencesValues.map((pref) => {
     return {
       name: pref.name,
       prefValue: pref.value,
       devicesValues: devices.map((device) => {
-        return { model: device.model, value: device[pref.name] ?? 0 }
+        const value =
+          pref.name === 'releaseDate'
+            ? new Date(device[pref.name]).getFullYear()
+            : device[pref.name]
+        return { model: device.model, value: value ?? 0 }
       }),
     }
   })
-  console.dir(mergedValues, { depth: null })
   const normilizedValues: mergedValuesType = mergedValues.map((value) => {
     const weight = weights
       .find((val) => val.deviceType === deviceType)
@@ -141,10 +108,12 @@ export function getMatchedDevices(
   })
   const totalPrefsValues = normilizedValues.map((value) => value.prefValue)
   const totalDevicesValues: totalDevicesType[] = convertToTotalDevicesValues(normilizedValues)
-  const recommendedDevices = totalDevicesValues.map((device) => ({
-    model: device.model,
-    match: parseFloat(calculateMatch(totalPrefsValues, device.values).toFixed(2)),
-  }))
+  const recommendedDevices = totalDevicesValues
+    .map((device) => ({
+      model: device.model,
+      match: parseFloat(calculateMatch(totalPrefsValues, device.values).toFixed(2)),
+    }))
+    .slice(0, limit)
   return recommendedDevices
 }
 
@@ -184,6 +153,7 @@ export function convertPreferencesToValues(
 }
 
 function getValueWithinRange(index: number, min: number, max: number): number {
+  const preferenceRange = 4
   const step = (max - min) / (preferenceRange - 1)
   return min + (index - 1) * step
 }
@@ -199,25 +169,3 @@ function calculateMatch(prefValues: number[], deviceValue: number[]): number {
   })
   return Math.max(0, 1 - totalDifference / prefValues.length) * 100
 }
-
-// const devices: matchDeviceType[] = [
-//   ...Array(6)
-//     .fill(null)
-//     .map(() => ({
-//       model: `Device ${Math.floor(Math.random() * 100) + 1}`, // Unique model name
-//       screenSize: getRandomValueFromOptions([5, 6.7]),
-//       batterySize: getRandomValueFromOptions([2800, 3400]),
-//       price: getRandomValueFromOptions([600, 1200]),
-//       storage: 16,
-//       memory: 8,
-//       weight: 2,
-//       cpu: null,
-//       gpu: null,
-//     })),
-// ]
-// function getRandomValueFromOptions(range: number[]) {
-//   const min = Math.min(...range)
-//   const max = Math.max(...range)
-//   const randomValue = Math.random() * (max - min + 1) + min
-//   return parseFloat(randomValue.toFixed(1))
-// }

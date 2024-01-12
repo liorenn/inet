@@ -71,3 +71,9 @@ export function translateDeviceName(t: Translate, name: string) {
     .map((word) => (Number.isNaN(parseFloat(word)) ? t(word.toLowerCase()) : word))
     .join(' ')
 }
+
+export function excludeProperty<T, K extends keyof T>(obj: T, propKey: K): Omit<T, K> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { [propKey]: _, ...rest } = obj
+  return rest
+}

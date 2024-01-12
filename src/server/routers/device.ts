@@ -1,15 +1,10 @@
-import {
-  convertPreferencesToValues,
-  getRecommendedDevices,
-  preferenceType,
-  selectParams,
-} from '@/server/match'
+import { convertPreferencesToValues, getRecommendedDevices, selectParams } from '@/server/match'
 import { deleteDeviceSoap, insertDeviceSoap, updateDeviceSoap } from '@/server/soapFunctions'
-import { getMatchedDevices, matchDeviceType } from '@/server/match'
+import { getMatchedDevices } from '@/server/match'
 import { method, router } from '@/server/trpc'
 
 import { selectProprties, type devicePropertiesType } from '@/models/enums'
-import { deviceSchema } from '@/models/schemas'
+import { deviceSchema, matchDeviceType, preprtiesSchema } from '@/models/schemas'
 import { sendSoapRequest } from 'config'
 import { z } from 'zod'
 
@@ -46,44 +41,35 @@ export const DeviceRouter = router({
       })
       return recommendedDevices.sort((a, b) => b.match - a.match)
     }),
-  test: method.query(async ({ ctx }) => {
-    const deviceType = 'iphone'
-    const userPreferences: preferenceType[] = [
-      { name: 'screenSize', value: 4 },
-      { name: 'batterySize', value: 4 },
-      { name: 'price', value: 4 },
-    ]
-    const devices: matchDeviceType[] = await ctx.prisma.device.findMany({
-      select: {
-        model: true,
-        price: true,
-        batterySize: true,
-        weight: true,
-        storage: true,
-        cpu: true,
-        gpu: true,
-        memory: true,
-        screenSize: true,
-      },
-      where: {
-        type: deviceType,
-      },
-    })
-    const preferencesValues = convertPreferencesToValues(userPreferences, deviceType)
-    const matches = getMatchedDevices(preferencesValues, deviceType, devices)
-    return [
-      preferencesValues,
-      matches,
-      devices.map((device) => {
-        return {
-          model: device.model,
-          screenSize: device.screenSize,
-          batterySize: device.batterySize,
-          price: device.price,
-        }
-      }),
-    ]
-  }),
+  getMatchedDevices: method
+    .input(
+      z.object({
+        deviceType: z.string(),
+        userPreferences: z.array(z.object({ name: preprtiesSchema, value: z.number() })),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const devices = await ctx.prisma.device.findMany({
+        select: selectParams,
+        where: {
+          type: input.deviceType,
+        },
+      })
+      const preferencesValues = convertPreferencesToValues(input.userPreferences, input.deviceType)
+      const matches = getMatchedDevices(preferencesValues, devices, input.deviceType, 8)
+      const query = await ctx.prisma.device.findMany({
+        select: selectProprties,
+        where: {
+          model: {
+            in: matches.map((device) => device.model),
+          },
+        },
+      })
+      const matchedDevices = query.map((device, index) => {
+        return { ...device, match: matches[index].match }
+      })
+      return matchedDevices.sort((a, b) => b.match - a.match)
+    }),
   insertDevice: method
     .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {

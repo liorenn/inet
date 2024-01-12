@@ -5,23 +5,14 @@ import useTranslation from 'next-translate/useTranslation'
 import { useState } from 'react'
 import Link from 'next/link'
 import DeviceTable from '@/components/device/DeviceTable'
-
-const deviceSpecsCategories = [
-  'display',
-  'battery',
-  'hardware',
-  'dimensions',
-  'cameras',
-  'features',
-  'availability',
-]
+import { deviceSpecsCategories } from '@/models/deviceProperties'
 
 type props = { device: deviceSpecsType }
 
 export default function DeviceSpecs({ device }: props) {
   const { t } = useTranslation('translations')
   const { colorScheme } = useMantineColorScheme()
-  const [value, setValue] = useState<string[]>(deviceSpecsCategories)
+  const [accordionState, setAccordionState] = useState<string[]>(deviceSpecsCategories)
   const categories = formatSpecs(device)
 
   if (!categories)
@@ -42,8 +33,8 @@ export default function DeviceSpecs({ device }: props) {
       variant='contained'
       radius='md'
       multiple
-      value={value}
-      onChange={setValue}
+      value={accordionState}
+      onChange={setAccordionState}
       sx={{ marginBottom: 20 }}
       styles={{
         label: { fontSize: 28, fontWeight: 500 },

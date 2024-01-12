@@ -8,6 +8,7 @@ import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import RecommendedDevices from './RecommendedDevices'
 import type { deviceSpecsType } from '@/models/SpecsFormatter'
 import { translateDeviceName } from '@/utils/utils'
+import { trpc } from '@/server/client'
 import useTranslation from 'next-translate/useTranslation'
 
 type props = {
@@ -16,6 +17,12 @@ type props = {
 
 export default function DeviceLayout({ device }: props) {
   const { t } = useTranslation('translations')
+  const { data, isLoading } = trpc.device.getRecommendedDevices.useQuery({
+    model: device.model,
+    deviceType: device.type,
+  })
+  console.log(data)
+
   return (
     <>
       <Center>
@@ -54,7 +61,7 @@ export default function DeviceLayout({ device }: props) {
       </div>
       <Divider sx={{ marginBottom: 10 }} />
       <DeviceSpecs device={device} />
-      <RecommendedDevices model={device.model} />
+      <RecommendedDevices data={data} isLoading={isLoading} title='Recommended Devices' />
     </>
   )
 }

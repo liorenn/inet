@@ -5,36 +5,26 @@ import useTranslation from 'next-translate/useTranslation'
 import { useState } from 'react'
 import { useViewportSize } from '@mantine/hooks'
 import DevicesTable from '@/components/device/DevicesTable'
+import { devicesSpecsCategories } from '@/models/deviceProperties'
 
 type props = {
   devices: deviceSpecsType[]
 }
 
-const devicesSpecsCategories = [
-  'name',
-  'display',
-  'battery',
-  'hardware',
-  'dimensions',
-  'cameras',
-  'features',
-  'availability',
-]
-
 export default function DevicesSpecs({ devices }: props) {
   const { t } = useTranslation('translations')
   const { colorScheme } = useMantineColorScheme()
   const { width } = useViewportSize()
-  const [value, setValue] = useState<string[]>(devicesSpecsCategories)
+  const [accordionState, setAccordionState] = useState<string[]>(devicesSpecsCategories)
   const mergedCategories = formatArrSpecs(devices)
 
   return (
     <Accordion
-      variant='contained'
-      radius='md'
       multiple
-      value={value}
-      onChange={setValue}
+      radius='md'
+      variant='contained'
+      value={accordionState}
+      onChange={setAccordionState}
       sx={{ marginBottom: 100 }}
       styles={{
         label: { fontSize: width < 500 ? 20 : 26, fontWeight: 500 },

@@ -14,6 +14,7 @@ type props = {
 
 export default function DeviceCard({ device, matchPrecentage }: props) {
   const { t } = useTranslation('translations')
+
   return (
     <Card shadow='lg' p='lg' radius='md'>
       <Card.Section>
@@ -23,7 +24,7 @@ export default function DeviceCard({ device, matchPrecentage }: props) {
       <Text weight={500} style={{ marginBottom: 10, fontSize: 30 }} align='center'>
         {translateDeviceName(t, device.name)}
       </Text>
-      {matchPrecentage ? (
+      {matchPrecentage || matchPrecentage === 0 ? (
         <Tooltip radius='md' color='dark' label={`${matchPrecentage}% Precentage Match`}>
           <Progress
             radius='md'

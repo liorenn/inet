@@ -1,3 +1,4 @@
+import { Device } from '@prisma/client'
 import { z } from 'zod'
 
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -53,3 +54,17 @@ export const commentSchema = z.object({
 export type commentSchemaType = z.infer<typeof commentSchema>
 
 export const updateSchema = z.enum(['username', 'name', 'password', 'phone'])
+
+export const preprtiesSchema = z.enum([
+  'releaseDate',
+  'screenSize',
+  'batterySize',
+  'price',
+  'storage',
+  'memory',
+  'weight',
+  'cpu',
+  'gpu',
+])
+export type preprtiesSchemaType = z.infer<typeof preprtiesSchema>
+export type matchDeviceType = Pick<Device, preprtiesSchemaType | 'model'>

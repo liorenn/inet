@@ -9,8 +9,8 @@ import { useViewportSize } from '@mantine/hooks'
 
 export default function Home() {
   const { t } = useTranslation('translations')
-  const spotlight = useSpotlight()
   const { width } = useViewportSize()
+  const spotlight = useSpotlight()
 
   return (
     <>
