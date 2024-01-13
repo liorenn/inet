@@ -67,3 +67,16 @@ export const deviceSpecsCategories = [
 ]
 
 export const devicesSpecsCategories = ['name', ...deviceSpecsCategories]
+
+export const selectParams = {
+  model: true,
+  price: true,
+  batterySize: true,
+  weight: true,
+  storage: true,
+  cpu: true,
+  gpu: true,
+  memory: true,
+  screenSize: true,
+  releaseDate: true,
+}

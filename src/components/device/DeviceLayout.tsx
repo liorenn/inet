@@ -21,7 +21,6 @@ export default function DeviceLayout({ device }: props) {
     model: device.model,
     deviceType: device.type,
   })
-  console.log(data)
 
   return (
     <>

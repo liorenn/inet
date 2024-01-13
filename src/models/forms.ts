@@ -1,159 +1,152 @@
 import { Device, User } from '@prisma/client'
 import { deviceSchemaType, userSchemaType } from '@/models/schemas'
 
-import { accountFieldsNames } from '@/pages/auth/account'
 import type { formType as formDevice } from '@/components/admin/DeviceManagement'
 import type { formType as formUser } from '@/components/admin/UserManagement'
 
-export type accountField = {
-  name: accountFieldsNames
-  regex: RegExp
-  validator: (value: string) => string | null
-}
-
-export function getAccountFields() {
-  const omitFields: Omit<accountField, 'validator'>[] = [
-    { name: 'username', regex: /^[A-Za-z\d_.]{5,}$/ },
-    {
-      name: 'name',
-      regex: /^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/,
-    },
-
-    {
-      name: 'password',
-      regex: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
-    },
-    { name: 'phone', regex: /^0\d{1,2}-?\d{7}$/ },
-  ]
-
-  const fields: accountField[] = omitFields.map((field) => {
-    return {
-      ...field,
-      validator: (value: string | number) =>
-        field.regex.test(value.toString()) ? null : `${field.name} is not valid`,
-    }
-  })
-
-  const defaultValues = {
-    username: '',
-    name: '',
-    password: '',
-    phone: '',
-  }
-
-  return { fields, defaultValues }
-}
-
-export type signField = {
-  name: keyof User
-  regex: RegExp
-}
-
-export function getSignInFields() {
-  const fields: signField[] = [
-    {
-      name: 'email',
-      regex: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
-    },
-    {
-      name: 'password',
-      regex: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
-    },
-  ]
-  const validators: { [key: string]: (value: string) => string | null } = {}
-
-  fields.forEach(({ name, regex }) => {
-    validators[name] = (value: string | number) =>
-      regex.test(value.toString()) ? null : `${name} is not valid`
-  })
-
-  const defaultValues = {
-    email: 'lior.oren06@gmail.com',
-    password: '123456',
-  }
-
-  return { fields, validators, defaultValues }
-}
-
-export function getSignUpFields() {
-  const fields: signField[] = [
-    {
-      name: 'email',
-      regex: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
-    },
-    { name: 'username', regex: /^[A-Za-z\d_.]{5,}$/ },
-    {
-      name: 'name',
-      regex: /^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/,
-    },
-    {
-      name: 'password',
-      regex: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
-    },
-    { name: 'phone', regex: /^0\d{1,2}-?\d{7}$/ },
-  ]
-  const validators: { [key: string]: (value: string) => string | null } = {}
-
-  fields.forEach(({ name, regex }) => {
-    validators[name] = (value: string | number) =>
-      regex.test(value.toString()) ? null : `${name} is not valid`
-  })
-
-  const defaultValues = {
-    email: 'lior.oren10@gmail.com',
-    name: 'Lior Oren',
-    phone: '0548853393',
-    username: 'lioren10',
-    password: '123456',
-  }
-
-  return { fields, validators, defaultValues }
-}
-
-type userField = {
+class UserProperty {
   name: keyof User
   regex: RegExp
   disabled?: boolean
+
+  constructor(name: keyof User, regex: RegExp, disabled?: boolean) {
+    this.name = name
+    this.regex = regex
+    this.disabled = disabled
+  }
 }
 
-export function getUserFields() {
-  const fields: userField[] = [
-    {
-      disabled: true,
+export class FormDefaultValues {
+  email: string
+  password: string
+  username: string
+  name: string
+  phone: string
+  accessKey: number
+
+  constructor(
+    email: string,
+    password: string,
+    username: string,
+    name: string,
+    phone: string,
+    accessKey: number
+  ) {
+    this.email = email
+    this.password = password
+    this.username = username
+    this.name = name
+    this.phone = phone
+    this.accessKey = accessKey
+  }
+}
+
+export class SignInForm {
+  email: UserProperty
+  password: UserProperty
+  constructor() {
+    this.email = {
       name: 'email',
       regex: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
-    },
-
-    { name: 'username', regex: /^[A-Za-z\d_.]{5,}$/ },
-    {
-      name: 'name',
-      regex: /^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/,
-    },
-
-    {
+    }
+    this.password = {
       name: 'password',
       regex: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
-    },
-    { name: 'phone', regex: /^0\d{1,2}-?\d{7}$/ },
-    { name: 'accessKey', regex: /^(\d)?$/ },
-  ]
-  const validators: { [key: string]: (value: string) => string | null } = {}
+    }
+  }
+  getFileds() {
+    return [this.email, this.password]
+  }
+  getDefaultValues(): Partial<FormDefaultValues> {
+    return {
+      email: 'lior.oren06@gmail.com',
+      password: '123456',
+    }
+  }
+  getValidators() {
+    const validators: { [key: string]: (value: string) => string | null } = {}
+    this.getFileds().forEach(({ name, regex }) => {
+      validators[name] = (value: string | number) =>
+        regex.test(value.toString()) ? null : `${name} is not valid`
+    })
+    return validators
+  }
+}
+export class AccountForm extends SignInForm {
+  username: UserProperty
+  name: UserProperty
+  phone: UserProperty
 
-  fields.forEach(({ name, regex }) => {
-    validators[name] = (value: string | number) =>
-      regex.test(value.toString()) ? null : `${name} is not valid`
-  })
-
-  const defaultValues = {
-    accessKey: '',
-    email: '',
-    name: '',
-    phone: '',
-    username: '',
-    password: '',
+  constructor() {
+    super()
+    this.username = {
+      name: 'username',
+      regex: /^[A-Za-z\d_.]{5,}$/,
+    }
+    this.name = {
+      name: 'name',
+      regex: /^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/,
+    }
+    this.phone = {
+      name: 'phone',
+      regex: /^0\d{1,2}-?\d{7}$/,
+    }
   }
 
-  return { fields, validators, defaultValues }
+  getFileds(): UserProperty[] {
+    return [this.username, this.name, this.phone, this.password]
+  }
+  getDefaultValues() {
+    return {
+      username: '',
+      name: '',
+      password: '',
+      phone: '',
+    }
+  }
+}
+export class SignUpForm extends AccountForm {
+  constructor() {
+    super()
+  }
+
+  getFileds(): UserProperty[] {
+    return [this.email, this.username, this.name, this.password, this.phone]
+  }
+  getDefaultValues() {
+    return {
+      email: 'lior.oren10@gmail.com',
+      name: 'Lior Oren',
+      phone: '0548853393',
+      username: 'lioren10',
+      password: '123456',
+    }
+  }
+}
+export class UserManagementForm extends SignUpForm {
+  accessKey: UserProperty
+  constructor() {
+    super()
+    this.accessKey = { name: 'accessKey', regex: /^\d$/ }
+    this.email = {
+      name: 'email',
+      regex: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
+      disabled: true,
+    }
+  }
+  getFileds(): UserProperty[] {
+    return [this.email, this.username, this.name, this.phone, this.password, this.accessKey]
+  }
+  getDefaultValues() {
+    return {
+      accessKey: '',
+      email: '',
+      name: '',
+      phone: '',
+      username: '',
+      password: '',
+    }
+  }
 }
 
 export function convertFormUserValues(values: formUser): userSchemaType {

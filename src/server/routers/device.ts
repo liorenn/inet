@@ -1,4 +1,4 @@
-import { convertPreferencesToValues, getRecommendedDevices, selectParams } from '@/server/match'
+import { convertPreferencesToValues, getRecommendedDevices } from '@/server/match'
 import { deleteDeviceSoap, insertDeviceSoap, updateDeviceSoap } from '@/server/soapFunctions'
 import { getMatchedDevices } from '@/server/match'
 import { method, router } from '@/server/trpc'
@@ -7,6 +7,7 @@ import { selectProprties, type devicePropertiesType } from '@/models/enums'
 import { deviceSchema, matchDeviceType, preprtiesSchema } from '@/models/schemas'
 import { sendSoapRequest } from 'config'
 import { z } from 'zod'
+import { selectParams } from '@/models/deviceProperties'
 
 export const DeviceRouter = router({
   getRecommendedDevices: method

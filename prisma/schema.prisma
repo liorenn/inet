@@ -43,7 +43,7 @@ model Comment {
   username  String   @db.VarChar
   rating    Int
   device    Device   @relation(fields: [model], references: [model], onDelete: Cascade)
-  user      User     @relation(fields: [username], references: [username])
+  user      User     @relation(fields: [username], references: [username], onDelete: Cascade)
 }
 
 model DeviceUser {

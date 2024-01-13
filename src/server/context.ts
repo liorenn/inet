@@ -1,8 +1,7 @@
 import { type inferAsyncReturnType } from '@trpc/server'
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next'
-import type { SupabaseClient, Session } from '@supabase/supabase-js'
-import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import { prisma } from '@/server/client'
+import type { Session, SupabaseClient } from '@supabase/supabase-js'
+import { prisma, supabase } from '@/server/client'
 
 type CreateContextOptions = {
   session: Session | null
@@ -17,14 +16,11 @@ export const createContextInner = (opts: CreateContextOptions) => {
   }
 }
 
-export const createContext = async (opts: CreateNextContextOptions) => {
-  const { req, res } = opts
-  const supabase = createPagesServerClient({ req, res })
-  const session = (await supabase.auth.getSession()).data.session
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const createContext = (_opts: CreateNextContextOptions) => {
   return createContextInner({
     supabase: supabase,
-    session: session,
+    session: null,
   })
 }
 

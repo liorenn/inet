@@ -1,7 +1,7 @@
 import { Button, ScrollArea, Table, Text, TextInput } from '@mantine/core'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
-import { convertFormUserValues, getUserFields } from '@/models/forms'
+import { UserManagementForm, convertFormUserValues } from '@/models/forms'
 
 import { CreateNotification } from '@/utils/utils'
 import Loader from '@/components/layout/Loader'
@@ -77,14 +77,15 @@ type insertRowProps = {
 
 function InsertRow({ setUsers }: insertRowProps) {
   const os = useOs()
+  const formProperties = new UserManagementForm()
   const { t } = useTranslation('translations')
   const [loading, setLoading] = useState(false)
   const { mutate: mutateInsert } = trpc.auth.insertUser.useMutation()
-  const { fields, validators, defaultValues } = getUserFields()
+
   const form = useForm<formType>({
-    initialValues: defaultValues,
+    initialValues: formProperties.getDefaultValues(),
     validateInputOnChange: true,
-    validate: validators,
+    validate: formProperties.getValidators(),
   })
 
   const handleInsert = () => {
@@ -95,7 +96,7 @@ function InsertRow({ setUsers }: insertRowProps) {
         onSuccess: () => {
           setLoading(false)
           setUsers((prev) => [...prev, form.values])
-          form.setValues(defaultValues)
+          form.setValues(formProperties.getDefaultValues())
           CreateNotification(t('insertedSuccessfully'), 'green', os === 'ios' ? true : false)
         },
         onError: () => {
@@ -109,7 +110,7 @@ function InsertRow({ setUsers }: insertRowProps) {
   return (
     <>
       <tr>
-        {fields.map((field, index) => (
+        {formProperties.getFileds().map((field, index) => (
           <td key={index}>
             <FormInput form={form} editMode={true} disabled={false} inputName={field.name} />
           </td>
@@ -137,16 +138,16 @@ type userRowProps = {
 
 function UserRow({ data, setUsers }: userRowProps) {
   const os = useOs()
+  const formProperties = new UserManagementForm()
   const { t } = useTranslation('translations')
   const [editMode, setEditMode] = useState(false)
   const [loading, setLoading] = useState(false)
   const { mutate: mutateDelete } = trpc.auth.deleteUser.useMutation()
   const { mutate: mutateUpdate } = trpc.auth.updateUser.useMutation()
-  const { fields, validators } = getUserFields()
   const form = useForm<formType>({
     initialValues: data,
     validateInputOnChange: true,
-    validate: validators,
+    validate: formProperties.getValidators(),
   })
 
   const handleDelete = () => {
@@ -189,7 +190,7 @@ function UserRow({ data, setUsers }: userRowProps) {
   return (
     <>
       <tr>
-        {fields.map((field, index) => (
+        {formProperties.getFileds().map((field, index) => (
           <td key={index}>
             <FormInput
               form={form}

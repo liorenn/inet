@@ -1,4 +1,5 @@
 import { Button, Center, Container, Text, Title } from '@mantine/core'
+import { FormDefaultValues, SignUpForm } from '@/models/forms'
 import { Paper, TextInput } from '@mantine/core'
 import { useEffect, useState } from 'react'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -7,7 +8,6 @@ import { CreateNotification } from '@/utils/utils'
 import Head from 'next/head'
 import Link from 'next/link'
 import { User } from '@prisma/client'
-import { getSignUpFields } from '@/models/forms'
 import { trpc } from '@/server/client'
 import { useForm } from '@mantine/form'
 import { usePostHog } from 'posthog-js/react'
@@ -23,6 +23,7 @@ export default function SignUp() {
   const session = useSession()
   const posthog = usePostHog()
   const supabase = useSupabaseClient()
+  const formProperties = new SignUpForm()
   const [loading, setLoading] = useState(false)
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
   const { mutate } = trpc.auth.createUser.useMutation()
@@ -35,11 +36,10 @@ export default function SignUp() {
     data && data >= 1 && router.push('/')
   }, [data, router])
 
-  const { defaultValues, fields, validators } = getSignUpFields()
   const form = useForm<formType>({
-    initialValues: defaultValues,
+    initialValues: formProperties.getDefaultValues() as FormDefaultValues,
     validateInputOnChange: true,
-    validate: validators,
+    validate: formProperties.getValidators(),
   })
 
   function signUp(fields: formType) {
@@ -115,7 +115,7 @@ export default function SignUp() {
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
           <form onSubmit={form.onSubmit((values) => signUp(values))}>
-            {fields.map((field, index) => (
+            {formProperties.getFileds().map((field, index) => (
               <TextInput
                 key={index}
                 label={t(field.name)}

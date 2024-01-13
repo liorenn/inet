@@ -1,4 +1,5 @@
 import { Button, Center, Container, SimpleGrid, Text, Title } from '@mantine/core'
+import { FormDefaultValues, SignInForm } from '@/models/forms'
 import { Paper, PasswordInput, TextInput } from '@mantine/core'
 import { useEffect, useState } from 'react'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -6,7 +7,6 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { CreateNotification } from '@/utils/utils'
 import Head from 'next/head'
 import Link from 'next/link'
-import { getSignInFields } from '@/models/forms'
 import { trpc } from '@/server/client'
 import { useForm } from '@mantine/form'
 import { usePostHog } from 'posthog-js/react'
@@ -25,10 +25,10 @@ export default function SignIn() {
   const posthog = usePostHog()
   const session = useSession()
   const supabase = useSupabaseClient()
+  const formProperties = new SignInForm()
   const [loading, setLoading] = useState(false)
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
   const { t } = useTranslation('translations')
-
   const { data, isLoading } = trpc.auth.getAccessKey.useQuery({
     email: session?.user.email,
   })
@@ -36,11 +36,10 @@ export default function SignIn() {
     data && data >= 1 && router.push('/')
   }, [data, router])
 
-  const { defaultValues, validators } = getSignInFields()
   const form = useForm<formType>({
-    initialValues: defaultValues,
+    initialValues: formProperties.getDefaultValues() as FormDefaultValues,
     validateInputOnChange: true,
-    validate: validators,
+    validate: formProperties.getValidators(),
   })
 
   function signIn(values: formType) {

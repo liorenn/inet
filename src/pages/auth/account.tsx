@@ -2,6 +2,7 @@ import { Box, Container, Group, Stack, Text } from '@mantine/core'
 import { Center, SimpleGrid, TextInput, UnstyledButton } from '@mantine/core'
 import { useSession, useUser } from '@supabase/auth-helpers-react'
 
+import { AccountForm } from '@/models/forms'
 import { CreateNotification } from '@/utils/utils'
 import { Divider } from '@mantine/core'
 import Head from 'next/head'
@@ -9,7 +10,6 @@ import ImageUploader from '@/components/misc/UploadAvatar'
 import Loader from '@/components/layout/Loader'
 import React from 'react'
 import { User } from '@prisma/client'
-import { getAccountFields } from '@/models/forms'
 import { trpc } from '@/server/client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
@@ -19,11 +19,17 @@ import type { userSchemaType } from '@/models/schemas'
 
 export type accountFields = Omit<User, 'email' | 'accessKey'>
 export type accountFieldsNames = keyof accountFields
+type accountField = {
+  name: accountFieldsNames
+  regex: RegExp
+  validator: (value: string) => string | null
+}
 
 export default function Account() {
   const user = useUser()
   const router = useRouter()
   const session = useSession()
+  const formProperties = new AccountForm()
   const { t } = useTranslation('translations')
   const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' })
   const updateMutation = trpc.auth.updateUserDetails.useMutation()
@@ -31,8 +37,15 @@ export default function Account() {
     email: user?.email,
   })
   const [account, setAccount] = useState<userSchemaType | undefined>()
-  const { fields, defaultValues } = getAccountFields()
-  const [inputs, setInputs] = useState<accountFields>(defaultValues)
+  const omitFields = formProperties.getFileds() as Omit<accountField, 'validator'>[]
+  const fields = omitFields.map((field) => {
+    return {
+      ...field,
+      validator: (value: string | number) =>
+        field.regex.test(value?.toString()) ? null : `${field.name} is not valid`,
+    }
+  })
+  const [inputs, setInputs] = useState<accountFields>(formProperties.getDefaultValues())
 
   useEffect(() => {
     if (data !== undefined) {
