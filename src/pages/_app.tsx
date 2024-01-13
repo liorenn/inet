@@ -1,7 +1,6 @@
 import { ColorSchemeProvider, MantineProvider, createEmotionCache } from '@mantine/core'
-import { defaultColorSchema, posthogApiHost, posthogDebug, posthogToken } from 'config'
+import { defaultColorScheme, posthogDebug, posthogToken } from 'config'
 import { supabase, trpc } from '@/server/client'
-import { useEffect, useState } from 'react'
 
 import type { AppProps } from 'next/app'
 import type { ColorScheme } from '@mantine/core'
@@ -12,15 +11,15 @@ import RouterTransition from '@/components/layout/RouterTransition'
 import type { Session } from '@supabase/auth-helpers-react'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import SpotlightControl from '@/components/misc/Spotlight'
-import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
 import posthog from 'posthog-js'
 import rtlPlugin from 'stylis-plugin-rtl'
+import { useEffect } from 'react'
 import { useLocalStorage } from '@mantine/hooks'
 import useTranslation from 'next-translate/useTranslation'
 
 if (typeof window !== 'undefined') {
   posthog.init(posthogToken, {
-    api_host: posthogApiHost,
+    api_host: 'https://app.posthog.com',
     loaded: (posthog) => {
       posthog.debug(posthogDebug)
     },
@@ -39,7 +38,7 @@ const rtlCache = createEmotionCache({
 function App({ Component, pageProps }: props) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'mantine-color-scheme',
-    defaultValue: defaultColorSchema,
+    defaultValue: defaultColorScheme,
     getInitialValueInEffect: true,
   })
   const toggleColorScheme = (value?: ColorScheme) =>

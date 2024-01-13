@@ -53,7 +53,14 @@ export default function DevicePhotos({ device, miniphotos, withName }: props) {
           title={`${translateDeviceName(t, device.name)} ${t('photos')}`}
           onClose={() => setOpened(false)}>
           <Center>
-            <Image src={activeLink} fit='contain' alt={'photo'} width={430} height={550} />
+            <Image
+              src={activeLink}
+              fit='contain'
+              alt={'photo'}
+              mb='sm'
+              width={width <= 500 ? 200 : 140}
+              height={width <= 560 ? 240 : 550}
+            />
           </Center>
           <Container>
             <Group position='apart' spacing='md'>
@@ -68,8 +75,8 @@ export default function DevicePhotos({ device, miniphotos, withName }: props) {
                     fit='contain'
                     key={index}
                     alt={'photo'}
-                    width={width <= 500 ? 78 : 100}
-                    height={width <= 500 ? 100 : 132}
+                    width={width <= 560 ? 78 : 100}
+                    height={width <= 560 ? 100 : 132}
                     style={{ cursor: 'pointer' }}
                     onClick={() => handleSetActiveLink(index + 1)}
                   />
@@ -91,8 +98,8 @@ export default function DevicePhotos({ device, miniphotos, withName }: props) {
                 }
                 src={activeLink}
                 fit='contain'
-                width={280}
-                height={320}
+                width={width <= 560 ? 180 : 280}
+                height={width <= 560 ? 280 : 320}
                 alt={'photo'}
                 style={{ cursor: 'zoom-in' }}
                 onClick={() => setOpened(true)}
@@ -118,8 +125,8 @@ export default function DevicePhotos({ device, miniphotos, withName }: props) {
                           fit='contain'
                           src={src}
                           key={index}
-                          width={70}
-                          height={100}
+                          width={width <= 560 ? 50 : 70}
+                          height={width <= 560 ? 80 : 100}
                           className='SmallGalleryImg'
                           onClick={() => handleSetActiveLink(index + 1)}
                         />

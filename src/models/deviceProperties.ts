@@ -27,7 +27,7 @@ export type PropertiesLabels = {
 export const propertiesLabels: PropertiesLabels[] = [
   { property: 'screenSize', labels: ['small', 'medium', 'large', 'massive'] },
   { property: 'batterySize', labels: ['small', 'medium', 'large', 'massive'] },
-  { property: 'releaseDate', labels: ['old', 'aged', 'current', 'new'] },
+  { property: 'releaseDate', labels: ['old', 'relativelyOld', 'lastGeneration', 'new'] },
   { property: 'price', labels: ['cheap', 'budget', 'affordable', 'expensive'] },
   { property: 'cpu', labels: ['bad', 'acceptable', 'good', 'excellent'] },
   { property: 'gpu', labels: ['bad', 'acceptable', 'good', 'excellent'] },

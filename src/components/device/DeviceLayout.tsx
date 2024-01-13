@@ -5,7 +5,7 @@ import DevicePhotos from '@/components/device/DevicePhotos'
 import DeviceSpecs from '@/components/device/DeviceSpecs'
 import DeviceWidgets from '@/components/device/DeviceWidgets'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
-import RecommendedDevices from './RecommendedDevices'
+import MatchedDevices from '@/components/device/MatchedDevices'
 import type { deviceSpecsType } from '@/models/SpecsFormatter'
 import { translateDeviceName } from '@/utils/utils'
 import { trpc } from '@/server/client'
@@ -60,7 +60,7 @@ export default function DeviceLayout({ device }: props) {
       </div>
       <Divider sx={{ marginBottom: 10 }} />
       <DeviceSpecs device={device} />
-      <RecommendedDevices data={data} isLoading={isLoading} title='Recommended Devices' />
+      <MatchedDevices data={data} isLoading={isLoading} title={t('recommendedDevices')} />
     </>
   )
 }

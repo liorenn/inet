@@ -6,6 +6,7 @@ import Loader from '@/components/layout/Loader'
 import { managerAccessKey } from 'config'
 import { trpc } from '@/server/client'
 import { useRouter } from 'next/router'
+import useTranslation from 'next-translate/useTranslation'
 
 const breakpoints = [
   { minWidth: 300, cols: 1 },
@@ -82,6 +83,7 @@ export default function ConfigsEditor({ accessKey }: props) {
       router.push('/')
     }
   }, [accessKey, router])
+  const { t } = useTranslation('translations')
   const { data } = trpc.auth.getConfigs.useQuery()
   const { mutate } = trpc.auth.saveConfigs.useMutation()
   const { mutate: sendEmails } = trpc.auth.sendPriceDropsEmails.useMutation()
@@ -138,7 +140,7 @@ export default function ConfigsEditor({ accessKey }: props) {
               }
             )
           }}>
-          Send Emails
+          {t('sendEmails')}
         </Button>
         <Button
           variant='light'
@@ -154,7 +156,7 @@ export default function ConfigsEditor({ accessKey }: props) {
               }
             )
           }}>
-          Send Test Emails
+          {t('sendTestEmails')}
         </Button>
         <Button
           variant='light'
@@ -163,7 +165,7 @@ export default function ConfigsEditor({ accessKey }: props) {
           onClick={() => {
             saveConfigs()
           }}>
-          Update Configurations
+          {t('updateConfigs')}
         </Button>
       </SimpleGrid>
     </>
@@ -178,11 +180,11 @@ type configInputProps = {
 
 function ConfigInput({ config, originalValue, setConfigs }: configInputProps) {
   const validation = getValidation(originalValue)
-
+  const { t } = useTranslation('translations')
   return (
     <TextInput
-      placeholder='Enter Config Value...'
-      label={config.name}
+      placeholder={t('enterConfigValue')}
+      label={t(config.name)}
       value={config.value}
       error={validateString(config.value, validation)}
       onChange={(event) =>

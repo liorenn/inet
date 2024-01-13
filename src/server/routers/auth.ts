@@ -1,8 +1,8 @@
 import { calculatePercentageDiff, encodeEmail } from '@/utils/utils'
 import { commentSchema, updateSchema, userSchema } from '@/models/schemas'
 import { deleteUserSoap, insertUserSoap, updateUserSoap } from '../soapFunctions'
+import { emailProvider, sendSoapRequest, websiteEmail } from 'config'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { fromEmail, resendKey, sendSoapRequest } from 'config'
 import { method, router } from '@/server/trpc'
 
 import PriceDropEmail from '@/components/misc/PriceDropEmail'
@@ -117,11 +117,11 @@ export const authRouter = router({
             })
           }
           if (input.sendTest === true) {
-            const resend = new Resend(resendKey)
+            const resend = new Resend(emailProvider)
             device.price = 600
             await resend.emails
               .send({
-                from: fromEmail,
+                from: websiteEmail,
                 to: user.email,
                 subject: `${device.name} Price Drop`,
                 react: PriceDropEmail({
@@ -138,10 +138,10 @@ export const authRouter = router({
               })
           } else {
             if (price && price < device.price) {
-              const resend = new Resend(resendKey)
+              const resend = new Resend(emailProvider)
               await resend.emails
                 .send({
-                  from: fromEmail,
+                  from: websiteEmail,
                   to: user.email,
                   subject: `${device.name} Price Drop`,
                   react: PriceDropEmail({

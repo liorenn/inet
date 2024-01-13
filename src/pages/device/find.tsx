@@ -4,7 +4,7 @@ import { deviceTypeProperties, propertiesLabels } from '@/models/devicePropertie
 import { useEffect, useState } from 'react'
 
 import Head from 'next/head'
-import RecommendedDevices from '@/components/device/RecommendedDevices'
+import MatchedDevices from '@/components/device/MatchedDevices'
 import { deviceType as deviceTypeEnum } from '@/models/enums'
 import { preprtiesSchemaType } from '@/models/schemas'
 import { trpc } from '@/server/client'
@@ -110,7 +110,7 @@ export default function Find() {
       <Container size={1000}>
         <Stack spacing={0}>
           <Group position='apart'>
-            <Title size={width < 1000 ? 20 : 26}>Select Device Type</Title>
+            <Title size={width < 1000 ? 20 : 26}>{t('selectDeviceType')}</Title>
             <Button
               mb={8}
               w={'auto'}
@@ -126,7 +126,7 @@ export default function Find() {
                   )
                 )
               }}>
-              Reset Preferences
+              {t('resetPreferences')}
             </Button>
           </Group>
           <ScrollArea type='always'>
@@ -183,9 +183,9 @@ export default function Find() {
           color='green'
           variant='light'
           onClick={() => handleSubmit()}>
-          {isLoading ? t('loading') : 'Find Your Device'}
+          {isLoading ? t('loading') : t('findYourDevice')}
         </Button>
-        <RecommendedDevices data={data} isLoading={isLoading} title='Best Matched Devices' />
+        <MatchedDevices data={data} isLoading={isLoading} title={t('bestMatchedDevices')} />
       </Container>
     </>
   )

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { currrencyApiHost } from 'config'
+import { currrencyApiUrl } from 'config'
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -36,7 +36,7 @@ export async function fetchCurrentPrice(deviceModel: string) {
 
 export async function convertPrice(price: number, currency: string, targetCurrency: string) {
   const response = await fetch(
-    `${currrencyApiHost}&currencies=${targetCurrency}&base_currency=${currency}`
+    `${currrencyApiUrl}&currencies=${targetCurrency}&base_currency=${currency}`
   )
   const data = await response.json()
   const convertedPrice = price * data.data[targetCurrency]
@@ -52,7 +52,7 @@ export async function FormatPrice(priceString: string) {
       .split(' ')[0]
     return parseFloat(dollarNumber)
   } else {
-    const response = await fetch(`${currrencyApiHost}&currencies=$USD&base_currency=$EUR`)
+    const response = await fetch(`${currrencyApiUrl}&currencies=$USD&base_currency=$EUR`)
     const data = await response.json()
     const extractedNumber = parseFloat(priceString.split(' ')[1])
     return extractedNumber * data.data.USD

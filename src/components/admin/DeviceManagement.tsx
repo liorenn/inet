@@ -5,7 +5,7 @@ import { convertDeviceValues, convertFormDeviceValues, getDevicesFields } from '
 
 import { CreateNotification } from '@/utils/utils'
 import type { Device } from '@prisma/client'
-import Loader from '../layout/Loader'
+import Loader from '@/components/layout/Loader'
 import { deviceSchema } from '@/models/schemas'
 import { managerAccessKey } from 'config'
 import { trpc } from '@/server/client'

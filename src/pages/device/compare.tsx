@@ -1,4 +1,4 @@
-import { Container, Group, SegmentedControl, Select, SimpleGrid } from '@mantine/core'
+import { Container, Group, SegmentedControl, Select, SimpleGrid, Title } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
 import DevicePhotos from '@/components/device/DevicePhotos'
@@ -6,31 +6,48 @@ import DevicesSpecs from '@/components/device/DevicesSpecs'
 import Head from 'next/head'
 import Loader from '@/components/layout/Loader'
 import React from 'react'
+import { Translate } from 'next-translate'
 import { translateDeviceName } from '@/utils/utils'
 import { trpc } from '@/server/client'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
+import { useViewportSize } from '@mantine/hooks'
 import { z } from 'zod'
 
-const Buttons = [
-  { label: 'Two Devices', value: '2' },
-  { label: 'Three Devices', value: '3' },
-  { label: 'Four Devices', value: '4' },
-]
+function getButtons(t: Translate, width: number) {
+  const Buttons = [
+    { label: `${t('two')} ${t('devices')}`, value: '2' },
+    { label: `${t('three')} ${t('devices')}`, value: '3' },
+    { label: `${t('four')} ${t('devices')}`, value: '4' },
+  ]
+  if (width > 1100) {
+    return Buttons
+  }
+  if (width > 800) {
+    return Buttons.slice(0, 2)
+  }
+  return Buttons.slice(0, 1)
+}
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 export default function Compare() {
   const { t } = useTranslation('translations')
+  const { width } = useViewportSize()
   const router = useRouter()
   const deviceList = z
     .string()
     .parse(router.query.deviceList ?? '')
     .split(',')
   const [value, setValue] = useState(
-    Buttons.find((mark) => Number(mark.value) === deviceList.length)?.value
+    getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
   )
   const { data: allDevices } = trpc.device.getModelsAndNames.useQuery()
   const { data } = trpc.device.getDevicesFromArr.useQuery(deviceList)
+
+  useEffect(() => {
+    setValue(getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [width])
 
   useEffect(() => {
     if (!router.query.deviceList) {
@@ -40,7 +57,7 @@ export default function Compare() {
 
   useEffect(() => {
     if (allDevices) {
-      const arrayLength = Number(Buttons.find((mark) => mark.value === value)?.value)
+      const arrayLength = Number(getButtons(t, width).find((mark) => mark.value === value)?.value)
       router.push(generateUrlSring(allDevices.slice(0, arrayLength).map((device) => device.model)))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,7 +91,14 @@ export default function Compare() {
         <title>{t('compare')}</title>
       </Head>
       <Container size='lg'>
-        <SegmentedControl value={value} onChange={setValue} data={Buttons} size='lg' fullWidth />
+        <Title>{t('selectDevicesAmount')}</Title>
+        <SegmentedControl
+          value={value}
+          onChange={setValue}
+          data={getButtons(t, width)}
+          size='lg'
+          fullWidth
+        />
         <Group grow position='apart' mb='xs' mt='sm'>
           {deviceList.map((_, index) => (
             <Select
