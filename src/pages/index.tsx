@@ -22,7 +22,7 @@ export default function Home() {
       <Container size={1400} p={40} mt={width < 400 ? 0 : 80}>
         <Stack spacing={0} align='center'>
           <Title align='center' size={56}>
-            Find Your Perfect Device
+            Find the Perfect Device
           </Title>
           <Text align='center' size={30}>
             {t('homeParagraph')
