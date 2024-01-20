@@ -1,7 +1,7 @@
 import { deviceTypeProperties, weight, weightsValues } from '@/models/deviceProperties'
 import { matchDeviceType, preprtiesSchemaType } from '@/models/schemas'
 
-export type recommendedDevice = {
+type recommendedDevice = {
   model: string
   match: number
 }
@@ -42,7 +42,7 @@ export function getRecommendedDevices(
   return getMatchedDevices(preferencesValues, devices, deviceType, 4)
 }
 
-export type preferenceType = {
+type preferenceType = {
   name: preprtiesSchemaType
   value: number
 }
@@ -69,7 +69,7 @@ type weights = {
   weights: weight[]
 }
 
-export const weights: weights[] = deviceTypeProperties.map((value) => {
+const weights: weights[] = deviceTypeProperties.map((value) => {
   return {
     deviceType: value.deviceType,
     weights: value.properties.map(

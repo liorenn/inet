@@ -3,9 +3,10 @@ import * as React from 'react'
 import { Body, Container, Head, Hr } from '@react-email/components'
 import { Html, Link, Preview, Text } from '@react-email/components'
 
-/* eslint-disable react/no-unescaped-entities */
 import { Device } from '@prisma/client'
 import { websiteUrl } from 'config'
+
+/* eslint-disable react/no-unescaped-entities */
 
 type PriceDropEmailProps = {
   name: string

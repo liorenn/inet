@@ -8,7 +8,7 @@ type CreateContextOptions = {
   supabase: SupabaseClient
 }
 
-export const createContextInner = (opts: CreateContextOptions) => {
+const createContextInner = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     supabase: opts.supabase,

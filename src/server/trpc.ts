@@ -1,4 +1,4 @@
-import { initTRPC, TRPCError } from '@trpc/server'
+import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 
 import { type Context } from '@/server/context'
@@ -9,40 +9,41 @@ const t = initTRPC.context<Context>().create({
 
 export const router = t.router
 
-const isAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
-  }
-  return next({
-    ctx: {
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  })
-})
-
-const isAdmin = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
-  }
-  return next({
-    ctx: {
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  })
-})
-
-const isManager = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
-  }
-  return next({
-    ctx: {
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  })
-})
-
 export const method = t.procedure
-export const userMethod = t.procedure.use(isAuthed)
-export const adminMethod = t.procedure.use(isAdmin)
-export const managerMethod = t.procedure.use(isManager)
+
+//const isAuthed = t.middleware(({ ctx, next }) => {
+//   if (!ctx.session || !ctx.session.user) {
+//     throw new TRPCError({ code: 'UNAUTHORIZED' })
+//   }
+//   return next({
+//     ctx: {
+//       session: { ...ctx.session, user: ctx.session.user },
+//     },
+//   })
+// })
+
+// const isAdmin = t.middleware(({ ctx, next }) => {
+//   if (!ctx.session || !ctx.session.user) {
+//     throw new TRPCError({ code: 'UNAUTHORIZED' })
+//   }
+//   return next({
+//     ctx: {
+//       session: { ...ctx.session, user: ctx.session.user },
+//     },
+//   })
+// })
+
+// const isManager = t.middleware(({ ctx, next }) => {
+//   if (!ctx.session || !ctx.session.user) {
+//     throw new TRPCError({ code: 'UNAUTHORIZED' })
+//   }
+//   return next({
+//     ctx: {
+//       session: { ...ctx.session, user: ctx.session.user },
+//     },
+//   })
+// })
+
+// export const userMethod = t.procedure.use(isAuthed)
+// export const adminMethod = t.procedure.use(isAdmin)
+// export const managerMethod = t.procedure.use(isManager)

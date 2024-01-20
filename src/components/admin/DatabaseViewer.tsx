@@ -17,7 +17,7 @@ type props = {
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-export function findObjectByPropertyValue<T>(array: T[], name: keyof T, value: T[keyof T]) {
+function findObjectByPropertyValue<T>(array: T[], name: keyof T, value: T[keyof T]) {
   return array.find((item) => item[name] === value)
 }
 

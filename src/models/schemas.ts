@@ -51,8 +51,6 @@ export const commentSchema = z.object({
   username: z.string(),
 })
 
-export type commentSchemaType = z.infer<typeof commentSchema>
-
 export const updateSchema = z.enum(['username', 'name', 'password', 'phone'])
 
 export const preprtiesSchema = z.enum([

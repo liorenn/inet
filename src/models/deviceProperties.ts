@@ -19,7 +19,7 @@ export const weightsValues: weight[] = [
   { name: 'storage', minValue: 64, maxValue: 128 },
 ]
 
-export type PropertiesLabels = {
+type PropertiesLabels = {
   property: preprtiesSchemaType
   labels: string[]
 }

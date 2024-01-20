@@ -43,7 +43,7 @@ export async function convertPrice(price: number, currency: string, targetCurren
   return convertedPrice
 }
 
-export async function FormatPrice(priceString: string) {
+async function FormatPrice(priceString: string) {
   if (priceString.includes('$')) {
     const dollarIndex = priceString.indexOf('$')
     const dollarNumber = priceString

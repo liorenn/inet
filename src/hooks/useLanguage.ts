@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export type languagesType = {
+type languagesType = {
   value: string
   name: string
 }

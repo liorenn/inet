@@ -1,7 +1,7 @@
 import type { Device } from '@prisma/client'
 import { FormatDate } from '@/utils/utils'
 
-export type categoriesType = {
+type categoriesType = {
   name: string
   specs: specsArrayType
 }[]
@@ -13,7 +13,7 @@ export type specsDataType = {
   values: (string | null)[] | colorsSpecsType[]
 }[]
 
-export type categoryType = {
+type categoryType = {
   name: string
   specs: specsType
 }
