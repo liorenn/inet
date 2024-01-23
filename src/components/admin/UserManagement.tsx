@@ -1,20 +1,19 @@
 import { Button, ScrollArea, Table, Text, TextInput } from '@mantine/core'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
-import { UserManagementForm, convertFormUserValues } from '@/models/forms'
+import { UserManagementForm, convertFormUserValues, userPropertyName } from '@/models/forms'
+import { managerAccessKey, validateInputOnChange } from 'config'
 
 import { CreateNotification } from '@/utils/utils'
 import Loader from '@/components/layout/Loader'
-import type { User } from '@prisma/client'
-import { managerAccessKey } from 'config'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import { useOs } from '@mantine/hooks'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import { userSchema } from '@/models/schemas'
 
 export type formType = {
-  [K in keyof User]: string
+  [K in userPropertyName]: string
 }
 
 type props = {
@@ -84,7 +83,7 @@ function InsertRow({ setUsers }: insertRowProps) {
 
   const form = useForm<formType>({
     initialValues: formProperties.getDefaultValues(),
-    validateInputOnChange: true,
+    validateInputOnChange,
     validate: formProperties.getValidators(),
   })
 
@@ -146,7 +145,7 @@ function UserRow({ data, setUsers }: userRowProps) {
   const { mutate: mutateUpdate } = trpc.auth.updateUser.useMutation()
   const form = useForm<formType>({
     initialValues: data,
-    validateInputOnChange: true,
+    validateInputOnChange,
     validate: formProperties.getValidators(),
   })
 

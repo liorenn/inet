@@ -5,11 +5,23 @@ import { method, router } from '@/server/trpc'
 
 import { selectProprties, type devicePropertiesType } from '@/models/enums'
 import { deviceSchema, matchDeviceType, preprtiesSchema } from '@/models/schemas'
-import { sendSoapRequest } from 'config'
+import { matchedDevicesLimit, sendSoapRequest } from 'config'
 import { z } from 'zod'
 import { selectParams } from '@/models/deviceProperties'
+import { convertPrice } from '@/server/price'
 
 export const DeviceRouter = router({
+  convertPrice: method
+    .input(
+      z.object({
+        price: z.number(),
+        currency: z.string(),
+        targetCurrency: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return convertPrice(input.price, input.currency, input.targetCurrency)
+    }),
   getRecommendedDevices: method
     .input(z.object({ model: z.string(), deviceType: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -57,7 +69,12 @@ export const DeviceRouter = router({
         },
       })
       const preferencesValues = convertPreferencesToValues(input.userPreferences, input.deviceType)
-      const matches = getMatchedDevices(preferencesValues, devices, input.deviceType, 8)
+      const matches = getMatchedDevices(
+        preferencesValues,
+        devices,
+        input.deviceType,
+        matchedDevicesLimit
+      )
       const query = await ctx.prisma.device.findMany({
         select: selectProprties,
         where: {

@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 
 import Comment from '@/components/misc/Comment'
 import type { FormEvent } from 'react'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import { useComments } from '@/hooks/useComments'
 import { useProfilePicture } from '@/hooks/useProfilePicture'
 import useTranslation from 'next-translate/useTranslation'

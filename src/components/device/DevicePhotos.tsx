@@ -58,8 +58,8 @@ export default function DevicePhotos({ device, miniphotos, withName }: props) {
               fit='contain'
               alt={'photo'}
               mb='sm'
-              width={width <= 500 ? 200 : 140}
-              height={width <= 560 ? 240 : 550}
+              width={width <= 500 ? 200 : 280}
+              height={width <= 560 ? 240 : 340}
             />
           </Center>
           <Container>

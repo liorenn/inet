@@ -1,14 +1,14 @@
 import { calculatePercentageDiff, encodeEmail } from '@/utils/utils'
 import { commentSchema, updateSchema, userSchema } from '@/models/schemas'
-import { deleteUserSoap, insertUserSoap, updateUserSoap } from '../soapFunctions'
-import { emailProvider, sendSoapRequest, websiteEmail } from 'config'
+import { deleteUserSoap, insertUserSoap, updateUserSoap } from '@/server/soapFunctions'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { method, router } from '@/server/trpc'
+import { sendSoapRequest, websiteEmail } from 'config'
 
 import PriceDropEmail from '@/components/misc/PriceDropEmail'
 import { Prisma } from '@prisma/client'
-import { Resend } from 'resend'
-import { fetchCurrentPrice } from '@/utils/price'
+import { fetchCurrentPrice } from '@/server/price'
+import { resend } from '@/server/client'
 import { z } from 'zod'
 
 export const authRouter = router({
@@ -96,6 +96,50 @@ export const authRouter = router({
   getUsersData: method.query(async ({ ctx }) => {
     return await ctx.prisma.user.findMany()
   }),
+  sendPriceDropsEmail: method
+    .input(z.object({ email: z.string().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const email = input.email
+      if (!email) return false
+      const userDevices = await ctx.prisma.deviceUser.findMany({
+        where: { userEmail: input.email },
+        include: {
+          device: true,
+          user: true,
+        },
+      })
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      userDevices.forEach(async (userDevice) => {
+        const price = await fetchCurrentPrice(userDevice.deviceModel)
+        if (price && price != userDevice.device.price) {
+          await ctx.prisma.device.update({
+            where: { model: userDevice.deviceModel },
+            data: { price: price },
+          })
+        }
+        if (price && price < userDevice.device.price) {
+          await resend.emails
+            .send({
+              from: websiteEmail,
+              to: email,
+              subject: `${userDevice.device.name} Price Drop`,
+              react: PriceDropEmail({
+                name: userDevice.user.name,
+                newPrice: price,
+                device: userDevice.device,
+                precentage: calculatePercentageDiff(userDevice.device.price, price),
+              }),
+            })
+            .then((value) => {
+              if (value.id) {
+                return true
+              }
+            })
+        } else {
+          return false
+        }
+      })
+    }),
   sendPriceDropsEmails: method
     .input(z.object({ sendTest: z.boolean().optional() }))
     .mutation(async ({ ctx, input }) => {
@@ -117,7 +161,6 @@ export const authRouter = router({
             })
           }
           if (input.sendTest === true) {
-            const resend = new Resend(emailProvider)
             device.price = 600
             await resend.emails
               .send({
@@ -138,7 +181,6 @@ export const authRouter = router({
               })
           } else {
             if (price && price < device.price) {
-              const resend = new Resend(emailProvider)
               await resend.emails
                 .send({
                   from: websiteEmail,

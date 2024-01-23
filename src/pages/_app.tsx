@@ -1,6 +1,6 @@
 import { ColorSchemeProvider, MantineProvider, createEmotionCache } from '@mantine/core'
-import { defaultColorScheme, posthogDebug, posthogToken } from 'config'
-import { supabase, trpc } from '@/server/client'
+import { defaultColorScheme, rtlInHebrew } from 'config'
+import { supabase, trpc } from '@/utils/client'
 
 import type { AppProps } from 'next/app'
 import type { ColorScheme } from '@mantine/core'
@@ -11,6 +11,7 @@ import RouterTransition from '@/components/layout/RouterTransition'
 import type { Session } from '@supabase/auth-helpers-react'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import SpotlightControl from '@/components/misc/Spotlight'
+import { clientEnv } from '@/utils/env'
 import posthog from 'posthog-js'
 import rtlPlugin from 'stylis-plugin-rtl'
 import { useEffect } from 'react'
@@ -18,10 +19,10 @@ import { useLocalStorage } from '@mantine/hooks'
 import useTranslation from 'next-translate/useTranslation'
 
 if (typeof window !== 'undefined') {
-  posthog.init(posthogToken, {
-    api_host: 'https://app.posthog.com',
+  posthog.init(clientEnv.posthogToken, {
+    api_host: clientEnv.posthogApiHost,
     loaded: (posthog) => {
-      posthog.debug(posthogDebug)
+      posthog.debug(false)
     },
   })
 }
@@ -46,7 +47,7 @@ function App({ Component, pageProps }: props) {
   const { lang } = useTranslation('translations')
 
   useEffect(() => {
-    document.body.dir = lang === 'he' ? 'rtl' : 'ltr'
+    document.body.dir = rtlInHebrew ? (lang === 'he' ? 'rtl' : 'ltr') : 'ltr'
   }, [lang])
 
   return (
@@ -54,10 +55,10 @@ function App({ Component, pageProps }: props) {
       <MantineProvider
         withGlobalStyles
         withNormalizeCSS
-        emotionCache={lang === 'he' ? rtlCache : undefined}
+        emotionCache={rtlInHebrew ? (lang === 'he' ? rtlCache : undefined) : undefined}
         theme={{
           colorScheme,
-          dir: lang === 'he' ? 'rtl' : 'ltr',
+          dir: rtlInHebrew ? (lang === 'he' ? 'rtl' : 'ltr') : 'ltr',
           breakpoints: {
             xs: '30em',
             sm: '48em',

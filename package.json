@@ -1,15 +1,13 @@
 {
-  "name": "create-t3-app",
+  "name": "inet",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "static": "next build --no-lint && next export",
     "lint": "next lint",
     "start": "next start",
-    "ionic:build": "npm run build",
-    "ionic:serve": "npm run start"
+    "static": "next build --no-lint && next export"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -63,8 +61,5 @@
     "npm": "^9.3.1",
     "prisma": "^5.8.0",
     "typescript": "^4.8.4"
-  },
-  "ct3aMetadata": {
-    "initVersion": "6.10.1"
   }
 }

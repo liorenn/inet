@@ -3,7 +3,7 @@ import { useSession, useUser } from '@supabase/auth-helpers-react'
 
 import Loader from '@/components/layout/Loader'
 import { managerAccessKey } from 'config'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'

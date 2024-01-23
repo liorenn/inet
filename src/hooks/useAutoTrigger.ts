@@ -1,17 +1,20 @@
 import { Cookies } from 'typescript-cookie'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import { useEffect } from 'react'
+import { useUser } from '@supabase/auth-helpers-react'
 
 const useAutoTrigger = () => {
-  const { mutate } = trpc.auth.sendPriceDropsEmails.useMutation()
+  const user = useUser()
+  const { mutate } = trpc.auth.sendPriceDropsEmail.useMutation()
   useEffect(() => {
     const existingCookie = Cookies.get('triggeredFunction')
     if (!existingCookie) {
-      mutate({})
+      mutate({ email: user?.email })
       console.log('triggered function')
-      Cookies.set('triggeredFunction', true, { expires: 7 })
+      Cookies.set('triggeredFunction', true, { expires: 1 })
     }
-  }, [mutate])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 }
 
 export default useAutoTrigger

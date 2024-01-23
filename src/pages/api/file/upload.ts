@@ -29,9 +29,7 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
         console.error(err)
         return res.status(500).end('File upload error')
       }
-      const { originalname, path: filePath } = (req as any).file
-      console.log('Uploaded file:', originalname, 'saved at:', filePath)
-      res.status(200).json({ success: true })
+      return res.status(200).json({ success: true })
     })
   } catch (error) {
     console.error(error)

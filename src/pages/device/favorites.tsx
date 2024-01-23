@@ -5,7 +5,7 @@ import Head from 'next/head'
 import ListCard from '@/components/device/DeviceListCard'
 import Loader from '@/components/layout/Loader'
 import type { devicePropertiesType } from '@/models/enums'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 

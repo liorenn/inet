@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 
 import { Loader } from '@mantine/core'
-import { convertPrice } from '@/utils/price'
+import { trpc } from '@/utils/client'
 import { useCurrency } from '@/hooks/useCurrency'
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 export default function PriceText({ priceString }: { priceString: string }) {
   const { currency } = useCurrency()
+  const { mutate } = trpc.device.convertPrice.useMutation()
   const [price, setPrice] = useState<number>(parseFloat(priceString ?? '0'))
   const [prevCurrency, setPrevCurrency] = useState<string | undefined>(undefined)
 
@@ -17,18 +18,29 @@ export default function PriceText({ priceString }: { priceString: string }) {
         setNewPrice(currency.value)
       } else setPrevCurrency('USD')
     } else {
-      convertPrice(price, prevCurrency, currency.value).then((price) => {
-        setPrice(price)
-        setPrevCurrency(currency.value)
-      })
+      mutate(
+        { price, currency: prevCurrency, targetCurrency: currency.value },
+        {
+          onSuccess(data) {
+            setPrice(data)
+            setPrevCurrency(currency.value)
+          },
+        }
+      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency])
 
-  async function setNewPrice(currencyValue: string) {
-    const newPrice = await convertPrice(price, 'USD', currencyValue)
-    setPrice(newPrice)
-    setPrevCurrency(currencyValue)
+  function setNewPrice(currencyValue: string) {
+    mutate(
+      { price, currency: 'USD', targetCurrency: currencyValue },
+      {
+        onSuccess(data) {
+          setPrice(data)
+          setPrevCurrency(currencyValue)
+        },
+      }
+    )
   }
 
   if (!currency) {

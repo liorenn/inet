@@ -8,7 +8,7 @@ import Loader from '@/components/layout/Loader'
 import React from 'react'
 import { Translate } from 'next-translate'
 import { translateDeviceName } from '@/utils/utils'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
@@ -38,14 +38,16 @@ export default function Compare() {
     .string()
     .parse(router.query.deviceList ?? '')
     .split(',')
-  const [value, setValue] = useState(
+  const [compareAmount, setCompareAmount] = useState(
     getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
   )
   const { data: allDevices } = trpc.device.getModelsAndNames.useQuery()
   const { data } = trpc.device.getDevicesFromArr.useQuery(deviceList)
 
   useEffect(() => {
-    setValue(getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value)
+    setCompareAmount(
+      getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [width])
 
@@ -57,11 +59,13 @@ export default function Compare() {
 
   useEffect(() => {
     if (allDevices) {
-      const arrayLength = Number(getButtons(t, width).find((mark) => mark.value === value)?.value)
+      const arrayLength = Number(
+        getButtons(t, width).find((mark) => mark.value === compareAmount)?.value
+      )
       router.push(generateUrlSring(allDevices.slice(0, arrayLength).map((device) => device.model)))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allDevices, value])
+  }, [allDevices, compareAmount])
 
   function generateUrlSring(deviceList: string[]) {
     return `?deviceList=${deviceList.join(',')}`
@@ -93,8 +97,8 @@ export default function Compare() {
       <Container size='lg'>
         <Title>{t('selectDevicesAmount')}</Title>
         <SegmentedControl
-          value={value}
-          onChange={setValue}
+          value={compareAmount}
+          onChange={setCompareAmount}
           data={getButtons(t, width)}
           size='lg'
           fullWidth
@@ -114,11 +118,11 @@ export default function Compare() {
             />
           ))}
         </Group>
-        {data ? (
+        {data && data.length > 0 ? (
           <>
             <SimpleGrid mb='md' cols={data.length}>
               {deviceList.map((model, index) => {
-                const device = data.find((x) => x.model === model)
+                const device = data.find((device) => device.model === model)
                 return (
                   device && (
                     <DevicePhotos

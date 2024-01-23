@@ -3,7 +3,7 @@ import { Dispatch, useEffect, useState } from 'react'
 import { Button } from '@mantine/core'
 import { CreateNotification } from '@/utils/utils'
 import { devicePropertiesType } from '@/models/enums'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 

@@ -16,7 +16,7 @@ import type { SpotlightAction } from '@mantine/spotlight'
 import { SpotlightProvider } from '@mantine/spotlight'
 import { Translate } from 'next-translate'
 import { translateDeviceName } from '@/utils/utils'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions */

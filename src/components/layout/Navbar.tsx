@@ -4,7 +4,7 @@ import { Button, Group, Header, Text } from '@mantine/core'
 import { CreateNotification, encodeEmail } from '@/utils/utils'
 import { DEFlag, GBFlag, ILFlag } from 'mantine-flagpack'
 import { IconCurrencyDollar, IconLanguage, IconMoon, IconSearch, IconSun } from '@tabler/icons'
-import { adminAccessKey, websiteUrl } from 'config'
+import { adminAccessKey, defaultLanguage } from 'config'
 import { currencies, useCurrency } from '@/hooks/useCurrency'
 import { languages, useLanguage } from '@/hooks/useLanguage'
 import { useEffect, useState } from 'react'
@@ -13,7 +13,7 @@ import { useSession, useSupabaseClient, useUser } from '@supabase/auth-helpers-r
 import Link from 'next/link'
 import NavBarDropdown from '@/components/layout/NavbarDropdown'
 import setLanguage from 'next-translate/setLanguage'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import useAutoTrigger from '@/hooks/useAutoTrigger'
 import { usePostHog } from 'posthog-js/react'
 import { useProfilePicture } from '@/hooks/useProfilePicture'
@@ -45,7 +45,7 @@ export default function Navbar() {
       languages.find((lang) => lang.value === localStorage.getItem('language')) ?? languages[0]
     )
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    setLanguage(localStorage.getItem('language') ?? 'en')
+    setLanguage(localStorage.getItem('language') ?? defaultLanguage)
     setCurrency(
       currencies.find((Currency) => Currency.value === localStorage.getItem('currency')) ??
         currencies[0]
@@ -64,7 +64,7 @@ export default function Navbar() {
           onSuccess(data, params) {
             if (data === true) {
               setImageExists(true)
-              setImagePath(`${websiteUrl}/users/${encodeEmail(params.email)}.png`)
+              setImagePath(`${''}/users/${encodeEmail(params.email)}.png`)
             }
           },
         }
@@ -227,7 +227,7 @@ export default function Navbar() {
                     background: lang === language.value ? '#1c1c1c' : '',
                   }}
                   icon={
-                    language.value === 'en' ? (
+                    language.value === defaultLanguage ? (
                       <GBFlag w={38} />
                     ) : language.value === 'de' ? (
                       <DEFlag w={38} />

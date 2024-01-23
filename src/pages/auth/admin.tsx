@@ -1,5 +1,5 @@
 import { Container, ScrollArea, SegmentedControl } from '@mantine/core'
-import { adminAccessKey, managerAccessKey } from 'config'
+import { adminAccessKey, defaultDashboard, managerAccessKey } from 'config'
 
 import ConfigsEditor from '@/components/admin/ConfigsEditor'
 import DatabaseViewer from '@/components/admin/DatabaseViewer'
@@ -8,7 +8,7 @@ import Head from 'next/head'
 import Loader from '@/components/layout/Loader'
 import UserManagement from '@/components/admin/UserManagement'
 import WebsiteStatistics from '@/components/admin/WebsiteStatistics'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
@@ -27,7 +27,7 @@ export default function Admin() {
   useEffect(() => {
     if (!router.query.dashboard) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      router.push(`?dashboard=deviceManagement`)
+      router.push(`?dashboard=${defaultDashboard}`)
     }
   }, [router])
 

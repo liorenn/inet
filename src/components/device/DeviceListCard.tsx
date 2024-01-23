@@ -1,6 +1,6 @@
 import { Button, Card, Grid, Space, Text } from '@mantine/core'
 
-import DevicePhotos from './DevicePhotos'
+import DevicePhotos from '@/components/device/DevicePhotos'
 import { Dispatch } from 'react'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import Link from 'next/link'

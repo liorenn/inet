@@ -8,11 +8,12 @@ import { CreateNotification } from '@/utils/utils'
 import Head from 'next/head'
 import Link from 'next/link'
 import { User } from '@prisma/client'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import { useForm } from '@mantine/form'
 import { usePostHog } from 'posthog-js/react'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
+import { validateInputOnChange } from 'config'
 
 export type formType = {
   [K in keyof Omit<User, 'accessKey'>]: string
@@ -38,7 +39,7 @@ export default function SignUp() {
 
   const form = useForm<formType>({
     initialValues: formProperties.getDefaultValues() as FormDefaultValues,
-    validateInputOnChange: true,
+    validateInputOnChange,
     validate: formProperties.getValidators(),
   })
 

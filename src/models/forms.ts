@@ -4,12 +4,13 @@ import { deviceSchemaType, userSchemaType } from '@/models/schemas'
 import type { formType as formDevice } from '@/components/admin/DeviceManagement'
 import type { formType as formUser } from '@/components/admin/UserManagement'
 
+export type userPropertyName = keyof User
 class UserProperty {
-  name: keyof User
+  name: userPropertyName
   regex: RegExp
   disabled?: boolean
 
-  constructor(name: keyof User, regex: RegExp, disabled?: boolean) {
+  constructor(name: userPropertyName, regex: RegExp, disabled?: boolean) {
     this.name = name
     this.regex = regex
     this.disabled = disabled
@@ -72,7 +73,7 @@ export class SignInForm {
     return validators
   }
 }
-export class AccountForm extends SignInForm {
+class UserForm extends SignInForm {
   username: UserProperty
   name: UserProperty
   phone: UserProperty
@@ -92,7 +93,11 @@ export class AccountForm extends SignInForm {
       regex: /^0\d{1,2}-?\d{7}$/,
     }
   }
-
+}
+export class AccountForm extends UserForm {
+  constructor() {
+    super()
+  }
   getFileds(): UserProperty[] {
     return [this.username, this.name, this.phone, this.password]
   }
@@ -139,12 +144,12 @@ export class UserManagementForm extends SignUpForm {
   }
   getDefaultValues() {
     return {
-      accessKey: '',
       email: '',
+      username: '',
       name: '',
       phone: '',
-      username: '',
       password: '',
+      accessKey: '',
     }
   }
 }

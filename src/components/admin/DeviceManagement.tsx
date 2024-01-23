@@ -2,13 +2,13 @@ import { Button, ScrollArea, Table, Text, TextInput } from '@mantine/core'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
 import { convertDeviceValues, convertFormDeviceValues, getDevicesFields } from '@/models/forms'
+import { managerAccessKey, validateInputOnChange } from 'config'
 
 import { CreateNotification } from '@/utils/utils'
 import type { Device } from '@prisma/client'
 import Loader from '@/components/layout/Loader'
 import { deviceSchema } from '@/models/schemas'
-import { managerAccessKey } from 'config'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import { useOs } from '@mantine/hooks'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
@@ -75,7 +75,7 @@ function InsertRow({ setUsers }: { setUsers: Dispatch<SetStateAction<formType[]>
   const { fields, validators, defaultValues } = getDevicesFields()
   const form = useForm<formType>({
     initialValues: defaultValues,
-    validateInputOnChange: true,
+    validateInputOnChange,
     validate: validators,
   })
 
@@ -138,7 +138,7 @@ function DeviceRow({
   const { fields, validators } = getDevicesFields()
   const form = useForm<formType>({
     initialValues: data,
-    validateInputOnChange: true,
+    validateInputOnChange,
     validate: validators,
   })
 

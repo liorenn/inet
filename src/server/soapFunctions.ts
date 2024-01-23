@@ -5,15 +5,15 @@ import {
 } from '@/server/soapHelpers'
 import type { deviceSchemaType, userSchemaType } from '@/models/schemas'
 
+import { env } from '@/server/env'
 import soapRequest from 'easy-soap-request'
-import { soapServerUrl } from 'config'
 
 function convertObjectToJson(object: deviceSchemaType | userSchemaType) {
   return { Name: 'json', Value: JSON.stringify(object) }
 }
 export async function insertUserSoap({ input }: { input: userSchemaType }) {
   const { response } = await soapRequest({
-    url: soapServerUrl,
+    url: env.soapServerUrl,
     headers: soapRequestHeaders,
     xml: createSoapRequestXml('InsertUser', convertObjectToJson(input)),
   })
@@ -21,7 +21,7 @@ export async function insertUserSoap({ input }: { input: userSchemaType }) {
 }
 export async function updateUserSoap({ input }: { input: userSchemaType }) {
   const { response } = await soapRequest({
-    url: soapServerUrl,
+    url: env.soapServerUrl,
     headers: soapRequestHeaders,
     xml: createSoapRequestXml('UpdateUser', convertObjectToJson(input)),
   })
@@ -29,7 +29,7 @@ export async function updateUserSoap({ input }: { input: userSchemaType }) {
 }
 export async function deleteUserSoap({ email }: { email: string }) {
   const { response } = await soapRequest({
-    url: soapServerUrl,
+    url: env.soapServerUrl,
     headers: soapRequestHeaders,
     xml: createSoapRequestXml('DeleteUser', { Name: 'email', Value: email }),
   })
@@ -38,7 +38,7 @@ export async function deleteUserSoap({ email }: { email: string }) {
 
 export async function insertDeviceSoap({ input }: { input: deviceSchemaType }) {
   const { response } = await soapRequest({
-    url: soapServerUrl,
+    url: env.soapServerUrl,
     headers: soapRequestHeaders,
     xml: createSoapRequestXml('InsetDevice', convertObjectToJson(input)),
   })
@@ -47,7 +47,7 @@ export async function insertDeviceSoap({ input }: { input: deviceSchemaType }) {
 
 export async function updateDeviceSoap({ input }: { input: deviceSchemaType }) {
   const { response } = await soapRequest({
-    url: soapServerUrl,
+    url: env.soapServerUrl,
     headers: soapRequestHeaders,
     xml: createSoapRequestXml('UpdateDevice', convertObjectToJson(input)),
   })
@@ -55,7 +55,7 @@ export async function updateDeviceSoap({ input }: { input: deviceSchemaType }) {
 }
 export async function deleteDeviceSoap({ model }: { model: string }) {
   const { response } = await soapRequest({
-    url: soapServerUrl,
+    url: env.soapServerUrl,
     headers: soapRequestHeaders,
     xml: createSoapRequestXml('DeleteDevice', { Name: 'model', Value: model }),
   })

@@ -1,5 +1,5 @@
 import { DeviceType } from '@/models/enums'
-import { preprtiesSchemaType } from './schemas'
+import { preprtiesSchemaType } from '@/models/schemas'
 
 export type weight = {
   name: preprtiesSchemaType

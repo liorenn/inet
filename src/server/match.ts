@@ -1,6 +1,8 @@
 import { deviceTypeProperties, weight, weightsValues } from '@/models/deviceProperties'
 import { matchDeviceType, preprtiesSchemaType } from '@/models/schemas'
 
+import { recommendedDevicesLimit } from 'config'
+
 type recommendedDevice = {
   model: string
   match: number
@@ -39,7 +41,7 @@ export function getRecommendedDevices(
       })
     }
   })
-  return getMatchedDevices(preferencesValues, devices, deviceType, 4)
+  return getMatchedDevices(preferencesValues, devices, deviceType, recommendedDevicesLimit)
 }
 
 type preferenceType = {

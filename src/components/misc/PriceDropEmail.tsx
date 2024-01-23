@@ -4,7 +4,7 @@ import { Body, Container, Head, Hr } from '@react-email/components'
 import { Html, Link, Preview, Text } from '@react-email/components'
 
 import { Device } from '@prisma/client'
-import { websiteUrl } from 'config'
+import { clientEnv } from '@/utils/env'
 
 /* eslint-disable react/no-unescaped-entities */
 
@@ -40,9 +40,11 @@ export default function PriceDropEmail({
             details. Blazing-fast {device.chipset} Bionic chip: Power through even the most
             demanding tasks with ease. Don't miss out on this chance to finally get your hands on
             the {device.name} at an amazing price. This offer won't last forever, so head over to{' '}
-            <Link href={`${websiteUrl}/device/${device.type}/${device.model}`}>Click me</Link> now
-            and make it yours! But hurry! This price drop is only for a limited time. We can't wait
-            to see you rocking your new {device.name}.
+            <Link href={`${clientEnv.websiteUrl}/device/${device.type}/${device.model}`}>
+              Click me
+            </Link>{' '}
+            now and make it yours! But hurry! This price drop is only for a limited time. We can't
+            wait to see you rocking your new {device.name}.
           </Text>
           <Hr style={hr} />
           <Text style={footer}>INet</Text>

@@ -6,11 +6,11 @@ import { CreateNotification, encodeEmail } from '@/utils/utils'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { IconPhoto, IconUpload, IconX } from '@tabler/icons'
 
+import { clientEnv } from '@/utils/env'
 import { useDisclosure } from '@mantine/hooks'
 import { useProfilePicture } from '@/hooks/useProfilePicture'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { websiteUrl } from 'config'
 
 type props = {
   email: string
@@ -31,8 +31,7 @@ export default function ImageUploader({ email }: props) {
       body: JSON.stringify({
         fileName: `public/users/${encodeEmail(email)}.png`,
       }),
-    }).then((response) => {
-      console.log(response)
+    }).then(() => {
       CreateNotification('Profile Picture Deleted', 'green')
       setImageExists(false)
       setFile(undefined)
@@ -53,15 +52,13 @@ export default function ImageUploader({ email }: props) {
       }).then((response) => {
         if (response.ok) {
           CreateNotification('Profile Picture Changed', 'green')
-          setImagePath(`${websiteUrl}/users/${newFileName}`)
+          setImagePath(`${clientEnv.websiteUrl}/users/${newFileName}`)
           setFile(newFile)
           router.reload()
         }
         close()
       })
-    } catch (error) {
-      console.log(error)
-    }
+    } catch (error) {}
   }
 
   return (

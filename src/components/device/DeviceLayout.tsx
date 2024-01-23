@@ -8,7 +8,7 @@ import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import MatchedDevices from '@/components/device/MatchedDevices'
 import type { deviceSpecsType } from '@/models/SpecsFormatter'
 import { translateDeviceName } from '@/utils/utils'
-import { trpc } from '@/server/client'
+import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
 
 type props = {

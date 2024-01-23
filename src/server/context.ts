@@ -1,7 +1,7 @@
 import { type inferAsyncReturnType } from '@trpc/server'
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next'
 import type { Session, SupabaseClient } from '@supabase/supabase-js'
-import { prisma, supabase } from '@/server/client'
+import { createSupabaseServer, prisma } from '@/server/client'
 
 type CreateContextOptions = {
   session: Session | null
@@ -17,9 +17,9 @@ const createContextInner = (opts: CreateContextOptions) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const createContext = (_opts: CreateNextContextOptions) => {
+export const createContext = (opts: CreateNextContextOptions) => {
   return createContextInner({
-    supabase: supabase,
+    supabase: createSupabaseServer(opts),
     session: null,
   })
 }
