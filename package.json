@@ -21,6 +21,7 @@
     "@mantine/spotlight": "^6.0.2",
     "@prisma/client": "^5.8.0",
     "@react-email/components": "0.0.6",
+    "@supabase/auth-helpers-nextjs": "^0.8.7",
     "@supabase/auth-helpers-react": "^0.3.1",
     "@supabase/supabase-js": "^2.39.3",
     "@tabler/icons": "^1.114.0",

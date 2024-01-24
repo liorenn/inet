@@ -1,17 +1,19 @@
-import { z } from 'zod'
+import { z } from 'zod' // Import the 'z' object from the 'zod' library
 
+// Define the schema for the environment variables
 const envVariables = z.object({
-  soapServerUrl: z.string(),
-  resendKey: z.string(),
-  currencyApiUrl: z.string(),
-  currencyApiKey: z.string(),
-  websiteStatus: z.enum(['development', 'test', 'production']),
+  soapServerUrl: z.string(), // Define soapServerUrl as a string
+  resendKey: z.string(), // Define resendKey as a string
+  currencyApiUrl: z.string(), // Define currencyApiUrl as a string
+  currencyApiKey: z.string(), // Define currencyApiKey as a string
+  websiteStatus: z.enum(['development', 'test', 'production']), // Define websiteStatus as an enum with specified values
 })
 
+// Parse and validate the environment variables using the defined schema
 export const env = envVariables.parse({
-  soapServerUrl: process.env.SOAP_SERVER_URL,
-  resendKey: process.env.RESEND_KEY,
-  currencyApiUrl: process.env.CURRENCY_API_URL,
-  currencyApiKey: process.env.CURRENCY_API_KEY,
-  websiteStatus: process.env.WEBSITE_STATUS,
+  soapServerUrl: process.env.SOAP_SERVER_URL, // Parse and validate SOAP server URL from environment variables
+  resendKey: process.env.RESEND_KEY, // Parse and validate resend key from environment variables
+  currencyApiUrl: process.env.CURRENCY_API_URL, // Parse and validate currency API URL from environment variables
+  currencyApiKey: process.env.CURRENCY_API_KEY, // Parse and validate currency API key from environment variables
+  websiteStatus: process.env.WEBSITE_STATUS, // Parse and validate website status from environment variables
 })

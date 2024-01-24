@@ -22,7 +22,8 @@ import useTranslation from 'next-translate/useTranslation'
 
 export default function Navbar() {
   useAutoTrigger()
-  const user = useUser()
+  const user =
+    useUser()() // Get the user object from Supabase
   const posthog = usePostHog()
   const { classes } = useStyles()
   const { lang } = useTranslation()

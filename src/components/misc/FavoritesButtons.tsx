@@ -14,7 +14,8 @@ type props = {
   setDevices?: Dispatch<React.SetStateAction<devicePropertiesType[] | undefined>>
 }
 export default function FavoritesButtons({ model, modelPage, favoritesPage, setDevices }: props) {
-  const user = useUser()
+  const user =
+    useUser()() // Get the user object from Supabase
   const { t } = useTranslation('translations')
   const [isInList, setIsInList] = useState<boolean | undefined>(undefined)
   const { mutate: addToFavoritesMutation } = trpc.device.addToFavorites.useMutation()

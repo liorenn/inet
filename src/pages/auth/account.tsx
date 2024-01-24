@@ -26,7 +26,8 @@ type accountField = {
 }
 
 export default function Account() {
-  const user = useUser()
+  const user =
+    useUser()() // Get the user object from Supabase
   const router = useRouter()
   const session = useSession()
   const formProperties = new AccountForm()

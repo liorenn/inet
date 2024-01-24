@@ -5,18 +5,17 @@ import { createNextApiHandler } from '@trpc/server/adapters/next'
 import { env } from '@/server/env'
 
 function convertErrorToString(error: TRPCError): string {
-  const errorString = `Error code: ${error.code}, Message: ${error.message}`
-  return errorString
+  return `Error code: ${error.code}, Message: ${error.message}` // Return error message
 }
 
 export default createNextApiHandler({
+  // Create Next API handler
   router: appRouter,
   createContext,
   onError:
     env.websiteStatus === 'development'
       ? ({ path, error }) => {
-          const errorString = convertErrorToString(error)
-          console.error(`❌ tRPC failed on ${path ?? 'unknown'}: ${errorString}`)
+          console.error(`❌ tRPC failed on ${path ?? 'unknown'}: ${convertErrorToString(error)}`) // Log error
         }
       : undefined,
 })

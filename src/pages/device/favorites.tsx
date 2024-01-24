@@ -10,7 +10,8 @@ import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 
 export default function Favorites() {
-  const user = useUser()
+  const user =
+    useUser()() // Get the user object from Supabase
   const { t } = useTranslation('translations')
   const { data } = trpc.device.getUserDevices.useQuery({
     email: user?.email,

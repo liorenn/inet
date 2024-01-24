@@ -1,43 +1,50 @@
-import {
-  IconCurrencyDollar,
-  IconCurrencyEuro,
-  IconCurrencyShekel,
-  TablerIcon,
-} from '@tabler/icons'
+// Import the necessary modules and types
+
+import { IconCurrencyDollar, IconCurrencyEuro, IconCurrencyShekel, TablerIcon } from '@tabler/icons'
+
 import { create } from 'zustand'
 
-type currency = {
-  value: string
-  name: string
-  symol: string
-  icon: TablerIcon
+// Define the type for a currency
+type Currency = {
+  value: string // The currency code
+  name: string // The currency name
+  symbol: string // The currency string symbol
+  icon: TablerIcon // The currency icon
 }
 
-export const currencies: currency[] = [
+// Define an array of supported currencies
+export const currencies: Currency[] = [
   {
     value: 'USD',
     name: 'United States Dollar',
-    symol: '$',
+    symbol: '$',
     icon: IconCurrencyDollar,
   },
   {
     value: 'ILS',
     name: 'Israeli Shekel',
-    symol: '₪',
+    symbol: '₪',
     icon: IconCurrencyShekel,
   },
-  { value: 'EUR', name: 'Euro', symol: '€', icon: IconCurrencyEuro },
+  {
+    value: 'EUR',
+    name: 'Euro',
+    symbol: '€',
+    icon: IconCurrencyEuro,
+  },
 ]
 
+// Define the type for the currency state and its setter function
 type CurrencyState = {
-  currency: currency | undefined
-  setCurrency: (currency: currency) => void
+  currency: Currency | undefined
+  setCurrency: (currency: Currency) => void
 }
 
+// Create and export the custom hook for managing the selected currency state
 export const useCurrency = create<CurrencyState>()((set) => ({
-  currency: undefined,
+  currency: undefined, // Initialize the selected currency as undefined
   setCurrency: (newCurrency) => {
-    set(() => ({ currency: newCurrency }))
-    localStorage.setItem('currency', newCurrency.value)
+    set(() => ({ currency: newCurrency })) // Set the selected currency
+    localStorage.setItem('currency', newCurrency.value) // Store the selected currency in local storage
   },
 }))

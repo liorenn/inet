@@ -22,19 +22,19 @@ type formType = {
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 export default function SignIn() {
-  const router = useRouter()
-  const posthog = usePostHog()
-  const session = useSession()
-  const supabase = useSupabaseClient()
-  const formProperties = new SignInForm()
-  const [loading, setLoading] = useState(false)
-  const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
-  const { t } = useTranslation('translations')
+  const router = useRouter() // Get the router
+  const posthog = usePostHog() // Get the posthog
+  const session = useSession() // Get the session
+  const supabase = useSupabaseClient() // Get the supabase
+  const formProperties = new SignInForm() // Get the form properties
+  const [loading, setLoading] = useState(false) // State for loading
+  const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation() // Get the IsUserExists mutation
+  const { t } = useTranslation('translations') // Get the translation function
   const { data, isLoading } = trpc.auth.getAccessKey.useQuery({
     email: session?.user.email,
-  })
+  }) // Get the access key for the user
   useEffect(() => {
-    data && data >= 1 && router.push('/')
+    data && data >= 1 && router.push('/') // Check if the data exists and redirect to home
   }, [data, router])
 
   const form = useForm<formType>({
@@ -44,8 +44,9 @@ export default function SignIn() {
   })
 
   function signIn(values: formType) {
-    setLoading(true)
+    setLoading(true) // Set loading to true
     IsUserExistsMutation.mutate(
+      // Check if the user exists in the database
       { email: values.email, password: values.password },
       {
         async onSuccess(data) {
@@ -53,19 +54,19 @@ export default function SignIn() {
             const { data: user } = await supabase.auth.signInWithPassword({
               email: values.email,
               password: values.password,
-            })
+            }) // Sign in the user
             if (user.user) {
-              CreateNotification(t('signedInSuccessfully'), 'green')
-              posthog.capture('User Signed In', { data: values })
-              router.push('/')
-              setLoading(false)
+              CreateNotification(t('signedInSuccessfully'), 'green') // Create a success notification
+              posthog.capture('User Signed In', { data: values }) // Capture the user signed in
+              router.push('/') // Redirect to home
+              setLoading(false) // Set loading to false
             } else {
-              setLoading(false)
-              CreateNotification(t('errorAccured'), 'red')
+              setLoading(false) // Set loading to false
+              CreateNotification(t('errorAccured'), 'red') // Create a error notification
             }
           } else {
-            setLoading(false)
-            CreateNotification(t('userDoesNotExist'), 'red')
+            setLoading(false) // Set loading to false
+            CreateNotification(t('userDoesNotExist'), 'red') // Create a error notification
           }
         },
       }

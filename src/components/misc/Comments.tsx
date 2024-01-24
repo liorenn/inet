@@ -17,30 +17,31 @@ type props = {
 }
 
 export default function Comments({ device }: props) {
-  const user = useUser()
-  const [text, setText] = useState('')
-  const [rating, setRating] = useState(0)
-  const { t } = useTranslation('translations')
-  const [comments, setComments] = useState<commentType[]>([])
-  const { mutate } = trpc.auth.addComment.useMutation()
-  const { username, setRatingValue, setCommentsAmount } = useComments()
+  const user = useUser() // Get the user object from Supabase
+  const [text, setText] = useState('') // State for the comment text
+  const [rating, setRating] = useState(0) // State for the comment rating
+  const { t } = useTranslation('translations') // Translation hook
+  const [comments, setComments] = useState<commentType[]>([]) // State for the comments
+  const { mutate } = trpc.auth.addComment.useMutation() // Add comment mutation
+  const { username, setRatingValue, setCommentsAmount } = useComments() // Get the comments state and functions
   const { data } = trpc.auth.getAllComments.useQuery({
     model: device.model,
-  })
-  const { imageExists, imagePath } = useProfilePicture()
+  }) // Get all comments
+  const { imageExists, imagePath } = useProfilePicture() // Get the profile picture state
 
   useEffect(() => {
     if (data) {
-      setComments(data)
-      setCommentsAmount(data.length)
-      setRatingValue(calculateAverageRating(data))
+      setComments(data) // Set the comments state to the updated data
+      setCommentsAmount(data.length) // Set the comments amount state to the updated data length
+      setRatingValue(calculateAverageRating(data)) // Set the rating value state to the average rating
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
   function AddComment(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+    e.preventDefault() // Prevent the default form submission
     const newComment = {
+      // Create a new comment object
       createdAt: new Date(),
       deviceTypeValue: device.type,
       likes: 0,
@@ -51,20 +52,20 @@ export default function Comments({ device }: props) {
       rating: rating,
     }
     mutate(newComment, {
+      // Add the new comment
       onSuccess(data) {
-        CreateNotification(t('commentAddedSuccessfully'), 'green')
-        setText('')
-        setRating(0)
-        setComments((prev) => pushComment(prev, data))
-        setCommentsAmount(comments.length + 1)
-        setRatingValue(calculateAverageRating([...comments, data]))
+        CreateNotification(t('commentAddedSuccessfully'), 'green') // Create a notification
+        setText('') // Clear the comment text
+        setRating(0) // Clear the comment rating
+        setComments((prev) => pushComment(prev, data)) // Add the new comment to the comments state
+        setCommentsAmount(comments.length + 1) // Increment the comments amount
+        setRatingValue(calculateAverageRating([...comments, data])) // Update the rating value
       },
     })
   }
 
   function pushComment(comments: commentType[], newComment: commentType) {
-    const newComments = [...comments, newComment]
-    return newComments
+    return [...comments, newComment] // Push the new comment to the comments array
   }
 
   return (

@@ -20,21 +20,21 @@ export type formType = {
 }
 
 export default function SignUp() {
-  const router = useRouter()
-  const session = useSession()
-  const posthog = usePostHog()
-  const supabase = useSupabaseClient()
-  const formProperties = new SignUpForm()
-  const [loading, setLoading] = useState(false)
-  const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation()
-  const { mutate } = trpc.auth.createUser.useMutation()
-  const { t } = useTranslation('translations')
+  const router = useRouter() // Get the router
+  const posthog = usePostHog() // Get the posthog
+  const session = useSession() // Get the session
+  const supabase = useSupabaseClient() // Get the supabase
+  const formProperties = new SignUpForm() // Get the form properties
+  const [loading, setLoading] = useState(false) // State for loading
+  const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation() // Get the IsUserExists mutation
+  const { mutate } = trpc.auth.createUser.useMutation() // Get the createUser mutation
+  const { t } = useTranslation('translations') // Get the translation function
 
   const { data, isLoading } = trpc.auth.getAccessKey.useQuery({
     email: session?.user.email,
-  })
+  }) // Get the access key for the user
   useEffect(() => {
-    data && data >= 1 && router.push('/')
+    data && data >= 1 && router.push('/') // Check if the data exists and redirect to home
   }, [data, router])
 
   const form = useForm<formType>({
@@ -44,8 +44,9 @@ export default function SignUp() {
   })
 
   function signUp(fields: formType) {
-    setLoading(true)
+    setLoading(true) // Set loading to true
     IsUserExistsMutation.mutate(
+      // Check if the user exists in the database
       {
         email: fields.email,
         password: fields.password,
@@ -53,18 +54,23 @@ export default function SignUp() {
       },
       {
         onSuccess(data) {
-          const IsExist = data
+          const IsExist = data // Is user exists in database
           if (IsExist?.email && !IsExist.username) {
-            CreateNotification(t('emailExistMessage'), 'red')
+            // If email  exist in database and username does not exists
+            CreateNotification(t('emailExistMessage'), 'red') // Create a error notification
           }
           if (!IsExist?.email && IsExist?.username) {
-            CreateNotification(t('usernameExistMessage'), 'red')
+            // If email does not exist in database and username exists
+            CreateNotification(t('usernameExistMessage'), 'red') // Create a error notification
           }
           if (IsExist?.email && IsExist?.username) {
-            CreateNotification(t('usernameAndEmailExistMessage'), 'red')
+            // If both email and username exist in database
+            CreateNotification(t('usernameAndEmailExistMessage'), 'red') // Create a error notification
           }
           if (!IsExist?.email && !IsExist?.username) {
+            // If both email and username does not exist in database
             mutate(
+              // Create the user
               {
                 email: fields.email,
                 phone: fields.phone,
@@ -78,21 +84,23 @@ export default function SignUp() {
                     phone: fields.phone,
                     email: fields.email,
                     password: fields.password,
-                  })
+                  }) // Sign up the user
                   if (!error) {
-                    CreateNotification(t('accountCreatedSuccessfully'), 'green')
+                    // If there is no error
+                    CreateNotification(t('accountCreatedSuccessfully'), 'green') // Create a success notification
                     posthog.capture('User Signed Up', { data })
                     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                    router.push('/')
-                    setLoading(false)
+                    router.push('/') // Redirect to home
+                    setLoading(false) // Set loading to false
                   } else {
-                    CreateNotification('Error Couldnt Create Account', 'red')
+                    // If there is an error
+                    CreateNotification('Error Couldnt Create Account', 'red') // Create a errpr notification
                   }
                 },
               }
             )
           }
-          setLoading(false)
+          setLoading(false) // Set loading to false
         },
       }
     )

@@ -5,17 +5,17 @@ import { useMantineColorScheme } from '@mantine/core'
 import { useRouter } from 'next/router'
 
 type props = {
-  accessKey: number
+  accessKey: number // The user access key
 }
 
 export default function WebsiteStatistics({ accessKey }: props) {
-  const router = useRouter()
-  const { colorScheme } = useMantineColorScheme()
+  const router = useRouter() // Get the router
+  const { colorScheme } = useMantineColorScheme() // Get the color scheme
 
   useEffect(() => {
     if (accessKey && accessKey < managerAccessKey) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      router.push('/')
+      router.push('/') // If the access key is less than the manager access key redirect to the home page
     }
   }, [accessKey, router])
 
@@ -26,15 +26,13 @@ export default function WebsiteStatistics({ accessKey }: props) {
         const iframe = document.getElementById('posthog-iframe') as HTMLIFrameElement
         if (iframe && e.source === iframe.contentWindow) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
-          iframe.style.height = `${e.data.height}px`
+          iframe.style.height = `${e.data.height}px` // Set the height of the iframe
         }
       }
     }
-
-    window.addEventListener('message', handleMessage)
-
+    window.addEventListener('message', handleMessage) // Listen for messages
     return () => {
-      window.removeEventListener('message', handleMessage)
+      window.removeEventListener('message', handleMessage) // Remove the listener
     }
   }, [])
 

@@ -22,18 +22,19 @@ function findObjectByPropertyValue<T>(array: T[], name: keyof T, value: T[keyof 
 }
 
 export default function DatabaseViewer({ accessKey }: props) {
-  const user = useUser()
-  const router = useRouter()
-  const session = useSession()
-  const { t } = useTranslation('translations')
-  const [table, setTable] = useState('')
-  const { data: tableColumns } = trpc.auth.getTablesColumns.useQuery()
-  const { mutate } = trpc.auth.getTableData.useMutation()
-  const [tableData, setTableData] = useState<string[][]>([])
+  const user = useUser() // Get the user object from Supabase
+  const router = useRouter() // Get the router object from Next.js
+  const session = useSession() // Get the session object from Supabase
+  const { t } = useTranslation('translations') // Get the translation function from Next.js
+  const [table, setTable] = useState('') // State variable to store the selected table
+  const { data: tableColumns } = trpc.auth.getTablesColumns.useQuery() // Query to get the columns of the selected table
+  const { mutate } = trpc.auth.getTableData.useMutation() // Mutation to get the data of the selected table
+  const [tableData, setTableData] = useState<string[][]>([]) // State variable to store the data of the selected table
 
   if (accessKey < managerAccessKey) {
+    // If the access key is less than the manager access key
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    router.push('/')
+    router.push('/') // Redirect to the home page
   }
 
   function changeTableName(tableName: string) {

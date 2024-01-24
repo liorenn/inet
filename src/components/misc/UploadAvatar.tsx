@@ -17,48 +17,51 @@ type props = {
 }
 
 export default function ImageUploader({ email }: props) {
-  const router = useRouter()
-  const [opened, { open, close }] = useDisclosure(false)
-  const [file, setFile] = useState<File | undefined>()
-  const { setImageExists, setImagePath, imageExists, imagePath } = useProfilePicture()
+  const router = useRouter() // Get the router
+  const [opened, { open, close }] = useDisclosure(false) // Open and close the modal functions
+  const [file, setFile] = useState<File | undefined>() // State variable to store the file
+  const { setImageExists, setImagePath, imageExists, imagePath } = useProfilePicture() // Get the profile picture state
 
   async function deleteImage() {
+    // Send a request to the server to delete the image
     await fetch('/api/file/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        fileName: `public/users/${encodeEmail(email)}.png`,
+        fileName: `public/users/${encodeEmail(email)}.png`, // The name of the image to delete
       }),
     }).then(() => {
-      CreateNotification('Profile Picture Deleted', 'green')
-      setImageExists(false)
-      setFile(undefined)
-      close()
+      CreateNotification('Profile Picture Deleted', 'green') // Create a success notification
+      setImageExists(false) // Set the imageExists state to false
+      setFile(undefined) // Set the file state to undefined
+      close() // Close the modal
     })
   }
 
   async function uploadImage() {
-    if (!file) return
-    const formData = new FormData()
-    const newFileName = `${encodeEmail(email)}.png`
-    const newFile = new File([file], newFileName, { type: file.type })
-    formData.append('file', newFile)
+    if (!file) return // If no file is selected return
+    const formData = new FormData() // Create a FormData object
+    const newFileName = `${encodeEmail(email)}.png` // The name of the image to upload
+    const newFile = new File([file], newFileName, { type: file.type }) // Create a new file object
+    formData.append('file', newFile) // Append the file to the FormData object
     try {
+      // Send a request to the server to upload the image
       await fetch('/api/file/upload', {
         method: 'POST',
-        body: formData,
+        body: formData, // Send the FormData object
       }).then((response) => {
         if (response.ok) {
-          CreateNotification('Profile Picture Changed', 'green')
-          setImagePath(`${clientEnv.websiteUrl}/users/${newFileName}`)
-          setFile(newFile)
-          router.reload()
+          // If the response is ok
+          CreateNotification('Profile Picture Changed', 'green') // Create a success notification
+          setImagePath(`${clientEnv.websiteUrl}/users/${newFileName}`) // Set the imagePath state
+          setFile(newFile) // Set the file state
+          router.reload() // Reload the page
         }
-        close()
+        close() // Close the modal
       })
-    } catch (error) {}
+    } catch (error) {} // Catch any errors
   }
 
   return (

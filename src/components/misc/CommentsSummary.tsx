@@ -6,10 +6,11 @@ import useTranslation from 'next-translate/useTranslation'
 import { useWindowScroll } from '@mantine/hooks'
 
 export default function CommentsSummary() {
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('translations') // Get the translation function
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_scroll, scrollTo] = useWindowScroll()
-  const { commentsAmount, ratingValue } = useComments()
+  const [_scroll, scrollTo] = useWindowScroll() // Get scroll function
+  const { commentsAmount, ratingValue } = useComments() // Get the comments state
+
   return (
     <Group position='right'>
       <Text weight={600}>{`${ratingValue === 0 ? 0 : ratingValue.toFixed(1)} ${t(

@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { Body, Container, Head, Hr } from '@react-email/components'
 import { Html, Link, Preview, Text } from '@react-email/components'
 
