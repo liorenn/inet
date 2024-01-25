@@ -32,6 +32,7 @@ export default function UserManagement({ accessKey }: props) {
   }
 
   useEffect(() => {
+    console.log(tableData)
     if (tableData) {
       setUsers(
         tableData.map((user) => {
@@ -149,14 +150,19 @@ function UserRow({ data, setUsers }: userRowProps) {
     validate: formProperties.getValidators(),
   })
 
+  useEffect(() => {
+    form.setValues(data)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
+
   const handleDelete = () => {
     setLoading(true)
+    setUsers((prev) => prev.filter((user) => user.email !== data.email))
     mutateDelete(
       { email: data.email },
       {
         onSuccess: () => {
           setLoading(false)
-          setUsers((prev) => prev.filter((user) => user.email !== data.email))
           CreateNotification(t('deletedSuccessfully'), 'green', os === 'ios' ? true : false)
         },
         onError: () => {

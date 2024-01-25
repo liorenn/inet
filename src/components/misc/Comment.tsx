@@ -18,8 +18,7 @@ type props = {
 }
 
 export default function Comment({ comment, comments, setComments }: props) {
-  const user =
-    useUser()() // Get the user object from Supabase
+  const user = useUser() // Get the user object from Supabase
   const [rating, setRating] = useState(comment.rating)
   const [editing, setEditing] = useState(false)
   const [editText, setEditText] = useState(comment.message)

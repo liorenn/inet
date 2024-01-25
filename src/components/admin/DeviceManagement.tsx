@@ -142,6 +142,11 @@ function DeviceRow({
     validate: validators,
   })
 
+  useEffect(() => {
+    form.setValues(data)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
+
   const handleDelete = () => {
     setLoading(true)
     mutateDelete(

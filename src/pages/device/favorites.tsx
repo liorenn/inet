@@ -1,4 +1,4 @@
-import { Container, SimpleGrid } from '@mantine/core'
+import { Center, Container, SimpleGrid } from '@mantine/core'
 import React, { useEffect, useState } from 'react'
 
 import Head from 'next/head'
@@ -10,16 +10,15 @@ import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 
 export default function Favorites() {
-  const user =
-    useUser()() // Get the user object from Supabase
-  const { t } = useTranslation('translations')
+  const user = useUser() // Get the user object from Supabase
+  const { t } = useTranslation('translations') // Get the translation function
   const { data } = trpc.device.getUserDevices.useQuery({
     email: user?.email,
-  })
+  }) // Get the user object from Supabase
   const [devices, setDevices] = useState<devicePropertiesType[] | undefined>(undefined)
 
   useEffect(() => {
-    if (data && devices === undefined) {
+    if (data) {
       setDevices(data)
     }
   }, [devices, data])
@@ -30,25 +29,29 @@ export default function Favorites() {
         <title>{t('favorites')}</title>
       </Head>
       {devices ? (
-        <Container size='lg'>
-          <SimpleGrid
-            cols={3}
-            breakpoints={[
-              { maxWidth: 'sm', cols: 1 },
-              { maxWidth: 'md', cols: 2 },
-              { minWidth: 'lg', cols: 3 },
-            ]}>
-            {devices &&
-              devices.map((value, index) => (
-                <ListCard
-                  device={value}
-                  key={index}
-                  deviceType={value.type}
-                  setDevices={setDevices}
-                />
-              ))}
-          </SimpleGrid>
-        </Container>
+        devices.length > 0 ? (
+          <Container size='lg'>
+            <SimpleGrid
+              cols={3}
+              breakpoints={[
+                { maxWidth: 'sm', cols: 1 },
+                { maxWidth: 'md', cols: 2 },
+                { minWidth: 'lg', cols: 3 },
+              ]}>
+              {devices &&
+                devices.map((value, index) => (
+                  <ListCard
+                    device={value}
+                    key={index}
+                    deviceType={value.type}
+                    setDevices={setDevices}
+                  />
+                ))}
+            </SimpleGrid>
+          </Container>
+        ) : (
+          <Center>You dont have any favorite devices</Center>
+        )
       ) : (
         <Loader />
       )}

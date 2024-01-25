@@ -5,8 +5,7 @@ import { useUser } from '@supabase/auth-helpers-react'
 
 // Define a custom hook to trigger a specific action
 export default function useAutoTrigger() {
-  const user =
-    useUser()() // Get the user object from Supabase // Get the user object from Supabase
+  const user = useUser() // Get the user object from Supabase // Get the user object from Supabase
   // Get the mutate function from the trpc client for sending price drop emails
   const { mutate } = trpc.auth.sendPriceDropsEmail.useMutation()
   useEffect(() => {

@@ -16,8 +16,7 @@ import { useUser } from '@supabase/auth-helpers-react'
 import { z } from 'zod'
 
 export default function Admin() {
-  const user =
-    useUser()() // Get the user object from Supabase
+  const user = useUser() // Get the user object from Supabase
   const router = useRouter()
   const { t } = useTranslation('translations')
   const button = z.string().parse(router.query.dashboard ?? '')

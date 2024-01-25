@@ -15,8 +15,7 @@ import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 
 export default function Device() {
-  const user =
-    useUser()() // Get the user object from Supabase
+  const user = useUser() // Get the user object from Supabase
   const router = useRouter()
   const posthog = usePostHog()
   const { setUsername } = useComments()

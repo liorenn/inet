@@ -12,6 +12,9 @@ import { resend } from '@/server/client'
 import { z } from 'zod'
 
 export const authRouter = router({
+  test: method.query(({ ctx }) => {
+    return ctx.supabase.auth.getSession()
+  }),
   getConfigs: method.query(() => {
     const filePath = 'config.ts'
     const fileContents = readFileSync(filePath, 'utf8')

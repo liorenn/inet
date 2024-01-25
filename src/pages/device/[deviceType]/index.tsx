@@ -19,8 +19,7 @@ export default function Devices() {
   const router = useRouter()
   const posthog = usePostHog()
   const deviceType = router.asPath.split('/')[router.asPath.split('/').length - 1] as DeviceType
-  const user =
-    useUser()() // Get the user object from Supabase
+  const user = useUser() // Get the user object from Supabase
   const [devices, setDevices] = useState<devicesType[] | undefined>(undefined)
   const { data: devicesQuery } = trpc.device.getDevices.useQuery({
     deviceType: deviceType,
