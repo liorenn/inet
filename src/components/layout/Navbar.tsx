@@ -19,6 +19,7 @@ import { usePostHog } from 'posthog-js/react'
 import { useProfilePicture } from '@/hooks/useProfilePicture'
 import { useSpotlight } from '@mantine/spotlight'
 import useTranslation from 'next-translate/useTranslation'
+import { useViewportSize } from '@mantine/hooks'
 
 export default function Navbar() {
   useAutoTrigger()
@@ -26,17 +27,18 @@ export default function Navbar() {
   const posthog = usePostHog()
   const { classes } = useStyles()
   const { lang } = useTranslation()
+  const { width } = useViewportSize() // Get the width of the viewport
   const { t } = useTranslation('translations')
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const { imagePath, imageExists, setImageExists, setImagePath } = useProfilePicture()
-  const { mutate: isImageExists } = trpc.auth.isImageExists.useMutation()
+  const isImageExistsMutation = trpc.auth.isImageExists.useMutation()
   const supabase = useSupabaseClient()
   const spotlight = useSpotlight()
   const [session, setSession] = useState(useSession())
   const { currency, setCurrency } = useCurrency()
   const { setLanguage: setlanguageStore } = useLanguage()
-  const { data: AccessKey } = trpc.auth.getAccessKey.useQuery({
+  const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
   })
 
@@ -58,7 +60,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (user?.email) {
-      isImageExists(
+      isImageExistsMutation.mutate(
         { email: user?.email },
         {
           onSuccess(data, params) {
@@ -86,14 +88,14 @@ export default function Navbar() {
   }
 
   return (
-    <Header height={65} className={classes.root} mb={20}>
+    <Header height={65} className={classes.root} mb={width < 400 ? 14 : 40}>
       <Container className={classes.inner} fluid>
         <Group>
           <div className={classes.dropdown}>
-            <NavBarDropdown AccessKey={AccessKey} />
+            <NavBarDropdown AccessKey={accessKeyQuery.data} />
           </div>
           <Link
-            className={classes.end}
+            className={classes.title}
             style={{
               textDecoration: 'none',
               fontSize: '22px',
@@ -103,9 +105,13 @@ export default function Navbar() {
             href={'/'}>
             {t('inet')}
           </Link>
-          {/* <button onClick={() => signOut()}>click me</button> */}
         </Group>
         <Group spacing={5} className={classes.buttons}>
+          <Link href={'/device'}>
+            <Button variant='light' color='gray' radius='md' className={classes.end}>
+              {t('allDevices')}
+            </Button>
+          </Link>
           <Link href={'/device/compare'}>
             <Button variant='light' color='gray' radius='md' className={classes.end}>
               {t('compare')}
@@ -114,11 +120,6 @@ export default function Navbar() {
           <Link href={'/device/find'}>
             <Button variant='light' color='gray' radius='md' className={classes.end}>
               {t('find')}
-            </Button>
-          </Link>
-          <Link href={'/device'}>
-            <Button variant='light' color='gray' radius='md' className={classes.end}>
-              {t('allDevices')}
             </Button>
           </Link>
           {session && (
@@ -145,7 +146,7 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              {AccessKey !== undefined && AccessKey >= adminAccessKey && (
+              {accessKeyQuery.data !== undefined && accessKeyQuery.data >= adminAccessKey && (
                 <Link href={'/auth/admin'}>
                   <Button variant='light' color='gray' radius='md' className={classes.end}>
                     {t('admin')}
@@ -162,7 +163,7 @@ export default function Navbar() {
                 {t('signOut')}
               </Button>
               {user?.email && (
-                <Link href={'/auth/account'}>
+                <Link className={classes.actionIcon} href={'/auth/account'}>
                   <Avatar src={imageExists ? imagePath : ''} radius='md' />
                 </Link>
               )}
@@ -174,7 +175,8 @@ export default function Navbar() {
             size='lg'
             color='gray'
             onClick={() => spotlight.openSpotlight()}
-            title={t('searchDevice')}>
+            title={t('searchDevice')}
+            className={classes.actionIcon}>
             <IconSearch size={18} />
           </ActionIcon>
           <Menu shadow='md' width={140} offset={14}>
@@ -184,7 +186,8 @@ export default function Navbar() {
                 radius='md'
                 size='lg'
                 color='gray'
-                title={t('changeLanguage')}>
+                title={t('changeLanguage')}
+                className={classes.actionIcon}>
                 <IconCurrencyDollar size={18} />
               </ActionIcon>
             </Menu.Target>
@@ -213,7 +216,8 @@ export default function Navbar() {
                 radius='md'
                 size='lg'
                 color='gray'
-                title={t('changeLanguage')}>
+                title={t('changeLanguage')}
+                className={classes.actionIcon}>
                 <IconLanguage size={18} />
               </ActionIcon>
             </Menu.Target>
@@ -228,11 +232,11 @@ export default function Navbar() {
                   }}
                   icon={
                     language.value === defaultLanguage ? (
-                      <GBFlag w={38} />
+                      <GBFlag w={30} />
                     ) : language.value === 'de' ? (
-                      <DEFlag w={38} />
+                      <DEFlag w={30} />
                     ) : (
-                      language.value === 'he' && <ILFlag w={38} />
+                      language.value === 'he' && <ILFlag w={30} />
                     )
                   }
                   onClick={() => {
@@ -251,7 +255,8 @@ export default function Navbar() {
             size='lg'
             color='gray'
             onClick={() => toggleColorScheme()}
-            title={t('toggleColorScheme')}>
+            title={t('toggleColorScheme')}
+            className={classes.actionIcon}>
             {colorScheme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
           </ActionIcon>
         </Group>
@@ -271,25 +276,35 @@ const useStyles = createStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginLeft: 15,
-    marginRight: 15,
+  },
+
+  title: {
+    [theme.fn.smallerThan(450)]: {
+      display: 'none',
+    },
   },
 
   dropdown: {
-    [theme.fn.largerThan('lg')]: {
+    [theme.fn.largerThan(1200)]: {
       display: 'none',
     },
   },
 
   buttons: {
     //prev lg, current sm
-    [theme.fn.smallerThan('sm')]: {
+    [theme.fn.smallerThan(1200)]: {
       display: 'none',
     },
   },
 
   end: {
-    [theme.fn.smallerThan('sm')]: {
+    [theme.fn.smallerThan(650)]: {
+      display: 'none',
+    },
+  },
+
+  actionIcon: {
+    [theme.fn.smallerThan(380)]: {
       display: 'none',
     },
   },

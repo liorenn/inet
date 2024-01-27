@@ -27,7 +27,7 @@ if (typeof window !== 'undefined') {
   })
 }
 
-type props = AppProps<{
+type PageProps = AppProps<{
   initialSession: Session
 }>
 
@@ -36,7 +36,8 @@ const rtlCache = createEmotionCache({
   stylisPlugins: [rtlPlugin],
 })
 
-function App({ Component, pageProps }: props) {
+function App({ Component, pageProps }: PageProps) {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'mantine-color-scheme',
     defaultValue: defaultColorScheme,

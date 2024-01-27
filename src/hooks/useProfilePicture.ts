@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-type imageInfo = {
+type ImageInfo = {
   imageExists: boolean // Define the imageExists property
   imagePath: string // Define the imagePath property
   setImageExists: (imageExists: boolean) => void // Define the setImageExists function
@@ -8,7 +8,7 @@ type imageInfo = {
 }
 
 // Create and export the custom hook for managing the selected Profile Picture state
-export const useProfilePicture = create<imageInfo>()((set) => ({
+export const useProfilePicture = create<ImageInfo>()((set) => ({
   imageExists: false, // Set the default value of imageExists to false
   imagePath: '', // Set the default value of imagePath to an empty string
   setImageExists(imageExists) {

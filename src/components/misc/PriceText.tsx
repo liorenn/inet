@@ -7,7 +7,7 @@ import { useCurrency } from '@/hooks/useCurrency'
 /* eslint-disable @typescript-eslint/no-floating-promises */
 export default function PriceText({ priceString }: { priceString: string }) {
   const { currency } = useCurrency() // Get the selected currency
-  const { mutate } = trpc.device.convertPrice.useMutation() // Convert price mutation
+  const convertPriceMutation = trpc.device.convertPrice.useMutation() // Convert price mutation
   const [price, setPrice] = useState<number>(parseFloat(priceString ?? '0')) // State variable to store the price
   const [prevCurrency, setPrevCurrency] = useState<string | undefined>(undefined) // State variable to store the previous currency
 
@@ -19,7 +19,7 @@ export default function PriceText({ priceString }: { priceString: string }) {
         setNewPrice(currency.value) // Convert the price to USD
       } else setPrevCurrency('USD') // Set the previous currency to USD
     } else {
-      mutate(
+      convertPriceMutation.mutate(
         // Convert the price to the selected currency
         { price, currency: prevCurrency, targetCurrency: currency.value },
         {
@@ -34,7 +34,7 @@ export default function PriceText({ priceString }: { priceString: string }) {
   }, [currency])
 
   function setNewPrice(currencyValue: string) {
-    mutate(
+    convertPriceMutation.mutate(
       // Convert the price to the selected currency
       { price, currency: 'USD', targetCurrency: currencyValue },
       {

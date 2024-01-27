@@ -6,9 +6,9 @@ import { translateDeviceName } from '@/utils/utils'
 import { useMantineColorScheme } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 
-type props = { device: Device }
+type Props = { device: Device }
 
-export default function DeviceHeader({ device }: props) {
+export default function DeviceHeader({ device }: Props) {
   const { colorScheme } = useMantineColorScheme()
   const { t, lang } = useTranslation('translations')
 
@@ -22,7 +22,6 @@ export default function DeviceHeader({ device }: props) {
     <Group
       position='apart'
       sx={{
-        marginTop: 50,
         marginBottom: 15,
         borderBottom: colorScheme === 'dark' ? '1px solid #333333' : '1px solid #dee2e6',
       }}>

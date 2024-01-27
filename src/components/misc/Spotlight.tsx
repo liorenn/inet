@@ -84,17 +84,17 @@ function getDeviceDescription(device: Device) {
 
 export default function SpotlightControl({ children }: { children: ReactNode }) {
   const { t } = useTranslation('translations') // Get the translation function
-  const { data } = trpc.device.getDevicesData.useQuery() // Get the devices data
+  const devicesQuery = trpc.device.getDevicesData.useQuery() // Get the devices data
   const router = useRouter() // Get the router
   const actions = useMemo(() => {
-    if (data) {
+    if (devicesQuery.data) {
       // Check if the data exists
-      return createActionsArray(t, data, router) // Return the actions array
+      return createActionsArray(t, devicesQuery.data, router) // Return the actions array
     } else {
       return [] // Return an empty array
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, router])
+  }, [devicesQuery.data, router])
 
   return (
     <SpotlightProvider

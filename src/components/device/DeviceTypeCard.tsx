@@ -3,11 +3,11 @@ import { Button, Card, Image } from '@mantine/core'
 import Link from 'next/link'
 import useTranslation from 'next-translate/useTranslation'
 
-type props = {
+type Props = {
   devicesType: string
 }
 
-export default function DeviceTypeCard({ devicesType }: props) {
+export default function DeviceTypeCard({ devicesType }: Props) {
   const { t } = useTranslation('translations')
 
   return (

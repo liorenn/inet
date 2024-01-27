@@ -2,33 +2,33 @@ import { Dispatch, useEffect, useState } from 'react'
 
 import { Button } from '@mantine/core'
 import { CreateNotification } from '@/utils/utils'
-import { devicePropertiesType } from '@/models/enums'
+import { DevicePropertiesType } from '@/models/enums'
 import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 
-type props = {
+type Props = {
   model: string
   modelPage?: boolean
   favoritesPage?: boolean
-  setDevices?: Dispatch<React.SetStateAction<devicePropertiesType[] | undefined>>
+  setDevices?: Dispatch<React.SetStateAction<DevicePropertiesType[] | undefined>>
 }
-export default function FavoritesButtons({ model, modelPage, favoritesPage, setDevices }: props) {
+export default function FavoritesButtons({ model, modelPage, favoritesPage, setDevices }: Props) {
   const user = useUser() // Get the user object from Supabase
   const { t } = useTranslation('translations')
   const [isInList, setIsInList] = useState<boolean | undefined>(undefined)
-  const { mutate: addToFavoritesMutation } = trpc.device.addToFavorites.useMutation()
-  const { mutate: deleteFromFavoritesMutation } = trpc.device.deleteFromFavorites.useMutation()
-  const { data } = trpc.device.isDeviceInUser.useQuery({
+  const addToFavoritesMutation = trpc.device.addToFavorites.useMutation()
+  const deleteFromFavoritesMutation = trpc.device.deleteFromFavorites.useMutation()
+  const isDeviceInUserMutation = trpc.device.isDeviceInUser.useQuery({
     email: user?.email,
     model: model,
   })
 
   useEffect(() => {
-    if (data !== undefined) {
-      setIsInList(data)
+    if (isDeviceInUserMutation.data !== undefined) {
+      setIsInList(isDeviceInUserMutation.data)
     }
-  }, [data])
+  }, [isDeviceInUserMutation.data])
 
   function handleIsInlist(model: string, email: string, method: 'add' | 'remove') {
     if (method === 'add') {
@@ -39,7 +39,7 @@ export default function FavoritesButtons({ model, modelPage, favoritesPage, setD
   }
   function deleteFromFavorites(model: string, email: string) {
     setIsInList(undefined)
-    deleteFromFavoritesMutation(
+    deleteFromFavoritesMutation.mutate(
       { model, email },
       {
         onSuccess() {
@@ -54,7 +54,7 @@ export default function FavoritesButtons({ model, modelPage, favoritesPage, setD
   }
   function addToFavorites(model: string, email: string) {
     setIsInList(undefined)
-    addToFavoritesMutation(
+    addToFavoritesMutation.mutate(
       { model, email },
       {
         onSuccess() {

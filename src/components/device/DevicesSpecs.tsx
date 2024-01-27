@@ -1,4 +1,4 @@
-import { type deviceSpecsType, formatArrSpecs } from '@/models/SpecsFormatter'
+import { type DeviceSpecsType, formatArrSpecs } from '@/models/SpecsFormatter'
 import { useMantineColorScheme } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
@@ -7,11 +7,11 @@ import { useViewportSize } from '@mantine/hooks'
 import DevicesTable from '@/components/device/DevicesTable'
 import { devicesSpecsCategories } from '@/models/deviceProperties'
 
-type props = {
-  devices: deviceSpecsType[]
+type Props = {
+  devices: DeviceSpecsType[]
 }
 
-export default function DevicesSpecs({ devices }: props) {
+export default function DevicesSpecs({ devices }: Props) {
   const { t } = useTranslation('translations')
   const { colorScheme } = useMantineColorScheme()
   const { width } = useViewportSize()

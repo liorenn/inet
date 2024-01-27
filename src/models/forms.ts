@@ -1,16 +1,17 @@
 import { Device, User } from '@prisma/client'
-import { deviceSchemaType, userSchemaType } from '@/models/schemas'
+import { DeviceSchemaType, UserSchemaType } from '@/models/schemas'
 
-import type { formType as formDevice } from '@/components/admin/DeviceManagement'
-import type { formType as formUser } from '@/components/admin/UserManagement'
+import type { DeviceFormType } from '@/components/admin/DeviceManagement'
+import type { UserFormType } from '@/components/admin/UserManagement'
 
-export type userPropertyName = keyof User
+export type UserPropertyName = keyof User
+
 class UserProperty {
-  name: userPropertyName
+  name: UserPropertyName
   regex: RegExp
   disabled?: boolean
 
-  constructor(name: userPropertyName, regex: RegExp, disabled?: boolean) {
+  constructor(name: UserPropertyName, regex: RegExp, disabled?: boolean) {
     this.name = name
     this.regex = regex
     this.disabled = disabled
@@ -154,14 +155,14 @@ export class UserManagementForm extends SignUpForm {
   }
 }
 
-export function convertFormUserValues(values: formUser): userSchemaType {
+export function convertFormUserValues(values: UserFormType): UserSchemaType {
   return {
     ...values,
     accessKey: values.accessKey === '' ? 0 : Number(values.accessKey),
   }
 }
 
-type deviceField = {
+type DeviceField = {
   name: keyof Device
   regex: RegExp
   disabled?: boolean
@@ -175,7 +176,7 @@ export function getDevicesFields() {
   const booleanRegex = /^(true|false)?$/
   const numberRegex = /^(-?\d+)?$/
 
-  const fields: deviceField[] = [
+  const fields: DeviceField[] = [
     {
       disabled: true,
       name: 'model',
@@ -281,7 +282,7 @@ export function getDevicesFields() {
       regex.test(value.toString()) ? null : `${name} is not valid`
   })
 
-  const defaultValues: formDevice = {
+  const defaultValues: DeviceFormType = {
     model: '',
     name: '',
     type: '',
@@ -311,7 +312,7 @@ export function getDevicesFields() {
   return { fields, validators, defaultValues }
 }
 
-export function convertFormDeviceValues(values: formDevice): deviceSchemaType {
+export function convertFormDeviceValues(values: DeviceFormType): DeviceSchemaType {
   return {
     ...values,
     releaseDate: new Date(values.releaseDate),
@@ -335,7 +336,7 @@ export function convertFormDeviceValues(values: formDevice): deviceSchemaType {
   }
 }
 
-export function convertDeviceValues(values: Device): formDevice {
+export function convertDeviceValues(values: Device): DeviceFormType {
   const formatter = new Intl.DateTimeFormat('en-US', {
     day: 'numeric',
     month: 'short',

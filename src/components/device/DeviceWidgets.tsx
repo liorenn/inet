@@ -8,9 +8,9 @@ import type { Device } from '@prisma/client'
 import { FormatDate } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 
-type props = { device: Device }
+type Props = { device: Device }
 
-export default function DeviceWidgets({ device }: props) {
+export default function DeviceWidgets({ device }: Props) {
   const { t } = useTranslation('translations')
 
   const cards = [

@@ -1,4 +1,4 @@
-import { formatSpecs, type deviceSpecsType } from '@/models/SpecsFormatter'
+import { formatSpecs, type DeviceSpecsType } from '@/models/SpecsFormatter'
 import { Button, Container, useMantineColorScheme } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
@@ -7,9 +7,9 @@ import Link from 'next/link'
 import DeviceTable from '@/components/device/DeviceTable'
 import { deviceSpecsCategories } from '@/models/deviceProperties'
 
-type props = { device: deviceSpecsType }
+type Props = { device: DeviceSpecsType }
 
-export default function DeviceSpecs({ device }: props) {
+export default function DeviceSpecs({ device }: Props) {
   const { t } = useTranslation('translations')
   const { colorScheme } = useMantineColorScheme()
   const [accordionState, setAccordionState] = useState<string[]>(deviceSpecsCategories)

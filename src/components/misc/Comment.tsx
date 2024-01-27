@@ -11,24 +11,24 @@ import { useUser } from '@supabase/auth-helpers-react'
 import { useComments } from '@/hooks/useComments'
 import { adminAccessKey } from 'config'
 
-type props = {
+type Props = {
   comment: Comment
   comments: Comment[]
   setComments: (value: Comment[]) => void
 }
 
-export default function Comment({ comment, comments, setComments }: props) {
+export default function Comment({ comment, comments, setComments }: Props) {
   const user = useUser() // Get the user object from Supabase
   const [rating, setRating] = useState(comment.rating)
   const [editing, setEditing] = useState(false)
   const [editText, setEditText] = useState(comment.message)
-  const { data: accessKey } = trpc.auth.getAccessKey.useQuery({
+  const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
   })
-  const { data: imageExists } = trpc.auth.isCommentImageExists.useQuery({
+  const imageExistsQuery = trpc.auth.isCommentImageExists.useQuery({
     username: comment.username,
   })
-  const { data: commentEmail } = trpc.auth.getCommentEmail.useQuery({
+  const commentEmailQuery = trpc.auth.getCommentEmail.useQuery({
     username: comment.username,
   })
   const { mutateAsync: mutateDelete } = trpc.auth.deleteComment.useMutation()
@@ -79,7 +79,11 @@ export default function Comment({ comment, comments, setComments }: props) {
         <Group sx={{ padding: 10 }}>
           {user?.email && (
             <Avatar
-              src={imageExists && commentEmail ? `/users/${encodeEmail(commentEmail)}.png` : ''}
+              src={
+                imageExistsQuery.data && commentEmailQuery.data
+                  ? `/users/${encodeEmail(commentEmailQuery.data)}.png`
+                  : ''
+              }
               radius='md'
             />
           )}
@@ -94,7 +98,8 @@ export default function Comment({ comment, comments, setComments }: props) {
         </Group>
         <Group sx={{ padding: 10 }}>
           <Rating readOnly={!editing} value={rating} onChange={setRating} />
-          {(comment.username === username || (accessKey && accessKey >= adminAccessKey)) && (
+          {(comment.username === username ||
+            (accessKeyQuery.data && accessKeyQuery.data >= adminAccessKey)) && (
             <>
               <Tooltip color='gray' label={t('edit')}>
                 <ActionIcon color='dark'>

@@ -1,20 +1,20 @@
 import { Button, Card, Grid, Space, Text } from '@mantine/core'
 
 import DevicePhotos from '@/components/device/DevicePhotos'
+import { DevicePropertiesType } from '@/models/enums'
 import { Dispatch } from 'react'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import Link from 'next/link'
-import { devicePropertiesType } from '@/models/enums'
 import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 
-type props = {
-  device: devicePropertiesType
+type Props = {
+  device: DevicePropertiesType
   deviceType: string
-  setDevices: Dispatch<React.SetStateAction<devicePropertiesType[] | undefined>>
+  setDevices: Dispatch<React.SetStateAction<DevicePropertiesType[] | undefined>>
 }
 
-export default function DeviceListCard({ device, deviceType, setDevices }: props) {
+export default function DeviceListCard({ device, deviceType, setDevices }: Props) {
   const { t } = useTranslation('translations')
 
   return (

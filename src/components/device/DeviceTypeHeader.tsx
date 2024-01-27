@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { useMantineColorScheme } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 
-type props = {
+type Props = {
   deviceType: DeviceType
 }
 
-export default function DeviceTypeHeader({ deviceType }: props) {
+export default function DeviceTypeHeader({ deviceType }: Props) {
   const { colorScheme } = useMantineColorScheme()
   const { t } = useTranslation('translations')
 
@@ -22,7 +22,6 @@ export default function DeviceTypeHeader({ deviceType }: props) {
     <Group
       position='apart'
       sx={{
-        marginTop: 50,
         marginBottom: 15,
         borderBottom: colorScheme === 'dark' ? '1px solid #333333' : '1px solid #e6e6e6',
       }}>

@@ -1,5 +1,3 @@
-// Import the necessary modules and types
-
 import { create } from 'zustand'
 
 // Define the type for the comments state

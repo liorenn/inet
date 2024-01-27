@@ -3,8 +3,8 @@ import { deleteDeviceSoap, insertDeviceSoap, updateDeviceSoap } from '@/server/s
 import { getMatchedDevices } from '@/server/match'
 import { method, router } from '@/server/trpc'
 
-import { selectProprties, type devicePropertiesType } from '@/models/enums'
-import { deviceSchema, matchDeviceType, preprtiesSchema } from '@/models/schemas'
+import { selectProprties, type DevicePropertiesType } from '@/models/enums'
+import { deviceSchema, MatchDeviceType, PropertiesSchema } from '@/models/schemas'
 import { matchedDevicesLimit, sendSoapRequest } from 'config'
 import { z } from 'zod'
 import { selectParams } from '@/models/deviceProperties'
@@ -32,7 +32,7 @@ export const DeviceRouter = router({
         },
       })
       if (!device) return []
-      const devices: matchDeviceType[] = await ctx.prisma.device.findMany({
+      const devices: MatchDeviceType[] = await ctx.prisma.device.findMany({
         select: selectParams,
         where: {
           model: {
@@ -58,7 +58,7 @@ export const DeviceRouter = router({
     .input(
       z.object({
         deviceType: z.string(),
-        userPreferences: z.array(z.object({ name: preprtiesSchema, value: z.number() })),
+        userPreferences: z.array(z.object({ name: PropertiesSchema, value: z.number() })),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -165,21 +165,23 @@ export const DeviceRouter = router({
     })
     return device
   }),
-  getDevicesFromArr: method.input(z.array(z.string()).optional()).query(async ({ ctx, input }) => {
-    if (!input) return []
-    const devices = await ctx.prisma.device.findMany({
-      where: {
-        model: {
-          in: input,
+  getDevicesFromModelsArr: method
+    .input(z.object({ modelsArr: z.array(z.string()).optional() }))
+    .query(async ({ ctx, input }) => {
+      if (!input.modelsArr) return []
+      const devices = await ctx.prisma.device.findMany({
+        where: {
+          model: {
+            in: input.modelsArr,
+          },
         },
-      },
-      include: {
-        cameras: { select: { type: true, megapixel: true } },
-        colors: { select: { color: true } },
-      },
-    })
-    return devices
-  }),
+        include: {
+          cameras: { select: { type: true, megapixel: true } },
+          colors: { select: { color: true } },
+        },
+      })
+      return devices
+    }),
   getModelsAndNames: method.query(async ({ ctx }) => {
     const devices = await ctx.prisma.device.findMany({
       select: { model: true, name: true },
@@ -238,7 +240,7 @@ export const DeviceRouter = router({
           userEmail: input.email,
         },
       })
-      const devicesArr: devicePropertiesType[] = []
+      const devicesArr: DevicePropertiesType[] = []
       for (const device of devices) {
         const userDevice = await ctx.prisma.device.findFirst({
           where: { model: device.deviceModel },

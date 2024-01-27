@@ -1,20 +1,20 @@
-import { deviceTypeProperties, weight, weightsValues } from '@/models/deviceProperties'
-import { matchDeviceType, preprtiesSchemaType } from '@/models/schemas'
+import { MatchDeviceType, PropertiesSchemaType } from '@/models/schemas'
+import { Weight, deviceTypesProperties, weightsValues } from '@/models/deviceProperties'
 
 import { recommendedDevicesLimit } from 'config'
 
-type recommendedDevice = {
+type RecommendedDevice = {
   model: string
   match: number
 }
 
 // Function to get matched devices based on preference values, devices, device type, and limit
 export function getMatchedDevices(
-  preferencesValues: preferenceType[],
-  devices: matchDeviceType[],
+  preferencesValues: PreferenceType[],
+  devices: MatchDeviceType[],
   deviceType: string,
   limit: number
-): recommendedDevice[] {
+): RecommendedDevice[] {
   // Merge preference values with device values and normalize them
   const mergedValues = preferencesValuesToMergedValues(preferencesValues, devices)
   const normilizedValues = mergedValuesToNormilizedValues(mergedValues, deviceType)
@@ -26,14 +26,14 @@ export function getMatchedDevices(
 
 // Function to get recommended devices based on a single device, device type, and all devices
 export function getRecommendedDevices(
-  device: matchDeviceType,
+  device: MatchDeviceType,
   deviceType: string,
-  devices: matchDeviceType[]
+  devices: MatchDeviceType[]
 ) {
   // Extract preference values from the given device and calculate matched devices based on them
-  const preferencesValues: preferenceType[] = []
+  const preferencesValues: PreferenceType[] = []
   Object.keys(device).forEach((key) => {
-    const property = key as keyof matchDeviceType
+    const property = key as keyof MatchDeviceType
     if (property !== 'model' && device[property] !== null) {
       const value =
         property === 'releaseDate'
@@ -49,19 +49,19 @@ export function getRecommendedDevices(
   return getMatchedDevices(preferencesValues, devices, deviceType, recommendedDevicesLimit)
 }
 
-type preferenceType = {
-  name: preprtiesSchemaType
+type PreferenceType = {
+  name: PropertiesSchemaType
   value: number
 }
 
 export function convertPreferencesToValues(
-  preferences: preferenceType[],
+  preferences: PreferenceType[],
   deviceType: string
-): preferenceType[] {
+): PreferenceType[] {
   return preferences.map((pref) => {
     const weight = weights
       .find((val) => val.deviceType === deviceType)
-      ?.weights.find((weight) => weight.name === pref.name)
+      ?.weights?.find((weight) => weight.name === pref.name)
     const minValue = weight?.minValue ?? 0
     const maxValue = weight?.maxValue ?? 0
     return {
@@ -71,12 +71,12 @@ export function convertPreferencesToValues(
   })
 }
 
-type weights = {
+type Weights = {
   deviceType: string
-  weights: weight[]
+  weights: Weight[]
 }
 
-const weights: weights[] = deviceTypeProperties.map((value) => {
+const weights: Weights[] = deviceTypesProperties.map((value) => {
   return {
     deviceType: value.deviceType,
     weights: value.properties.map(
@@ -85,8 +85,8 @@ const weights: weights[] = deviceTypeProperties.map((value) => {
   }
 })
 
-type mergedValuesType = {
-  name: preprtiesSchemaType
+type MergedValuesType = {
+  name: PropertiesSchemaType
   prefValue: number
   devicesValues: {
     model: string
@@ -95,9 +95,9 @@ type mergedValuesType = {
 }[]
 
 function preferencesValuesToMergedValues(
-  preferencesValues: preferenceType[],
-  devices: matchDeviceType[]
-): mergedValuesType {
+  preferencesValues: PreferenceType[],
+  devices: MatchDeviceType[]
+): MergedValuesType {
   return preferencesValues.map((pref) => {
     return {
       name: pref.name,
@@ -113,18 +113,18 @@ function preferencesValuesToMergedValues(
   })
 }
 
-function mergedValuesToNormilizedValues(mergedValues: mergedValuesType, deviceType: string) {
+function mergedValuesToNormilizedValues(mergedValues: MergedValuesType, deviceType: string) {
   return mergedValues
     .filter((value) => {
       const weight = weights
         .find((val) => val.deviceType === deviceType)
-        ?.weights.find((weight) => weight.name === value.name)
+        ?.weights?.find((weight) => weight.name === value.name)
       return weight !== undefined
     })
     .map((value) => {
       const weight = weights
         .find((val) => val.deviceType === deviceType)
-        ?.weights.find((weight) => weight.name === value.name)
+        ?.weights?.find((weight) => weight.name === value.name)
       const minValue = weight?.minValue ?? 0
       const maxValue = weight?.maxValue ?? 0
       const devicesValues = value.devicesValues.map((value) => value.value)
@@ -146,13 +146,13 @@ function mergedValuesToNormilizedValues(mergedValues: mergedValuesType, deviceTy
 }
 
 // Define the total devices type
-type totalDevicesType = {
+type TotalDevicesType = {
   model: string
   values: number[]
 }
 
-function convertToTotalDevicesValues(merged: mergedValuesType): totalDevicesType[] {
-  const totalDevices: totalDevicesType[] = [] // Create an empty array to store the total devices
+function convertToTotalDevicesValues(merged: MergedValuesType): TotalDevicesType[] {
+  const totalDevices: TotalDevicesType[] = [] // Create an empty array to store the total devices
   const models = merged[0].devicesValues.map((device) => device.model) // Get the models from the first device
   models.forEach((model) => {
     const values: number[] = [] // Create an empty array to store the values
@@ -189,7 +189,7 @@ function calculateMatch(prefValues: number[], deviceValue: number[]): number {
 
 // Function to calculate the recommended devices based on total device values, total preference values, and a limit
 function calculateRecommendedDevices(
-  totalDevicesValues: totalDevicesType[],
+  totalDevicesValues: TotalDevicesType[],
   totalPrefsValues: number[],
   limit: number
 ) {

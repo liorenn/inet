@@ -1,20 +1,20 @@
+import type { DeviceSchemaType, UserSchemaType } from '@/models/schemas' // Importing schema types
 import {
   createSoapRequestXml,
   getResultFromResponse,
   soapRequestHeaders,
 } from '@/server/soapHelpers'
-import type { deviceSchemaType, userSchemaType } from '@/models/schemas' // Importing schema types
 
 import { env } from '@/server/env' // Importing server environment variables
 import soapRequest from 'easy-soap-request' // Importing the easy-soap-request library for making SOAP requests
 
 // Function to convert an object to JSON format
-function convertObjectToJson(object: deviceSchemaType | userSchemaType) {
+function convertObjectToJson(object: DeviceSchemaType | UserSchemaType) {
   return { Name: 'json', Value: JSON.stringify(object) }
 }
 
 // Function to insert a user using a SOAP request
-export async function insertUserSoap({ input }: { input: userSchemaType }) {
+export async function insertUserSoap({ input }: { input: UserSchemaType }) {
   const { response } = await soapRequest({
     // Making a SOAP request to insert a user
     url: env.soapServerUrl,
@@ -25,7 +25,7 @@ export async function insertUserSoap({ input }: { input: userSchemaType }) {
 }
 
 // Function to update a user using a SOAP request
-export async function updateUserSoap({ input }: { input: userSchemaType }) {
+export async function updateUserSoap({ input }: { input: UserSchemaType }) {
   const { response } = await soapRequest({
     // Making a SOAP request to update a user
     url: env.soapServerUrl,
@@ -47,7 +47,7 @@ export async function deleteUserSoap({ email }: { email: string }) {
 }
 
 // Function to insert a device using a SOAP request
-export async function insertDeviceSoap({ input }: { input: deviceSchemaType }) {
+export async function insertDeviceSoap({ input }: { input: DeviceSchemaType }) {
   const { response } = await soapRequest({
     // Making a SOAP request to insert a device
     url: env.soapServerUrl,
@@ -58,7 +58,7 @@ export async function insertDeviceSoap({ input }: { input: deviceSchemaType }) {
 }
 
 // Function to update a device using a SOAP request
-export async function updateDeviceSoap({ input }: { input: deviceSchemaType }) {
+export async function updateDeviceSoap({ input }: { input: DeviceSchemaType }) {
   const { response } = await soapRequest({
     // Making a SOAP request to update a device
     url: env.soapServerUrl,

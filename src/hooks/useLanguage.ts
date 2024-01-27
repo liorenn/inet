@@ -1,20 +1,20 @@
 import { create } from 'zustand'
 
-type languagesType = {
+type LanguagesType = {
   value: string // The code of the language
   name: string // The name of the language
 }
 
 // The list of supported languages
-export const languages: languagesType[] = [
+export const languages: LanguagesType[] = [
   { value: 'en', name: 'English' },
   { value: 'de', name: 'Deutsch' },
   { value: 'he', name: 'עברית' },
 ]
 
 type LanguageState = {
-  language: languagesType // The current language
-  setLanguage: (language: languagesType) => void // The function to set the language
+  language: LanguagesType // The current language
+  setLanguage: (language: LanguagesType) => void // The function to set the language
 }
 
 // Create and export the custom hook for managing the selected Language state

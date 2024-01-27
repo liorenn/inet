@@ -1,53 +1,53 @@
 import { Button, ScrollArea, Table, Text, TextInput } from '@mantine/core'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
-import { UserManagementForm, convertFormUserValues, userPropertyName } from '@/models/forms'
+import { UserManagementForm, UserPropertyName, convertFormUserValues } from '@/models/forms'
 import { managerAccessKey, validateInputOnChange } from 'config'
+import { useOs, useViewportSize } from '@mantine/hooks'
 
 import { CreateNotification } from '@/utils/utils'
 import Loader from '@/components/layout/Loader'
 import { trpc } from '@/utils/client'
-import { useOs } from '@mantine/hooks'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import { userSchema } from '@/models/schemas'
 
-export type formType = {
-  [K in userPropertyName]: string
+export type UserFormType = {
+  [K in UserPropertyName]: string
 }
 
-type props = {
+type Props = {
   accessKey: number
 }
 
-export default function UserManagement({ accessKey }: props) {
+export default function UserManagement({ accessKey }: Props) {
   const router = useRouter()
+  const { width } = useViewportSize()
   const { t } = useTranslation('translations')
-  const [users, setUsers] = useState<formType[]>([])
+  const [users, setUsers] = useState<UserFormType[]>([])
   const fieldNames = Object.keys(userSchema.shape)
-  const { data: tableData, isLoading } = trpc.auth.getUsersData.useQuery()
+  const usersDataQuery = trpc.auth.getUsersData.useQuery()
   if (accessKey < managerAccessKey) {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     router.push('/')
   }
 
   useEffect(() => {
-    console.log(tableData)
-    if (tableData) {
+    if (usersDataQuery.data) {
       setUsers(
-        tableData.map((user) => {
+        usersDataQuery.data.map((user) => {
           return { ...user, accessKey: user.accessKey.toString() }
         })
       )
     }
-  }, [tableData])
+  }, [usersDataQuery.data])
 
   return (
     <>
-      {isLoading ? (
+      {usersDataQuery.isLoading ? (
         <Loader />
       ) : (
-        <ScrollArea>
+        <ScrollArea type={width < 400 ? 'always' : 'auto'}>
           <Table mb='md' withBorder withColumnBorders>
             <thead>
               <tr>
@@ -59,10 +59,10 @@ export default function UserManagement({ accessKey }: props) {
               </tr>
             </thead>
             <tbody>
-              {users.map((data, index) => (
-                <UserRow setUsers={setUsers} data={data} key={index} />
+              {users.map((user, index) => (
+                <UserRow setUsers={setUsers} user={user} key={index} />
               ))}
-              <InsertRow setUsers={setUsers} />
+              <UserInsertRow setUsers={setUsers} />
             </tbody>
           </Table>
         </ScrollArea>
@@ -71,18 +71,18 @@ export default function UserManagement({ accessKey }: props) {
   )
 }
 
-type insertRowProps = {
-  setUsers: Dispatch<SetStateAction<formType[]>>
+type UserInsertRowProps = {
+  setUsers: Dispatch<SetStateAction<UserFormType[]>>
 }
 
-function InsertRow({ setUsers }: insertRowProps) {
+function UserInsertRow({ setUsers }: UserInsertRowProps) {
   const os = useOs()
   const formProperties = new UserManagementForm()
   const { t } = useTranslation('translations')
   const [loading, setLoading] = useState(false)
-  const { mutate: mutateInsert } = trpc.auth.insertUser.useMutation()
+  const insertUserMutation = trpc.auth.insertUser.useMutation()
 
-  const form = useForm<formType>({
+  const form = useForm<UserFormType>({
     initialValues: formProperties.getDefaultValues(),
     validateInputOnChange,
     validate: formProperties.getValidators(),
@@ -90,7 +90,7 @@ function InsertRow({ setUsers }: insertRowProps) {
 
   const handleInsert = () => {
     setLoading(true)
-    mutateInsert(
+    insertUserMutation.mutate(
       { ...convertFormUserValues(form.values) },
       {
         onSuccess: () => {
@@ -112,7 +112,12 @@ function InsertRow({ setUsers }: insertRowProps) {
       <tr>
         {formProperties.getFileds().map((field, index) => (
           <td key={index}>
-            <FormInput form={form} editMode={true} disabled={false} inputName={field.name} />
+            <UserTableFormInput
+              form={form}
+              editMode={true}
+              disabled={false}
+              inputName={field.name}
+            />
           </td>
         ))}
         <td colSpan={2}>
@@ -131,35 +136,35 @@ function InsertRow({ setUsers }: insertRowProps) {
   )
 }
 
-type userRowProps = {
-  data: formType
-  setUsers: Dispatch<SetStateAction<formType[]>>
+type UserRowProps = {
+  user: UserFormType
+  setUsers: Dispatch<SetStateAction<UserFormType[]>>
 }
 
-function UserRow({ data, setUsers }: userRowProps) {
+function UserRow({ user, setUsers }: UserRowProps) {
   const os = useOs()
   const formProperties = new UserManagementForm()
   const { t } = useTranslation('translations')
   const [editMode, setEditMode] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { mutate: mutateDelete } = trpc.auth.deleteUser.useMutation()
-  const { mutate: mutateUpdate } = trpc.auth.updateUser.useMutation()
-  const form = useForm<formType>({
-    initialValues: data,
+  const deleteUserMutation = trpc.auth.deleteUser.useMutation()
+  const updateUserMutation = trpc.auth.updateUser.useMutation()
+  const form = useForm<UserFormType>({
+    initialValues: user,
     validateInputOnChange,
     validate: formProperties.getValidators(),
   })
 
   useEffect(() => {
-    form.setValues(data)
+    form.setValues(user)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
+  }, [user])
 
   const handleDelete = () => {
     setLoading(true)
-    setUsers((prev) => prev.filter((user) => user.email !== data.email))
-    mutateDelete(
-      { email: data.email },
+    setUsers((prev) => prev.filter((user) => user.email !== user.email))
+    deleteUserMutation.mutate(
+      { email: user.email },
       {
         onSuccess: () => {
           setLoading(false)
@@ -175,15 +180,15 @@ function UserRow({ data, setUsers }: userRowProps) {
   const handleUpdate = () => {
     if (form.isValid()) {
       setEditMode(false)
-      if (form.values !== data) {
-        mutateUpdate(
+      if (form.values !== user) {
+        updateUserMutation.mutate(
           { ...convertFormUserValues(form.values) },
           {
             onSuccess: () => {
               CreateNotification(t('updatedSuccessfully'), 'green', os === 'ios' ? true : false)
             },
             onError: () => {
-              form.setValues(data)
+              form.setValues(user)
               CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false)
             },
           }
@@ -197,7 +202,7 @@ function UserRow({ data, setUsers }: userRowProps) {
       <tr>
         {formProperties.getFileds().map((field, index) => (
           <td key={index}>
-            <FormInput
+            <UserTableFormInput
               form={form}
               editMode={editMode}
               disabled={field.disabled}
@@ -238,14 +243,14 @@ function UserRow({ data, setUsers }: userRowProps) {
   )
 }
 
-type FormInputProps = {
+type UserTableFormInputProps = {
   editMode: boolean
-  inputName: keyof formType
+  inputName: keyof UserFormType
   disabled?: boolean
-  form: UseFormReturnType<formType>
+  form: UseFormReturnType<UserFormType>
 }
 
-function FormInput({ form, inputName, disabled, editMode }: FormInputProps) {
+function UserTableFormInput({ form, inputName, disabled, editMode }: UserTableFormInputProps) {
   return (
     <>
       {editMode && !disabled ? (

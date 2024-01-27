@@ -10,17 +10,20 @@ import ImageUploader from '@/components/misc/UploadAvatar'
 import Loader from '@/components/layout/Loader'
 import React from 'react'
 import { User } from '@prisma/client'
+import type { UserSchemaType } from '@/models/schemas'
 import { trpc } from '@/utils/client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
-import type { userSchemaType } from '@/models/schemas'
+import { useViewportSize } from '@mantine/hooks'
 
-export type accountFields = Omit<User, 'email' | 'accessKey'>
-export type accountFieldsNames = keyof accountFields
-type accountField = {
-  name: accountFieldsNames
+export type AccountFields = Omit<User, 'email' | 'accessKey'>
+
+export type AccountFieldsNames = keyof AccountFields
+
+type AccountField = {
+  name: AccountFieldsNames
   regex: RegExp
   validator: (value: string) => string | null
 }
@@ -29,15 +32,17 @@ export default function Account() {
   const user = useUser() // Get the user object from Supabase
   const router = useRouter()
   const session = useSession()
+  const { width } = useViewportSize()
   const formProperties = new AccountForm()
   const { t } = useTranslation('translations')
   const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' })
   const updateMutation = trpc.auth.updateUserDetails.useMutation()
-  const { data } = trpc.auth.getUserDetails.useQuery({
+  const userDetailsQuery = trpc.auth.getUserDetails.useQuery({
     email: user?.email,
   })
-  const [account, setAccount] = useState<userSchemaType | undefined>()
-  const omitFields = formProperties.getFileds() as Omit<accountField, 'validator'>[]
+  const data = userDetailsQuery.data
+  const [account, setAccount] = useState<UserSchemaType | undefined>()
+  const omitFields = formProperties.getFileds() as Omit<AccountField, 'validator'>[]
   const fields = omitFields.map((field) => {
     return {
       ...field,
@@ -45,7 +50,7 @@ export default function Account() {
         field.regex.test(value?.toString()) ? null : `${field.name} is not valid`,
     }
   })
-  const [inputs, setInputs] = useState<accountFields>(formProperties.getDefaultValues())
+  const [inputs, setInputs] = useState<AccountFields>(formProperties.getDefaultValues())
 
   useEffect(() => {
     if (data !== undefined) {
@@ -67,7 +72,7 @@ export default function Account() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
-  function updateProperty(property: accountFieldsNames, account: userSchemaType) {
+  function updateProperty(property: AccountFieldsNames, account: UserSchemaType) {
     if (fields.find((field) => field.name === property)?.validator(inputs[property]) !== null)
       return
     // if (property === 'password' || property === 'phone') {
@@ -123,18 +128,33 @@ export default function Account() {
             </Box>
           </Group>
           <Stack sx={{ marginTop: 28 }}>
-            <Text sx={{ fontSize: 18 }} weight={500} color='dimmed' align='right'>
+            <Text
+              ta={width < 400 ? 'left' : 'right'}
+              sx={{ fontSize: 18 }}
+              weight={500}
+              color='dimmed'
+              align='right'>
               {`${t('createdAt')} ${dateFormmater.format(
                 new Date(user?.updated_at ?? new Date())
               )}`}
             </Text>
-            <Text sx={{ fontSize: 18 }} weight={500} color='dimmed' align='right'>
+            <Text
+              ta={width < 400 ? 'left' : 'right'}
+              sx={{ fontSize: 18 }}
+              weight={500}
+              color='dimmed'
+              align='right'>
               {`${t('updatedAt')} ${dateFormmater.format(
                 new Date(user?.created_at ?? new Date())
               )}`}
             </Text>
-            <Text sx={{ fontSize: 18 }} weight={500} color='dimmed' align='right'>
-              {`${data?.comments.length ?? 0} ${t('commentsCommented')}`}
+            <Text
+              ta={width < 400 ? 'left' : 'right'}
+              sx={{ fontSize: 18 }}
+              weight={500}
+              color='dimmed'
+              align='right'>
+              {`${data?.comments?.length ?? 0} ${t('commentsCommented')}`}
             </Text>
           </Stack>
         </Group>

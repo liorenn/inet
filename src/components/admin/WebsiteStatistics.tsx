@@ -1,14 +1,13 @@
-import React, { useEffect } from 'react'
-
 import { managerAccessKey } from 'config'
+import { useEffect } from 'react'
 import { useMantineColorScheme } from '@mantine/core'
 import { useRouter } from 'next/router'
 
-type props = {
+type Props = {
   accessKey: number // The user access key
 }
 
-export default function WebsiteStatistics({ accessKey }: props) {
+export default function WebsiteStatistics({ accessKey }: Props) {
   const router = useRouter() // Get the router
   const { colorScheme } = useMantineColorScheme() // Get the color scheme
 
@@ -43,7 +42,6 @@ export default function WebsiteStatistics({ accessKey }: props) {
       width='100%'
       height='100%'
       frameBorder='0'
-      className='dark:invert dark:grayscale-[50%]'
       style={{
         filter: colorScheme === 'dark' ? 'invert(93%) grayscale(5%)' : '',
       }}

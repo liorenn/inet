@@ -1,5 +1,3 @@
-// Import the necessary modules and types
-
 import { IconCurrencyDollar, IconCurrencyEuro, IconCurrencyShekel, TablerIcon } from '@tabler/icons'
 
 import { create } from 'zustand'

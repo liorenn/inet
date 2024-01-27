@@ -1,5 +1,5 @@
 import { Container, SimpleGrid } from '@mantine/core'
-import type { DeviceType, devicePropertiesType } from '@/models/enums'
+import type { DevicePropertiesType, DeviceType } from '@/models/enums'
 import { useEffect, useState } from 'react'
 
 import DeviceCard from '@/components/device/DeviceCard'
@@ -11,26 +11,26 @@ import { usePostHog } from 'posthog-js/react'
 import { useRouter } from 'next/router'
 import { useUser } from '@supabase/auth-helpers-react'
 
-type devicesType = {
+type Device = {
   isInList?: boolean
-} & devicePropertiesType
+} & DevicePropertiesType
 
 export default function Devices() {
   const router = useRouter()
   const posthog = usePostHog()
   const deviceType = router.asPath.split('/')[router.asPath.split('/').length - 1] as DeviceType
   const user = useUser() // Get the user object from Supabase
-  const [devices, setDevices] = useState<devicesType[] | undefined>(undefined)
-  const { data: devicesQuery } = trpc.device.getDevices.useQuery({
+  const [devices, setDevices] = useState<Device[] | undefined>(undefined)
+  const devicesQuery = trpc.device.getDevices.useQuery({
     deviceType: deviceType,
   })
-  const { data: userDevicesQuery } = trpc.device.getUserDevicesFromUserTable.useQuery({
+  const userDevicesQuery = trpc.device.getUserDevicesFromUserTable.useQuery({
     email: user?.email,
   })
   const [captured, setCaptured] = useState(false)
 
   useEffect(() => {
-    const userDevices = userDevicesQuery?.deviceList
+    const userDevices = userDevicesQuery.data?.deviceList
     if (userDevices) {
       setDevices((prev) =>
         prev?.map((device) => {
@@ -41,19 +41,19 @@ export default function Devices() {
         })
       )
     }
-  }, [userDevicesQuery?.deviceList])
+  }, [userDevicesQuery.data?.deviceList])
 
   useEffect(() => {
-    if (devicesQuery) {
-      setDevices(devicesQuery)
+    if (devicesQuery.data) {
+      setDevices(devicesQuery.data)
     }
-    if (!captured && devicesQuery) {
+    if (!captured && devicesQuery.data) {
       posthog.capture('Device Type Page', {
         deviceType,
       })
       setCaptured(true)
     }
-  }, [captured, deviceType, devicesQuery, posthog])
+  }, [captured, deviceType, devicesQuery.data, posthog])
 
   if (!devices) return <Loader />
 

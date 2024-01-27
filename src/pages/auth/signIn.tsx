@@ -14,7 +14,7 @@ import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import { validateInputOnChange } from 'config'
 
-type formType = {
+type SignInFormType = {
   email: string
   password: string
 }
@@ -26,24 +26,25 @@ export default function SignIn() {
   const posthog = usePostHog() // Get the posthog
   const session = useSession() // Get the session
   const supabase = useSupabaseClient() // Get the supabase
+  const { t } = useTranslation('translations') // Get the translation function
   const formProperties = new SignInForm() // Get the form properties
   const [loading, setLoading] = useState(false) // State for loading
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation() // Get the IsUserExists mutation
-  const { t } = useTranslation('translations') // Get the translation function
-  const { data, isLoading } = trpc.auth.getAccessKey.useQuery({
-    email: session?.user.email,
+  const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
+    email: session?.user?.email,
   }) // Get the access key for the user
-  useEffect(() => {
-    data && data >= 1 && router.push('/') // Check if the data exists and redirect to home
-  }, [data, router])
 
-  const form = useForm<formType>({
+  useEffect(() => {
+    accessKeyQuery.data && accessKeyQuery.data >= 1 && router.push('/') // Check if the data exists and redirect to home
+  }, [accessKeyQuery, router])
+
+  const form = useForm<SignInFormType>({
     initialValues: formProperties.getDefaultValues() as FormDefaultValues,
     validateInputOnChange,
     validate: formProperties.getValidators(),
   })
 
-  function signIn(values: formType) {
+  function signIn(values: SignInFormType) {
     setLoading(true) // Set loading to true
     IsUserExistsMutation.mutate(
       // Check if the user exists in the database
@@ -73,7 +74,7 @@ export default function SignIn() {
     )
   }
 
-  if (session || isLoading) {
+  if (session || accessKeyQuery.isLoading) {
     return <Center>{t('accessDeniedMessageSignOut')}</Center>
   }
 

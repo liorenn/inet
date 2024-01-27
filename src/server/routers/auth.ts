@@ -1,19 +1,36 @@
+import { UpdateSchema, commentSchema, userSchema } from '@/models/schemas'
 import { calculatePercentageDiff, encodeEmail } from '@/utils/utils'
-import { commentSchema, updateSchema, userSchema } from '@/models/schemas'
+import { databaseEditorPort, sendSoapRequest, websiteEmail } from 'config'
 import { deleteUserSoap, insertUserSoap, updateUserSoap } from '@/server/soapFunctions'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { method, router } from '@/server/trpc'
-import { sendSoapRequest, websiteEmail } from 'config'
 
 import PriceDropEmail from '@/components/misc/PriceDropEmail'
 import { Prisma } from '@prisma/client'
+import { exec } from 'child_process'
 import { fetchCurrentPrice } from '@/server/price'
 import { resend } from '@/server/client'
 import { z } from 'zod'
 
 export const authRouter = router({
-  test: method.query(({ ctx }) => {
-    return ctx.supabase.auth.getSession()
+  openDatabaseEditor: method.query(async () => {
+    try {
+      await fetch(`http://localhost:${databaseEditorPort}/`)
+      return false
+    } catch {
+      exec(`npx prisma studio --port ${databaseEditorPort} --browser none`)
+      return true
+    }
+  }),
+  closeDatabaseEditor: method.mutation(() => {
+    try {
+      exec(
+        `for /f "tokens=5" %a in ('netstat -aon ^| find ":${databaseEditorPort}" ^| find "LISTENING"') do taskkill /f /pid %a`
+      )
+      return true
+    } catch {
+      return false
+    }
   }),
   getConfigs: method.query(() => {
     const filePath = 'config.ts'
@@ -277,7 +294,7 @@ export const authRouter = router({
   updateUserDetails: method
     .input(
       z.object({
-        property: updateSchema,
+        property: UpdateSchema,
         email: z.string(),
         value: z.string(),
       })

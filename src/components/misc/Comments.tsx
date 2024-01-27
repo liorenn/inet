@@ -12,31 +12,31 @@ import { useProfilePicture } from '@/hooks/useProfilePicture'
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 
-type props = {
+type Props = {
   device: Device
 }
 
-export default function Comments({ device }: props) {
+export default function Comments({ device }: Props) {
   const user = useUser() // Get the user object from Supabase
   const [text, setText] = useState('') // State for the comment text
   const [rating, setRating] = useState(0) // State for the comment rating
   const { t } = useTranslation('translations') // Translation hook
   const [comments, setComments] = useState<commentType[]>([]) // State for the comments
-  const { mutate } = trpc.auth.addComment.useMutation() // Add comment mutation
+  const addCommentMutation = trpc.auth.addComment.useMutation() // Add comment mutation
   const { username, setRatingValue, setCommentsAmount } = useComments() // Get the comments state and functions
-  const { data } = trpc.auth.getAllComments.useQuery({
+  const allCommentsQuery = trpc.auth.getAllComments.useQuery({
     model: device.model,
   }) // Get all comments
   const { imageExists, imagePath } = useProfilePicture() // Get the profile picture state
 
   useEffect(() => {
-    if (data) {
-      setComments(data) // Set the comments state to the updated data
-      setCommentsAmount(data.length) // Set the comments amount state to the updated data length
-      setRatingValue(calculateAverageRating(data)) // Set the rating value state to the average rating
+    if (allCommentsQuery.data) {
+      setComments(allCommentsQuery.data) // Set the comments state to the updated allCommentsQuery.data
+      setCommentsAmount(allCommentsQuery.data.length) // Set the comments amount state to the updated allCommentsQuery.data length
+      setRatingValue(calculateAverageRating(allCommentsQuery.data)) // Set the rating value state to the average rating
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
+  }, [allCommentsQuery.data])
 
   function AddComment(e: FormEvent<HTMLFormElement>) {
     e.preventDefault() // Prevent the default form submission
@@ -51,7 +51,7 @@ export default function Comments({ device }: props) {
       updatedAt: new Date(),
       rating: rating,
     }
-    mutate(newComment, {
+    addCommentMutation.mutate(newComment, {
       // Add the new comment
       onSuccess(data) {
         CreateNotification(t('commentAddedSuccessfully'), 'green') // Create a notification
@@ -101,12 +101,12 @@ export default function Comments({ device }: props) {
                     </Text>
                   </div>
                 </Group>
-                <Group>
+                <Group mb='sm'>
                   <Rating value={rating} onChange={setRating} />
-                  <Button type='submit' variant='subtle'>
+                  <Button type='submit' size='xs' variant='subtle'>
                     {t('addComment')}
                   </Button>
-                  <Button type='reset' variant='subtle' color='gray'>
+                  <Button type='reset' size='xs' variant='subtle' color='gray'>
                     {t('cancel')}
                   </Button>
                 </Group>

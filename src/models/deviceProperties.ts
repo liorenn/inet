@@ -1,13 +1,13 @@
 import { DeviceType } from '@/models/enums'
-import { preprtiesSchemaType } from '@/models/schemas'
+import { PropertiesSchemaType } from '@/models/schemas'
 
-export type weight = {
-  name: preprtiesSchemaType
+export type Weight = {
+  name: PropertiesSchemaType
   minValue: number
   maxValue: number
 }
 
-export const weightsValues: weight[] = [
+export const weightsValues: Weight[] = [
   { name: 'screenSize', minValue: 5, maxValue: 6.8 },
   { name: 'batterySize', minValue: 2800, maxValue: 3300 },
   { name: 'releaseDate', minValue: 2020, maxValue: 2023 },
@@ -20,7 +20,7 @@ export const weightsValues: weight[] = [
 ]
 
 type PropertiesLabels = {
-  property: preprtiesSchemaType
+  property: PropertiesSchemaType
   labels: string[]
 }
 
@@ -36,12 +36,12 @@ export const propertiesLabels: PropertiesLabels[] = [
   { property: 'weight', labels: ['light', 'moderate', 'heavy', 'substantial'] },
 ]
 
-export type deviceTypeProperties = {
+export type DeviceTypeProperties = {
   deviceType: DeviceType
-  properties: preprtiesSchemaType[]
+  properties: PropertiesSchemaType[]
 }
 
-export const deviceTypeProperties: deviceTypeProperties[] = [
+export const deviceTypesProperties: DeviceTypeProperties[] = [
   {
     deviceType: 'iphone',
     properties: ['screenSize', 'batterySize', 'releaseDate', 'price'],

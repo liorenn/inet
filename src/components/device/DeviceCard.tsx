@@ -1,18 +1,18 @@
 import { Button, Card, Grid, Progress, Space, Text, Tooltip } from '@mantine/core'
 
 import DevicePhotos from '@/components/device/DevicePhotos'
+import type { DevicePropertiesType } from '@/models/enums'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import Link from 'next/link'
-import type { devicePropertiesType } from '@/models/enums'
 import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 
-type props = {
-  device: devicePropertiesType
+type Props = {
+  device: DevicePropertiesType
   matchPrecentage?: number
 }
 
-export default function DeviceCard({ device, matchPrecentage }: props) {
+export default function DeviceCard({ device, matchPrecentage }: Props) {
   const { t } = useTranslation('translations')
 
   return (

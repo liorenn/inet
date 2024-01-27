@@ -29,7 +29,7 @@ export const deviceSchema = z.object({
   resistanceRating: z.string().optional(),
 })
 
-export type deviceSchemaType = z.infer<typeof deviceSchema>
+export type DeviceSchemaType = z.infer<typeof deviceSchema>
 
 export const userSchema = z.object({
   email: z.string(),
@@ -40,7 +40,7 @@ export const userSchema = z.object({
   accessKey: z.number(),
 })
 
-export type userSchemaType = z.infer<typeof userSchema>
+export type UserSchemaType = z.infer<typeof userSchema>
 
 export const commentSchema = z.object({
   message: z.string(),
@@ -51,9 +51,9 @@ export const commentSchema = z.object({
   username: z.string(),
 })
 
-export const updateSchema = z.enum(['username', 'name', 'password', 'phone'])
+export const UpdateSchema = z.enum(['username', 'name', 'password', 'phone'])
 
-export const preprtiesSchema = z.enum([
+export const PropertiesSchema = z.enum([
   'releaseDate',
   'screenSize',
   'batterySize',
@@ -64,5 +64,5 @@ export const preprtiesSchema = z.enum([
   'cpu',
   'gpu',
 ])
-export type preprtiesSchemaType = z.infer<typeof preprtiesSchema>
-export type matchDeviceType = Pick<Device, preprtiesSchemaType | 'model'>
+export type PropertiesSchemaType = z.infer<typeof PropertiesSchema>
+export type MatchDeviceType = Pick<Device, PropertiesSchemaType | 'model'>

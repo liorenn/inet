@@ -1,29 +1,30 @@
-import { Accordion, Button, Container, Group, ScrollArea } from '@mantine/core'
+import { Accordion, Button, Container, Divider, Group, ScrollArea } from '@mantine/core'
 import { SegmentedControl, Stack, Title, useMantineColorScheme } from '@mantine/core'
-import { deviceTypeProperties, propertiesLabels } from '@/models/deviceProperties'
+import { deviceTypesProperties, propertiesLabels } from '@/models/deviceProperties'
 import { useEffect, useState } from 'react'
 
 import Head from 'next/head'
 import MatchedDevices from '@/components/device/MatchedDevices'
+import { PropertiesSchemaType } from '@/models/schemas'
 import { deviceType as deviceTypeEnum } from '@/models/enums'
-import { preprtiesSchemaType } from '@/models/schemas'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 import { z } from 'zod'
 
-type inputType = { value: string; label: string }[]
-type preferenceType = {
+type InputType = { value: string; label: string }[]
+
+type PreferenceType = {
   name: string
   value: string
 }
 
 const getPreferences = (deviceType: string) => {
-  return deviceTypeProperties.find((device) => device.deviceType === deviceType)?.properties ?? []
+  return deviceTypesProperties.find((device) => device.deviceType === deviceType)?.properties ?? []
 }
 
-function generateUrlString(deviceType: string, preferences: preferenceType[]) {
+function generateUrlString(deviceType: string, preferences: PreferenceType[]) {
   return `?deviceType=${deviceType}&preferences=${preferences
     .map((preference) => {
       return `${preference.name}-${preference.value}`
@@ -31,7 +32,7 @@ function generateUrlString(deviceType: string, preferences: preferenceType[]) {
     .join(',')}`
 }
 
-function getPreferencesFormatter(preferences: preferenceType[]) {
+function getPreferencesFormatter(preferences: PreferenceType[]) {
   return `${preferences
     .map((preference) => {
       return `${preference.name}-${preference.value}`
@@ -41,31 +42,36 @@ function getPreferencesFormatter(preferences: preferenceType[]) {
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 export default function Find() {
-  const router = useRouter()
-  const { width } = useViewportSize()
-  const { t } = useTranslation('translations')
-  const { colorScheme } = useMantineColorScheme()
-  const { mutate, data, isLoading, reset } = trpc.device.getMatchedDevices.useMutation()
+  const router = useRouter() // Get the router
+  const { width } = useViewportSize() // Get the width of the viewport
+  const { t } = useTranslation('translations') // Get the translation function
+  const { colorScheme } = useMantineColorScheme() // Get the color scheme
+  const MatchedDevicesMutation = trpc.device.getMatchedDevices.useMutation() // Mutation to get the matched devices
 
-  const deviceType = z.string().parse(router.query.deviceType ?? 'iphone')
-  const preferences = z
+  const deviceType = z.string().parse(router.query.deviceType ?? 'iphone') // Get the device type from the url
+  const preferences = z // Get the user preferences from the url
     .string()
     .parse(
       router.query.preferences ??
         getPreferencesFormatter(getPreferences(deviceType).map((name) => ({ name, value: '' })))
+      // Set the preferences to be empty if they are not in the url
     )
-    .split(',')
+    .split(',') // Split the preferences seperated by a comma into an array
     .map((value) => {
+      // Map the preferences to an object with name and value
       return { name: value.split('-')[0], value: value.split('-')[1] }
     })
 
   const [accordionState, setAccordionState] = useState<string[]>(
     preferences.map((pref) => pref.name)
-  )
+  ) // Set the accordion state to manage its state
 
   useEffect(() => {
+    // If the preferences are not in the url
     if (!router.query.preferences) {
+      // Push the preferences to the url
       router.push(
+        // Generate the url string
         generateUrlString(
           deviceType,
           getPreferences(deviceType).map((name) => ({ name, value: '' }))
@@ -80,20 +86,21 @@ export default function Find() {
       .filter((pref) => pref.value !== 'notInterested' && pref.value !== '')
       .map((pref) => {
         return {
-          name: pref.name as preprtiesSchemaType,
+          name: pref.name as PropertiesSchemaType,
           value:
             (propertiesLabels
               .find((property) => property.property === pref.name)
-              ?.labels.indexOf(pref.value) ?? 0) + 1,
+              ?.labels?.indexOf(pref.value) ?? 0) + 1,
         }
       })
-    userPreferences.length > 0 && mutate({ deviceType, userPreferences: userPreferences })
+    userPreferences.length > 0 &&
+      MatchedDevicesMutation.mutate({ deviceType, userPreferences: userPreferences })
   }
 
-  function getSegmentedData(preference: preprtiesSchemaType) {
+  function getSegmentedData(preference: PropertiesSchemaType) {
     const data = propertiesLabels
       .find((property) => property.property === preference)
-      ?.labels.map((value) => {
+      ?.labels?.map((value) => {
         return {
           value: value,
           label: `${value} ${t(preference)}`,
@@ -108,17 +115,19 @@ export default function Find() {
         <title>{t('find')}</title>
       </Head>
       <Container size={1000}>
+        <Title>{t('compareTitle')}</Title>
+        <Divider mb='md' />
         <Stack spacing={0}>
           <Group position='apart'>
-            <Title size={width < 1000 ? 20 : 26}>{t('selectDeviceType')}</Title>
+            <Title size={width < 1000 ? 20 : 22}>{t('selectDeviceType')}</Title>
             <Button
               mb={8}
               w={'auto'}
-              disabled={isLoading}
+              disabled={MatchedDevicesMutation.isLoading}
               color='gray'
               variant='default'
               onClick={() => {
-                reset()
+                MatchedDevicesMutation.reset()
                 router.push(
                   generateUrlString(
                     deviceType,
@@ -179,29 +188,34 @@ export default function Find() {
           fullWidth
           mt='xl'
           mb='md'
-          disabled={isLoading}
+          disabled={MatchedDevicesMutation.isLoading}
           color='green'
           variant='light'
           onClick={() => handleSubmit()}>
-          {isLoading ? t('loading') : t('findYourDevice')}
+          {MatchedDevicesMutation.isLoading ? t('loading') : t('findYourDevice')}
         </Button>
-        <MatchedDevices data={data} isLoading={isLoading} title={t('bestMatchedDevices')} />
+        <MatchedDevices
+          data={MatchedDevicesMutation.data}
+          isLoading={MatchedDevicesMutation.isLoading}
+          title={t('bestMatchedDevices')}
+        />
       </Container>
     </>
   )
 }
 
 type preferenceInputType = {
-  value: inputType
+  value: InputType
   index: number
   deviceType: string
-  preferences: preferenceType[]
+  preferences: PreferenceType[]
 }
 
 function PreferenceInput({ value, index, deviceType, preferences }: preferenceInputType) {
   const router = useRouter()
   const { width } = useViewportSize()
   const { t } = useTranslation('translations')
+
   return (
     <>
       <Accordion.Item value={preferences[index].name}>

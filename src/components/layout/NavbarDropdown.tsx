@@ -7,15 +7,15 @@ import Link from 'next/link'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 
-type props = { AccessKey: number | undefined }
+type Props = { AccessKey: number | undefined }
 
-export default function NavBarDropdown({ AccessKey }: props) {
-  const { t } = useTranslation('translations')
-  const [activeLink, setActiveLink] = useState('Settings')
-  const [opened, setOpened] = useState(false)
-  const { classes, cx } = useStyles()
+export default function NavBarDropdown({ AccessKey }: Props) {
   const session = useSession()
   const supabase = useSupabaseClient()
+  const { classes, cx } = useStyles()
+  const [opened, setOpened] = useState(false)
+  const { t } = useTranslation('translations')
+  const [activeLink, setActiveLink] = useState('Settings')
 
   async function signOut() {
     const { error } = await supabase.auth.signOut()
@@ -24,22 +24,23 @@ export default function NavBarDropdown({ AccessKey }: props) {
     }
   }
 
-  const Buttons = [
+  const buttons = [
     { title: t('home'), href: '/' },
     { title: t('allDevices'), href: '/device' },
-    { title: t('compare'), href: '/compare' },
-    { title: t('favorites'), href: '/favorites' },
+    { title: t('compare'), href: '/device/compare' },
+    { title: t('find'), href: '/device/find' },
   ]
 
   if (session) {
-    Buttons.push({ title: t('account'), href: '/auth/account' })
+    buttons.push({ title: t('favorites'), href: '/device/favorites' })
+    buttons.push({ title: t('account'), href: '/auth/account' })
     if (AccessKey && AccessKey >= 5) {
-      Buttons.push({ title: t('admin'), href: '/auth/admin' })
+      buttons.push({ title: t('admin'), href: '/auth/admin' })
     }
-    Buttons.push({ title: t('signOut'), href: '/' })
+    buttons.push({ title: t('signOut'), href: '/' })
   } else {
-    Buttons.push({ title: t('signIn'), href: '/auth/signin' })
-    Buttons.push({ title: t('signUp'), href: '/auth/signup' })
+    buttons.push({ title: t('signIn'), href: '/auth/signin' })
+    buttons.push({ title: t('signUp'), href: '/auth/signup' })
   }
 
   return (
@@ -55,7 +56,7 @@ export default function NavBarDropdown({ AccessKey }: props) {
         }
         size={280}
         withOverlay={true}>
-        {Buttons.map((link) => (
+        {buttons.map((link) => (
           <Link
             className={cx(classes.link, {
               [classes.linkActive]: activeLink === link.href,
@@ -71,7 +72,7 @@ export default function NavBarDropdown({ AccessKey }: props) {
           </Link>
         ))}
       </Drawer>
-      <ActionIcon size='xl'>
+      <ActionIcon pr='lg' size='xl'>
         <IconMenu2 onClick={() => setOpened(true)} />
       </ActionIcon>
     </>

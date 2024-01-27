@@ -7,7 +7,7 @@ export const deviceType = {
   macbook: 'macbook',
 }
 
-export type devicePropertiesType = {
+export type DevicePropertiesType = {
   model: string
   name: string
   type: string

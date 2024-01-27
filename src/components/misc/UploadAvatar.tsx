@@ -12,11 +12,11 @@ import { useProfilePicture } from '@/hooks/useProfilePicture'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-type props = {
+type Props = {
   email: string
 }
 
-export default function ImageUploader({ email }: props) {
+export default function ImageUploader({ email }: Props) {
   const router = useRouter() // Get the router
   const [opened, { open, close }] = useDisclosure(false) // Open and close the modal functions
   const [file, setFile] = useState<File | undefined>() // State variable to store the file

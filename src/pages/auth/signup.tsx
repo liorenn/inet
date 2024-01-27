@@ -15,7 +15,7 @@ import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import { validateInputOnChange } from 'config'
 
-export type formType = {
+export type SignUpFormType = {
   [K in keyof Omit<User, 'accessKey'>]: string
 }
 
@@ -27,23 +27,23 @@ export default function SignUp() {
   const formProperties = new SignUpForm() // Get the form properties
   const [loading, setLoading] = useState(false) // State for loading
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation() // Get the IsUserExists mutation
-  const { mutate } = trpc.auth.createUser.useMutation() // Get the createUser mutation
+  const createUserMutation = trpc.auth.createUser.useMutation() // Get the createUser mutation
   const { t } = useTranslation('translations') // Get the translation function
 
-  const { data, isLoading } = trpc.auth.getAccessKey.useQuery({
-    email: session?.user.email,
+  const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
+    email: session?.user?.email,
   }) // Get the access key for the user
   useEffect(() => {
-    data && data >= 1 && router.push('/') // Check if the data exists and redirect to home
-  }, [data, router])
+    accessKeyQuery.data && accessKeyQuery.data >= 1 && router.push('/') // Check if the accessKeyQuery.data exists and redirect to home
+  }, [accessKeyQuery.data, router])
 
-  const form = useForm<formType>({
+  const form = useForm<SignUpFormType>({
     initialValues: formProperties.getDefaultValues() as FormDefaultValues,
     validateInputOnChange,
     validate: formProperties.getValidators(),
   })
 
-  function signUp(fields: formType) {
+  function signUp(fields: SignUpFormType) {
     setLoading(true) // Set loading to true
     IsUserExistsMutation.mutate(
       // Check if the user exists in the database
@@ -69,7 +69,7 @@ export default function SignUp() {
           }
           if (!IsExist?.email && !IsExist?.username) {
             // If both email and username does not exist in database
-            mutate(
+            createUserMutation.mutate(
               // Create the user
               {
                 email: fields.email,
@@ -106,7 +106,7 @@ export default function SignUp() {
     )
   }
 
-  if (session || isLoading) {
+  if (session || accessKeyQuery.isLoading) {
     return <Center>{t('accessDeniedMessageSignOut')}</Center>
   }
 

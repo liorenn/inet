@@ -3,47 +3,48 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
 import { convertDeviceValues, convertFormDeviceValues, getDevicesFields } from '@/models/forms'
 import { managerAccessKey, validateInputOnChange } from 'config'
+import { useOs, useViewportSize } from '@mantine/hooks'
 
 import { CreateNotification } from '@/utils/utils'
 import type { Device } from '@prisma/client'
 import Loader from '@/components/layout/Loader'
 import { deviceSchema } from '@/models/schemas'
 import { trpc } from '@/utils/client'
-import { useOs } from '@mantine/hooks'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 
-export type formType = {
+export type DeviceFormType = {
   [K in keyof Device]: string
 }
 
-type props = {
+type Props = {
   accessKey: number
 }
 
-export default function DeviceManagement({ accessKey }: props) {
+export default function DeviceManagement({ accessKey }: Props) {
   const router = useRouter()
+  const { width } = useViewportSize()
   const { t } = useTranslation('translations')
-  const [devices, setDevices] = useState<formType[]>([])
+  const [devices, setDevices] = useState<DeviceFormType[]>([])
   const fieldNames = Object.keys(deviceSchema.shape)
-  const { data: tableData, isLoading } = trpc.device.getDevicesData.useQuery()
+  const devicesDataQuery = trpc.device.getDevicesData.useQuery()
   if (accessKey < managerAccessKey) {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     router.push('/')
   }
 
   useEffect(() => {
-    if (tableData) {
-      setDevices(tableData.map((device) => convertDeviceValues(device)))
+    if (devicesDataQuery.data) {
+      setDevices(devicesDataQuery.data.map((device) => convertDeviceValues(device)))
     }
-  }, [tableData])
+  }, [devicesDataQuery.data])
 
   return (
     <>
-      {isLoading ? (
+      {devicesDataQuery.isLoading ? (
         <Loader />
       ) : (
-        <ScrollArea>
+        <ScrollArea type={width < 400 ? 'always' : 'auto'}>
           <Table mb='md' withBorder withColumnBorders>
             <thead>
               <tr>
@@ -55,10 +56,10 @@ export default function DeviceManagement({ accessKey }: props) {
               </tr>
             </thead>
             <tbody>
-              {devices.map((data, index) => (
-                <DeviceRow setDevices={setDevices} data={data} key={index} />
+              {devices.map((device, index) => (
+                <DeviceRow setDevices={setDevices} device={device} key={index} />
               ))}
-              <InsertRow setUsers={setDevices} />
+              <DeviceInsertRow setDevices={setDevices} />
             </tbody>
           </Table>
         </ScrollArea>
@@ -67,13 +68,15 @@ export default function DeviceManagement({ accessKey }: props) {
   )
 }
 
-function InsertRow({ setUsers }: { setUsers: Dispatch<SetStateAction<formType[]>> }) {
+type DeviceInsertRowProps = { setDevices: Dispatch<SetStateAction<DeviceFormType[]>> }
+
+function DeviceInsertRow({ setDevices }: DeviceInsertRowProps) {
   const os = useOs()
   const { t } = useTranslation('translations')
   const [loading, setLoading] = useState(false)
-  const { mutate: mutateInsert } = trpc.device.insertDevice.useMutation()
+  const insertDeviceMutation = trpc.device.insertDevice.useMutation()
   const { fields, validators, defaultValues } = getDevicesFields()
-  const form = useForm<formType>({
+  const form = useForm<DeviceFormType>({
     initialValues: defaultValues,
     validateInputOnChange,
     validate: validators,
@@ -81,12 +84,12 @@ function InsertRow({ setUsers }: { setUsers: Dispatch<SetStateAction<formType[]>
 
   const handleInsert = () => {
     setLoading(true)
-    mutateInsert(
+    insertDeviceMutation.mutate(
       { ...convertFormDeviceValues(form.values) },
       {
         onSuccess: () => {
           setLoading(false)
-          setUsers((prev) => [...prev, form.values])
+          setDevices((prev) => [...prev, form.values])
           form.setValues(defaultValues)
           CreateNotification(t('insertedSuccessfully'), 'green', os === 'ios' ? true : false)
         },
@@ -103,7 +106,12 @@ function InsertRow({ setUsers }: { setUsers: Dispatch<SetStateAction<formType[]>
       <tr>
         {fields.map((field, index) => (
           <td key={index}>
-            <FormInput form={form} editMode={true} disabled={false} inputName={field.name} />
+            <DeviceTableFormInput
+              form={form}
+              editMode={true}
+              disabled={false}
+              inputName={field.name}
+            />
           </td>
         ))}
         <td colSpan={2}>
@@ -122,39 +130,38 @@ function InsertRow({ setUsers }: { setUsers: Dispatch<SetStateAction<formType[]>
   )
 }
 
-function DeviceRow({
-  data,
-  setDevices,
-}: {
-  data: formType
-  setDevices: Dispatch<SetStateAction<formType[]>>
-}) {
+type DeviceRowProps = {
+  device: DeviceFormType
+  setDevices: Dispatch<SetStateAction<DeviceFormType[]>>
+}
+
+function DeviceRow({ device, setDevices }: DeviceRowProps) {
   const os = useOs()
   const { t } = useTranslation('translations')
   const [editMode, setEditMode] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { mutate: mutateDelete } = trpc.device.deleteDevice.useMutation()
-  const { mutate: mutateUpdate } = trpc.device.updateDevice.useMutation()
+  const deleteDeviceMutation = trpc.device.deleteDevice.useMutation()
+  const updateDeviceMutation = trpc.device.updateDevice.useMutation()
   const { fields, validators } = getDevicesFields()
-  const form = useForm<formType>({
-    initialValues: data,
+  const form = useForm<DeviceFormType>({
+    initialValues: device,
     validateInputOnChange,
     validate: validators,
   })
 
   useEffect(() => {
-    form.setValues(data)
+    form.setValues(device)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
+  }, [device])
 
   const handleDelete = () => {
     setLoading(true)
-    mutateDelete(
-      { model: data.model },
+    deleteDeviceMutation.mutate(
+      { model: device.model },
       {
         onSuccess: () => {
           setLoading(false)
-          setDevices((prev) => prev.filter((device) => device.model !== data.model))
+          setDevices((prev) => prev.filter((device) => device.model !== device.model))
           CreateNotification(t('deletedSuccessfully'), 'green', os === 'ios' ? true : false)
         },
         onError: () => {
@@ -167,15 +174,15 @@ function DeviceRow({
   const handleUpdate = () => {
     if (form.isValid()) {
       setEditMode(false)
-      if (form.values !== data) {
-        mutateUpdate(
+      if (form.values !== device) {
+        updateDeviceMutation.mutate(
           { ...convertFormDeviceValues(form.values) },
           {
             onSuccess: () => {
               CreateNotification(t('updatedSuccessfully'), 'green', os === 'ios' ? true : false)
             },
             onError: () => {
-              form.setValues(data)
+              form.setValues(device)
               CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false)
             },
           }
@@ -189,7 +196,7 @@ function DeviceRow({
       <tr>
         {fields.map((field, index) => (
           <td key={index}>
-            <FormInput
+            <DeviceTableFormInput
               form={form}
               editMode={editMode}
               disabled={field.disabled}
@@ -230,14 +237,14 @@ function DeviceRow({
   )
 }
 
-type FormInputProps = {
+type DeviceTableFormInputProps = {
   editMode: boolean
-  inputName: keyof formType
+  inputName: keyof DeviceFormType
   disabled?: boolean
-  form: UseFormReturnType<formType>
+  form: UseFormReturnType<DeviceFormType>
 }
 
-function FormInput({ form, inputName, disabled, editMode }: FormInputProps) {
+function DeviceTableFormInput({ form, inputName, disabled, editMode }: DeviceTableFormInputProps) {
   return (
     <>
       {editMode && !disabled ? (

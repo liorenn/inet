@@ -22,33 +22,33 @@ export default function Device() {
   const { t } = useTranslation('translations')
   const [captured, setCaptured] = useState(false)
   const deviceModel = router.asPath.split('/')[3]
-  const { data: deviceDetails } = trpc.device.getDevice.useQuery({
+  const deviceDetailsQuery = trpc.device.getDevice.useQuery({
     model: deviceModel,
   })
-  const { data: userDetails } = trpc.auth.getUserDetails.useQuery({
+  const userDetailsQuery = trpc.auth.getUserDetails.useQuery({
     email: user?.email,
   })
 
   useEffect(() => {
-    if (userDetails) {
-      setUsername(userDetails.username)
+    if (userDetailsQuery.data) {
+      setUsername(userDetailsQuery.data.username)
     }
-  }, [setUsername, userDetails])
+  }, [setUsername, userDetailsQuery.data])
 
   useEffect(() => {
-    if (!captured && deviceDetails) {
+    if (!captured && deviceDetailsQuery.data) {
       posthog.capture('Device Page', {
-        deviceName: deviceDetails.name,
+        deviceName: deviceDetailsQuery.data.name,
       })
       setCaptured(true)
     }
-  }, [captured, deviceDetails, posthog])
+  }, [captured, deviceDetailsQuery.data, posthog])
 
-  if (deviceDetails === undefined) {
+  if (deviceDetailsQuery.data === undefined) {
     return <Loader />
   }
 
-  if (deviceDetails === null) {
+  if (deviceDetailsQuery.data === null) {
     return (
       <Container size='lg'>
         {t('deviceDoesntExist')}
@@ -65,12 +65,12 @@ export default function Device() {
   return (
     <>
       <Head>
-        <title>{deviceDetails.name}</title>
+        <title>{deviceDetailsQuery.data.name}</title>
       </Head>
       <Container size='lg'>
-        <DeviceHeader device={deviceDetails} />
-        <DeviceLayout device={deviceDetails} />
-        {user && userDetails?.username && <Comments device={deviceDetails} />}
+        <DeviceHeader device={deviceDetailsQuery.data} />
+        <DeviceLayout device={deviceDetailsQuery.data} />
+        {user && userDetailsQuery.data?.username && <Comments device={deviceDetailsQuery.data} />}
       </Container>
     </>
   )

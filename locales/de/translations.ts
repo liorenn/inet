@@ -257,4 +257,18 @@ export default {
   two: 'Zwei',
   three: 'Drei',
   four: 'Vier',
+  databaseEditor: 'Datenbank Editor',
+  defaultDashboard: 'Standard Dashboard',
+  matchedDevicesLimit: 'Passende Geräte Limit',
+  recommendedDevicesLimit: 'Empfohlene Geräte Limit',
+  defaultLanguage: 'Standard Sprache',
+  validateInputOnChange: 'Eingabe bei jeder Aenderung validieren',
+  rtlInHebrew: 'RTL in Häbrischen',
+  noData: 'Es gibt keine Daten in dieser Tabelle',
+  databaseEditorPort: 'Datenbank Editor Port',
+  compareTitle: 'Vergleich verschiedene Geräte',
+  compareDescription:
+    'Vergleich verschiedene Geräte, um dasjenige zu finden, das Ihren Anforderungen am besten entspricht',
+  findTitle: 'Find Ihr perfektes Gerät',
+  findDescription: 'Find das Gerät, das genau Ihren Anforderungen und Vorlieben entspricht',
 }

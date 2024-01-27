@@ -3,18 +3,18 @@ import { Center, Grid, Group, SimpleGrid, Stack, Text } from '@mantine/core'
 import { Container, Modal, useMantineColorScheme } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
-import { devicePropertiesType } from '@/models/enums'
+import { DevicePropertiesType } from '@/models/enums'
 import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 
-type props = {
-  device: devicePropertiesType
+type Props = {
+  device: DevicePropertiesType
   miniphotos: boolean
   withName?: boolean
 }
 
-export default function DevicePhotos({ device, miniphotos, withName }: props) {
+export default function DevicePhotos({ device, miniphotos, withName }: Props) {
   const [activeLink, setActiveLink] = useState(`/images/${device.type}/${device.model}_1.png`)
   const [opened, setOpened] = useState(false)
   const { colorScheme } = useMantineColorScheme()
@@ -98,7 +98,7 @@ export default function DevicePhotos({ device, miniphotos, withName }: props) {
                 }
                 src={activeLink}
                 fit='contain'
-                width={width <= 560 ? 180 : 280}
+                width={width <= 560 ? 280 : 280}
                 height={width <= 560 ? 280 : 320}
                 alt={'photo'}
                 style={{ cursor: 'zoom-in' }}
@@ -125,7 +125,7 @@ export default function DevicePhotos({ device, miniphotos, withName }: props) {
                           fit='contain'
                           src={src}
                           key={index}
-                          width={width <= 560 ? 50 : 70}
+                          width={width <= 560 ? 80 : 70}
                           height={width <= 560 ? 80 : 100}
                           className='SmallGalleryImg'
                           onClick={() => handleSetActiveLink(index + 1)}

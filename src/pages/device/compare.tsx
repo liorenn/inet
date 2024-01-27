@@ -1,4 +1,12 @@
-import { Container, Group, SegmentedControl, Select, SimpleGrid, Title } from '@mantine/core'
+import {
+  Container,
+  Divider,
+  Group,
+  SegmentedControl,
+  Select,
+  SimpleGrid,
+  Title,
+} from '@mantine/core'
 import { useEffect, useState } from 'react'
 
 import DevicePhotos from '@/components/device/DevicePhotos'
@@ -41,8 +49,10 @@ export default function Compare() {
   const [compareAmount, setCompareAmount] = useState(
     getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
   )
-  const { data: allDevices } = trpc.device.getModelsAndNames.useQuery()
-  const { data } = trpc.device.getDevicesFromArr.useQuery(deviceList)
+  const allDevicesQuery = trpc.device.getModelsAndNames.useQuery()
+  const selectedDevicesQuery = trpc.device.getDevicesFromModelsArr.useQuery({
+    modelsArr: deviceList,
+  })
 
   useEffect(() => {
     setCompareAmount(
@@ -58,14 +68,16 @@ export default function Compare() {
   }, [router])
 
   useEffect(() => {
-    if (allDevices) {
+    if (allDevicesQuery.data) {
       const arrayLength = Number(
         getButtons(t, width).find((mark) => mark.value === compareAmount)?.value
       )
-      router.push(generateUrlSring(allDevices.slice(0, arrayLength).map((device) => device.model)))
+      router.push(
+        generateUrlSring(allDevicesQuery.data.slice(0, arrayLength).map((device) => device.model))
+      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allDevices, compareAmount])
+  }, [allDevicesQuery.data, compareAmount])
 
   function generateUrlSring(deviceList: string[]) {
     return `?deviceList=${deviceList.join(',')}`
@@ -78,7 +90,7 @@ export default function Compare() {
     router.push(`?deviceList=${newDeviceList.join(',')}`)
   }
 
-  if (allDevices === undefined) {
+  if (allDevicesQuery.data === undefined) {
     return (
       <>
         <Head>
@@ -95,7 +107,9 @@ export default function Compare() {
         <title>{t('compare')}</title>
       </Head>
       <Container size='lg'>
-        <Title>{t('selectDevicesAmount')}</Title>
+        <Title>{t('compareTitle')}</Title>
+        <Divider mb='md' />
+        <Title size={22}>{t('selectDevicesAmount')}</Title>
         <SegmentedControl
           value={compareAmount}
           onChange={setCompareAmount}
@@ -111,18 +125,18 @@ export default function Compare() {
               value={deviceList[index]}
               key={index}
               onChange={(e) => updateDeviceList(e, index)}
-              data={allDevices.map((value) => ({
+              data={allDevicesQuery.data.map((value) => ({
                 value: value.model,
                 label: translateDeviceName(t, value.name),
               }))}
             />
           ))}
         </Group>
-        {data && data.length > 0 ? (
+        {selectedDevicesQuery.data && selectedDevicesQuery.data.length > 0 ? (
           <>
-            <SimpleGrid mb='md' cols={data.length}>
+            <SimpleGrid mb='md' cols={selectedDevicesQuery.data.length}>
               {deviceList.map((model, index) => {
-                const device = data.find((device) => device.model === model)
+                const device = selectedDevicesQuery.data.find((device) => device.model === model)
                 return (
                   device && (
                     <DevicePhotos
@@ -140,7 +154,7 @@ export default function Compare() {
                 )
               })}
             </SimpleGrid>
-            <DevicesSpecs devices={data} />
+            <DevicesSpecs devices={selectedDevicesQuery.data} />
           </>
         ) : (
           deviceList && <Loader />

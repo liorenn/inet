@@ -1,20 +1,20 @@
 import { ColorSwatch, Grid, Group, Table, Text, Tooltip } from '@mantine/core'
-import type { colorsSpecsType, mergedCameraType } from '@/models/SpecsFormatter'
-import type { specsArrayType, specsDataType } from '@/models/SpecsFormatter'
+import type { ColorsSpecsType, MergedCameraType } from '@/models/SpecsFormatter'
+import type { SpecsArrayType, SpecsDataType } from '@/models/SpecsFormatter'
 
 import PriceText from '@/components/misc/PriceText'
 import useTranslation from 'next-translate/useTranslation'
 
-type props = {
+type Props = {
   name: string
-  specs: specsArrayType
+  specs: SpecsArrayType
 }
 
-export default function DevicesTable({ specs, name }: props) {
+export default function DevicesTable({ specs, name }: Props) {
   const { t } = useTranslation('translations')
 
   if (name === 'cameras') {
-    specs = specs as mergedCameraType[]
+    specs = specs as MergedCameraType[]
     return (
       <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
         <tbody>
@@ -48,13 +48,13 @@ export default function DevicesTable({ specs, name }: props) {
       </Table>
     )
   } else {
-    specs = specs as specsDataType
+    specs = specs as SpecsDataType
     return (
       <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
         <tbody>
           {specs.map((element, index) => {
             if (element.property === 'colors') {
-              element.values = element.values as colorsSpecsType[]
+              element.values = element.values as ColorsSpecsType[]
               return (
                 <tr key={`c${index}`}>
                   <td>
