@@ -1,11 +1,11 @@
-import { Button, ScrollArea, Table, Text, TextInput } from '@mantine/core'
+import { Button, Group, Pagination, ScrollArea, Table, Text, TextInput } from '@mantine/core'
+import { CreateNotification, chunkArray } from '@/utils/utils'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
-import { convertDeviceValues, convertFormDeviceValues, getDevicesFields } from '@/models/forms'
-import { managerAccessKey, validateInputOnChange } from 'config'
+import { adminTableRows, managerAccessKey, validateInputOnChange } from 'config'
+import { convertDeviceValues, convertFormDeviceValues, getDeviceFormFields } from '@/models/forms'
 import { useOs, useViewportSize } from '@mantine/hooks'
 
-import { CreateNotification } from '@/utils/utils'
 import type { Device } from '@prisma/client'
 import Loader from '@/components/layout/Loader'
 import { deviceSchema } from '@/models/schemas'
@@ -14,91 +14,154 @@ import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 
 export type DeviceFormType = {
-  [K in keyof Device]: string
+  [K in keyof Device]: string // Type of the form inputs
 }
 
+// The component props
 type Props = {
-  accessKey: number
+  accessKey: number // Access key of the user
 }
 
 export default function DeviceManagement({ accessKey }: Props) {
-  const router = useRouter()
-  const { width } = useViewportSize()
-  const { t } = useTranslation('translations')
-  const [devices, setDevices] = useState<DeviceFormType[]>([])
-  const fieldNames = Object.keys(deviceSchema.shape)
-  const devicesDataQuery = trpc.device.getDevicesData.useQuery()
+  const router = useRouter() // Get the router
+  const { width } = useViewportSize() // Get the viewport size
+  const { t } = useTranslation('translations') // Get the translation function
+  const [activePage, setActivePage] = useState(0) // The active page of the table
+  const [chunkedDevices, setChunkedDevices] = useState<DeviceFormType[][]>([]) // The chunked devices
+  const fieldNames = Object.keys(deviceSchema.shape) // The field names of the devices
+  const devicesDataQuery = trpc.device.getDevicesData.useQuery() // The devices data query
+
+  // If the access key is less than the manager access key
   if (accessKey < managerAccessKey) {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    router.push('/')
+    router.push('/') // Redirect to the home page
   }
 
+  // When the devices query data updates
   useEffect(() => {
+    // If the devices data query loaded successfully
     if (devicesDataQuery.data) {
-      setDevices(devicesDataQuery.data.map((device) => convertDeviceValues(device)))
+      // Set the chunked devices
+      setChunkedDevices(
+        // Chunk the devices data
+        chunkArray(
+          devicesDataQuery.data.map((device) => convertDeviceValues(device)),
+          adminTableRows
+        )
+      )
     }
   }, [devicesDataQuery.data])
 
   return (
     <>
-      {devicesDataQuery.isLoading ? (
-        <Loader />
+      {devicesDataQuery.isLoading ? ( // If the devices data query is loading
+        <Loader /> // Show the loader
       ) : (
-        <ScrollArea type={width < 400 ? 'always' : 'auto'}>
-          <Table mb='md' withBorder withColumnBorders>
-            <thead>
-              <tr>
-                {fieldNames.map((name, index) => (
-                  <th key={index}>{t(name)}</th>
-                ))}
-                <th>{t('updateDevice')}</th>
-                <th>{t('deleteDevice')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {devices.map((device, index) => (
-                <DeviceRow setDevices={setDevices} device={device} key={index} />
-              ))}
-              <DeviceInsertRow setDevices={setDevices} />
-            </tbody>
-          </Table>
-        </ScrollArea>
+        <>
+          <ScrollArea mb='sm' type={width < 400 ? 'always' : 'auto'}>
+            <Table mb='sm' withBorder withColumnBorders>
+              <thead>
+                <tr>
+                  {fieldNames.map((name, index) => (
+                    // For each field name show it
+                    <th key={index}>{t(name)}</th>
+                  ))}
+                  <th>{t('updateDevice')}</th>
+                  <th>{t('deleteDevice')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {chunkedDevices &&
+                  chunkedDevices[activePage] &&
+                  chunkedDevices[activePage].map((device, index) => (
+                    <DeviceRow
+                      setChunkedDevices={setChunkedDevices}
+                      setActivePage={setActivePage}
+                      activePage={activePage}
+                      device={device}
+                      key={index}
+                    />
+                  ))}
+                <DeviceInsertRow
+                  setChunkedDevices={setChunkedDevices}
+                  setActivePage={setActivePage}
+                />
+              </tbody>
+            </Table>
+          </ScrollArea>
+          <Pagination.Root
+            color='dark'
+            total={chunkedDevices.length}
+            value={activePage + 1}
+            onChange={(value) => setActivePage(value - 1)}>
+            <Group spacing={5}>
+              <Pagination.First />
+              <Pagination.Previous />
+              <Pagination.Items />
+              <Pagination.Next />
+              <Pagination.Last />
+            </Group>
+          </Pagination.Root>
+        </>
       )}
     </>
   )
 }
 
-type DeviceInsertRowProps = { setDevices: Dispatch<SetStateAction<DeviceFormType[]>> }
+type DeviceInsertRowProps = {
+  setActivePage: Dispatch<SetStateAction<number>>
+  setChunkedDevices: Dispatch<SetStateAction<DeviceFormType[][]>>
+}
 
-function DeviceInsertRow({ setDevices }: DeviceInsertRowProps) {
-  const os = useOs()
-  const { t } = useTranslation('translations')
-  const [loading, setLoading] = useState(false)
-  const insertDeviceMutation = trpc.device.insertDevice.useMutation()
-  const { fields, validators, defaultValues } = getDevicesFields()
+function DeviceInsertRow({ setActivePage, setChunkedDevices }: DeviceInsertRowProps) {
+  const os = useOs() // Get the client operating system
+  const { t } = useTranslation('translations') // Get the translation function
+  const [loading, setLoading] = useState(false) // The loading state
+  const insertDeviceMutation = trpc.device.insertDevice.useMutation() // The insert device mutation
+  const { fields, validators, defaultValues } = getDeviceFormFields() // Get the devices form fields
+
+  // Form management function
   const form = useForm<DeviceFormType>({
     initialValues: defaultValues,
     validateInputOnChange,
     validate: validators,
   })
 
+  // Insert device function
   const handleInsert = () => {
-    setLoading(true)
+    setLoading(true) // Set the loading state to true
+    // Insert the device
     insertDeviceMutation.mutate(
       { ...convertFormDeviceValues(form.values) },
       {
+        // On insertion success
         onSuccess: () => {
-          setLoading(false)
-          setDevices((prev) => [...prev, form.values])
-          form.setValues(defaultValues)
-          CreateNotification(t('insertedSuccessfully'), 'green', os === 'ios' ? true : false)
+          setLoading(false) // Set the loading state to false
+          // Set the chunked devices
+          setChunkedDevices((prev) => {
+            const newData = prev.slice() // Create a copy of the chunked devices
+            // If the last page is not full
+            if (newData[prev.length - 1].length < adminTableRows) {
+              newData[prev.length - 1].push(form.values) // Push the form values to the last page
+              setActivePage(prev.length - 1) // Set the active page to the last page
+            }
+            // If the last page is full
+            else {
+              newData.push([form.values]) // Create a new page after the last page
+              setActivePage(newData.length - 1) // Set the active page to the new page
+            }
+            return newData // Return the new chunked devices
+          })
+          form.setValues(defaultValues) // Set the form values to the default values
+          CreateNotification(t('insertedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
         },
         onError: () => {
-          setLoading(false)
-          CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false)
+          setLoading(false) // Set the loading state to false
+          CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
         },
       }
     )
+    setLoading(false) // Set the loading state to false
   }
 
   return (
@@ -132,58 +195,88 @@ function DeviceInsertRow({ setDevices }: DeviceInsertRowProps) {
 
 type DeviceRowProps = {
   device: DeviceFormType
-  setDevices: Dispatch<SetStateAction<DeviceFormType[]>>
+  activePage: number
+  setActivePage: Dispatch<SetStateAction<number>>
+  setChunkedDevices: Dispatch<SetStateAction<DeviceFormType[][]>>
 }
 
-function DeviceRow({ device, setDevices }: DeviceRowProps) {
-  const os = useOs()
-  const { t } = useTranslation('translations')
-  const [editMode, setEditMode] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const deleteDeviceMutation = trpc.device.deleteDevice.useMutation()
-  const updateDeviceMutation = trpc.device.updateDevice.useMutation()
-  const { fields, validators } = getDevicesFields()
+function DeviceRow({ device, activePage, setActivePage, setChunkedDevices }: DeviceRowProps) {
+  const os = useOs() // Get the client operating system
+  const { t } = useTranslation('translations') // Get the translation function
+  const [editMode, setEditMode] = useState(false) // The edit mode state
+  const [loading, setLoading] = useState(false) // The loading state
+  const deleteDeviceMutation = trpc.device.deleteDevice.useMutation() // The delete device mutation
+  const updateDeviceMutation = trpc.device.updateDevice.useMutation() // The update device mutation
+  const { fields, validators } = getDeviceFormFields() // Get the devices form fields
+
+  // Form management function
   const form = useForm<DeviceFormType>({
     initialValues: device,
     validateInputOnChange,
     validate: validators,
   })
 
+  // When device data changes
   useEffect(() => {
-    form.setValues(device)
+    form.setValues(device) // Set the form values to the changed device data
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [device])
 
+  // Delete device function
   const handleDelete = () => {
-    setLoading(true)
+    setLoading(true) // Set the loading state to true
+    // Delete the device
     deleteDeviceMutation.mutate(
       { model: device.model },
       {
+        // On deletion success
         onSuccess: () => {
-          setLoading(false)
-          setDevices((prev) => prev.filter((device) => device.model !== device.model))
-          CreateNotification(t('deletedSuccessfully'), 'green', os === 'ios' ? true : false)
+          setLoading(false) // Set the loading state to false
+          // Set the chunked devices
+          setChunkedDevices((prev) => {
+            let newData = prev.slice() // Create a copy of the chunked devices
+            // Delete the device from the current page
+            newData[activePage] = newData[activePage].filter((data) => data.model !== device.model)
+            // Delete the page if it is empty
+            newData = newData.filter((arr) => {
+              // If the page is empty
+              if (arr.length === 0) {
+                setActivePage((prev) => prev - 1) // Set the active page to the previous page
+              }
+              return arr.length > 0 // Return true if the page is not empty
+            })
+            return newData // Return the new chunked devices
+          })
+          CreateNotification(t('deletedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
         },
         onError: () => {
-          setLoading(false)
-          CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false)
+          setLoading(false) // Set the loading state to false
+          CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
         },
       }
     )
+    setLoading(false) // Set the loading state to false
   }
+
+  // Update device function
   const handleUpdate = () => {
+    // If the form passed the validation
     if (form.isValid()) {
-      setEditMode(false)
+      setEditMode(false) // Set the edit mode to false
+      // If the form values are different from the current device
       if (form.values !== device) {
+        // Update the device
         updateDeviceMutation.mutate(
           { ...convertFormDeviceValues(form.values) },
           {
+            // On update success
             onSuccess: () => {
-              CreateNotification(t('updatedSuccessfully'), 'green', os === 'ios' ? true : false)
+              CreateNotification(t('updatedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
             },
+            // On update error
             onError: () => {
-              form.setValues(device)
-              CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false)
+              form.setValues(device) // Set the form values to the current device
+              CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
             },
           }
         )

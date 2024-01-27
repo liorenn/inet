@@ -268,4 +268,5 @@ export default {
   compareDescription: 'Compare different devices to find the one that suits your needs best',
   findTitle: 'Find Your Perfect Device',
   findDescription: 'Find the Device that matches your exact needs and preferences',
+  adminTableRows: 'Admin Table Rows',
 }

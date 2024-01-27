@@ -1,3 +1,4 @@
+// Define the device type enum
 export const deviceType = {
   iphone: 'iphone',
   ipad: 'ipad',
@@ -7,6 +8,10 @@ export const deviceType = {
   macbook: 'macbook',
 }
 
+// Define the device type enum type
+export type DeviceType = keyof typeof deviceType
+
+// Define the device properties type
 export type DevicePropertiesType = {
   model: string
   name: string
@@ -14,6 +19,5 @@ export type DevicePropertiesType = {
   imageAmount: number
 }
 
+// Define the DevicePropertiesType object to query
 export const selectProprties = { model: true, name: true, type: true, imageAmount: true }
-
-export type DeviceType = keyof typeof deviceType

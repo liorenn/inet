@@ -1,7 +1,6 @@
-import { Device } from '@prisma/client'
 import { z } from 'zod'
 
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+// Define the device schema
 export const deviceSchema = z.object({
   model: z.string(),
   name: z.string(),
@@ -29,8 +28,10 @@ export const deviceSchema = z.object({
   resistanceRating: z.string().optional(),
 })
 
+// Define the device schema type
 export type DeviceSchemaType = z.infer<typeof deviceSchema>
 
+// Define the user schema
 export const userSchema = z.object({
   email: z.string(),
   username: z.string(),
@@ -40,8 +41,10 @@ export const userSchema = z.object({
   accessKey: z.number(),
 })
 
+// Define the user schema type
 export type UserSchemaType = z.infer<typeof userSchema>
 
+// Define the comment schema
 export const commentSchema = z.object({
   message: z.string(),
   rating: z.number(),
@@ -51,18 +54,5 @@ export const commentSchema = z.object({
   username: z.string(),
 })
 
+// Define the update user function schema
 export const UpdateSchema = z.enum(['username', 'name', 'password', 'phone'])
-
-export const PropertiesSchema = z.enum([
-  'releaseDate',
-  'screenSize',
-  'batterySize',
-  'price',
-  'storage',
-  'memory',
-  'weight',
-  'cpu',
-  'gpu',
-])
-export type PropertiesSchemaType = z.infer<typeof PropertiesSchema>
-export type MatchDeviceType = Pick<Device, PropertiesSchemaType | 'model'>

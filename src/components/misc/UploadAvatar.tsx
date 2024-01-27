@@ -12,6 +12,7 @@ import { useProfilePicture } from '@/hooks/useProfilePicture'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
+// The component props
 type Props = {
   email: string
 }

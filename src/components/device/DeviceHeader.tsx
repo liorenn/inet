@@ -6,12 +6,14 @@ import { translateDeviceName } from '@/utils/utils'
 import { useMantineColorScheme } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 
+// The component props
 type Props = { device: Device }
 
 export default function DeviceHeader({ device }: Props) {
-  const { colorScheme } = useMantineColorScheme()
-  const { t, lang } = useTranslation('translations')
+  const { colorScheme } = useMantineColorScheme() // Get the color scheme
+  const { t, lang } = useTranslation('translations') // Get the translation function and the current language
 
+  // Define the links for the breadcrumbs
   const links = [
     { name: t('allDevices'), href: '/device' },
     { name: t(device.type), href: `/device/${device.type}` },

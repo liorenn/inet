@@ -7,6 +7,7 @@ import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 
+// The component props
 type Props = {
   model: string
   modelPage?: boolean

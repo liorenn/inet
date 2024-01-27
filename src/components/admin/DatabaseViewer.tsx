@@ -9,6 +9,7 @@ import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 
+// The component props
 type Props = {
   accessKey: number
 }

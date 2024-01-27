@@ -8,6 +8,7 @@ import type { Device } from '@prisma/client'
 import { FormatDate } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 
+// The component props
 type Props = { device: Device }
 
 export default function DeviceWidgets({ device }: Props) {

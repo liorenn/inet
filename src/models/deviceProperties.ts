@@ -1,30 +1,35 @@
+import { Device } from '@prisma/client'
 import { DeviceType } from '@/models/enums'
-import { PropertiesSchemaType } from '@/models/schemas'
+import { z } from 'zod'
 
+// Define the Weight type
 export type Weight = {
-  name: PropertiesSchemaType
+  property: PropertiesSchemaType
   minValue: number
   maxValue: number
 }
 
+// Define for each property the min and max values that should be calculated in the match algorithm
 export const weightsValues: Weight[] = [
-  { name: 'screenSize', minValue: 5, maxValue: 6.8 },
-  { name: 'batterySize', minValue: 2800, maxValue: 3300 },
-  { name: 'releaseDate', minValue: 2020, maxValue: 2023 },
-  { name: 'price', minValue: 600, maxValue: 1200 },
-  { name: 'memory', minValue: 2, maxValue: 8 },
-  { name: 'cpu', minValue: 2, maxValue: 8 },
-  { name: 'gpu', minValue: 2, maxValue: 8 },
-  { name: 'weight', minValue: 100, maxValue: 210 },
-  { name: 'storage', minValue: 64, maxValue: 128 },
+  { property: 'screenSize', minValue: 5, maxValue: 6.8 },
+  { property: 'batterySize', minValue: 2800, maxValue: 3300 },
+  { property: 'releaseDate', minValue: 2020, maxValue: 2023 },
+  { property: 'price', minValue: 600, maxValue: 1200 },
+  { property: 'memory', minValue: 2, maxValue: 8 },
+  { property: 'cpu', minValue: 2, maxValue: 8 },
+  { property: 'gpu', minValue: 2, maxValue: 8 },
+  { property: 'weight', minValue: 100, maxValue: 210 },
+  { property: 'storage', minValue: 64, maxValue: 128 },
 ]
 
-type PropertiesLabels = {
+// Define the Property Labels type
+type PropertyLabels = {
   property: PropertiesSchemaType
   labels: string[]
 }
 
-export const propertiesLabels: PropertiesLabels[] = [
+// Define each property labels that should be displayed in the form
+export const propertiesLabels: PropertyLabels[] = [
   { property: 'screenSize', labels: ['small', 'medium', 'large', 'massive'] },
   { property: 'batterySize', labels: ['small', 'medium', 'large', 'massive'] },
   { property: 'releaseDate', labels: ['old', 'relativelyOld', 'lastGeneration', 'new'] },
@@ -36,11 +41,13 @@ export const propertiesLabels: PropertiesLabels[] = [
   { property: 'weight', labels: ['light', 'moderate', 'heavy', 'substantial'] },
 ]
 
+// Define the deviceTypeProperties type
 export type DeviceTypeProperties = {
   deviceType: DeviceType
   properties: PropertiesSchemaType[]
 }
 
+// Define the properties for each device type that should be displayed in the form and calculated
 export const deviceTypesProperties: DeviceTypeProperties[] = [
   {
     deviceType: 'iphone',
@@ -51,11 +58,24 @@ export const deviceTypesProperties: DeviceTypeProperties[] = [
     properties: ['screenSize', 'batterySize', 'releaseDate', 'price'],
   },
   {
+    deviceType: 'airpods',
+    properties: ['batterySize', 'weight', 'releaseDate', 'price'],
+  },
+  {
     deviceType: 'mac',
-    properties: ['price', 'storage', 'cpu', 'gpu', 'memory'],
+    properties: ['cpu', 'gpu', 'memory', 'releaseDate', 'price'],
+  },
+  {
+    deviceType: 'imac',
+    properties: ['cpu', 'gpu', 'memory', 'screenSize', 'releaseDate', 'price'],
+  },
+  {
+    deviceType: 'macbook',
+    properties: ['cpu', 'gpu', 'memory', 'screenSize', 'weight', 'releaseDate', 'price'],
   },
 ]
 
+// Define the device Specs Categories
 export const deviceSpecsCategories = [
   'display',
   'battery',
@@ -66,8 +86,10 @@ export const deviceSpecsCategories = [
   'availability',
 ]
 
+// Define the device Specs Categories with the 'name' property
 export const devicesSpecsCategories = ['name', ...deviceSpecsCategories]
 
+// Define the select params for the select query in the match algorithm
 export const selectParams = {
   model: true,
   price: true,
@@ -79,4 +101,23 @@ export const selectParams = {
   memory: true,
   screenSize: true,
   releaseDate: true,
-}
+} // Define the properties schema
+
+// Define the properties schema
+export const PropertiesSchema = z.enum([
+  'releaseDate',
+  'screenSize',
+  'batterySize',
+  'price',
+  'storage',
+  'memory',
+  'weight',
+  'cpu',
+  'gpu',
+])
+
+// Define the properties schema type
+export type PropertiesSchemaType = z.infer<typeof PropertiesSchema>
+
+// Define the match device type
+export type MatchDeviceType = Pick<Device, PropertiesSchemaType | 'model'>

@@ -18,6 +18,7 @@ const breakpoints = [
 ]
 
 // Defining the props type for the ConfigsEditor component
+// The component props
 type Props = {
   accessKey: number
 }
@@ -30,12 +31,12 @@ type ConfigType = {
 
 // Function to check if a string represents a boolean value
 function isStringBoolean(value: string): boolean {
-  return value === 'true' || value === 'false'
+  return value === 'true' || value === 'false' // Returns true if the value is 'true' or 'false'
 }
 
 // Function to check if a string represents a number
 function isStringNumber(value: string): boolean {
-  return !Number.isNaN(Number(value))
+  return !Number.isNaN(Number(value)) // Returns true if the value is a valid number
 }
 
 // Defining the validationType for configuration value validation
@@ -48,6 +49,7 @@ const numberRegex = /^-?\d+$/
 
 // Function to validate a string based on its type
 function validateString(value: string, validation: ValidationType): string | null {
+  // Returns null if the value is valid, otherwise returns an validation message
   switch (validation) {
     case 'number':
       return numberRegex.test(value) ? null : 'Must be a number'
@@ -62,42 +64,46 @@ function validateString(value: string, validation: ValidationType): string | nul
 
 // Function to determine the type of a configuration value
 function getValidation(value: string): ValidationType {
+  // Returns the validation type of the configuration value
   return isStringNumber(value) ? 'number' : isStringBoolean(value) ? 'boolean' : 'string'
 }
 
 // Function to convert a string of configurations into an array of configType objects
 function getConfigsArray(configs: string) {
   return configs
-    .replace(/\r?\n|\'|\s+/g, '')
-    .split('exportconst')
+    .replace(/\r?\n|\'|\s+/g, '') // Remove newlines and whitespace
+    .split('exportconst') // Split the string into an array of configurations
     .map((value) => {
+      // Map the array of configurations to an array of configType objects
       return { name: value.split('=')[0], value: value.split('=')[1] }
     })
-    .filter((value) => value.value !== undefined)
+    .filter((value) => value.value !== undefined) // Filter out any undefined values
 }
 
 // Function to convert an array of configType objects into a string of configurations
 function stringifyConfigsArray(configsArray: ConfigType[]): string {
   return configsArray
     .map((value) => {
+      // Map the array of configType objects to an array of strings
       const parsedValue =
         isStringNumber(value.value) || isStringBoolean(value.value)
           ? value.value
           : `'${value.value}'`
-      return `export const ${value.name} = ${parsedValue}\r\n`
+      return `export const ${value.name} = ${parsedValue}\r\n` // Return a string of configurations
     })
-    .join('')
+    .join('') // Join the array of strings into a single string
 }
 
 // Defining the ConfigsEditor component
 export default function ConfigsEditor({ accessKey }: Props) {
-  const router = useRouter()
+  const router = useRouter() // Get the router
 
-  // Redirecting if the access key is less than the manager access key
+  // When access key changes
   useEffect(() => {
+    // If the access key is smaller than the manager access key
     if (accessKey && accessKey < managerAccessKey) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      router.push('/')
+      router.push('/') // Redirect to the home page
     }
   }, [accessKey, router])
 
@@ -107,10 +113,11 @@ export default function ConfigsEditor({ accessKey }: Props) {
   const sendEmailsMutation = trpc.auth.sendPriceDropsEmails.useMutation() // Mutation function for sending price drop emails using trpc
   const [configs, setConfigs] = useState<ConfigType[]>([]) // State for holding the configurations as an array of configType objects
 
+  // When configs query data changes
   useEffect(() => {
     // Populating the configs state when data is available
     if (configsQuery.data) {
-      setConfigs(getConfigsArray(configsQuery.data))
+      setConfigs(getConfigsArray(configsQuery.data)) // Set the configs state
     }
   }, [configsQuery.data, router])
 
@@ -119,18 +126,20 @@ export default function ConfigsEditor({ accessKey }: Props) {
     if (!configsQuery.data) return false
     return values
       .map((value, index) => {
+        // Map the array of configType objects to an array of validation results
         return validateString(
           value.value,
           getValidation(getConfigsArray(configsQuery.data)[index].value)
         )
       })
-      .every((value) => value === null)
+      .every((value) => value === null) // Return true if all validation results are null
   }
 
   // Function to save configurations if they are valid
   function saveConfigs() {
+    // If the configurations are valid
     if (validateValues(configs)) {
-      saveConfigsMutation.mutate({ configs: stringifyConfigsArray(configs) })
+      saveConfigsMutation.mutate({ configs: stringifyConfigsArray(configs) }) // Save the configurations
     }
   }
 
@@ -206,10 +215,8 @@ type ConfigInputProps = {
 
 // Component for rendering a single configuration input with validation and change handling
 function ConfigInput({ config, originalValue, setConfigs }: ConfigInputProps) {
-  const validation = getValidation(originalValue)
-
-  // Getting the translation function from next-translate
-  const { t } = useTranslation('translations')
+  const validation = getValidation(originalValue) // Getting the validation type of the original value
+  const { t } = useTranslation('translations') // Getting the translation function from next-translate
 
   // Rendering a TextInput component for the configuration with validation and change handling
   return (

@@ -4,13 +4,16 @@ import { DeviceSchemaType, UserSchemaType } from '@/models/schemas'
 import type { DeviceFormType } from '@/components/admin/DeviceManagement'
 import type { UserFormType } from '@/components/admin/UserManagement'
 
+// Define the user properties type
 export type UserPropertyName = keyof User
 
+// Define the user property class
 class UserProperty {
-  name: UserPropertyName
-  regex: RegExp
-  disabled?: boolean
+  name: UserPropertyName // Property name
+  regex: RegExp // Regular expression for validation
+  disabled?: boolean // Is the property disabled
 
+  // Constructor for the class
   constructor(name: UserPropertyName, regex: RegExp, disabled?: boolean) {
     this.name = name
     this.regex = regex
@@ -18,14 +21,16 @@ class UserProperty {
   }
 }
 
+// Define the form default values class
 export class FormDefaultValues {
-  email: string
-  password: string
-  username: string
-  name: string
-  phone: string
-  accessKey: number
+  email: string // The user email
+  password: string // The user password
+  username: string // The user username
+  name: string // The user name
+  phone: string // The user phone
+  accessKey: number // The user access key
 
+  // Constructor for the class
   constructor(
     email: string,
     password: string,
@@ -43,9 +48,12 @@ export class FormDefaultValues {
   }
 }
 
+// Define the sign in form class
 export class SignInForm {
-  email: UserProperty
-  password: UserProperty
+  email: UserProperty // The user email
+  password: UserProperty // The user password
+
+  // Constructor for the class
   constructor() {
     this.email = {
       name: 'email',
@@ -56,31 +64,40 @@ export class SignInForm {
       regex: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
     }
   }
+
+  // Get the user properties from the form
   getFileds() {
     return [this.email, this.password]
   }
+
+  // Get the default values for the form
   getDefaultValues(): Partial<FormDefaultValues> {
     return {
       email: 'lior.oren06@gmail.com',
       password: '123456',
     }
   }
+
+  // Get the validators for the form
   getValidators() {
-    const validators: { [key: string]: (value: string) => string | null } = {}
+    const validators: { [key: string]: (value: string) => string | null } = {} // Create an object to store the validators
     this.getFileds().forEach(({ name, regex }) => {
       validators[name] = (value: string | number) =>
-        regex.test(value.toString()) ? null : `${name} is not valid`
+        regex.test(value.toString()) ? null : `${name} is not valid` // Add the validator
     })
-    return validators
+    return validators // Return the validators
   }
 }
-class UserForm extends SignInForm {
-  username: UserProperty
-  name: UserProperty
-  phone: UserProperty
 
+// Define the user form class that extends the sign in form class
+class UserForm extends SignInForm {
+  username: UserProperty // The user username
+  name: UserProperty // The user name
+  phone: UserProperty // The user phone
+
+  // Constructor for the class
   constructor() {
-    super()
+    super() // Call the constructor of the parent class
     this.username = {
       name: 'username',
       regex: /^[A-Za-z\d_.]{5,}$/,
@@ -95,13 +112,20 @@ class UserForm extends SignInForm {
     }
   }
 }
+
+// Define the account form class that extends the user form class
 export class AccountForm extends UserForm {
+  // Constructor for the class
   constructor() {
-    super()
+    super() // Call the constructor of the parent class
   }
+
+  // Get the user properties from the form
   getFileds(): UserProperty[] {
     return [this.username, this.name, this.phone, this.password]
   }
+
+  // Get the default values for the form
   getDefaultValues() {
     return {
       username: '',
@@ -111,14 +135,19 @@ export class AccountForm extends UserForm {
     }
   }
 }
+
+// Define the sign up form class that extends the account form class
 export class SignUpForm extends AccountForm {
+  // Constructor for the class
   constructor() {
-    super()
+    super() // Call the constructor of the parent class
   }
 
+  // Get the user properties from the form
   getFileds(): UserProperty[] {
     return [this.email, this.username, this.name, this.password, this.phone]
   }
+  // Get the default values for the form
   getDefaultValues() {
     return {
       email: 'lior.oren10@gmail.com',
@@ -129,10 +158,14 @@ export class SignUpForm extends AccountForm {
     }
   }
 }
+
+// Define the user management form class that extends the sign up form class
 export class UserManagementForm extends SignUpForm {
-  accessKey: UserProperty
+  accessKey: UserProperty // The user access key
+
+  // Constructor for the class
   constructor() {
-    super()
+    super() // Call the constructor of the parent class
     this.accessKey = { name: 'accessKey', regex: /^\d$/ }
     this.email = {
       name: 'email',
@@ -140,9 +173,13 @@ export class UserManagementForm extends SignUpForm {
       disabled: true,
     }
   }
+
+  // Get the user properties from the form
   getFileds(): UserProperty[] {
     return [this.email, this.username, this.name, this.phone, this.password, this.accessKey]
   }
+
+  // Get the default values for the form
   getDefaultValues() {
     return {
       email: '',
@@ -155,6 +192,7 @@ export class UserManagementForm extends SignUpForm {
   }
 }
 
+// Convert the user values to string values
 export function convertFormUserValues(values: UserFormType): UserSchemaType {
   return {
     ...values,
@@ -162,13 +200,16 @@ export function convertFormUserValues(values: UserFormType): UserSchemaType {
   }
 }
 
+// Define the device form type
 type DeviceField = {
   name: keyof Device
   regex: RegExp
   disabled?: boolean
 }
 
-export function getDevicesFields() {
+// Define the device form fields
+export function getDeviceFormFields() {
+  // Define the regexes for the fields
   const nullableStringRegex = /^([A-Za-z0-9 _,]{3,})?$/
   const floatRegex = /^[+-]?\d*\.?\d+$/
   const nullableFloatRegex = /^([+-]?\d*\.?\d+)?$/
@@ -176,6 +217,7 @@ export function getDevicesFields() {
   const booleanRegex = /^(true|false)?$/
   const numberRegex = /^(-?\d+)?$/
 
+  // Assign for each field a regex
   const fields: DeviceField[] = [
     {
       disabled: true,
@@ -275,13 +317,15 @@ export function getDevicesFields() {
       regex: nullableStringRegex,
     },
   ]
-  const validators: { [key: string]: (value: string) => string | null } = {}
+
+  const validators: { [key: string]: (value: string) => string | null } = {} // Create an object to store the validators
 
   fields.forEach(({ name, regex }) => {
     validators[name] = (value: string | number) =>
-      regex.test(value.toString()) ? null : `${name} is not valid`
+      regex.test(value.toString()) ? null : `${name} is not valid` // Add the validator
   })
 
+  // Define the dafult values
   const defaultValues: DeviceFormType = {
     model: '',
     name: '',
@@ -309,10 +353,12 @@ export function getDevicesFields() {
     resistanceRating: '',
   }
 
-  return { fields, validators, defaultValues }
+  return { fields, validators, defaultValues } // Return the device form fields
 }
 
+// Convert string values to device
 export function convertFormDeviceValues(values: DeviceFormType): DeviceSchemaType {
+  // Return all values as the device values
   return {
     ...values,
     releaseDate: new Date(values.releaseDate),
@@ -336,12 +382,14 @@ export function convertFormDeviceValues(values: DeviceFormType): DeviceSchemaTyp
   }
 }
 
+// Convert device values to string values
 export function convertDeviceValues(values: Device): DeviceFormType {
   const formatter = new Intl.DateTimeFormat('en-US', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
-  })
+  }) // Create a date formatter
+  // Return all values as strings
   return {
     ...values,
     releaseDate: formatter.format(values.releaseDate),

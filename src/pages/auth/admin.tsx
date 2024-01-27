@@ -22,30 +22,48 @@ export default function Admin() {
   const router = useRouter()
   const { width } = useViewportSize() // Get the width of the viewport
   const { t } = useTranslation('translations')
-  const button = z.string().parse(router.query.dashboard ?? '')
+  const openEditorMutation = trpc.auth.openDatabaseEditor.useMutation() // Open the database editor
+  const button = z.string().parse(router.query.dashboard ?? '') // Get the dashboard from the url
+  const closeEditorMutation = trpc.auth.closeDatabaseEditor.useMutation() // Mutation to close the database editor
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
-  })
-  const accessKey = accessKeyQuery.data
+  }) // The access key query
+  const accessKey = accessKeyQuery.data // The access key
 
+  // When the url changes
   useEffect(() => {
+    // If the dashboard is undefined
     if (!router.query.dashboard) {
+      openEditorMutation.mutate() // Open the database editor
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      router.push(`?dashboard=${defaultDashboard}`)
+      router.push(`?dashboard=${defaultDashboard}`) // Set the dashboard to the default dashboard
     }
+    // If the dashboard is the Database Editor
+    else if (router.query.dashboard === 'databaseEditor') {
+      openEditorMutation.mutate() // Open the database editor
+    }
+    // If the dashboard is not the Database Editor
+    else {
+      closeEditorMutation.mutate() // Close the database editor
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router])
 
+  // When the access key changes
   useEffect(() => {
+    // If the access key is smaller than the admin access key
     if (accessKey && accessKey < adminAccessKey) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      router.push('/')
+      router.push('/') // Redirect to the home page
     }
   }, [accessKey, router])
 
+  // Define the buttons that will be displayed according to the user access key
   const buttons =
-    accessKey && accessKey < managerAccessKey
+    accessKey && accessKey < managerAccessKey // If the use is an admin
       ? [{ value: 'deviceManagement', label: t('deviceManagement') }]
-      : [
+      : // If the user is a manager
+        [
           { value: 'deviceManagement', label: t('deviceManagement') },
           { value: 'userManagement', label: t('userManagement') },
           { value: 'websiteStatistics', label: t('websiteStatistics') },

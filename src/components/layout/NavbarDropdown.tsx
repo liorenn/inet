@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 
+// The component props
 type Props = { AccessKey: number | undefined }
 
 export default function NavBarDropdown({ AccessKey }: Props) {

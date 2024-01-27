@@ -5,6 +5,7 @@ import { DevicePropertiesType } from '@/models/enums'
 import Loader from '@/components/layout/Loader'
 import { excludeProperty } from '@/utils/utils'
 
+// The component props
 type Props = {
   title: string
   isLoading: boolean

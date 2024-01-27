@@ -8,6 +8,7 @@ import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 
+// The component props
 type Props = {
   device: DevicePropertiesType
   miniphotos: boolean
@@ -15,26 +16,31 @@ type Props = {
 }
 
 export default function DevicePhotos({ device, miniphotos, withName }: Props) {
-  const [activeLink, setActiveLink] = useState(`/images/${device.type}/${device.model}_1.png`)
-  const [opened, setOpened] = useState(false)
-  const { colorScheme } = useMantineColorScheme()
-  const { width } = useViewportSize()
-  const { t } = useTranslation('translations')
-  const imagesLinks: string[] = []
+  const [activeLink, setActiveLink] = useState(`/images/${device.type}/${device.model}_1.png`) // The active image
+  const [opened, setOpened] = useState(false) // Is the modal opened
+  const { colorScheme } = useMantineColorScheme() // Get the color scheme
+  const { width } = useViewportSize() // Get the viewport size
+  const { t } = useTranslation('translations') // Get the translation function
+  const imagesLinks: string[] = [] // The array of image links
+
+  // For each image
   for (let i = 0; i < device.imageAmount; i++) {
-    imagesLinks.push(`/images/${device.type}/${device.model}_${(i + 1).toString()}.png`)
+    imagesLinks.push(`/images/${device.type}/${device.model}_${(i + 1).toString()}.png`) // Add the image link
   }
 
+  // When the device data changes
   useEffect(() => {
-    setActiveLink(`/images/${device.type}/${device.model}_1.png`)
+    setActiveLink(`/images/${device.type}/${device.model}_1.png`) // Set the active image
   }, [device])
 
+  // Handle the active image changes
   function handleSetActiveLink(index: number) {
-    const imageIndex = activeLink.indexOf('_') + 1
-    const newLink = replaceAt(imageIndex, index, activeLink)
-    setActiveLink(newLink)
+    const imageIndex = activeLink.indexOf('_') + 1 // Get the index of the image
+    const newLink = replaceAt(imageIndex, index, activeLink) // The new image index
+    setActiveLink(newLink) // Set the active image
   }
 
+  // Replace a character at a given index
   function replaceAt(index: number, replacement: number, string: string) {
     return (
       string.substring(0, index) +

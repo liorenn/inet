@@ -88,3 +88,12 @@ export function excludeProperty<T, K extends keyof T>(obj: T, propKey: K): Omit<
   const { [propKey]: _, ...rest } = obj // Destructuring the property to be excluded and the rest of the object
   return rest // Returning the new object without the excluded property
 }
+
+export function chunkArray<T>(array: T[], size: number): T[][] {
+  if (!array.length) {
+    return []
+  }
+  const head = array.slice(0, size)
+  const tail = array.slice(size)
+  return [head, ...chunkArray(tail, size)]
+}

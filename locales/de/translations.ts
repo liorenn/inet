@@ -271,4 +271,5 @@ export default {
     'Vergleich verschiedene Geräte, um dasjenige zu finden, das Ihren Anforderungen am besten entspricht',
   findTitle: 'Find Ihr perfektes Gerät',
   findDescription: 'Find das Gerät, das genau Ihren Anforderungen und Vorlieben entspricht',
+  adminTableRows: 'Admin Tabelle Zeilen',
 }

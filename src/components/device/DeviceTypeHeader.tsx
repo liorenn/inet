@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useMantineColorScheme } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 
+// The component props
 type Props = {
   deviceType: DeviceType
 }

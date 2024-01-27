@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 
+// The component props
 type Props = {
   device: DevicePropertiesType
   deviceType: string
@@ -15,7 +16,7 @@ type Props = {
 }
 
 export default function DeviceListCard({ device, deviceType, setDevices }: Props) {
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('translations') // Get the translation function
 
   return (
     <Card shadow='lg' p='lg' radius='md'>

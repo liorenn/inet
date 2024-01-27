@@ -1,4 +1,4 @@
-import { MatchDeviceType, PropertiesSchemaType } from '@/models/schemas'
+import { MatchDeviceType, PropertiesSchemaType } from '@/models/deviceProperties'
 import { Weight, deviceTypesProperties, weightsValues } from '@/models/deviceProperties'
 
 import { recommendedDevicesLimit } from 'config'
@@ -61,7 +61,7 @@ export function convertPreferencesToValues(
   return preferences.map((pref) => {
     const weight = weights
       .find((val) => val.deviceType === deviceType)
-      ?.weights?.find((weight) => weight.name === pref.name)
+      ?.weights?.find((weight) => weight.property === pref.name)
     const minValue = weight?.minValue ?? 0
     const maxValue = weight?.maxValue ?? 0
     return {
@@ -80,7 +80,7 @@ const weights: Weights[] = deviceTypesProperties.map((value) => {
   return {
     deviceType: value.deviceType,
     weights: value.properties.map(
-      (property) => weightsValues.find((weight) => weight.name === property) ?? weightsValues[0]
+      (property) => weightsValues.find((weight) => weight.property === property) ?? weightsValues[0]
     ),
   }
 })
@@ -118,13 +118,13 @@ function mergedValuesToNormilizedValues(mergedValues: MergedValuesType, deviceTy
     .filter((value) => {
       const weight = weights
         .find((val) => val.deviceType === deviceType)
-        ?.weights?.find((weight) => weight.name === value.name)
+        ?.weights?.find((weight) => weight.property === value.name)
       return weight !== undefined
     })
     .map((value) => {
       const weight = weights
         .find((val) => val.deviceType === deviceType)
-        ?.weights?.find((weight) => weight.name === value.name)
+        ?.weights?.find((weight) => weight.property === value.name)
       const minValue = weight?.minValue ?? 0
       const maxValue = weight?.maxValue ?? 0
       const devicesValues = value.devicesValues.map((value) => value.value)

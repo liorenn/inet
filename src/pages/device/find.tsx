@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 import Head from 'next/head'
 import MatchedDevices from '@/components/device/MatchedDevices'
-import { PropertiesSchemaType } from '@/models/schemas'
+import { PropertiesSchemaType } from '@/models/deviceProperties'
 import { deviceType as deviceTypeEnum } from '@/models/enums'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'

@@ -7,6 +7,7 @@ import { useViewportSize } from '@mantine/hooks'
 import DevicesTable from '@/components/device/DevicesTable'
 import { devicesSpecsCategories } from '@/models/deviceProperties'
 
+// The component props
 type Props = {
   devices: DeviceSpecsType[]
 }

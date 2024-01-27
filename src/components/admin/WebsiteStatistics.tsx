@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useMantineColorScheme } from '@mantine/core'
 import { useRouter } from 'next/router'
 
+// The component props
 type Props = {
   accessKey: number // The user access key
 }

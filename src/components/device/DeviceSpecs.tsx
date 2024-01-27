@@ -7,6 +7,7 @@ import Link from 'next/link'
 import DeviceTable from '@/components/device/DeviceTable'
 import { deviceSpecsCategories } from '@/models/deviceProperties'
 
+// The component props
 type Props = { device: DeviceSpecsType }
 
 export default function DeviceSpecs({ device }: Props) {

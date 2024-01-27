@@ -10,3 +10,4 @@ export const defaultDashboard = 'deviceManagement'
 export const databaseEditorPort = 5555
 export const recommendedDevicesLimit = 4
 export const matchedDevicesLimit = 8
+export const adminTableRows = 6

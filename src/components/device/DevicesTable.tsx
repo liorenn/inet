@@ -5,6 +5,7 @@ import type { SpecsArrayType, SpecsDataType } from '@/models/SpecsFormatter'
 import PriceText from '@/components/misc/PriceText'
 import useTranslation from 'next-translate/useTranslation'
 
+// The component props
 type Props = {
   name: string
   specs: SpecsArrayType

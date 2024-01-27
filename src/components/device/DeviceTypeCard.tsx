@@ -3,6 +3,7 @@ import { Button, Card, Image } from '@mantine/core'
 import Link from 'next/link'
 import useTranslation from 'next-translate/useTranslation'
 
+// The component props
 type Props = {
   devicesType: string
 }

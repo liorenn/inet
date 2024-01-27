@@ -13,12 +13,17 @@ import { resend } from '@/server/client'
 import { z } from 'zod'
 
 export const authRouter = router({
-  openDatabaseEditor: method.query(async () => {
+  openDatabaseEditor: method.mutation(async () => {
     try {
-      await fetch(`http://localhost:${databaseEditorPort}/`)
+      const response = await fetch(`http://localhost:${databaseEditorPort}/`)
+      const text = await response.text()
+      console.log(text)
       return false
     } catch {
-      exec(`npx prisma studio --port ${databaseEditorPort} --browser none`)
+      console.log('opening database editor')
+      exec(
+        `npx prisma studio --port ${databaseEditorPort} --browser none --schema=./prisma/schema.prisma`
+      )
       return true
     }
   }),

@@ -11,6 +11,7 @@ import { useUser } from '@supabase/auth-helpers-react'
 import { useComments } from '@/hooks/useComments'
 import { adminAccessKey } from 'config'
 
+// The component props
 type Props = {
   comment: Comment
   comments: Comment[]
