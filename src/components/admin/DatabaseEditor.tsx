@@ -7,6 +7,8 @@ type Props = {
   accessKey: number // The user access key
 }
 
+// Defining breakpoints for the SimpleGrid component
+
 export default function DatabaseEditor({ accessKey }: Props) {
   const router = useRouter() // Get the router
 
@@ -22,7 +24,7 @@ export default function DatabaseEditor({ accessKey }: Props) {
       <iframe
         title='Database Editor'
         width='100%'
-        height='760px'
+        height='450px'
         frameBorder='0'
         src={`http://localhost:5555/`}></iframe>
     </>

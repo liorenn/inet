@@ -3,6 +3,7 @@ import { adminAccessKey, defaultDashboard, managerAccessKey } from 'config'
 
 import ConfigsEditor from '@/components/admin/ConfigsEditor'
 import DatabaseEditor from '@/components/admin/DatabaseEditor'
+import DatabaseManagement from '@/components/admin/DatabaseManagement'
 import DatabaseViewer from '@/components/admin/DatabaseViewer'
 import DeviceManagement from '@/components/admin/DeviceManagement'
 import Head from 'next/head'
@@ -61,11 +62,15 @@ export default function Admin() {
   // Define the buttons that will be displayed according to the user access key
   const buttons =
     accessKey && accessKey < managerAccessKey // If the use is an admin
-      ? [{ value: 'deviceManagement', label: t('deviceManagement') }]
+      ? [
+          { value: 'deviceManagement', label: t('deviceManagement') },
+          { value: 'databaseManagement', label: t('databaseManagement') },
+        ]
       : // If the user is a manager
         [
           { value: 'deviceManagement', label: t('deviceManagement') },
           { value: 'userManagement', label: t('userManagement') },
+          { value: 'databaseManagement', label: t('databaseManagement') },
           { value: 'websiteStatistics', label: t('websiteStatistics') },
           { value: 'configsEditor', label: t('configsEditor') },
           { value: 'databaseViewer', label: t('databaseViewer') },
@@ -98,6 +103,9 @@ export default function Admin() {
           )}
           {button === 'deviceManagement' && accessKey >= adminAccessKey && (
             <DeviceManagement accessKey={accessKey} />
+          )}
+          {button === 'databaseManagement' && accessKey >= adminAccessKey && (
+            <DatabaseManagement accessKey={accessKey} />
           )}
           {button === 'userManagement' && accessKey >= managerAccessKey && (
             <UserManagement accessKey={accessKey} />

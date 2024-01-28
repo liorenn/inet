@@ -5,12 +5,38 @@ import {
   soapRequestHeaders,
 } from '@/server/soapHelpers'
 
+import { allDataType } from './routers/auth'
 import { env } from '@/server/env' // Importing server environment variables
 import soapRequest from 'easy-soap-request' // Importing the easy-soap-request library for making SOAP requests
 
 // Function to convert an object to JSON format
-function convertObjectToJson(object: DeviceSchemaType | UserSchemaType) {
+function convertObjectToJson(object: DeviceSchemaType | UserSchemaType | allDataType) {
   return { Name: 'json', Value: JSON.stringify(object) }
+}
+
+// Function to insert a user using a SOAP request
+export async function restoreDatabaseSoap() {
+  const { response } = await soapRequest({
+    // Making a SOAP request to insert a user
+    url: env.soapServerUrl,
+    headers: soapRequestHeaders,
+    xml: createSoapRequestXml('RestoreDatabase'), // Converting the input object to XML
+  })
+  return getResultFromResponse('RestoreDatabase', response.body) // Extracting the result from the response
+}
+
+// Function to insert a user using a SOAP request
+export async function backupDatabaseSoap({ input }: { input: allDataType }) {
+  const { response } = await soapRequest({
+    // Making a SOAP request to insert a user
+    url: env.soapServerUrl,
+    headers: soapRequestHeaders,
+    xml: createSoapRequestXml('BackupDatabase', {
+      Name: 'data',
+      Value: JSON.stringify(input),
+    }), // Converting the input object to XML
+  })
+  return getResultFromResponse('BackupDatabase', response.body) // Extracting the result from the response
 }
 
 // Function to insert a user using a SOAP request

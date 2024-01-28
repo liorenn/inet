@@ -1,26 +1,115 @@
+import { Prisma, PrismaClient } from '@prisma/client'
 import { UpdateSchema, commentSchema, userSchema } from '@/models/schemas'
+import {
+  backupDatabaseSoap,
+  deleteUserSoap,
+  insertUserSoap,
+  restoreDatabaseSoap,
+  updateUserSoap,
+} from '@/server/soapFunctions'
 import { calculatePercentageDiff, encodeEmail } from '@/utils/utils'
 import { databaseEditorPort, sendSoapRequest, websiteEmail } from 'config'
-import { deleteUserSoap, insertUserSoap, updateUserSoap } from '@/server/soapFunctions'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { method, router } from '@/server/trpc'
 
 import PriceDropEmail from '@/components/misc/PriceDropEmail'
-import { Prisma } from '@prisma/client'
 import { exec } from 'child_process'
 import { fetchCurrentPrice } from '@/server/price'
 import { resend } from '@/server/client'
 import { z } from 'zod'
 
+export type allDataType = {
+  table: string
+  data: Record<string, unknown>[]
+}[]
+
+type RestoreDatabaseInput = {
+  input: {
+    data: string
+    FromAsp?: boolean | undefined
+  }
+  prisma: PrismaClient
+}
+
+async function restoreDatabase({ input, prisma }: RestoreDatabaseInput) {
+  if (input.FromAsp) {
+    const jsonData = input.data
+    const data: allDataType = JSON.parse(jsonData) as allDataType
+    await prisma.$executeRawUnsafe(`DELETE FROM "Device";`)
+    for (const { table, data: rows } of data) {
+      // Generate DELETE query for the entire table
+      const deleteQuery = `DELETE FROM "${table}";`
+      await prisma.$executeRawUnsafe(deleteQuery)
+      // Generate INSERT queries
+      const insertQueries = rows.map((row) => {
+        const columns = Object.keys(row)
+          .map((column) => `"${column}"`)
+          .join(', ')
+        const values = Object.values(row)
+          .map((value) => {
+            // Handle different data types
+            if (value === null) {
+              return 'NULL'
+            } else if (typeof value === 'number') {
+              return value
+            } else {
+              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+              return `'${value}'`
+            }
+          })
+          .join(', ')
+        return `INSERT INTO "${table}" (${columns}) VALUES (${values});`
+      })
+      // Execute INSERT queries
+      for (const insertQuery of insertQueries) {
+        await prisma.$executeRawUnsafe(insertQuery)
+      }
+    }
+  }
+}
+
+async function backupDatabase({ prisma }: { prisma: PrismaClient }) {
+  const allData: allDataType = []
+  allData.push({ table: 'Device', data: await prisma.device.findMany() })
+  allData.push({
+    table: 'BiometricFeature',
+    data: await prisma.biometricFeature.findMany(),
+  })
+  allData.push({ table: 'Camera', data: await prisma.camera.findMany() })
+  allData.push({ table: 'CameraType', data: await prisma.cameraType.findMany() })
+  allData.push({ table: 'Color', data: await prisma.color.findMany() })
+  allData.push({ table: 'Comment', data: await prisma.camera.findMany() })
+  allData.push({ table: 'DeviceColor', data: await prisma.deviceColor.findMany() })
+  allData.push({ table: 'DeviceConnector', data: await prisma.deviceConnector.findMany() })
+  allData.push({ table: 'DeviceType', data: await prisma.deviceType.findMany() })
+  allData.push({ table: 'DeviceUser', data: await prisma.deviceUser.findMany() })
+  allData.push({ table: 'User', data: await prisma.user.findMany() })
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+  await backupDatabaseSoap({ input: allData })
+}
+
 export const authRouter = router({
+  backupDatabase: method.mutation(async ({ ctx }) => {
+    await backupDatabase({ prisma: ctx.prisma })
+    return true
+  }),
+  restoreDatabase: method.mutation(async ({ ctx }) => {
+    const response = await restoreDatabaseSoap()
+    await restoreDatabase({ input: { data: response, FromAsp: true }, prisma: ctx.prisma })
+    return true
+  }),
+  restoreDatabaseSoap: method
+    .input(z.object({ data: z.string(), FromAsp: z.boolean().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      await restoreDatabase({ input, prisma: ctx.prisma })
+      return true
+    }),
   openDatabaseEditor: method.mutation(async () => {
     try {
       const response = await fetch(`http://localhost:${databaseEditorPort}/`)
-      const text = await response.text()
-      console.log(text)
+      await response.text()
       return false
     } catch {
-      console.log('opening database editor')
       exec(
         `npx prisma studio --port ${databaseEditorPort} --browser none --schema=./prisma/schema.prisma`
       )
@@ -71,7 +160,6 @@ export const authRouter = router({
     .mutation(async ({ ctx, input }) => {
       try {
         const { FromAsp, ...user } = input
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
         await ctx.prisma.user.update({
           where: { email: input.email },
           data: {
@@ -79,6 +167,7 @@ export const authRouter = router({
           },
         })
         if (sendSoapRequest && FromAsp !== true) {
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
           await updateUserSoap({ input: user })
         }
         return true
@@ -109,7 +198,7 @@ export const authRouter = router({
   getUserColumns: method.query(() => {
     return Prisma.dmmf.datamodel.models.find((model) => model.name === 'User')
   }),
-  getTablesColumns: method.query(() => {
+  getTablesProperties: method.query(() => {
     return Prisma.dmmf.datamodel.models
   }),
   getTableData: method

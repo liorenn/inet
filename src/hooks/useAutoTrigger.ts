@@ -10,6 +10,7 @@ export default function useAutoTrigger() {
   // Get the mutate function from the trpc client for sending price drop emails
   const sendEmailMutation = trpc.auth.sendPriceDropsEmail.useMutation()
   const sendEmailsMutation = trpc.auth.sendPriceDropsEmails.useMutation()
+  const backupDatabaseMutation = trpc.auth.backupDatabase.useMutation() // The backup mutation
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({ email: user?.email })
 
   useEffect(() => {
@@ -19,6 +20,7 @@ export default function useAutoTrigger() {
       if (!existingCookie) {
         // If the cookie doesn't exist, trigger the action and set the cookie
         sendEmailsMutation.mutate({}) // Trigger the action
+        backupDatabaseMutation.mutate()
         Cookies.set('triggeredAdminFunction', true, { expires: 3 }) // Set the cookie to prevent repeated triggering
       }
     } else {

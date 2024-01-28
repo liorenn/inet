@@ -110,7 +110,6 @@ export const DeviceRouter = router({
   updateDevice: method
     .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
       try {
         const { FromAsp, ...device } = input
         await ctx.prisma.device.update({
@@ -120,6 +119,7 @@ export const DeviceRouter = router({
           },
         })
         if (sendSoapRequest && FromAsp !== true) {
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
           await updateDeviceSoap({ input: device })
         }
         return true

@@ -1,6 +1,6 @@
 export const adminAccessKey = 6
 export const managerAccessKey = 9
-export const sendSoapRequest = false
+export const sendSoapRequest = true
 export const rtlInHebrew = true
 export const validateInputOnChange = true
 export const defaultLanguage = 'en'

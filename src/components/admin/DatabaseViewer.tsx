@@ -31,7 +31,7 @@ export default function DatabaseViewer({ accessKey }: Props) {
   const { t } = useTranslation('translations') // Get the translation function from Next.js
   const [table, setTable] = useState('') // State variable to store the selected table
   const [loading, setLoading] = useState(false) // State variable to store the loading state
-  const tableColumnsQuery = trpc.auth.getTablesColumns.useQuery() // Query to get the columns of the selected table
+  const tablesPropertiesQuery = trpc.auth.getTablesProperties.useQuery() // Query to get the properties of the tables
   const getTableDataMutation = trpc.auth.getTableData.useMutation() // Mutation to get the data of the selected table
   const [tableData, setTableData] = useState<string[][]>([]) // State variable to store the data of the selected table
 
@@ -76,8 +76,8 @@ export default function DatabaseViewer({ accessKey }: Props) {
     return <Center>{t('accessDeniedMessageSignIn')}</Center>
   }
 
-  if (!(tableColumnsQuery.data && tableData)) {
-    // If the table columns or data is not loaded
+  if (!(tablesPropertiesQuery.data && tableData)) {
+    // If the tables names or data is not loaded
     return <Loader />
   }
 
@@ -86,7 +86,7 @@ export default function DatabaseViewer({ accessKey }: Props) {
       <Container size='xl'>
         <ScrollArea mb='lg' type={width < 400 ? 'always' : 'auto'}>
           <SegmentedControl
-            data={tableColumnsQuery.data.map((value) => value.name)}
+            data={tablesPropertiesQuery.data.map((value) => value.name)}
             onChange={(tableName) => changeTableName(tableName)}
             value={table}
             fullWidth
@@ -100,11 +100,13 @@ export default function DatabaseViewer({ accessKey }: Props) {
             <Table striped highlightOnHover withBorder withColumnBorders>
               <thead>
                 <tr>
-                  {findObjectByPropertyValue(tableColumnsQuery.data, 'name', table)?.fields?.map(
-                    (value, index) => {
-                      if (!value.relationName) return <th key={index}>{value.name}</th>
-                    }
-                  )}
+                  {findObjectByPropertyValue(
+                    tablesPropertiesQuery.data,
+                    'name',
+                    table
+                  )?.fields?.map((value, index) => {
+                    if (!value.relationName) return <th key={index}>{value.name}</th>
+                  })}
                 </tr>
               </thead>
               <tbody>

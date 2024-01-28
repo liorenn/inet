@@ -269,11 +269,10 @@ function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowPr
           { ...convertFormUserValues(form.values) },
           {
             // On update success
-            onSuccess: () => {
+            onSuccess() {
               CreateNotification(t('updatedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
-            },
-            // On update error
-            onError: () => {
+            }, // On update error
+            onError() {
               form.setValues(user) // Set the form values to the current user
               CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
             },

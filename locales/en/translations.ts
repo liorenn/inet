@@ -269,4 +269,8 @@ export default {
   findTitle: 'Find Your Perfect Device',
   findDescription: 'Find the Device that matches your exact needs and preferences',
   adminTableRows: 'Admin Table Rows',
+  restoreDatabase: 'Restore Database',
+  backupDatabase: 'Backup Database',
+  databaseManagement: 'Database Management',
+  success: 'Success',
 }

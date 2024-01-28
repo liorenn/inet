@@ -14,12 +14,14 @@ type MethodParameter = {
 }
 
 // Function to create a SOAP request XML
-export function createSoapRequestXml(Method: string, Parameters: MethodParameter) {
+export function createSoapRequestXml(Method: string, Parameter?: MethodParameter) {
   return `
   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
     <soapenv:Header/>
     <soapenv:Body>
-      <tem:${Method}><tem:${Parameters.Name}>${Parameters.Value}</tem:${Parameters.Name}></tem:${Method}>
+      <tem:${Method}>${
+    Parameter ? `<tem:${Parameter.Name}>${Parameter.Value}</tem:${Parameter.Name}>` : ''
+  }</tem:${Method}>
     </soapenv:Body>
   </soapenv:Envelope>
   `
@@ -32,5 +34,5 @@ export function getResultFromResponse(Method: string, xml: any): string {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
   const json = parser.parse(xml)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-  return json['soap:Envelope']['soap:Body'][`${Method} Response`][`${Method} Result`]
+  return json['soap:Envelope']['soap:Body'][`${Method}Response`][`${Method}Result`]
 }

@@ -272,4 +272,8 @@ export default {
   findTitle: 'Find Ihr perfektes Gerät',
   findDescription: 'Find das Gerät, das genau Ihren Anforderungen und Vorlieben entspricht',
   adminTableRows: 'Admin Tabelle Zeilen',
+  restoreDatabase: 'Restore Database',
+  backupDatabase: 'Backup Database',
+  databaseManagement: 'Datenbank Verwaltung',
+  success: 'Erfolgreich',
 }
