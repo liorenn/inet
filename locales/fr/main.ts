@@ -275,4 +275,5 @@ export default {
   backupDatabase: 'Sauvegarder la base de données',
   databaseManagement: 'Gestion de la base de données',
   success: 'Succès',
+  ethernet: 'Ethernet',
 }

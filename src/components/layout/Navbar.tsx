@@ -17,6 +17,7 @@ import { trpc } from '@/utils/client'
 import useAutoTrigger from '@/hooks/useAutoTrigger'
 import { usePostHog } from 'posthog-js/react'
 import { useProfilePicture } from '@/hooks/useProfilePicture'
+import { useRouter } from 'next/router'
 import { useSpotlight } from '@mantine/spotlight'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
@@ -24,14 +25,17 @@ import { useViewportSize } from '@mantine/hooks'
 export default function Navbar() {
   useAutoTrigger()
   const user = useUser() // Get the user object from Supabase
+  const router = useRouter()
   const posthog = usePostHog()
   const { classes } = useStyles()
   const { lang } = useTranslation()
   const { width } = useViewportSize() // Get the width of the viewport
   const { t } = useTranslation('main')
+  const [visitedAdminPage, setVisitedAdminPage] = useState(false)
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const { imagePath, imageExists, setImageExists, setImagePath } = useProfilePicture()
+  const closeEditorMutation = trpc.auth.closeDatabaseEditor.useMutation() // Mutation to close the database editor
   const isImageExistsMutation = trpc.auth.isImageExists.useMutation()
   const supabase = useSupabaseClient()
   const spotlight = useSpotlight()
@@ -41,6 +45,20 @@ export default function Navbar() {
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
   })
+
+  useEffect(() => {
+    if (router.asPath === '/auth/admin') {
+      setVisitedAdminPage(true)
+    } else if (
+      accessKeyQuery.data &&
+      accessKeyQuery.data >= adminAccessKey &&
+      visitedAdminPage &&
+      !router.asPath.includes('admin')
+    ) {
+      closeEditorMutation.mutate()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.asPath])
 
   useEffect(() => {
     setlanguageStore(

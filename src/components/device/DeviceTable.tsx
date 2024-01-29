@@ -72,7 +72,6 @@ export default function DeviceTable({ specs, name }: Props) {
               )
             } else {
               element.value = element.value as string | null
-              console.log(element.property.toLowerCase())
               return (
                 <tr key={index}>
                   <td>

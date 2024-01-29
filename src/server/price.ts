@@ -10,36 +10,38 @@ import { env } from '@/server/env' // Importing server environment variables
 // Function to fetch the current price of a device model
 export async function fetchCurrentPrice(deviceModel: string) {
   const prisma = new PrismaClient()
+  const device = await prisma.device.findFirst({
+    where: {
+      model: deviceModel,
+    },
+  })
   const gsmarena = require('gsmarena-api') //create the api client
-  try {
-    // Fetch devices from the website
-    const devices = await gsmarena.catalog.getBrand('apple-phones-48')
-    let deviceID: any = null
-    // Find the device ID for the specified model
-    devices.forEach((device: any) => {
-      const deviceName = device.name as string
-      if (
-        deviceName.toLowerCase().replace(/\s/g, '') === deviceModel.toLowerCase().replace(/\s/g, '')
-      ) {
-        deviceID = device.id
-      }
-    })
-    // Get the device details
-    const device = await gsmarena.catalog.getDevice(deviceID)
-    // Extract the price from the device details
-    const price = device.detailSpec[12].specifications.find((item: any) => item.name === 'Price')
-      .value as string
-    // Format the price
-    const formatterPrice = await FormatPrice(price)
-    // Update the price in the database
-    await prisma.device.update({
-      where: { model: deviceModel },
-      data: { price: formatterPrice },
-    })
-    return formatterPrice //Return formatted price
-  } catch (error) {
-    return undefined //Return undefined if an error occurs
-  }
+  if (!device) return 0
+  const search = await gsmarena.search.search(
+    device.name.toLowerCase().includes('ipad pro')
+      ? 'Apple iPad Pro 12.9'
+      : device.name.toLowerCase()
+  )
+  const deviceID =
+    search.find((item: { name: string }) =>
+      isGsmarenaNameEquals(item.name, device.name, device.type)
+    ).id ?? ''
+  //apple_iphone_13_pro_max-11089
+  // Get the device details
+  const apiDevice = await gsmarena.catalog.getDevice(deviceID)
+  // Extract the price from the device details
+  const price = apiDevice.detailSpec[12].specifications.find((item: any) => item.name === 'Price')
+    .value as string
+  // Format the price
+  const formatterPrice = await FormatPrice(price)
+
+  console.log(price, formatterPrice)
+  // Update the price in the database
+  // await prisma.device.update({
+  //   where: { model: deviceModel },
+  //   data: { price: formatterPrice },
+  // })
+  return formatterPrice
 }
 
 // Function to convert the price to a different currency
@@ -62,10 +64,44 @@ async function FormatPrice(priceString: string) {
     return parseFloat(dollarNumber) // Return the formatted price
   } else {
     const response = await fetch(
-      `${env.currencyApiUrl}?apikey=${env.currencyApiKey}&currencies=$USD&base_currency=$EUR`
+      `${env.currencyApiUrl}?apikey=${env.currencyApiKey}&currencies=USD&base_currency=EUR`
     ) // Fetch the data from the API
     const data = await response.json() // Extract the data from the response
     const extractedNumber = parseFloat(priceString.split(' ')[1]) // Extract the number from the price string
     return extractedNumber * data.data.USD // Return the formatted price
+  }
+}
+
+function isGsmarenaNameEquals(gsmarenaName: string, name: string, deviceType: string): boolean {
+  if (deviceType === 'iphone') {
+    return (
+      gsmarenaName.toLowerCase().replace(/\s|apple/g, '') === name.toLowerCase().replace(/\s/g, '')
+    )
+  }
+  switch (name.toLowerCase().replace(/\s/g, '')) {
+    case 'ipad10':
+      return gsmarenaName === 'Apple iPad (2022)'
+    case 'ipad9':
+      return gsmarenaName === 'Apple iPad 10.2 (2021)'
+    case 'ipad8':
+      return gsmarenaName === 'Apple iPad 10.2 (2020)'
+    case 'ipadair4':
+      return gsmarenaName === 'Apple iPad Air (2020)'
+    case 'ipadair5':
+      return gsmarenaName === 'Apple iPad Air (2022)'
+    case 'ipadmini5':
+      return gsmarenaName === 'Apple iPad mini (2019)'
+    case 'ipadmini6':
+      return gsmarenaName === 'Apple iPad mini (2021)'
+    case 'ipadpro3':
+      return gsmarenaName === 'Apple iPad Pro 12.9 (2018)'
+    case 'ipadpro4':
+      return gsmarenaName === 'Apple iPad Pro 12.9 (2020)'
+    case 'ipadpro5':
+      return gsmarenaName === 'Apple iPad Pro 12.9 (2021)'
+    case 'ipadpro6':
+      return gsmarenaName === 'Apple iPad Pro 12.9 (2022)'
+    default:
+      return false
   }
 }

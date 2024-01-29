@@ -2,7 +2,6 @@ import { Container, ScrollArea, SegmentedControl } from '@mantine/core'
 import { adminAccessKey, defaultDashboard, managerAccessKey } from 'config'
 
 import ConfigsEditor from '@/components/admin/ConfigsEditor'
-import DatabaseEditor from '@/components/admin/DatabaseEditor'
 import DatabaseManagement from '@/components/admin/DatabaseManagement'
 import DatabaseViewer from '@/components/admin/DatabaseViewer'
 import DeviceManagement from '@/components/admin/DeviceManagement'
@@ -25,7 +24,6 @@ export default function Admin() {
   const { t } = useTranslation('main')
   const openEditorMutation = trpc.auth.openDatabaseEditor.useMutation() // Open the database editor
   const button = z.string().parse(router.query.dashboard ?? '') // Get the dashboard from the url
-  const closeEditorMutation = trpc.auth.closeDatabaseEditor.useMutation() // Mutation to close the database editor
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
   }) // The access key query
@@ -38,14 +36,8 @@ export default function Admin() {
       openEditorMutation.mutate() // Open the database editor
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       router.push(`?dashboard=${defaultDashboard}`) // Set the dashboard to the default dashboard
-    }
-    // If the dashboard is the Database Editor
-    else if (router.query.dashboard === 'databaseEditor') {
+    } else if (accessKey && accessKey >= managerAccessKey) {
       openEditorMutation.mutate() // Open the database editor
-    }
-    // If the dashboard is not the Database Editor
-    else {
-      closeEditorMutation.mutate() // Close the database editor
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router])
@@ -88,8 +80,12 @@ export default function Admin() {
             <SegmentedControl
               data={buttons}
               onChange={(value: string) => {
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                router.push(`?dashboard=${value}`)
+                if (value === 'databaseEditor') {
+                  window.open('http://localhost:5555/', '_blank')?.focus()
+                } else {
+                  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                  router.push(`?dashboard=${value}`)
+                }
               }}
               value={button}
               fullWidth
@@ -115,9 +111,6 @@ export default function Admin() {
           )}
           {button === 'configsEditor' && accessKey >= managerAccessKey && (
             <ConfigsEditor accessKey={accessKey} />
-          )}
-          {button === 'databaseEditor' && accessKey >= managerAccessKey && (
-            <DatabaseEditor accessKey={accessKey} />
           )}
         </Container>
       ) : (

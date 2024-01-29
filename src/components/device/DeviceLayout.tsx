@@ -7,7 +7,6 @@ import type { DeviceSpecsType } from '@/models/SpecsFormatter'
 import DeviceWidgets from '@/components/device/DeviceWidgets'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import MatchedDevices from '@/components/device/MatchedDevices'
-import { translateDeviceName } from '@/utils/utils'
 import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
 
@@ -22,30 +21,27 @@ export default function DeviceLayout({ device }: Props) {
     model: device.model,
     deviceType: device.type,
   }) // The recommended devices query
-
   return (
     <>
       <Center>
         <Grid sx={{ marginBottom: 6 }}>
           <Grid.Col xs={12} md={6} lg={6}>
             <Center>
-              <Stack align='center' spacing='xs'>
-                <DevicePhotos
-                  device={{
-                    model: device.model,
-                    name: device.name,
-                    type: device.type,
-                    imageAmount: device.imageAmount,
-                  }}
-                  miniphotos={true}
-                />
-                <FavoritesButtons modelPage model={device.model} />
-              </Stack>
+              <DevicePhotos
+                device={{
+                  model: device.model,
+                  name: device.name,
+                  type: device.type,
+                  imageAmount: device.imageAmount,
+                }}
+                miniphotos={true}
+              />
             </Center>
           </Grid.Col>
           <Grid.Col xs={12} md={6} lg={6}>
             <Stack align='stretch' justify='space-between'>
               <DeviceWidgets device={device} />
+              <FavoritesButtons modelPage model={device.model} />
               <CommentsSummary />
             </Stack>
           </Grid.Col>
@@ -56,7 +52,7 @@ export default function DeviceLayout({ device }: Props) {
           {t('deviceSpecifications')}
         </Text>
         <Text sx={{ fontSize: 18 }} weight={500}>
-          {`${t('viewDeviceSpecifications')} ${translateDeviceName(t, device.name, device.type)}`}
+          {`${t('viewDeviceSpecifications')} ${device.name}`}
         </Text>
       </div>
       <Divider sx={{ marginBottom: 10 }} />

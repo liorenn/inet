@@ -48,7 +48,6 @@ export default function Find() {
   const { t, lang } = useTranslation('main') // Get the translation function
   const { colorScheme } = useMantineColorScheme() // Get the color scheme
   const MatchedDevicesMutation = trpc.device.getMatchedDevices.useMutation() // Mutation to get the matched devices
-
   const deviceType = z.string().parse(router.query.deviceType ?? 'iphone') // Get the device type from the url
   const preferences = z // Get the user preferences from the url
     .string()
@@ -115,7 +114,7 @@ export default function Find() {
       <Head>
         <title>{t('find')}</title>
       </Head>
-      <Container size={1000}>
+      <Container size={1200}>
         <Title>{t('compareTitle')}</Title>
         <Divider mb='md' />
         <Stack spacing={0}>

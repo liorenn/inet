@@ -9,17 +9,87 @@ export type Weight = {
   maxValue: number
 }
 
+export type DeviceTypeWeight = {
+  deviceType: DeviceType
+  weights: Weight[]
+}
+
 // Define for each property the min and max values that should be calculated in the match algorithm
-export const weightsValues: Weight[] = [
-  { property: 'screenSize', minValue: 5, maxValue: 6.8 },
-  { property: 'batterySize', minValue: 2800, maxValue: 3300 },
-  { property: 'releaseDate', minValue: 2020, maxValue: 2023 },
-  { property: 'price', minValue: 600, maxValue: 1200 },
-  { property: 'memory', minValue: 2, maxValue: 8 },
-  { property: 'cpu', minValue: 2, maxValue: 8 },
-  { property: 'gpu', minValue: 2, maxValue: 8 },
-  { property: 'weight', minValue: 100, maxValue: 210 },
-  { property: 'storage', minValue: 64, maxValue: 128 },
+export const weightsValues: DeviceTypeWeight[] = [
+  {
+    deviceType: 'iphone',
+    weights: [
+      { property: 'screenSize', minValue: 5, maxValue: 6.8 },
+      { property: 'batterySize', minValue: 2800, maxValue: 3300 },
+      { property: 'releaseDate', minValue: 2016, maxValue: 2023 },
+      { property: 'price', minValue: 600, maxValue: 1200 },
+      { property: 'memory', minValue: 2, maxValue: 8 },
+      { property: 'cpu', minValue: 2, maxValue: 8 },
+      { property: 'gpu', minValue: 2, maxValue: 8 },
+      { property: 'weight', minValue: 100, maxValue: 210 },
+      { property: 'storage', minValue: 64, maxValue: 128 },
+    ],
+  },
+  {
+    deviceType: 'ipad',
+    weights: [
+      { property: 'screenSize', minValue: 8, maxValue: 13 },
+      { property: 'batterySize', minValue: 5000, maxValue: 10000 },
+      { property: 'releaseDate', minValue: 2018, maxValue: 2023 },
+      { property: 'price', minValue: 300, maxValue: 1100 },
+      { property: 'memory', minValue: 2, maxValue: 8 },
+      { property: 'cpu', minValue: 6, maxValue: 8 },
+      { property: 'gpu', minValue: 4, maxValue: 10 },
+      { property: 'weight', minValue: 300, maxValue: 700 },
+      { property: 'storage', minValue: 32, maxValue: 128 },
+    ],
+  },
+  {
+    deviceType: 'airpods',
+    weights: [
+      { property: 'batterySize', minValue: 350, maxValue: 1000 },
+      { property: 'releaseDate', minValue: 2020, maxValue: 2023 },
+      { property: 'price', minValue: 150, maxValue: 550 },
+      { property: 'weight', minValue: 40, maxValue: 500 },
+    ],
+  },
+  {
+    deviceType: 'mac',
+    weights: [
+      { property: 'releaseDate', minValue: 2020, maxValue: 2023 },
+      { property: 'price', minValue: 690, maxValue: 7000 },
+      { property: 'memory', minValue: 16, maxValue: 192 },
+      { property: 'cpu', minValue: 8, maxValue: 24 },
+      { property: 'gpu', minValue: 8, maxValue: 76 },
+      { property: 'storage', minValue: 64, maxValue: 128 },
+    ],
+  },
+  {
+    deviceType: 'imac',
+    weights: [
+      { property: 'screenSize', minValue: 8, maxValue: 13 },
+      { property: 'releaseDate', minValue: 2021, maxValue: 2023 },
+      { property: 'price', minValue: 1300, maxValue: 2000 },
+      { property: 'memory', minValue: 8, maxValue: 8 },
+      { property: 'cpu', minValue: 8, maxValue: 8 },
+      { property: 'gpu', minValue: 7, maxValue: 7 },
+      { property: 'storage', minValue: 256, maxValue: 512 },
+    ],
+  },
+  {
+    deviceType: 'macbook',
+    weights: [
+      { property: 'screenSize', minValue: 13.2, maxValue: 14.3 },
+      { property: 'releaseDate', minValue: 2020, maxValue: 2023 },
+      { property: 'batterySize', minValue: 4300, maxValue: 6200 },
+      { property: 'price', minValue: 900, maxValue: 2000 },
+      { property: 'memory', minValue: 8, maxValue: 8 },
+      { property: 'cpu', minValue: 8, maxValue: 10 },
+      { property: 'gpu', minValue: 7, maxValue: 32 },
+      { property: 'storage', minValue: 2000, maxValue: 8000 },
+      { property: 'weight', minValue: 1290, maxValue: 1600 },
+    ],
+  },
 ]
 
 // Define the Property Labels type
@@ -71,7 +141,16 @@ export const deviceTypesProperties: DeviceTypeProperties[] = [
   },
   {
     deviceType: 'macbook',
-    properties: ['cpu', 'gpu', 'memory', 'screenSize', 'weight', 'releaseDate', 'price'],
+    properties: [
+      'screenSize',
+      'batterySize',
+      'weight',
+      'cpu',
+      'gpu',
+      'memory',
+      'releaseDate',
+      'price',
+    ],
   },
 ]
 
@@ -92,7 +171,7 @@ export const devicesSpecsCategories = ['name', ...deviceSpecsCategories]
 // Define the select params for the select query in the match algorithm
 export const selectParams = {
   model: true,
-  price: true,
+  releasePrice: true,
   batterySize: true,
   weight: true,
   storage: true,

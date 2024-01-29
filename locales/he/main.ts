@@ -277,4 +277,5 @@ export default {
   backupDatabase: 'גיבוי בסיס נתונים',
   databaseManagement: 'ניהול נתונים',
   success: 'הצלחה',
+  ethernet: 'איטרנט',
 }

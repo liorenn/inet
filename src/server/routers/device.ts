@@ -9,9 +9,20 @@ import { MatchDeviceType, PropertiesSchema } from '@/models/deviceProperties'
 import { matchedDevicesLimit, sendSoapRequest } from 'config'
 import { z } from 'zod'
 import { selectParams } from '@/models/deviceProperties'
-import { convertPrice } from '@/server/price'
+import { convertPrice, fetchCurrentPrice } from '@/server/price'
 
 export const DeviceRouter = router({
+  fetchDevicesPrices: method.mutation(async ({ ctx }) => {
+    const devices = await ctx.prisma.device.findMany({
+      where: {
+        OR: [{ type: 'iphone' }, { type: 'ipad' }],
+      },
+    })
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    devices.forEach(async (device) => {
+      await fetchCurrentPrice(device.model)
+    })
+  }),
   convertPrice: method
     .input(
       z.object({
@@ -26,20 +37,36 @@ export const DeviceRouter = router({
   getRecommendedDevices: method
     .input(z.object({ model: z.string(), deviceType: z.string() }))
     .query(async ({ ctx, input }) => {
-      const device = await ctx.prisma.device.findFirst({
+      const queriedDevice = await ctx.prisma.device.findFirst({
         select: selectParams,
         where: {
           model: input.model,
         },
       })
-      if (!device) return []
-      const devices: MatchDeviceType[] = await ctx.prisma.device.findMany({
+      if (!queriedDevice) return []
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { releasePrice, ...queriedDeviceWithoutReleasePrice } = queriedDevice
+      const device = {
+        ...queriedDeviceWithoutReleasePrice,
+        price: queriedDevice.releasePrice,
+      }
+      const queriesDevices = await ctx.prisma.device.findMany({
         select: selectParams,
         where: {
           model: {
             not: input.model,
           },
+          AND: {
+            type: input.deviceType,
+          },
         },
+      })
+      const devices: MatchDeviceType[] = queriesDevices.map((device) => {
+        const { releasePrice, ...deviceWithoutReleasePrice } = device
+        return {
+          ...deviceWithoutReleasePrice,
+          price: releasePrice,
+        }
       })
       const matches = getRecommendedDevices(device, input.deviceType, devices)
       const query = await ctx.prisma.device.findMany({
@@ -50,10 +77,15 @@ export const DeviceRouter = router({
           },
         },
       })
+      query.sort((a, b) => {
+        const modelAIndex = matches.map((device) => device.model).indexOf(a.model)
+        const modelBIndex = matches.map((device) => device.model).indexOf(b.model)
+        return modelAIndex - modelBIndex
+      })
       const recommendedDevices = query.map((device, index) => {
         return { ...device, match: matches[index].match }
       })
-      return recommendedDevices.sort((a, b) => b.match - a.match)
+      return recommendedDevices
     }),
   getMatchedDevices: method
     .input(
@@ -63,11 +95,18 @@ export const DeviceRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const devices = await ctx.prisma.device.findMany({
+      const queriesDevices = await ctx.prisma.device.findMany({
         select: selectParams,
         where: {
           type: input.deviceType,
         },
+      })
+      const devices: MatchDeviceType[] = queriesDevices.map((device) => {
+        const { releasePrice, ...deviceWithoutReleasePrice } = device
+        return {
+          ...deviceWithoutReleasePrice,
+          price: releasePrice,
+        }
       })
       const preferencesValues = convertPreferencesToValues(input.userPreferences, input.deviceType)
       const matches = getMatchedDevices(
@@ -83,6 +122,11 @@ export const DeviceRouter = router({
             in: matches.map((device) => device.model),
           },
         },
+      })
+      query.sort((a, b) => {
+        const modelAIndex = matches.map((device) => device.model).indexOf(a.model)
+        const modelBIndex = matches.map((device) => device.model).indexOf(b.model)
+        return modelAIndex - modelBIndex
       })
       const matchedDevices = query.map((device, index) => {
         return { ...device, match: matches[index].match }
@@ -154,6 +198,9 @@ export const DeviceRouter = router({
           name: input.deviceType,
         },
       },
+      orderBy: {
+        releaseDate: 'desc',
+      },
     })
   }),
   getDevice: method.input(z.object({ model: z.string() })).query(async ({ ctx, input }) => {
@@ -164,16 +211,22 @@ export const DeviceRouter = router({
         colors: { select: { color: true } },
       },
     })
+    if (device?.price === 0) {
+      const price = await fetchCurrentPrice(input.model)
+      device.price = price ?? 0
+      return device
+    }
     return device
   }),
   getDevicesFromModelsArr: method
     .input(z.object({ modelsArr: z.array(z.string()).optional() }))
     .query(async ({ ctx, input }) => {
-      if (!input.modelsArr) return []
+      const models = input.modelsArr
+      if (!models) return []
       const devices = await ctx.prisma.device.findMany({
         where: {
           model: {
-            in: input.modelsArr,
+            in: models,
           },
         },
         include: {
@@ -181,11 +234,23 @@ export const DeviceRouter = router({
           colors: { select: { color: true } },
         },
       })
+      // for (const device of devices) {
+      //   if (device) {
+      //     const model = device.model
+      //     const price = await fetchCurrentPrice(model)
+      //     device.price = price ?? 0
+      //   }
+      // }
+      devices.sort((a, b) => {
+        const modelAIndex = models.indexOf(a.model)
+        const modelBIndex = models.indexOf(b.model)
+        return modelAIndex - modelBIndex
+      })
       return devices
     }),
   getModelsAndNames: method.query(async ({ ctx }) => {
     const devices = await ctx.prisma.device.findMany({
-      select: { model: true, name: true },
+      select: { model: true, name: true, type: true },
     })
     return devices
   }),
@@ -258,7 +323,7 @@ export const DeviceRouter = router({
       }
       return devicesArr
     }),
-  getUserDevicesFromUserTable: method
+  getUserDevicesProperties: method
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       return await ctx.prisma.user.findFirst({

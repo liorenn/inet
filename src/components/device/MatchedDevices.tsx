@@ -28,8 +28,8 @@ export default function MatchedDevices({ title, data, isLoading }: Props) {
         data && (
           <SimpleGrid
             breakpoints={[
-              { maxWidth: 'sm', cols: 1 },
-              { maxWidth: 'md', cols: 2 },
+              { minWidth: 400, cols: 1 },
+              { minWidth: 800, cols: 2 },
               { minWidth: 'lg', cols: 3 },
             ]}
             mb={40}>

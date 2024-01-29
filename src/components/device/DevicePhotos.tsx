@@ -1,10 +1,9 @@
-import { ActionIcon, Image } from '@mantine/core'
-import { Center, Grid, Group, SimpleGrid, Stack, Text } from '@mantine/core'
+import { ActionIcon, Flex, Image } from '@mantine/core'
+import { Center, Group, Stack, Text } from '@mantine/core'
 import { Container, Modal, useMantineColorScheme } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
 import { DevicePropertiesType } from '@/models/enums'
-import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 
@@ -21,8 +20,8 @@ export default function DevicePhotos({ device, miniphotos, withName }: Props) {
   const { colorScheme } = useMantineColorScheme() // Get the color scheme
   const { width } = useViewportSize() // Get the viewport size
   const { t } = useTranslation('main') // Get the translation function
-  const imagesLinks: string[] = [] // The array of image links
 
+  const imagesLinks: string[] = [] // The array of image links
   // For each image
   for (let i = 0; i < device.imageAmount; i++) {
     imagesLinks.push(`/images/${device.type}/${device.model}_${(i + 1).toString()}.png`) // Add the image link
@@ -56,7 +55,7 @@ export default function DevicePhotos({ device, miniphotos, withName }: Props) {
           size='85%'
           opened={opened}
           radius='md'
-          title={`${translateDeviceName(t, device.name, device.type)} ${t('photos')}`}
+          title={`${device.name} ${t('photos')}`}
           onClose={() => setOpened(false)}>
           <Center>
             <Image
@@ -91,58 +90,50 @@ export default function DevicePhotos({ device, miniphotos, withName }: Props) {
             </Group>
           </Container>
         </Modal>
-        <Grid>
-          <Grid.Col span={miniphotos ? 12 : 12} sm={miniphotos ? 8 : 12}>
-            <Center>
-              <Image
-                caption={
-                  withName && (
-                    <Text mb='md' weight={500} size='lg'>
-                      {`${translateDeviceName(t, device.name, device.type)} ${t('photos')}`}
-                    </Text>
-                  )
-                }
-                src={activeLink}
-                fit='contain'
-                width={width <= 560 ? 280 : 280}
-                height={width <= 560 ? 280 : 320}
-                alt={'photo'}
-                style={{ cursor: 'zoom-in' }}
-                onClick={() => setOpened(true)}
-              />
-            </Center>
-          </Grid.Col>
-          <Grid.Col span={miniphotos ? 12 : 0} sm={miniphotos ? 4 : 0}>
-            <SimpleGrid
-              breakpoints={[
-                { minWidth: 'sm', cols: 2 },
-                { minWidth: 100, cols: 3 },
-              ]}
-              spacing='md'>
-              {miniphotos
-                ? imagesLinks.map((src, index) => (
-                    <Center key={index}>
-                      <ActionIcon
-                        size={92}
-                        color={colorScheme === 'dark' ? 'gray.9' : 'gray.2'}
-                        variant={src === activeLink ? 'filled' : 'subtle'}>
-                        <Image
-                          alt={'photo'}
-                          fit='contain'
-                          src={src}
-                          key={index}
-                          width={width <= 560 ? 80 : 70}
-                          height={width <= 560 ? 80 : 100}
-                          className='SmallGalleryImg'
-                          onClick={() => handleSetActiveLink(index + 1)}
-                        />
-                      </ActionIcon>
-                    </Center>
-                  ))
-                : ''}
-            </SimpleGrid>
-          </Grid.Col>
-        </Grid>
+        <Center>
+          <Image
+            caption={
+              withName && (
+                <Text mb='md' weight={500} size='lg'>
+                  {`${device.name} ${t('photos')}`}
+                </Text>
+              )
+            }
+            src={activeLink}
+            fit='contain'
+            width={width <= 560 ? 280 : 250}
+            height={width <= 560 ? 280 : 300}
+            alt={'photo'}
+            style={{ cursor: 'zoom-in' }}
+            onClick={() => setOpened(true)}
+          />
+        </Center>
+        {miniphotos ? (
+          <Center>
+            <Flex mih={50} gap='md' justify='center' align='center' direction='row' wrap='wrap'>
+              {imagesLinks.map((src, index) => (
+                <Center key={index}>
+                  <ActionIcon
+                    size={92}
+                    color={colorScheme === 'dark' ? 'gray.9' : 'gray.2'}
+                    variant={src === activeLink ? 'filled' : 'subtle'}>
+                    <Image
+                      alt={'photo'}
+                      fit='contain'
+                      src={src}
+                      key={index}
+                      width={width <= 560 ? 80 : 70}
+                      height={width <= 560 ? 80 : 100}
+                      onClick={() => handleSetActiveLink(index + 1)}
+                    />
+                  </ActionIcon>
+                </Center>
+              ))}
+            </Flex>
+          </Center>
+        ) : (
+          ''
+        )}
       </Stack>
     </Center>
   )

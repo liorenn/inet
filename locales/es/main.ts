@@ -276,4 +276,5 @@ export default {
   backupDatabase: 'Respaldar Base de Datos',
   databaseManagement: 'Gestión de Base de Datos',
   success: 'Éxito',
+  ethernet: 'Ethernet',
 }

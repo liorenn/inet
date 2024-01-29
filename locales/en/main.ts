@@ -273,4 +273,5 @@ export default {
   backupDatabase: 'Backup Database',
   databaseManagement: 'Database Management',
   success: 'Success',
+  ethernet: 'Ethernet',
 }

@@ -15,7 +15,6 @@ import { Device } from '@prisma/client'
 import type { SpotlightAction } from '@mantine/spotlight'
 import { SpotlightProvider } from '@mantine/spotlight'
 import { Translate } from 'next-translate'
-import { translateDeviceName } from '@/utils/utils'
 import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
 
@@ -26,7 +25,7 @@ function createActionsArray(
   router: NextRouter
 ): SpotlightAction[] {
   return devices.map((device) => ({
-    title: translateDeviceName(t, device.name, device.type),
+    title: device.name,
     group: t(device.type),
     description: getDeviceDescription(device),
     onTrigger: () => router.push(`/device/${device.type}/${device.model}`),
@@ -103,7 +102,7 @@ export default function SpotlightControl({ children }: { children: ReactNode }) 
       searchIcon={<IconSearch size={22} stroke={2.8} />}
       searchPlaceholder={t('searchForDevice')}
       nothingFoundMessage={t('deviceNotFound')}
-      limit={5}>
+      limit={devicesQuery.data?.length}>
       {children}
     </SpotlightProvider>
   )

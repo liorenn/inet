@@ -5,7 +5,6 @@ import { DevicePropertiesType } from '@/models/enums'
 import { Dispatch } from 'react'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import Link from 'next/link'
-import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 
 // The component props
@@ -26,7 +25,7 @@ export default function DeviceListCard({ device, deviceType, setDevices }: Props
       </Card.Section>
 
       <Text weight={500} style={{ marginBottom: 10, fontSize: 30 }} align='center'>
-        {translateDeviceName(t, device.name, device.type)}
+        {device.name}
       </Text>
 
       <Grid sx={{ marginTop: 2 }}>

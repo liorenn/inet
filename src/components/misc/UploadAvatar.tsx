@@ -68,11 +68,7 @@ export default function ImageUploader({ email }: Props) {
   return (
     <>
       <Modal opened={opened} onClose={close} size='auto' title='Upload Your Profile Photo'>
-        <Dropzone
-          onDrop={(files) => setFile(files[0])}
-          onReject={(file) => console.log('rejected files', file)}
-          accept={IMAGE_MIME_TYPE}
-          multiple={false}>
+        <Dropzone onDrop={(files) => setFile(files[0])} accept={IMAGE_MIME_TYPE} multiple={false}>
           <Group
             position='center'
             spacing='xl'

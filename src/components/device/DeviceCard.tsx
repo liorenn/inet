@@ -4,7 +4,6 @@ import DevicePhotos from '@/components/device/DevicePhotos'
 import type { DevicePropertiesType } from '@/models/enums'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import Link from 'next/link'
-import { translateDeviceName } from '@/utils/utils'
 import useTranslation from 'next-translate/useTranslation'
 
 // The component props
@@ -23,7 +22,7 @@ export default function DeviceCard({ device, matchPrecentage }: Props) {
         <DevicePhotos device={device} miniphotos={false} />
       </Card.Section>
       <Text weight={500} style={{ marginBottom: 10, fontSize: 30 }} align='center'>
-        {translateDeviceName(t, device.name, device.type)}
+        {device.name}
       </Text>
       {matchPrecentage || matchPrecentage === 0 ? (
         <Tooltip radius='md' color='dark' label={`${matchPrecentage}% Precentage Match`}>

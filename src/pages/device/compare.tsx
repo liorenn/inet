@@ -15,7 +15,6 @@ import Head from 'next/head'
 import Loader from '@/components/layout/Loader'
 import React from 'react'
 import { Translate } from 'next-translate'
-import { translateDeviceName } from '@/utils/utils'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
@@ -55,6 +54,20 @@ export default function Compare() {
   })
 
   useEffect(() => {
+    if (allDevicesQuery.data) {
+      const arrayLength = Number(
+        getButtons(t, width).find((mark) => mark.value === compareAmount)?.value
+      )
+      router.push(
+        generateUrlSring(allDevicesQuery.data.slice(0, arrayLength).map((device) => device.model))
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [compareAmount])
+
+  console.log(compareAmount)
+
+  useEffect(() => {
     setCompareAmount(
       getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
     )
@@ -66,18 +79,6 @@ export default function Compare() {
       router.push(generateUrlSring(['iphone14', 'iphone15pro']))
     }
   }, [router])
-
-  useEffect(() => {
-    if (allDevicesQuery.data) {
-      const arrayLength = Number(
-        getButtons(t, width).find((mark) => mark.value === compareAmount)?.value
-      )
-      router.push(
-        generateUrlSring(allDevicesQuery.data.slice(0, arrayLength).map((device) => device.model))
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allDevicesQuery.data, compareAmount])
 
   function generateUrlSring(deviceList: string[]) {
     return `?deviceList=${deviceList.join(',')}`
@@ -120,6 +121,7 @@ export default function Compare() {
         <Group grow position='apart' mb='xs' mt='sm'>
           {deviceList.map((_, index) => (
             <Select
+              searchable
               label={t('selectDevice')}
               placeholder='Pick one'
               value={deviceList[index]}
@@ -127,7 +129,8 @@ export default function Compare() {
               onChange={(e) => updateDeviceList(e, index)}
               data={allDevicesQuery.data.map((value) => ({
                 value: value.model,
-                label: translateDeviceName(t, value.name, ''),
+                label: value.name,
+                group: value.type,
               }))}
             />
           ))}

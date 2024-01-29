@@ -21,7 +21,7 @@ export default function Favorites() {
     if (userDevicesQuery.data) {
       setDevices(userDevicesQuery.data)
     }
-  }, [devices, userDevicesQuery.data])
+  }, [userDevicesQuery.data])
 
   return (
     <>

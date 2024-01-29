@@ -2,7 +2,6 @@ import { Breadcrumbs, Group, Text, Title } from '@mantine/core'
 
 import type { Device } from '@prisma/client'
 import Link from 'next/link'
-import { translateDeviceName } from '@/utils/utils'
 import { useMantineColorScheme } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
 
@@ -17,7 +16,7 @@ export default function DeviceHeader({ device }: Props) {
   const links = [
     { name: t('allDevices'), href: '/device' },
     { name: t(device.type), href: `/device/${device.type}` },
-    { name: translateDeviceName(t, device.name, device.type), href: '#' },
+    { name: device.name, href: '#' },
   ]
 
   return (
@@ -38,8 +37,8 @@ export default function DeviceHeader({ device }: Props) {
       </Breadcrumbs>
       <Title order={2}>
         {lang === 'he'
-          ? `${t('information')} ${translateDeviceName(t, device.name, device.type)}`
-          : `${translateDeviceName(t, device.name, device.type)} ${t('information')}`}
+          ? `${t('information')} ${device.name}`
+          : `${device.name} ${t('information')}`}
       </Title>
     </Group>
   )

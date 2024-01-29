@@ -108,6 +108,13 @@ export default function DevicesTable({ specs, name }: Props) {
                               t('none')
                             ) : element.property.toLowerCase().includes('price') ? (
                               <PriceText priceString={value} />
+                            ) : element.property.toLowerCase() === 'connector' ||
+                              element.property.toLowerCase() === 'biometrics' ? (
+                              element.values !== null ? (
+                                `${t(value)} ${t(`${element.property}Units`)}`
+                              ) : (
+                                t('none')
+                              )
                             ) : (
                               `${value} ${t(`${element.property}Units`)}`
                             )}

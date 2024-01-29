@@ -79,9 +79,13 @@ type Weights = {
 const weights: Weights[] = deviceTypesProperties.map((value) => {
   return {
     deviceType: value.deviceType,
-    weights: value.properties.map(
-      (property) => weightsValues.find((weight) => weight.property === property) ?? weightsValues[0]
-    ),
+    weights:
+      value.properties.map(
+        (property) =>
+          weightsValues
+            .find((deviceTypeWeight) => deviceTypeWeight.deviceType === value.deviceType)
+            ?.weights?.find((weight) => weight.property === property) ?? weightsValues[0].weights[0]
+      ) ?? weightsValues[0].weights[0],
   }
 })
 
@@ -199,5 +203,6 @@ function calculateRecommendedDevices(
       model: device.model,
       match: parseFloat(calculateMatch(totalPrefsValues, device.values).toFixed(2)),
     }))
+    .sort((a, b) => b.match - a.match)
     .slice(0, limit)
 }

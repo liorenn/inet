@@ -4,7 +4,6 @@ import { IconCheck, IconExclamationMark, IconX } from '@tabler/icons'
 
 import type { Comment } from '@prisma/client' // Importing Comment type from Prisma client
 import type { ReactElement } from 'react' // Importing ReactElement type from React
-import { Translate } from 'next-translate' // Importing Translate component from next-translate
 import { showNotification } from '@mantine/notifications' // Importing showNotification function from Mantine notifications
 
 // Function to create a notification with a message, color, and optional mobile parameter
@@ -72,18 +71,6 @@ export function calculatePercentageDiff(oldPrice: number, newPrice: number): num
 // Function to encode the given email using base64 encoding
 export function encodeEmail(email: string) {
   return btoa(email) // Encoding the email using base64
-}
-
-// Function to translate the device name using the provided Translate component and name
-export function translateDeviceName(t: Translate, name: string, type: string) {
-  if (type === 'iphone') {
-    return name
-      .split(' ')
-      .map((word) => (Number.isNaN(parseFloat(word)) ? t(word.toLowerCase()) : word)) // Translating non-numeric words using the Translate component
-      .join(' ')
-  } else {
-    return name
-  }
 }
 
 // Function to exclude a property from an object and return a new object without that property

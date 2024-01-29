@@ -24,7 +24,7 @@ export default function Devices() {
   const devicesQuery = trpc.device.getDevices.useQuery({
     deviceType: deviceType,
   })
-  const userDevicesQuery = trpc.device.getUserDevicesFromUserTable.useQuery({
+  const userDevicesQuery = trpc.device.getUserDevicesProperties.useQuery({
     email: user?.email,
   })
   const [captured, setCaptured] = useState(false)
