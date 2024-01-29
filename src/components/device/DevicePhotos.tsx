@@ -20,7 +20,7 @@ export default function DevicePhotos({ device, miniphotos, withName }: Props) {
   const [opened, setOpened] = useState(false) // Is the modal opened
   const { colorScheme } = useMantineColorScheme() // Get the color scheme
   const { width } = useViewportSize() // Get the viewport size
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const imagesLinks: string[] = [] // The array of image links
 
   // For each image
@@ -56,7 +56,7 @@ export default function DevicePhotos({ device, miniphotos, withName }: Props) {
           size='85%'
           opened={opened}
           radius='md'
-          title={`${translateDeviceName(t, device.name)} ${t('photos')}`}
+          title={`${translateDeviceName(t, device.name, device.type)} ${t('photos')}`}
           onClose={() => setOpened(false)}>
           <Center>
             <Image
@@ -98,7 +98,7 @@ export default function DevicePhotos({ device, miniphotos, withName }: Props) {
                 caption={
                   withName && (
                     <Text mb='md' weight={500} size='lg'>
-                      {`${translateDeviceName(t, device.name)} ${t('photos')}`}
+                      {`${translateDeviceName(t, device.name, device.type)} ${t('photos')}`}
                     </Text>
                   )
                 }

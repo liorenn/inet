@@ -125,6 +125,10 @@ export function formatArrSpecs(devices: DeviceSpecsType[]): CategoriesType {
           values: devices.map((device) => (device.chipset ? device.chipset.toString() : null)),
         },
         {
+          property: 'connector',
+          values: devices.map((device) => (device.connector ? device.connector.toString() : null)),
+        },
+        {
           property: 'memory',
           values: devices.map((device) => (device.memory ? device.memory.toString() : null)),
         },
@@ -241,6 +245,10 @@ export function formatSpecs(device: DeviceSpecsType): CategoryType[] {
         {
           property: 'chipset',
           value: device.chipset ? device.chipset.toString() : null,
+        },
+        {
+          property: 'connector',
+          value: device.connector ? device.connector.toString() : null,
         },
         {
           property: 'memory',

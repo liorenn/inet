@@ -273,8 +273,8 @@ export default {
   findTitle: 'מצא את המכשיר המושלם שלך',
   findDescription: 'מצא את המכשיר התואם את הצרכים וההעדפות המדויקות שלך',
   adminTableRows: 'מספר שורות בטבלת מנהל',
-  restoreDatabase: 'שחזר נתונים',
-  backupDatabase: 'גרסה נתונים',
+  restoreDatabase: 'שחזור בסיס נתונים',
+  backupDatabase: 'גיבוי בסיס נתונים',
   databaseManagement: 'ניהול נתונים',
   success: 'הצלחה',
 }

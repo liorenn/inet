@@ -8,8 +8,11 @@ type LanguagesType = {
 // The list of supported languages
 export const languages: LanguagesType[] = [
   { value: 'en', name: 'English' },
-  { value: 'de', name: 'Deutsch' },
   { value: 'he', name: 'עברית' },
+  { value: 'de', name: 'Deutsch' },
+  { value: 'fr', name: 'Français' },
+  { value: 'es', name: 'Español' },
+  { value: 'it', name: 'Italiano' },
 ]
 
 type LanguageState = {

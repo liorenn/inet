@@ -6,7 +6,7 @@ import useTranslation from 'next-translate/useTranslation'
 
 export default function ScrollToTop() {
   const os = useOs()
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
   const [scroll, scrollTo] = useWindowScroll()
 
   return (

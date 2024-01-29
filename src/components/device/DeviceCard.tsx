@@ -14,7 +14,7 @@ type Props = {
 }
 
 export default function DeviceCard({ device, matchPrecentage }: Props) {
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
 
   return (
     <Card shadow='lg' p='lg' radius='md'>
@@ -23,7 +23,7 @@ export default function DeviceCard({ device, matchPrecentage }: Props) {
         <DevicePhotos device={device} miniphotos={false} />
       </Card.Section>
       <Text weight={500} style={{ marginBottom: 10, fontSize: 30 }} align='center'>
-        {translateDeviceName(t, device.name)}
+        {translateDeviceName(t, device.name, device.type)}
       </Text>
       {matchPrecentage || matchPrecentage === 0 ? (
         <Tooltip radius='md' color='dark' label={`${matchPrecentage}% Precentage Match`}>

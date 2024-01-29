@@ -11,7 +11,7 @@ import { useUser } from '@supabase/auth-helpers-react'
 
 export default function Favorites() {
   const user = useUser() // Get the user object from Supabase
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const userDevicesQuery = trpc.device.getUserDevices.useQuery({
     email: user?.email,
   }) // Get the user object from Supabase

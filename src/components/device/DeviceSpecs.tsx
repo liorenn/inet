@@ -11,7 +11,7 @@ import { deviceSpecsCategories } from '@/models/deviceProperties'
 type Props = { device: DeviceSpecsType }
 
 export default function DeviceSpecs({ device }: Props) {
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
   const { colorScheme } = useMantineColorScheme()
   const [accordionState, setAccordionState] = useState<string[]>(deviceSpecsCategories)
   const categories = formatSpecs(device)

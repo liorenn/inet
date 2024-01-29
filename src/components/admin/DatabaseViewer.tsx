@@ -28,7 +28,7 @@ export default function DatabaseViewer({ accessKey }: Props) {
   const router = useRouter() // Get the router object from Next.js
   const session = useSession() // Get the session object from Supabase
   const { width } = useViewportSize()
-  const { t } = useTranslation('translations') // Get the translation function from Next.js
+  const { t } = useTranslation('main') // Get the translation function from Next.js
   const [table, setTable] = useState('') // State variable to store the selected table
   const [loading, setLoading] = useState(false) // State variable to store the loading state
   const tablesPropertiesQuery = trpc.auth.getTablesProperties.useQuery() // Query to get the properties of the tables

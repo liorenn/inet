@@ -26,7 +26,7 @@ function createActionsArray(
   router: NextRouter
 ): SpotlightAction[] {
   return devices.map((device) => ({
-    title: translateDeviceName(t, device.name),
+    title: translateDeviceName(t, device.name, device.type),
     group: t(device.type),
     description: getDeviceDescription(device),
     onTrigger: () => router.push(`/device/${device.type}/${device.model}`),
@@ -83,7 +83,7 @@ function getDeviceDescription(device: Device) {
 }
 
 export default function SpotlightControl({ children }: { children: ReactNode }) {
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const devicesQuery = trpc.device.getDevicesData.useQuery() // Get the devices data
   const router = useRouter() // Get the router
   const actions = useMemo(() => {

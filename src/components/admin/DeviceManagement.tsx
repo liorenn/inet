@@ -25,7 +25,7 @@ type Props = {
 export default function DeviceManagement({ accessKey }: Props) {
   const router = useRouter() // Get the router
   const { width } = useViewportSize() // Get the viewport size
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const [activePage, setActivePage] = useState(0) // The active page of the table
   const [chunkedDevices, setChunkedDevices] = useState<DeviceFormType[][]>([]) // The chunked devices
   const fieldNames = Object.keys(deviceSchema.shape) // The field names of the devices
@@ -115,7 +115,7 @@ type DeviceInsertRowProps = {
 
 function DeviceInsertRow({ setActivePage, setChunkedDevices }: DeviceInsertRowProps) {
   const os = useOs() // Get the client operating system
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const [loading, setLoading] = useState(false) // The loading state
   const insertDeviceMutation = trpc.device.insertDevice.useMutation() // The insert device mutation
   const { fields, validators, defaultValues } = getDeviceFormFields() // Get the devices form fields
@@ -202,7 +202,7 @@ type DeviceRowProps = {
 
 function DeviceRow({ device, activePage, setActivePage, setChunkedDevices }: DeviceRowProps) {
   const os = useOs() // Get the client operating system
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const [editMode, setEditMode] = useState(false) // The edit mode state
   const [loading, setLoading] = useState(false) // The loading state
   const deleteDeviceMutation = trpc.device.deleteDevice.useMutation() // The delete device mutation

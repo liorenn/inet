@@ -24,7 +24,7 @@ type Props = {
 export default function UserManagement({ accessKey }: Props) {
   const router = useRouter() // Get the router
   const { width } = useViewportSize() // Get the viewport size
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const [activePage, setActivePage] = useState(0) // The active page of the table
   const [chunkedUsers, setChunkedUsers] = useState<UserFormType[][]>([[]]) // The chunked users
   const fieldNames = Object.keys(userSchema.shape) // The field names of the users
@@ -113,7 +113,7 @@ type UserInsertRowProps = {
 function UserInsertRow({ setActivePage, setChunkedUsers }: UserInsertRowProps) {
   const os = useOs() // Get the client operating system
   const formProperties = new UserManagementForm() // Get the form properties
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const [loading, setLoading] = useState(false) // The loading state
   const insertUserMutation = trpc.auth.insertUser.useMutation() // The insert user mutation
 
@@ -202,7 +202,7 @@ type UserRowProps = {
 function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowProps) {
   const os = useOs() // Get the client operating system
   const formProperties = new UserManagementForm() // Get the form properties
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const [editMode, setEditMode] = useState(false) // The edit mode state
   const [loading, setLoading] = useState(false) // The loading state
   const deleteUserMutation = trpc.auth.deleteUser.useMutation() // The delete user mutation

@@ -34,7 +34,7 @@ export default function Account() {
   const session = useSession()
   const { width } = useViewportSize()
   const formProperties = new AccountForm()
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
   const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' })
   const updateMutation = trpc.auth.updateUserDetails.useMutation()
   const userDetailsQuery = trpc.auth.getUserDetails.useQuery({

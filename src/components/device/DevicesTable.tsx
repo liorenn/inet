@@ -12,7 +12,7 @@ type Props = {
 }
 
 export default function DevicesTable({ specs, name }: Props) {
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
 
   if (name === 'cameras') {
     specs = specs as MergedCameraType[]

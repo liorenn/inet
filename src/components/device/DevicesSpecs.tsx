@@ -13,7 +13,7 @@ type Props = {
 }
 
 export default function DevicesSpecs({ devices }: Props) {
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
   const { colorScheme } = useMantineColorScheme()
   const { width } = useViewportSize()
   const [accordionState, setAccordionState] = useState<string[]>(devicesSpecsCategories)

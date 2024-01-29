@@ -22,7 +22,7 @@ export default function Admin() {
   const user = useUser() // Get the user object from Supabase
   const router = useRouter()
   const { width } = useViewportSize() // Get the width of the viewport
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
   const openEditorMutation = trpc.auth.openDatabaseEditor.useMutation() // Open the database editor
   const button = z.string().parse(router.query.dashboard ?? '') // Get the dashboard from the url
   const closeEditorMutation = trpc.auth.closeDatabaseEditor.useMutation() // Mutation to close the database editor

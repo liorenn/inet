@@ -75,11 +75,15 @@ export function encodeEmail(email: string) {
 }
 
 // Function to translate the device name using the provided Translate component and name
-export function translateDeviceName(t: Translate, name: string) {
-  return name
-    .split(' ')
-    .map((word) => (Number.isNaN(parseFloat(word)) ? t(word.toLowerCase()) : word)) // Translating non-numeric words using the Translate component
-    .join(' ')
+export function translateDeviceName(t: Translate, name: string, type: string) {
+  if (type === 'iphone') {
+    return name
+      .split(' ')
+      .map((word) => (Number.isNaN(parseFloat(word)) ? t(word.toLowerCase()) : word)) // Translating non-numeric words using the Translate component
+      .join(' ')
+  } else {
+    return name
+  }
 }
 
 // Function to exclude a property from an object and return a new object without that property

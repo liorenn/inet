@@ -28,7 +28,7 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false) // State for loading
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation() // Get the IsUserExists mutation
   const createUserMutation = trpc.auth.createUser.useMutation() // Get the createUser mutation
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
 
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
     email: session?.user?.email,

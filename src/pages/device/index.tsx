@@ -10,7 +10,7 @@ import useTranslation from 'next-translate/useTranslation'
 export default function DeviceType() {
   const { colorScheme } = useMantineColorScheme() // Get color scheme
   const devicesTypes = Object.getOwnPropertyNames(deviceType) // Get device types
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
 
   return (
     <>

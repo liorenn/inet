@@ -107,7 +107,7 @@ export default function ConfigsEditor({ accessKey }: Props) {
     }
   }, [accessKey, router])
 
-  const { t } = useTranslation('translations') // Getting the translation function from next-translate
+  const { t } = useTranslation('main') // Getting the translation function from next-translate
   const configsQuery = trpc.auth.getConfigs.useQuery() // Querying for configurations using trpc
   const saveConfigsMutation = trpc.auth.saveConfigs.useMutation() // Mutation function for saving configurations using trpc
   const sendEmailsMutation = trpc.auth.sendPriceDropsEmails.useMutation() // Mutation function for sending price drop emails using trpc
@@ -216,7 +216,7 @@ type ConfigInputProps = {
 // Component for rendering a single configuration input with validation and change handling
 function ConfigInput({ config, originalValue, setConfigs }: ConfigInputProps) {
   const validation = getValidation(originalValue) // Getting the validation type of the original value
-  const { t } = useTranslation('translations') // Getting the translation function from next-translate
+  const { t } = useTranslation('main') // Getting the translation function from next-translate
 
   // Rendering a TextInput component for the configuration with validation and change handling
   return (

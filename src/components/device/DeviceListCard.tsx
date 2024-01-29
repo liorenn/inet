@@ -16,7 +16,7 @@ type Props = {
 }
 
 export default function DeviceListCard({ device, deviceType, setDevices }: Props) {
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
 
   return (
     <Card shadow='lg' p='lg' radius='md'>
@@ -26,7 +26,7 @@ export default function DeviceListCard({ device, deviceType, setDevices }: Props
       </Card.Section>
 
       <Text weight={500} style={{ marginBottom: 10, fontSize: 30 }} align='center'>
-        {translateDeviceName(t, device.name)}
+        {translateDeviceName(t, device.name, device.type)}
       </Text>
 
       <Grid sx={{ marginTop: 2 }}>

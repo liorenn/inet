@@ -15,7 +15,7 @@ export default function NavBarDropdown({ AccessKey }: Props) {
   const supabase = useSupabaseClient()
   const { classes, cx } = useStyles()
   const [opened, setOpened] = useState(false)
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
   const [activeLink, setActiveLink] = useState('Settings')
 
   async function signOut() {

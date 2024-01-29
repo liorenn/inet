@@ -17,7 +17,7 @@ type Props = {
 }
 
 export default function DeviceLayout({ device }: Props) {
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const recommendedDevicesQuery = trpc.device.getRecommendedDevices.useQuery({
     model: device.model,
     deviceType: device.type,
@@ -56,7 +56,7 @@ export default function DeviceLayout({ device }: Props) {
           {t('deviceSpecifications')}
         </Text>
         <Text sx={{ fontSize: 18 }} weight={500}>
-          {`${t('viewDeviceSpecifications')} ${translateDeviceName(t, device.name)}`}
+          {`${t('viewDeviceSpecifications')} ${translateDeviceName(t, device.name, device.type)}`}
         </Text>
       </div>
       <Divider sx={{ marginBottom: 10 }} />

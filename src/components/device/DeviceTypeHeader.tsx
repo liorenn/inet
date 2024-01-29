@@ -12,7 +12,7 @@ type Props = {
 
 export default function DeviceTypeHeader({ deviceType }: Props) {
   const { colorScheme } = useMantineColorScheme()
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
 
   const links = [
     { name: t('allDevices'), href: '/device' },

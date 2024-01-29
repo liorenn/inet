@@ -12,7 +12,7 @@ import useTranslation from 'next-translate/useTranslation'
 type Props = { device: Device }
 
 export default function DeviceWidgets({ device }: Props) {
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
 
   const cards = [
     {

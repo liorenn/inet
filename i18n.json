@@ -1,8 +1,8 @@
 {
-  "locales": ["en", "de", "he"],
+  "locales": ["en", "he", "de", "fr", "es", "it"],
   "defaultLocale": "en",
   "pages": {
-    "*": ["translations"]
+    "*": ["main"]
   },
   "namespaces": {
     "auth": {

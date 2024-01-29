@@ -19,7 +19,7 @@ type Props = {
 
 export default function DatabaseManagement({ accessKey }: Props) {
   const router = useRouter() // Get the router
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const backupDatabaseMutation = trpc.auth.backupDatabase.useMutation() // The backup mutation
   const restoreDatabaseMutation = trpc.auth.restoreDatabase.useMutation() // The backup mutation
 

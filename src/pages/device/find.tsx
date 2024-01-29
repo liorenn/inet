@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import MatchedDevices from '@/components/device/MatchedDevices'
 import { PropertiesSchemaType } from '@/models/deviceProperties'
+import { Translate } from 'next-translate'
 import { deviceType as deviceTypeEnum } from '@/models/enums'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
@@ -44,7 +45,7 @@ function getPreferencesFormatter(preferences: PreferenceType[]) {
 export default function Find() {
   const router = useRouter() // Get the router
   const { width } = useViewportSize() // Get the width of the viewport
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t, lang } = useTranslation('main') // Get the translation function
   const { colorScheme } = useMantineColorScheme() // Get the color scheme
   const MatchedDevicesMutation = trpc.device.getMatchedDevices.useMutation() // Mutation to get the matched devices
 
@@ -97,16 +98,16 @@ export default function Find() {
       MatchedDevicesMutation.mutate({ deviceType, userPreferences: userPreferences })
   }
 
-  function getSegmentedData(preference: PropertiesSchemaType) {
+  function getSegmentedData(t: Translate, lang: string, preference: PropertiesSchemaType) {
     const data = propertiesLabels
       .find((property) => property.property === preference)
       ?.labels?.map((value) => {
         return {
           value: value,
-          label: `${value} ${t(preference)}`,
+          label: lang === 'he' ? `${t(preference)} ${t(value)}` : `${t(value)} ${t(preference)}`,
         }
       })
-    return data ? [{ value: 'notInterested', label: 'not Interested' }, ...data] : []
+    return data ? [{ value: 'notInterested', label: t('notInterested') }, ...data] : []
   }
 
   return (
@@ -175,7 +176,7 @@ export default function Find() {
             }}>
             {getPreferences(deviceType).map((pref, index: number) => (
               <PreferenceInput
-                value={getSegmentedData(pref)}
+                value={getSegmentedData(t, lang, pref)}
                 deviceType={deviceType}
                 preferences={preferences}
                 index={index}
@@ -213,8 +214,7 @@ type preferenceInputType = {
 
 function PreferenceInput({ value, index, deviceType, preferences }: preferenceInputType) {
   const router = useRouter()
-  const { width } = useViewportSize()
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
 
   return (
     <>
@@ -224,9 +224,9 @@ function PreferenceInput({ value, index, deviceType, preferences }: preferenceIn
           <ScrollArea type='always'>
             <SegmentedControl
               fullWidth
-              mb={width < 1000 ? 'sm' : 0}
               data={value}
               defaultValue=''
+              mb='sm'
               styles={
                 preferences[index].value === ''
                   ? { indicator: { backgroundColor: 'transparent' } }

@@ -26,7 +26,7 @@ export default function SignIn() {
   const posthog = usePostHog() // Get the posthog
   const session = useSession() // Get the session
   const supabase = useSupabaseClient() // Get the supabase
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const formProperties = new SignInForm() // Get the form properties
   const [loading, setLoading] = useState(false) // State for loading
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation() // Get the IsUserExists mutation

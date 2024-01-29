@@ -19,7 +19,7 @@ export default function Device() {
   const router = useRouter()
   const posthog = usePostHog()
   const { setUsername } = useComments()
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
   const [captured, setCaptured] = useState(false)
   const deviceModel = router.asPath.split('/')[3]
   const deviceDetailsQuery = trpc.device.getDevice.useQuery({

@@ -45,7 +45,7 @@ function App({ Component, pageProps }: PageProps) {
   })
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'))
-  const { lang } = useTranslation('translations')
+  const { lang } = useTranslation('main')
 
   useEffect(() => {
     document.body.dir = rtlInHebrew ? (lang === 'he' ? 'rtl' : 'ltr') : 'ltr'

@@ -39,7 +39,7 @@ function getButtons(t: Translate, width: number) {
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 export default function Compare() {
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
   const { width } = useViewportSize()
   const router = useRouter()
   const deviceList = z
@@ -127,7 +127,7 @@ export default function Compare() {
               onChange={(e) => updateDeviceList(e, index)}
               data={allDevicesQuery.data.map((value) => ({
                 value: value.model,
-                label: translateDeviceName(t, value.name),
+                label: translateDeviceName(t, value.name, ''),
               }))}
             />
           ))}

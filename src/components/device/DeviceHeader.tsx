@@ -11,13 +11,13 @@ type Props = { device: Device }
 
 export default function DeviceHeader({ device }: Props) {
   const { colorScheme } = useMantineColorScheme() // Get the color scheme
-  const { t, lang } = useTranslation('translations') // Get the translation function and the current language
+  const { t, lang } = useTranslation('main') // Get the translation function and the current language
 
   // Define the links for the breadcrumbs
   const links = [
     { name: t('allDevices'), href: '/device' },
     { name: t(device.type), href: `/device/${device.type}` },
-    { name: translateDeviceName(t, device.name), href: '#' },
+    { name: translateDeviceName(t, device.name, device.type), href: '#' },
   ]
 
   return (
@@ -38,8 +38,8 @@ export default function DeviceHeader({ device }: Props) {
       </Breadcrumbs>
       <Title order={2}>
         {lang === 'he'
-          ? `${t('information')} ${translateDeviceName(t, device.name)}`
-          : `${translateDeviceName(t, device.name)} ${t('information')}`}
+          ? `${t('information')} ${translateDeviceName(t, device.name, device.type)}`
+          : `${translateDeviceName(t, device.name, device.type)} ${t('information')}`}
       </Title>
     </Group>
   )

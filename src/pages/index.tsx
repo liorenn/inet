@@ -8,7 +8,7 @@ import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 
 export default function Home() {
-  const { t } = useTranslation('translations') // Get the translation function
+  const { t } = useTranslation('main') // Get the translation function
   const { width } = useViewportSize() // Get the width of the viewport
   const spotlight = useSpotlight() // Get the spotlight instance
 

@@ -12,7 +12,7 @@ type Props = {
 }
 
 export default function DeviceTable({ specs, name }: Props) {
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
 
   if (name === 'cameras') {
     specs = specs as CamerasSpecsType[]
@@ -72,6 +72,7 @@ export default function DeviceTable({ specs, name }: Props) {
               )
             } else {
               element.value = element.value as string | null
+              console.log(element.property.toLowerCase())
               return (
                 <tr key={index}>
                   <td>
@@ -84,6 +85,13 @@ export default function DeviceTable({ specs, name }: Props) {
                           {element.property.toLowerCase().includes('price') ? (
                             element.value !== null ? (
                               <PriceText priceString={element.value} />
+                            ) : (
+                              t('none')
+                            )
+                          ) : element.property.toLowerCase() === 'connector' ||
+                            element.property.toLowerCase() === 'biometrics' ? (
+                            element.value !== null ? (
+                              `${t(element.value)} ${t(`${element.property}Units`)}`
                             ) : (
                               t('none')
                             )

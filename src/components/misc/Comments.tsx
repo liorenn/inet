@@ -21,7 +21,7 @@ export default function Comments({ device }: Props) {
   const user = useUser() // Get the user object from Supabase
   const [text, setText] = useState('') // State for the comment text
   const [rating, setRating] = useState(0) // State for the comment rating
-  const { t } = useTranslation('translations') // Translation hook
+  const { t } = useTranslation('main') // Translation hook
   const [comments, setComments] = useState<commentType[]>([]) // State for the comments
   const addCommentMutation = trpc.auth.addComment.useMutation() // Add comment mutation
   const { username, setRatingValue, setCommentsAmount } = useComments() // Get the comments state and functions

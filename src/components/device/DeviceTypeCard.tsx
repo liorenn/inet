@@ -9,7 +9,7 @@ type Props = {
 }
 
 export default function DeviceTypeCard({ devicesType }: Props) {
-  const { t } = useTranslation('translations')
+  const { t } = useTranslation('main')
 
   return (
     <Card key={devicesType}>
