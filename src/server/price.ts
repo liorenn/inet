@@ -37,10 +37,10 @@ export async function fetchCurrentPrice(deviceModel: string) {
 
   console.log(price, formatterPrice)
   // Update the price in the database
-  // await prisma.device.update({
-  //   where: { model: deviceModel },
-  //   data: { price: formatterPrice },
-  // })
+  await prisma.device.update({
+    where: { model: deviceModel },
+    data: { price: formatterPrice },
+  })
   return formatterPrice
 }
 

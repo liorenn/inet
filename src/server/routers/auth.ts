@@ -35,35 +35,45 @@ async function restoreDatabase({ input, prisma }: RestoreDatabaseInput) {
   if (input.FromAsp) {
     const jsonData = input.data
     const data: allDataType = JSON.parse(jsonData) as allDataType
-    await prisma.$executeRawUnsafe(`DELETE FROM "Device";`)
-    for (const { table, data: rows } of data) {
-      // Generate DELETE query for the entire table
-      const deleteQuery = `DELETE FROM "${table}";`
-      await prisma.$executeRawUnsafe(deleteQuery)
-      // Generate INSERT queries
-      const insertQueries = rows.map((row) => {
-        const columns = Object.keys(row)
+    // Start a transaction
+    await prisma.$executeRawUnsafe('DELETE FROM "Device";')
+    await prisma.$executeRawUnsafe('BEGIN;')
+    try {
+      for (const { table, data: rows } of data) {
+        // Generate DELETE query for the entire table
+        const deleteQuery = `DELETE FROM "${table}";`
+        await prisma.$executeRawUnsafe(deleteQuery)
+        // Generate INSERT query for all rows in the table
+        if (!rows[0]) continue
+        const columns = Object.keys(rows[0])
           .map((column) => `"${column}"`)
           .join(', ')
-        const values = Object.values(row)
-          .map((value) => {
-            // Handle different data types
-            if (value === null) {
-              return 'NULL'
-            } else if (typeof value === 'number') {
-              return value
-            } else {
-              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-              return `'${value}'`
-            }
+        const values = rows
+          .map((row) => {
+            const rowValues = Object.values(row)
+              .map((value) => {
+                if (value === null) {
+                  return 'NULL'
+                } else if (typeof value === 'number') {
+                  return value
+                } else {
+                  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                  return `'${value}'`
+                }
+              })
+              .join(', ')
+            return `(${rowValues})`
           })
           .join(', ')
-        return `INSERT INTO "${table}" (${columns}) VALUES (${values});`
-      })
-      // Execute INSERT queries
-      for (const insertQuery of insertQueries) {
+        const insertQuery = `INSERT INTO "${table}" (${columns}) VALUES ${values};`
         await prisma.$executeRawUnsafe(insertQuery)
       }
+      // Commit the transaction if all queries are successful
+      await prisma.$executeRawUnsafe('COMMIT;')
+    } catch (error) {
+      // Rollback the transaction if there is an error
+      await prisma.$executeRawUnsafe('ROLLBACK;')
+      throw error
     }
   }
 }
