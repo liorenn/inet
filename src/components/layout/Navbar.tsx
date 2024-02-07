@@ -25,66 +25,77 @@ import { useViewportSize } from '@mantine/hooks'
 export default function Navbar() {
   useAutoTrigger()
   const user = useUser() // Get the user object from Supabase
-  const router = useRouter()
-  const posthog = usePostHog()
-  const { classes } = useStyles()
-  const { lang } = useTranslation()
+  const router = useRouter() // Get the router
+  const posthog = usePostHog() // Get the posthog client instance
+  const { classes } = useStyles() // Get the styles
   const { width } = useViewportSize() // Get the width of the viewport
-  const { t } = useTranslation('main')
-  const [visitedAdminPage, setVisitedAdminPage] = useState(false)
+  const { t, lang } = useTranslation('main') // Get the translation function and the current language
+  const [visitedAdminPage, setVisitedAdminPage] = useState(false) // The visited admin page state
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
-  const { imagePath, imageExists, setImageExists, setImagePath } = useProfilePicture()
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme() // Get the color scheme
+  const { imagePath, imageExists, setImageExists, setImagePath } = useProfilePicture() // Get the profile picture state
   const closeEditorMutation = trpc.auth.closeDatabaseEditor.useMutation() // Mutation to close the database editor
-  const isImageExistsMutation = trpc.auth.isImageExists.useMutation()
-  const supabase = useSupabaseClient()
-  const spotlight = useSpotlight()
-  const [session, setSession] = useState(useSession())
-  const { currency, setCurrency } = useCurrency()
-  const { setLanguage: setlanguageStore } = useLanguage()
+  const isImageExistsMutation = trpc.auth.isImageExists.useMutation() // Mutation to check if the profile picture exists
+  const supabase = useSupabaseClient() // Get the Supabase client
+  const spotlight = useSpotlight() // Get the spotlight
+  const [session, setSession] = useState(useSession()) // Get the session
+  const { currency, setCurrency } = useCurrency() // Get the selected currency
+  const { setLanguage: setlanguageStore } = useLanguage() // Get the select language function
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
-  })
+  }) // Get the access key query
 
+  // When the user changes router
   useEffect(() => {
+    // If the user is on the admin page
     if (router.asPath === '/auth/admin') {
-      setVisitedAdminPage(true)
+      setVisitedAdminPage(true) // Set the visited admin page state to true
     } else if (
+      // If the user is not on the admin page and visited the admin page
       accessKeyQuery.data &&
       accessKeyQuery.data >= adminAccessKey &&
       visitedAdminPage &&
       !router.asPath.includes('admin')
     ) {
-      closeEditorMutation.mutate()
+      closeEditorMutation.mutate() // Close the database editor
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.asPath])
 
+  // When component mounts
   useEffect(() => {
+    // Set the selected language state to the language stored in local storage
     setlanguageStore(
       languages.find((lang) => lang.value === localStorage.getItem('language')) ?? languages[0]
     )
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    setLanguage(localStorage.getItem('language') ?? defaultLanguage)
+    setLanguage(localStorage.getItem('language') ?? defaultLanguage) // Set the selected language to the language stored in local storage
+    // Set the selected currency state to the currency stored in local storage
     setCurrency(
       currencies.find((Currency) => Currency.value === localStorage.getItem('currency')) ??
         currencies[0]
     )
+    // When user session changes
     supabase.auth.onAuthStateChange((_e, session) => {
-      setSession(session)
+      setSession(session) // Set the session to the new session
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // When the user state changes
   useEffect(() => {
+    // If the user has an email
     if (user?.email) {
+      // Check if the profile picture exists
       isImageExistsMutation.mutate(
         { email: user?.email },
         {
+          // On operation success
           onSuccess(data, params) {
+            // If the profile picture exists
             if (data === true) {
-              setImageExists(true)
-              setImagePath(`${''}/users/${encodeEmail(params.email)}.png`)
+              setImageExists(true) // Set the imageExists state to true
+              setImagePath(`${''}/users/${encodeEmail(params.email)}.png`) // Set the imagePath state
             }
           },
         }
@@ -93,14 +104,17 @@ export default function Navbar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
+  // Sign out the user
   async function signOut() {
-    const { error } = await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut() // Sign out the user
+    // If the sign out was successful
     if (!error) {
-      CreateNotification(t('signedOutSuccessfully'), 'green')
-      posthog.capture('User Signed Out', { user })
+      CreateNotification(t('signedOutSuccessfully'), 'green') // Create a notification
+      posthog.capture('User Signed Out', { user }) // Capture the event in PostHog statistics
+      // After half a second
       setTimeout(() => {
-        setImageExists(false)
-        setImagePath('')
+        setImageExists(false) // Set the imageExists state to false
+        setImagePath('') // Set the imagePath state to an empty string
       }, 500)
     }
   }
@@ -220,7 +234,7 @@ export default function Navbar() {
                   }}
                   icon={Currency.icon({})}
                   onClick={() => {
-                    setCurrency(Currency)
+                    setCurrency(Currency) // Set the selected currency
                   }}>
                   <Text weight={700}>{Currency.name}</Text>
                 </Menu.Item>
@@ -265,8 +279,8 @@ export default function Navbar() {
                   }
                   onClick={() => {
                     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                    setLanguage(language.value)
-                    setlanguageStore(language)
+                    setLanguage(language.value) // Set the language
+                    setlanguageStore(language) // Set the language in local storage
                   }}>
                   <Text weight={700}>{language.name}</Text>
                 </Menu.Item>

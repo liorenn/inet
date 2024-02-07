@@ -11,9 +11,10 @@ type Props = {
 }
 
 export default function DeviceTypeHeader({ deviceType }: Props) {
-  const { colorScheme } = useMantineColorScheme()
-  const { t } = useTranslation('main')
+  const { colorScheme } = useMantineColorScheme() // Get the color scheme
+  const { t } = useTranslation('main') // Get the translation function
 
+  // Define the links for the breadcrumbs
   const links = [
     { name: t('allDevices'), href: '/device' },
     { name: t(deviceType), href: `/device/${deviceType}` },

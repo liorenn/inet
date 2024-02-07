@@ -21,7 +21,7 @@ export default function Comments({ device }: Props) {
   const user = useUser() // Get the user object from Supabase
   const [text, setText] = useState('') // State for the comment text
   const [rating, setRating] = useState(0) // State for the comment rating
-  const { t } = useTranslation('main') // Translation hook
+  const { t } = useTranslation('main') // Get the translation hook
   const [comments, setComments] = useState<commentType[]>([]) // State for the comments
   const addCommentMutation = trpc.auth.addComment.useMutation() // Add comment mutation
   const { username, setRatingValue, setCommentsAmount } = useComments() // Get the comments state and functions
@@ -30,19 +30,22 @@ export default function Comments({ device }: Props) {
   }) // Get all comments
   const { imageExists, imagePath } = useProfilePicture() // Get the profile picture state
 
+  // When comments query data changes
   useEffect(() => {
+    // If the comments query data exists
     if (allCommentsQuery.data) {
-      setComments(allCommentsQuery.data) // Set the comments state to the updated allCommentsQuery.data
-      setCommentsAmount(allCommentsQuery.data.length) // Set the comments amount state to the updated allCommentsQuery.data length
+      setComments(allCommentsQuery.data) // Set the comments state to the updated comments data
+      setCommentsAmount(allCommentsQuery.data.length) // Set the comments amount state to the updated comments data length
       setRatingValue(calculateAverageRating(allCommentsQuery.data)) // Set the rating value state to the average rating
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allCommentsQuery.data])
 
+  // Add comment function
   function AddComment(e: FormEvent<HTMLFormElement>) {
     e.preventDefault() // Prevent the default form submission
+    // Create a new comment object
     const newComment = {
-      // Create a new comment object
       createdAt: new Date(),
       deviceTypeValue: device.type,
       likes: 0,
@@ -52,21 +55,18 @@ export default function Comments({ device }: Props) {
       updatedAt: new Date(),
       rating: rating,
     }
+    // Add the new comment
     addCommentMutation.mutate(newComment, {
-      // Add the new comment
+      // On operation success
       onSuccess(data) {
         CreateNotification(t('commentAddedSuccessfully'), 'green') // Create a notification
         setText('') // Clear the comment text
         setRating(0) // Clear the comment rating
-        setComments((prev) => pushComment(prev, data)) // Add the new comment to the comments state
+        setComments((prev) => [...prev, data]) // Add the new comment to the comments state
         setCommentsAmount(comments.length + 1) // Increment the comments amount
         setRatingValue(calculateAverageRating([...comments, data])) // Update the rating value
       },
     })
-  }
-
-  function pushComment(comments: commentType[], newComment: commentType) {
-    return [...comments, newComment] // Push the new comment to the comments array
   }
 
   return (

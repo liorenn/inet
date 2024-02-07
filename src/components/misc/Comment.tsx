@@ -20,58 +20,67 @@ type Props = {
 
 export default function Comment({ comment, comments, setComments }: Props) {
   const user = useUser() // Get the user object from Supabase
-  const [rating, setRating] = useState(comment.rating)
-  const [editing, setEditing] = useState(false)
-  const [editText, setEditText] = useState(comment.message)
+  const [rating, setRating] = useState(comment.rating) // State for the comment rating
+  const [editing, setEditing] = useState(false) // State for is user editing the comment
+  const [editText, setEditText] = useState(comment.message) // State for the comment text
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
-  })
+  }) // Get the access key
   const imageExistsQuery = trpc.auth.isCommentImageExists.useQuery({
     username: comment.username,
-  })
+  }) // Get is the profile picture exists
   const commentEmailQuery = trpc.auth.getCommentEmail.useQuery({
     username: comment.username,
-  })
-  const { mutateAsync: mutateDelete } = trpc.auth.deleteComment.useMutation()
-  const { mutateAsync: mutateEdit } = trpc.auth.editComment.useMutation()
-  const { setCommentsAmount, setRatingValue, username } = useComments()
-  const { t } = useTranslation('main')
+  }) // Get the comment email
+  const { mutateAsync: mutateDelete } = trpc.auth.deleteComment.useMutation() // Delete comment mutation
+  const { mutateAsync: mutateEdit } = trpc.auth.editComment.useMutation() // Edit comment mutation
+  const { setCommentsAmount, setRatingValue, username } = useComments() // Get the comments state
+  const { t } = useTranslation('main') // Translation hook
 
+  // Delete comment function
   async function deleteComment() {
+    // Delete the comment
     await mutateDelete(
       { commentId: comment.id },
       {
+        // Add the new comment
         onSuccess() {
-          CreateNotification(t('commentDeletedSuccessfully'), 'green')
+          CreateNotification(t('commentDeletedSuccessfully'), 'green') // Create a success notification
         },
       }
     )
-    const newArr: Comment[] = []
+    const newArr: Comment[] = [] // Initializes the new array
+    // For each comment in the comments
     comments.forEach((iteratedComment) => {
+      // If the comment id is not equal to the deleted comment id
       if (iteratedComment.id !== comment.id) {
-        newArr.push(iteratedComment)
+        newArr.push(iteratedComment) // Push the comment to the new array
       }
     })
-    setComments([...newArr])
-    setCommentsAmount(newArr.length)
-    setRatingValue(calculateAverageRating(newArr))
+    setComments([...newArr]) // Update the comments state
+    setCommentsAmount(newArr.length) // Update the comments amount state
+    setRatingValue(calculateAverageRating(newArr)) // Update the rating value
   }
 
+  // Edit comment function
   async function editComment() {
+    // Edit the comment
     await mutateEdit(
       { commentId: comment.id, message: editText, rating: rating },
       {
+        // Add the new comment
         onSuccess() {
-          CreateNotification(t('commentEditedSuccessfully'), 'green')
+          CreateNotification(t('commentEditedSuccessfully'), 'green') // Create a success notification
         },
       }
     )
-    const newComments = comments.map((comment) =>
-      comment.id === comment.id ? { ...comment, message: editText, rating } : comment
+    // Update the comments state
+    const newComments = comments.map(
+      (comment) => (comment.id === comment.id ? { ...comment, message: editText, rating } : comment) // Update the comment
     )
-    setComments(newComments)
-    setRatingValue(calculateAverageRating(newComments))
-    setEditing(false)
+    setComments(newComments) // Update the comments state
+    setRatingValue(calculateAverageRating(newComments)) // Update the rating value
+    setEditing(false) // Set the editing state to false
   }
 
   return (

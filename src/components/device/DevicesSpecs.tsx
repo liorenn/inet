@@ -13,11 +13,11 @@ type Props = {
 }
 
 export default function DevicesSpecs({ devices }: Props) {
-  const { t } = useTranslation('main')
-  const { colorScheme } = useMantineColorScheme()
-  const { width } = useViewportSize()
-  const [accordionState, setAccordionState] = useState<string[]>(devicesSpecsCategories)
-  const mergedCategories = formatArrSpecs(devices)
+  const { t } = useTranslation('main') // Get the translation function
+  const { colorScheme } = useMantineColorScheme() // Get the color scheme
+  const { width } = useViewportSize() // Get the viewport size
+  const [accordionState, setAccordionState] = useState<string[]>(devicesSpecsCategories) // The accordion state
+  const mergedCategories = formatArrSpecs(devices) // Get the formatted devices specs
 
   return (
     <Accordion

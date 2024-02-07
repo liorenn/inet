@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 
+// Defining breakpoints for the SimpleGrid component
 const breakpoints = [
   { minWidth: 300, cols: 1 },
   { minWidth: 500, cols: 2 },
@@ -23,10 +24,12 @@ export default function DatabaseManagement({ accessKey }: Props) {
   const backupDatabaseMutation = trpc.auth.backupDatabase.useMutation() // The backup mutation
   const restoreDatabaseMutation = trpc.auth.restoreDatabase.useMutation() // The backup mutation
 
+  // When access key changes
   useEffect(() => {
+    // If the access key is less than the manager access key
     if (accessKey && accessKey < adminAccessKey) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      router.push('/') // If the access key is less than the manager access key redirect to the home page
+      router.push('/') // Redirect to the home page
     }
   }, [accessKey, router])
 
@@ -44,9 +47,11 @@ export default function DatabaseManagement({ accessKey }: Props) {
           fullWidth
           disabled={backupDatabaseMutation.isLoading}
           onClick={() => {
+            // backup the database
             backupDatabaseMutation.mutate(undefined, {
+              // When the mutation is successful
               onSuccess() {
-                CreateNotification(t('success'), 'green')
+                CreateNotification(t('success'), 'green') // Create a success notification
               },
             })
           }}>
@@ -59,9 +64,11 @@ export default function DatabaseManagement({ accessKey }: Props) {
           fullWidth
           disabled={restoreDatabaseMutation.isLoading}
           onClick={() => {
+            // restore the database
             restoreDatabaseMutation.mutate(undefined, {
+              // When the mutation is successful
               onSuccess() {
-                CreateNotification(t('success'), 'green')
+                CreateNotification(t('success'), 'green') // Create a success notification
               },
             })
           }}>

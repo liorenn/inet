@@ -12,7 +12,7 @@ type Props = {
 }
 
 export default function DevicesTable({ specs, name }: Props) {
-  const { t } = useTranslation('main')
+  const { t } = useTranslation('main') // Get the translation function
 
   if (name === 'cameras') {
     specs = specs as MergedCameraType[]
@@ -29,7 +29,7 @@ export default function DevicesTable({ specs, name }: Props) {
                     <Text>{t(element.type)}</Text>
                   </Grid.Col>
                   {Array.from({ length: element.megapixels.length }).map((_, index) => {
-                    const megapixel = element.megapixels[index]
+                    const megapixel = element.megapixels[index] // Get the megapixel value
                     return (
                       <Grid.Col
                         key={`b${index}`}
@@ -55,7 +55,7 @@ export default function DevicesTable({ specs, name }: Props) {
         <tbody>
           {specs.map((element, index) => {
             if (element.property === 'colors') {
-              element.values = element.values as ColorsSpecsType[]
+              element.values = element.values as ColorsSpecsType[] // Cast the values to ColorsSpecsType
               return (
                 <tr key={`c${index}`}>
                   <td>
@@ -88,7 +88,7 @@ export default function DevicesTable({ specs, name }: Props) {
                 </tr>
               )
             } else {
-              element.values = element.values as (string | null)[]
+              element.values = element.values as (string | null)[] // Cast the values to string or null values
               return (
                 <tr key={`f${index}`}>
                   <td>

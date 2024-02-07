@@ -5,20 +5,23 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 export default function RouterTransition() {
-  const router = useRouter()
+  const router = useRouter() // Get the router
 
+  // When route changes
   useEffect(() => {
+    // The start navigation progress function
     const handleStart = (url: string) => url !== router.asPath && startNavigationProgress()
-    const handleComplete = () => completeNavigationProgress()
+    const handleComplete = () => completeNavigationProgress() // The complete navigation progress function
 
-    router.events.on('routeChangeStart', handleStart)
-    router.events.on('routeChangeComplete', handleComplete)
-    router.events.on('routeChangeError', handleComplete)
+    router.events.on('routeChangeStart', handleStart) // Activate the start navigation progress function when route changes starts
+    router.events.on('routeChangeComplete', handleComplete) // Activate the complete navigation progress function when route changes completes
+    router.events.on('routeChangeError', handleComplete) // Activate the complete navigation progress function when route changes errors
 
+    // When user leaves the page
     return () => {
-      router.events.off('routeChangeStart', handleStart)
-      router.events.off('routeChangeComplete', handleComplete)
-      router.events.off('routeChangeError', handleComplete)
+      router.events.off('routeChangeStart', handleStart) // Deactivate the start navigation progress function when user leaves the page
+      router.events.off('routeChangeComplete', handleComplete) // Deactivate the complete navigation progress function when user leaves the page
+      router.events.off('routeChangeError', handleComplete) // Deactivate the complete navigation progress function when user leaves the page
     }
   }, [router.asPath, router.events])
 

@@ -19,6 +19,7 @@ import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 function createActionsArray(
   t: Translate,
   devices: Device[],

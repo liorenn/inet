@@ -12,7 +12,7 @@ type Props = {
 }
 
 export default function DeviceTable({ specs, name }: Props) {
-  const { t } = useTranslation('main')
+  const { t } = useTranslation('main') // Get the translation function
 
   if (name === 'cameras') {
     specs = specs as CamerasSpecsType[]
@@ -37,13 +37,13 @@ export default function DeviceTable({ specs, name }: Props) {
       </Table>
     )
   } else {
-    specs = specs as SpecDataType[]
+    specs = specs as SpecDataType[] // Cast the specs to an array of SpecDataType
     return (
       <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
         <tbody>
           {specs.map((element, index) => {
             if (element.property === 'colors') {
-              element.value = element.value as ColorsSpecsType
+              element.value = element.value as ColorsSpecsType // Cast the value to a ColorsSpecsType
               return (
                 <tr key={index}>
                   <td>
@@ -71,7 +71,7 @@ export default function DeviceTable({ specs, name }: Props) {
                 </tr>
               )
             } else {
-              element.value = element.value as string | null
+              element.value = element.value as string | null // Cast the value to a string or null
               return (
                 <tr key={index}>
                   <td>

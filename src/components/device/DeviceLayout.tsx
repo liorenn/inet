@@ -21,6 +21,7 @@ export default function DeviceLayout({ device }: Props) {
     model: device.model,
     deviceType: device.type,
   }) // The recommended devices query
+
   return (
     <>
       <Center>

@@ -5,9 +5,9 @@ import { IconArrowUp } from '@tabler/icons'
 import useTranslation from 'next-translate/useTranslation'
 
 export default function ScrollToTop() {
-  const os = useOs()
-  const { t } = useTranslation('main')
-  const [scroll, scrollTo] = useWindowScroll()
+  const os = useOs() // Get the client operating system
+  const { t } = useTranslation('main') // Get the translation function
+  const [scroll, scrollTo] = useWindowScroll() // Get scroll function
 
   return (
     <>

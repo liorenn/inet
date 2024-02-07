@@ -11,11 +11,12 @@ import { deviceSpecsCategories } from '@/models/deviceProperties'
 type Props = { device: DeviceSpecsType }
 
 export default function DeviceSpecs({ device }: Props) {
-  const { t } = useTranslation('main')
-  const { colorScheme } = useMantineColorScheme()
-  const [accordionState, setAccordionState] = useState<string[]>(deviceSpecsCategories)
-  const categories = formatSpecs(device)
+  const { t } = useTranslation('main') // Get the translation function
+  const { colorScheme } = useMantineColorScheme() // Get the color scheme
+  const [accordionState, setAccordionState] = useState<string[]>(deviceSpecsCategories) // The accordion state
+  const categories = formatSpecs(device) // Format the device specs
 
+  // If the device doesn't exist return a message and a button to go to the home page
   if (!categories)
     return (
       <Container size='lg'>

@@ -4,6 +4,7 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { CreateNotification } from '@/utils/utils'
 import { IconMenu2 } from '@tabler/icons'
 import Link from 'next/link'
+import { adminAccessKey } from 'config'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 
@@ -11,20 +12,23 @@ import useTranslation from 'next-translate/useTranslation'
 type Props = { AccessKey: number | undefined }
 
 export default function NavBarDropdown({ AccessKey }: Props) {
-  const session = useSession()
-  const supabase = useSupabaseClient()
-  const { classes, cx } = useStyles()
-  const [opened, setOpened] = useState(false)
-  const { t } = useTranslation('main')
-  const [activeLink, setActiveLink] = useState('Settings')
+  const session = useSession() // Get the session
+  const supabase = useSupabaseClient() // Get the Supabase client
+  const { classes, cx } = useStyles() // Get the styles
+  const [opened, setOpened] = useState(false) // State of is the drawer opened
+  const { t } = useTranslation('main') // Get the translation function
+  const [activeLink, setActiveLink] = useState('Settings') // The active link
 
+  // Sign out the user
   async function signOut() {
-    const { error } = await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut() // Sign out the user
+    // If the sign out was successful
     if (!error) {
-      CreateNotification(t('signedOutSuccessfully'), 'green')
+      CreateNotification(t('signedOutSuccessfully'), 'green') // Create a notification
     }
   }
 
+  // The buttons data that should be displayed in the navbar
   const buttons = [
     { title: t('home'), href: '/' },
     { title: t('allDevices'), href: '/device' },
@@ -32,11 +36,13 @@ export default function NavBarDropdown({ AccessKey }: Props) {
     { title: t('find'), href: '/device/find' },
   ]
 
+  // Add the buttons to the navbar
   if (session) {
     buttons.push({ title: t('favorites'), href: '/device/favorites' })
     buttons.push({ title: t('account'), href: '/auth/account' })
-    if (AccessKey && AccessKey >= 5) {
-      buttons.push({ title: t('admin'), href: '/auth/admin' })
+    // If the user has an access key greater than or equal to the admin access key
+    if (AccessKey && AccessKey >= adminAccessKey) {
+      buttons.push({ title: t('admin'), href: '/auth/admin' }) // Add the admin button
     }
     buttons.push({ title: t('signOut'), href: '/' })
   } else {
@@ -64,9 +70,9 @@ export default function NavBarDropdown({ AccessKey }: Props) {
             })}
             href={link.href}
             onClick={() => {
-              link.title === t('signOut') && signOut()
-              setActiveLink(link.title)
-              setOpened(false)
+              link.title === t('signOut') && signOut() // If the button is the sign out button
+              setActiveLink(link.title) // Set the active link
+              setOpened(false) // Close the drawer
             }}
             key={link.title}>
             {link.title}
@@ -80,6 +86,7 @@ export default function NavBarDropdown({ AccessKey }: Props) {
   )
 }
 
+// Create the styles for the component
 const useStyles = createStyles((theme) => ({
   link: {
     boxSizing: 'border-box',

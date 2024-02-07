@@ -16,58 +16,73 @@ type Props = {
 }
 export default function FavoritesButtons({ model, modelPage, favoritesPage, setDevices }: Props) {
   const user = useUser() // Get the user object from Supabase
-  const { t } = useTranslation('main')
-  const [isInList, setIsInList] = useState<boolean | undefined>(undefined)
-  const addToFavoritesMutation = trpc.device.addToFavorites.useMutation()
-  const deleteFromFavoritesMutation = trpc.device.deleteFromFavorites.useMutation()
+  const email = user?.email // Get the user email from the user
+  const { t } = useTranslation('main') // Get the translation function
+  const [isInList, setIsInList] = useState<boolean | undefined>(undefined) // State variable to store if the device is in the user favorites
+  const addToFavoritesMutation = trpc.device.addToFavorites.useMutation() // Add to favorites mutation
+  const deleteFromFavoritesMutation = trpc.device.deleteFromFavorites.useMutation() // Delete from favorites mutation
   const isDeviceInUserMutation = trpc.device.isDeviceInUser.useQuery({
     email: user?.email,
     model: model,
-  })
+  }) // Check if the device is in the user favorites devices mutation
 
+  // When the is device in user mutation data changes
   useEffect(() => {
-    if (isDeviceInUserMutation.data !== undefined) {
-      setIsInList(isDeviceInUserMutation.data)
+    // Check if the data exists
+    if (isDeviceInUserMutation.data) {
+      setIsInList(isDeviceInUserMutation.data) // Set the state variable
     }
   }, [isDeviceInUserMutation.data])
 
+  // Handle add to favorites and delete from favorites
   function handleIsInlist(model: string, email: string, method: 'add' | 'remove') {
+    // If the method is add
     if (method === 'add') {
-      addToFavorites(model, email)
-    } else if (method === 'remove') {
-      deleteFromFavorites(model, email)
+      addToFavorites(model, email) // Add device to favorites
+    }
+    // If the method is remove
+    else if (method === 'remove') {
+      deleteFromFavorites(model, email) // Delete device from favorites
     }
   }
+
+  // Handle add to favorites and delete from favorites
   function deleteFromFavorites(model: string, email: string) {
-    setIsInList(undefined)
+    setIsInList(undefined) // Set the state variable to undefined
+    // Delete from favorites
     deleteFromFavoritesMutation.mutate(
       { model, email },
       {
+        // On operation success
         onSuccess() {
-          setIsInList(false)
-          CreateNotification(t('removedFromFavorites'), 'green')
+          setIsInList(false) // Set the state variable to false
+          CreateNotification(t('removedFromFavorites'), 'green') // Create a success notification
+          // If the favorites page and setDevices exist
           if (favoritesPage && setDevices) {
-            setDevices((prev) => prev?.filter((device) => device.model !== model))
+            setDevices((prev) => prev?.filter((device) => device.model !== model)) // Delete the device from the list
           }
         },
       }
     )
   }
+
+  // Add device to favorites
   function addToFavorites(model: string, email: string) {
-    setIsInList(undefined)
+    setIsInList(undefined) // Set the state variable to undefined
+    // Add to favorites
     addToFavoritesMutation.mutate(
       { model, email },
       {
+        // On operation success
         onSuccess() {
-          setIsInList(true)
-          CreateNotification(t('addedToFavorites'), 'green')
+          setIsInList(true) // Set the state variable to true
+          CreateNotification(t('addedToFavorites'), 'green') // Create a success notification
         },
       }
     )
   }
 
-  const email = user?.email
-
+  // If the user is not signed in
   if (!email) {
     return (
       <Button variant='light' color={'gray'} radius='md' size='md' disabled={true} fullWidth>

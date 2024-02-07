@@ -3,7 +3,8 @@ import { Loader as MantineLoader } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 
 export default function Loader() {
-  const { height } = useViewportSize()
+  const { height } = useViewportSize() // Get the height of the viewport
+
   return (
     <>
       <Center>

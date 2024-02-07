@@ -1,4 +1,4 @@
-import { z } from 'zod' // Import the 'z' object from the 'zod' library
+import { z } from 'zod' // Import the z object from the zod validation library
 
 // Define the schema for the environment variables
 const envVariables = z.object({

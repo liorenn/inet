@@ -21,10 +21,10 @@ export default function DevicePhotos({ device, miniphotos, withName }: Props) {
   const { width } = useViewportSize() // Get the viewport size
   const { t } = useTranslation('main') // Get the translation function
 
-  const imagesLinks: string[] = [] // The array of image links
-  // For each image
+  const imagesLinks: string[] = [] // Initialize an array of image links
+  // For each image in the images folder
   for (let i = 0; i < device.imageAmount; i++) {
-    imagesLinks.push(`/images/${device.type}/${device.model}_${(i + 1).toString()}.png`) // Add the image link
+    imagesLinks.push(`/images/${device.type}/${device.model}_${(i + 1).toString()}.png`) // Add the image link to the array
   }
 
   // When the device data changes
@@ -42,9 +42,9 @@ export default function DevicePhotos({ device, miniphotos, withName }: Props) {
   // Replace a character at a given index
   function replaceAt(index: number, replacement: number, string: string) {
     return (
-      string.substring(0, index) +
-      replacement.toString() +
-      string.substring(index + 1, string.length)
+      string.substring(0, index) + // The string before the index
+      replacement.toString() + // The replacement
+      string.substring(index + 1, string.length) // The string after the index
     )
   }
 

@@ -17,8 +17,7 @@ const breakpoints = [
   { minWidth: 800, cols: 3 },
 ]
 
-// Defining the props type for the ConfigsEditor component
-// The component props
+// Defining the props for the ConfigsEditor component
 type Props = {
   accessKey: number
 }
@@ -31,7 +30,7 @@ type ConfigType = {
 
 // Function to check if a string represents a boolean value
 function isStringBoolean(value: string): boolean {
-  return value === 'true' || value === 'false' // Returns true if the value is 'true' or 'false'
+  return value === 'true' || value === 'false' // Returns true if the value is true or false
 }
 
 // Function to check if a string represents a number
@@ -49,16 +48,15 @@ const numberRegex = /^-?\d+$/
 
 // Function to validate a string based on its type
 function validateString(value: string, validation: ValidationType): string | null {
-  // Returns null if the value is valid, otherwise returns an validation message
   switch (validation) {
-    case 'number':
-      return numberRegex.test(value) ? null : 'Must be a number'
-    case 'boolean':
-      return booleanRegex.test(value) ? null : 'Must be a boolean'
-    case 'string':
-      return stringRegex.test(value) ? null : 'Must be a string'
-    default:
-      return null
+    case 'number': // If the validation type is number
+      return numberRegex.test(value) ? null : 'Must be a number' // If value didnt pass the regex return a number warning
+    case 'boolean': // If the validation type is boolean
+      return booleanRegex.test(value) ? null : 'Must be a boolean' // If value didnt pass the regex return a boolean warning
+    case 'string': // If the validation type is string
+      return stringRegex.test(value) ? null : 'Must be a string' // If value didnt pass the regex return a string warning
+    default: // If the validation type is invalid
+      return null // Return null
   }
 }
 
@@ -123,7 +121,7 @@ export default function ConfigsEditor({ accessKey }: Props) {
 
   // Function to validate configuration values based on their types
   function validateValues(values: ConfigType[]) {
-    if (!configsQuery.data) return false
+    if (!configsQuery.data) return false // If configs data is not available return false
     return values
       .map((value, index) => {
         // Map the array of configType objects to an array of validation results
@@ -132,7 +130,7 @@ export default function ConfigsEditor({ accessKey }: Props) {
           getValidation(getConfigsArray(configsQuery.data)[index].value)
         )
       })
-      .every((value) => value === null) // Return true if all validation results are null
+      .every((value) => value === null) // Return true if all validation results are null which means the values are valid
   }
 
   // Function to save configurations if they are valid
@@ -165,11 +163,12 @@ export default function ConfigsEditor({ accessKey }: Props) {
           color='blue'
           fullWidth
           onClick={() => {
+            // Send emails to users
             sendEmailsMutation.mutate(
               {},
               {
                 onSuccess: () => {
-                  CreateNotification('success', 'green')
+                  CreateNotification('success', 'green') // Create a success notification
                 },
               }
             )
@@ -181,11 +180,12 @@ export default function ConfigsEditor({ accessKey }: Props) {
           color='orange'
           fullWidth
           onClick={() => {
+            // Send test emails to users
             sendEmailsMutation.mutate(
               { sendTest: true },
               {
                 onSuccess: () => {
-                  CreateNotification('success', 'green')
+                  CreateNotification('success', 'green') // Create a success notification
                 },
               }
             )
@@ -197,7 +197,7 @@ export default function ConfigsEditor({ accessKey }: Props) {
           color='green'
           fullWidth
           onClick={() => {
-            saveConfigs()
+            saveConfigs() // Save the configurations
           }}>
           {t('updateConfigs')}
         </Button>
@@ -216,7 +216,7 @@ type ConfigInputProps = {
 // Component for rendering a single configuration input with validation and change handling
 function ConfigInput({ config, originalValue, setConfigs }: ConfigInputProps) {
   const validation = getValidation(originalValue) // Getting the validation type of the original value
-  const { t } = useTranslation('main') // Getting the translation function from next-translate
+  const { t } = useTranslation('main') // Getting the translation function from next translate
 
   // Rendering a TextInput component for the configuration with validation and change handling
   return (

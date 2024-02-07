@@ -19,15 +19,17 @@ type Props = {
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
+// Function to find an object in an array by a property value
 function findObjectByPropertyValue<T>(array: T[], name: keyof T, value: T[keyof T]) {
-  return array.find((item) => item[name] === value)
+  return array.find((item) => item[name] === value) // Find the object in the array
 }
 
 export default function DatabaseViewer({ accessKey }: Props) {
   const user = useUser() // Get the user object from Supabase
   const router = useRouter() // Get the router object from Next.js
   const session = useSession() // Get the session object from Supabase
-  const { width } = useViewportSize()
+  const { width } = useViewportSize() // Get the viewport size
   const { t } = useTranslation('main') // Get the translation function from Next.js
   const [table, setTable] = useState('') // State variable to store the selected table
   const [loading, setLoading] = useState(false) // State variable to store the loading state
@@ -41,27 +43,30 @@ export default function DatabaseViewer({ accessKey }: Props) {
     router.push('/') // Redirect to the home page
   }
 
+  // Change the table name
   function changeTableName(tableName: string) {
     setLoading(true) // Set the loading state to true
     setTable(tableName) // Set the selected table
+    // Get the data of the selected table
     getTableDataMutation.mutate(
-      // Get the data of the selected table
       { tableName: tableName },
       {
         onSuccess(unknownData) {
-          const data = unknownData as any
+          const data = unknownData as any // Cast the unknown data to an array
           const stringArrays: string[][] = data.map((obj: any) =>
             // Convert the unknown data to an array of objects
-            Object.values(obj).map((val) => {
-              if (val instanceof Date) {
-                return val.toLocaleDateString('en-us', {
+            Object.values(obj).map((value) => {
+              // If the value is a date
+              if (value instanceof Date) {
+                // Convert the value to a string
+                return value.toLocaleDateString('en-us', {
                   weekday: 'short',
                   year: 'numeric',
                   month: 'short',
                   day: 'numeric',
                 })
               }
-              return String(val)
+              return String(value) // Convert the value to a string
             })
           )
           setTableData(stringArrays) // Set the data of the selected table
@@ -71,13 +76,13 @@ export default function DatabaseViewer({ accessKey }: Props) {
     )
   }
 
+  // If the user or session is not available
   if (!(user && session)) {
-    // If the user or session is not available
     return <Center>{t('accessDeniedMessageSignIn')}</Center>
   }
 
+  // If the tables names or data is not loaded
   if (!(tablesPropertiesQuery.data && tableData)) {
-    // If the tables names or data is not loaded
     return <Loader />
   }
 
