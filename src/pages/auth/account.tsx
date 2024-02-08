@@ -30,19 +30,20 @@ type AccountField = {
 
 export default function Account() {
   const user = useUser() // Get the user object from Supabase
-  const router = useRouter()
-  const session = useSession()
-  const { width } = useViewportSize()
-  const formProperties = new AccountForm()
-  const { t } = useTranslation('main')
-  const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' })
+  const router = useRouter() // Get the router object
+  const session = useSession() // Get the user session
+  const { width } = useViewportSize() // Get the width of the viewport
+  const formProperties = new AccountForm() // Get the form properties for validation
+  const { t } = useTranslation('main') // Get the translation function
+  const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' }) // Create formatter
   const updateMutation = trpc.auth.updateUserDetails.useMutation()
   const userDetailsQuery = trpc.auth.getUserDetails.useQuery({
     email: user?.email,
-  })
-  const data = userDetailsQuery.data
-  const [account, setAccount] = useState<UserSchemaType | undefined>()
-  const omitFields = formProperties.getFileds() as Omit<AccountField, 'validator'>[]
+  }) // Get the user details query
+  const userDetails = userDetailsQuery.data // Get the user details
+  const [account, setAccount] = useState<UserSchemaType | undefined>() // State variable to store the user details
+  const omitFields = formProperties.getFileds() as Omit<AccountField, 'validator'>[] // Cast the fields to remove the validator
+  // Get the fields from the form properties and create the validator
   const fields = omitFields.map((field) => {
     return {
       ...field,
@@ -50,37 +51,40 @@ export default function Account() {
         field.regex.test(value?.toString()) ? null : `${field.name} is not valid`,
     }
   })
-  const [inputs, setInputs] = useState<AccountFields>(formProperties.getDefaultValues())
+  const [inputs, setInputs] = useState<AccountFields>(formProperties.getDefaultValues()) // State variable to store the user inputs
 
+  // When user details data changes
   useEffect(() => {
-    if (data !== undefined) {
-      if (data === null) {
+    // If user details is not loading
+    if (userDetails !== undefined) {
+      // If the user doesnt exists
+      if (userDetails === null) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        router.push('/')
+        router.push('/') // Redirect to home
       } else {
-        setAccount(data)
+        setAccount(userDetails) // Set the user details
+        // For each key in the inputs
         Object.keys(inputs).forEach((key) => {
-          if (key in data) {
+          // If the key exists in the user details
+          if (key in userDetails) {
+            // Set the input values to updated user details
             setInputs((prevInputs) => ({
               ...prevInputs,
-              [key]: data[key as keyof typeof data],
+              [key]: userDetails[key as keyof typeof userDetails],
             }))
           }
         })
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
+  }, [userDetails])
 
+  // Update a user property in the database
   function updateProperty(property: AccountFieldsNames, account: UserSchemaType) {
+    // If the property is not validated
     if (fields.find((field) => field.name === property)?.validator(inputs[property]) !== null)
-      return
-    // if (property === 'password' || property === 'phone') {
-    //   await supabase.auth.updateUser({
-    //     password: account.password,
-    //     phone: account.phone,
-    //   })
-    // }
+      return // Exist the function
+    // Update the user property
     updateMutation.mutate(
       {
         email: account.email,
@@ -88,24 +92,29 @@ export default function Account() {
         value: inputs[property],
       },
       {
+        // On operation success
         onSuccess(data) {
-          CreateNotification(`${t(property)} ${t('updatedSuccessfully')}`, 'green')
+          CreateNotification(`${t(property)} ${t('updatedSuccessfully')}`, 'green') // Create a success notification
           setAccount({
             ...data,
             [property]: inputs[property],
           })
         },
         onError() {
-          CreateNotification(t('errorAccured'), 'red')
+          CreateNotification(t('errorAccured'), 'red') // Create an error notification
         },
       }
     )
   }
 
+  // If user is not connected
   if (!(user && session)) {
     return <Center>{t('accessDeniedMessageSignIn')}</Center>
   }
+
+  // If account details is still loading
   if (!account) return <Loader />
+
   return (
     <>
       <Head>
@@ -154,7 +163,7 @@ export default function Account() {
               weight={500}
               color='dimmed'
               align='right'>
-              {`${data?.comments?.length ?? 0} ${t('commentsCommented')}`}
+              {`${userDetails?.comments?.length ?? 0} ${t('commentsCommented')}`}
             </Text>
           </Stack>
         </Group>
@@ -190,7 +199,7 @@ export default function Account() {
                 <UnstyledButton
                   onClick={() => {
                     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                    updateProperty(field.name, account)
+                    updateProperty(field.name, account) // Update the user property
                   }}>
                   <Text sx={{ fontSize: 18 }} weight={500} align='right' color='green'>
                     {t('update')}

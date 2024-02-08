@@ -14,6 +14,7 @@ import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import { validateInputOnChange } from 'config'
 
+// The sign in form properties type
 type SignInFormType = {
   email: string
   password: string
@@ -34,10 +35,12 @@ export default function SignIn() {
     email: session?.user?.email,
   }) // Get the access key for the user
 
+  // When access key changes
   useEffect(() => {
     accessKeyQuery.data && accessKeyQuery.data >= 1 && router.push('/') // Check if the data exists and redirect to home
   }, [accessKeyQuery, router])
 
+  // Create the form with the properties
   const form = useForm<SignInFormType>({
     initialValues: formProperties.getDefaultValues() as FormDefaultValues,
     validateInputOnChange,
@@ -46,16 +49,20 @@ export default function SignIn() {
 
   function signIn(values: SignInFormType) {
     setLoading(true) // Set loading to true
+    // Check if the user exists in the database
     IsUserExistsMutation.mutate(
-      // Check if the user exists in the database
       { email: values.email, password: values.password },
       {
+        // On operation success
         async onSuccess(data) {
+          // If user exists in database
           if (data.email) {
+            // Sign in the user
             const { data: user } = await supabase.auth.signInWithPassword({
               email: values.email,
               password: values.password,
-            }) // Sign in the user
+            })
+            // If there is no error
             if (user.user) {
               CreateNotification(t('signedInSuccessfully'), 'green') // Create a success notification
               posthog.capture('User Signed In', { data: values }) // Capture the user signed in
@@ -74,6 +81,7 @@ export default function SignIn() {
     )
   }
 
+  // If user is connected
   if (session || accessKeyQuery.isLoading) {
     return <Center>{t('accessDeniedMessageSignOut')}</Center>
   }

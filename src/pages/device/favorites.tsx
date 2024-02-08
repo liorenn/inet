@@ -15,11 +15,13 @@ export default function Favorites() {
   const userDevicesQuery = trpc.device.getUserDevices.useQuery({
     email: user?.email,
   }) // Get the user object from Supabase
-  const [devices, setDevices] = useState<DevicePropertiesType[] | undefined>(undefined)
+  const [devices, setDevices] = useState<DevicePropertiesType[] | undefined>(undefined) // State variable to store the user devices
 
+  // When user data changes
   useEffect(() => {
+    // If user data exists
     if (userDevicesQuery.data) {
-      setDevices(userDevicesQuery.data)
+      setDevices(userDevicesQuery.data) // Set the devices to the user devices
     }
   }, [userDevicesQuery.data])
 

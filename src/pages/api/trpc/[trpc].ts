@@ -8,8 +8,8 @@ function convertErrorToString(error: TRPCError): string {
   return `Error code: ${error.code}, Message: ${error.message}` // Return error message
 }
 
+// Create Next API handler
 export default createNextApiHandler({
-  // Create Next API handler
   router: appRouter,
   createContext,
   onError:

@@ -16,38 +16,45 @@ import { useUser } from '@supabase/auth-helpers-react'
 
 export default function Device() {
   const user = useUser() // Get the user object from Supabase
-  const router = useRouter()
-  const posthog = usePostHog()
-  const { setUsername } = useComments()
-  const { t } = useTranslation('main')
-  const [captured, setCaptured] = useState(false)
-  const deviceModel = router.asPath.split('/')[3]
+  const router = useRouter() // Get the router object
+  const posthog = usePostHog() // Get the posthog client
+  const { setUsername } = useComments() // Get the set username function for comments component
+  const { t } = useTranslation('main') // Get the translation function
+  const [captured, setCaptured] = useState(false) // Was page captured in posthog
+  const deviceModel = router.asPath.split('/')[3] // Get the device model from the url
   const deviceDetailsQuery = trpc.device.getDevice.useQuery({
     model: deviceModel,
-  })
+  }) // Get the device details from the database
   const userDetailsQuery = trpc.auth.getUserDetails.useQuery({
     email: user?.email,
-  })
+  }) // Get the user details from the database
 
+  // When user data changes
   useEffect(() => {
+    // If user data finished loading
     if (userDetailsQuery.data) {
-      setUsername(userDetailsQuery.data.username)
+      setUsername(userDetailsQuery.data.username) // Set the username to the user username
     }
   }, [setUsername, userDetailsQuery.data])
 
+  // When device data changes
   useEffect(() => {
+    // If posthog was not captured
     if (!captured && deviceDetailsQuery.data) {
+      // Capture the device page in posthog
       posthog.capture('Device Page', {
         deviceName: deviceDetailsQuery.data.name,
       })
-      setCaptured(true)
+      setCaptured(true) // Set captured state to true
     }
   }, [captured, deviceDetailsQuery.data, posthog])
 
+  // If device data is not loaded
   if (deviceDetailsQuery.data === undefined) {
     return <Loader />
   }
 
+  // If requested device does not exist
   if (deviceDetailsQuery.data === null) {
     return (
       <Container size='lg'>

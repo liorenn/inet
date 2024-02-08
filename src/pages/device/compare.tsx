@@ -21,43 +21,51 @@ import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 import { z } from 'zod'
 
+// Function to get the buttons for the segmented control
 function getButtons(t: Translate, width: number) {
   const Buttons = [
     { label: `${t('two')} ${t('devices')}`, value: '2' },
     { label: `${t('three')} ${t('devices')}`, value: '3' },
     { label: `${t('four')} ${t('devices')}`, value: '4' },
   ]
+  // If the screen is wide only show four buttons
   if (width > 1100) {
-    return Buttons
+    return Buttons // Return the buttons
   }
+  // If the screen is medium only show three buttons
   if (width > 800) {
-    return Buttons.slice(0, 2)
+    return Buttons.slice(0, 2) // Slice the buttons array to only show three buttons
   }
-  return Buttons.slice(0, 1)
+  // If the screen is small only show two buttons
+  return Buttons.slice(0, 1) // Slice the buttons array to only show two buttons
 }
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 export default function Compare() {
-  const { t } = useTranslation('main')
-  const { width } = useViewportSize()
-  const router = useRouter()
+  const { t } = useTranslation('main') // Get the translation function
+  const { width } = useViewportSize() // Get the width of the viewport
+  const router = useRouter() // Get the router
   const deviceList = z
-    .string()
-    .parse(router.query.deviceList ?? '')
-    .split(',')
+    .string() // Parse to string
+    .parse(router.query.deviceList ?? '') // Parse the device list from the url
+    .split(',') // Split the device list into an array
   const [compareAmount, setCompareAmount] = useState(
     getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
-  )
-  const allDevicesQuery = trpc.device.getModelsAndNames.useQuery()
+  ) // Get the amount of devices to compare
+  const allDevicesQuery = trpc.device.getModelsAndNames.useQuery() // Get the devices from the database
   const selectedDevicesQuery = trpc.device.getDevicesFromModelsArr.useQuery({
     modelsArr: deviceList,
-  })
+  }) // Get the devices from the database
 
+  // When compare amount changes
   useEffect(() => {
+    // If all devices query data exists
     if (allDevicesQuery.data) {
+      // Get the new compare amount
       const arrayLength = Number(
         getButtons(t, width).find((mark) => mark.value === compareAmount)?.value
       )
+      // Push the new compare amount to device list in the url
       router.push(
         generateUrlSring(allDevicesQuery.data.slice(0, arrayLength).map((device) => device.model))
       )
@@ -65,25 +73,29 @@ export default function Compare() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [compareAmount])
 
-  console.log(compareAmount)
-
+  // When width changes
   useEffect(() => {
+    // Set the new compare amount based on the width
     setCompareAmount(
       getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [width])
 
+  // When device list changes
   useEffect(() => {
+    // If the device list is not in the url
     if (!router.query.deviceList) {
-      router.push(generateUrlSring(['iphone14', 'iphone15pro']))
+      router.push(generateUrlSring(['iphone14', 'iphone15pro'])) // Push the default device list to the url
     }
   }, [router])
 
+  // Function to generate the url string
   function generateUrlSring(deviceList: string[]) {
-    return `?deviceList=${deviceList.join(',')}`
+    return `?deviceList=${deviceList.join(',')}` // Return the url string
   }
 
+  // Function to update the device list
   function updateDeviceList(model: string | null, index: number) {
     if (model === null) return
     const newDeviceList = deviceList

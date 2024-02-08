@@ -15,6 +15,7 @@ import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import { validateInputOnChange } from 'config'
 
+// The sign up properties type
 export type SignUpFormType = {
   [K in keyof Omit<User, 'accessKey'>]: string
 }
@@ -29,48 +30,52 @@ export default function SignUp() {
   const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation() // Get the IsUserExists mutation
   const createUserMutation = trpc.auth.createUser.useMutation() // Get the createUser mutation
   const { t } = useTranslation('main') // Get the translation function
-
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
     email: session?.user?.email,
   }) // Get the access key for the user
+
+  // When access key changes
   useEffect(() => {
     accessKeyQuery.data && accessKeyQuery.data >= 1 && router.push('/') // Check if the accessKeyQuery.data exists and redirect to home
   }, [accessKeyQuery.data, router])
 
+  // Create the form with the properties
   const form = useForm<SignUpFormType>({
     initialValues: formProperties.getDefaultValues() as FormDefaultValues,
     validateInputOnChange,
     validate: formProperties.getValidators(),
   })
 
+  //Sign up the user
   function signUp(fields: SignUpFormType) {
     setLoading(true) // Set loading to true
+    // Check if the user exists in the database
     IsUserExistsMutation.mutate(
-      // Check if the user exists in the database
       {
         email: fields.email,
         password: fields.password,
         username: fields.username,
       },
       {
+        // On operation success
         onSuccess(data) {
           const IsExist = data // Is user exists in database
+          // If email  exist in database and username does not exists
           if (IsExist?.email && !IsExist.username) {
-            // If email  exist in database and username does not exists
             CreateNotification(t('emailExistMessage'), 'red') // Create a error notification
           }
+          // If email does not exist in database and username exists
           if (!IsExist?.email && IsExist?.username) {
-            // If email does not exist in database and username exists
             CreateNotification(t('usernameExistMessage'), 'red') // Create a error notification
           }
+          // If both email and username exist in database
           if (IsExist?.email && IsExist?.username) {
-            // If both email and username exist in database
             CreateNotification(t('usernameAndEmailExistMessage'), 'red') // Create a error notification
           }
+          // If both email and username does not exist in database
           if (!IsExist?.email && !IsExist?.username) {
-            // If both email and username does not exist in database
+            // Create the user
             createUserMutation.mutate(
-              // Create the user
               {
                 email: fields.email,
                 phone: fields.phone,
@@ -79,14 +84,16 @@ export default function SignUp() {
                 username: fields.username,
               },
               {
+                // On operation success
                 async onSuccess() {
+                  // Sign up the user
                   const { data, error } = await supabase.auth.signUp({
                     phone: fields.phone,
                     email: fields.email,
                     password: fields.password,
                   }) // Sign up the user
+                  // If there is no error
                   if (!error) {
-                    // If there is no error
                     CreateNotification(t('accountCreatedSuccessfully'), 'green') // Create a success notification
                     posthog.capture('User Signed Up', { data })
                     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -106,6 +113,7 @@ export default function SignUp() {
     )
   }
 
+  // If user is connected
   if (session || accessKeyQuery.isLoading) {
     return <Center>{t('accessDeniedMessageSignOut')}</Center>
   }

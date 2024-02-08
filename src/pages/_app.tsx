@@ -18,7 +18,9 @@ import { useEffect } from 'react'
 import { useLocalStorage } from '@mantine/hooks'
 import useTranslation from 'next-translate/useTranslation'
 
+// If there is a window
 if (typeof window !== 'undefined') {
+  // Initialize PostHog client
   posthog.init(clientEnv.posthogToken, {
     api_host: clientEnv.posthogApiHost,
     loaded: (posthog) => {
@@ -31,6 +33,7 @@ type PageProps = AppProps<{
   initialSession: Session
 }>
 
+// Create rtl cache
 const rtlCache = createEmotionCache({
   key: 'mantine-rtl',
   stylisPlugins: [rtlPlugin],
@@ -42,12 +45,14 @@ function App({ Component, pageProps }: PageProps) {
     key: 'mantine-color-scheme',
     defaultValue: defaultColorScheme,
     getInitialValueInEffect: true,
-  })
+  }) // Get the color scheme
   const toggleColorScheme = (value?: ColorScheme) =>
-    setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'))
-  const { lang } = useTranslation('main')
+    setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark')) // Toggle the color scheme function
+  const { lang } = useTranslation('main') // Get the current language
 
+  // When the language changes
   useEffect(() => {
+    // Set the direction of the document based on the language
     document.body.dir = rtlInHebrew ? (lang === 'he' ? 'rtl' : 'ltr') : 'ltr'
   }, [lang])
 
