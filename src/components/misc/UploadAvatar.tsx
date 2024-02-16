@@ -23,6 +23,7 @@ export default function ImageUploader({ email }: Props) {
   const [file, setFile] = useState<File | undefined>() // State variable to store the file
   const { setImageExists, setImagePath, imageExists, imagePath } = useProfilePicture() // Get the profile picture state
 
+  // Function to delete the image from the server
   async function deleteImage() {
     // Send a request to the server to delete the image
     await fetch('/api/file/delete', {
@@ -41,6 +42,7 @@ export default function ImageUploader({ email }: Props) {
     })
   }
 
+  // Function to upload the image
   async function uploadImage() {
     if (!file) return // If no file is selected return
     const formData = new FormData() // Create a FormData object
@@ -53,8 +55,8 @@ export default function ImageUploader({ email }: Props) {
         method: 'POST',
         body: formData, // Send the FormData object
       }).then((response) => {
+        // If the response is ok
         if (response.ok) {
-          // If the response is ok
           CreateNotification('Profile Picture Changed', 'green') // Create a success notification
           setImagePath(`${clientEnv.websiteUrl}/users/${newFileName}`) // Set the imagePath state
           setFile(newFile) // Set the file state

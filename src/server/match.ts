@@ -19,9 +19,9 @@ export function getMatchedDevices(
   const mergedValues = preferencesValuesToMergedValues(preferencesValues, devices)
   const normilizedValues = mergedValuesToNormilizedValues(mergedValues, deviceType)
   // Extract preference values and total device values, then calculate recommended devices
-  const totalPrefsValues = normilizedValues.map((value) => value.prefValue)
-  const totalDevicesValues = convertToTotalDevicesValues(normilizedValues)
-  return calculateRecommendedDevices(totalDevicesValues, totalPrefsValues, limit)
+  const totalPrefsValues = normilizedValues.map((value) => value.prefValue) // Get preferences values
+  const totalDevicesValues = convertToTotalDevicesValues(normilizedValues) // Get total device values
+  return calculateRecommendedDevices(totalDevicesValues, totalPrefsValues, limit) // Return the recommended devices
 }
 
 // Function to get recommended devices based on a single device, device type, and all devices
@@ -30,23 +30,24 @@ export function getRecommendedDevices(
   deviceType: string,
   devices: MatchDeviceType[]
 ) {
-  // Extract preference values from the given device and calculate matched devices based on them
-  const preferencesValues: PreferenceType[] = []
+  const preferencesValues: PreferenceType[] = [] // Initialize the preference values array
+  // Get the properties from the device
   Object.keys(device).forEach((key) => {
-    const property = key as keyof MatchDeviceType
+    const property = key as keyof MatchDeviceType // Cast the key to the type of the property
+    // If property is not model and the property value is not null
     if (property !== 'model' && device[property] !== null) {
       const value =
-        property === 'releaseDate'
-          ? new Date(device[property]).getFullYear()
-          : device[property] ?? 0
-
+        property === 'releaseDate' // If property is release date
+          ? new Date(device[property]).getFullYear() // Get the year of the release date
+          : device[property] ?? 0 // Else get the property value and else set it to zero
+      // Add the preference value to the preferences values array
       preferencesValues.push({
         name: property,
         value: value,
       })
     }
   })
-  return getMatchedDevices(preferencesValues, devices, deviceType, recommendedDevicesLimit)
+  return getMatchedDevices(preferencesValues, devices, deviceType, recommendedDevicesLimit) // Return the recommended devices
 }
 
 type PreferenceType = {
@@ -98,6 +99,7 @@ type MergedValuesType = {
   }[]
 }[]
 
+// Function to convert preference values and devices values to merged values
 function preferencesValuesToMergedValues(
   preferencesValues: PreferenceType[],
   devices: MatchDeviceType[]
@@ -117,24 +119,25 @@ function preferencesValuesToMergedValues(
   })
 }
 
+// Function to convert the merged values to normalized values
 function mergedValuesToNormilizedValues(mergedValues: MergedValuesType, deviceType: string) {
   return mergedValues
     .filter((value) => {
       const weight = weights
-        .find((val) => val.deviceType === deviceType)
-        ?.weights?.find((weight) => weight.property === value.name)
-      return weight !== undefined
+        .find((val) => val.deviceType === deviceType) // Get the weight of the device type
+        ?.weights?.find((weight) => weight.property === value.name) // Find the weight of the property
+      return weight !== undefined // Keep in the array if the weight exists
     })
     .map((value) => {
       const weight = weights
-        .find((val) => val.deviceType === deviceType)
-        ?.weights?.find((weight) => weight.property === value.name)
-      const minValue = weight?.minValue ?? 0
-      const maxValue = weight?.maxValue ?? 0
-      const devicesValues = value.devicesValues.map((value) => value.value)
-      const prefValue = normalizeValue(value.prefValue, minValue, maxValue)
-      const devicesNormalizedValues = devicesValues.map((deviceValue) =>
-        normalizeValue(deviceValue, minValue, maxValue)
+        .find((val) => val.deviceType === deviceType) // Get the weight of the device type
+        ?.weights?.find((weight) => weight.property === value.name) // Find the weight of the property
+      const minValue = weight?.minValue ?? 0 // Get the minimum value of the value
+      const maxValue = weight?.maxValue ?? 0 // Get the maximum value of the value
+      const devicesValues = value.devicesValues.map((value) => value.value) // Get the device values
+      const prefValue = normalizeValue(value.prefValue, minValue, maxValue) // Get the normalized preference value
+      const devicesNormalizedValues = devicesValues.map(
+        (deviceValue) => normalizeValue(deviceValue, minValue, maxValue) // Get the normalized device values
       )
       return {
         name: value.name,
@@ -155,6 +158,7 @@ type TotalDevicesType = {
   values: number[]
 }
 
+// Function to convert the merged values into an array
 function convertToTotalDevicesValues(merged: MergedValuesType): TotalDevicesType[] {
   const totalDevices: TotalDevicesType[] = [] // Create an empty array to store the total devices
   const models = merged[0].devicesValues.map((device) => device.model) // Get the models from the first device
@@ -166,7 +170,7 @@ function convertToTotalDevicesValues(merged: MergedValuesType): TotalDevicesType
     })
     totalDevices.push({ model: model, values: values }) // Push the model and values to the total devices array
   })
-  return totalDevices
+  return totalDevices // Return the total devices
 }
 
 // Function to calculate a value within a specified range based on an index
@@ -198,11 +202,14 @@ function calculateRecommendedDevices(
   limit: number
 ) {
   // Calculate the match percentage for each device, round it to two decimal places, and return the top devices based on the limit
-  return totalDevicesValues
-    .map((device) => ({
-      model: device.model,
-      match: parseFloat(calculateMatch(totalPrefsValues, device.values).toFixed(2)),
-    }))
-    .sort((a, b) => b.match - a.match)
-    .slice(0, limit)
+  return (
+    totalDevicesValues
+      // For each device in the total
+      .map((device) => ({
+        model: device.model,
+        match: parseFloat(calculateMatch(totalPrefsValues, device.values).toFixed(2)), // Calculate the match percentage for device
+      }))
+      .sort((a, b) => b.match - a.match) // Sort the devices based on the match percentage
+      .slice(0, limit)
+  ) // Return the top devices based on the limit amount
 }

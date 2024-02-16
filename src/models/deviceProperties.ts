@@ -9,6 +9,7 @@ export type Weight = {
   maxValue: number
 }
 
+// Define the DeviceTypeWeight type
 export type DeviceTypeWeight = {
   deviceType: DeviceType
   weights: Weight[]

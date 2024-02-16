@@ -55,6 +55,7 @@ export default function Comments({ device }: Props) {
       updatedAt: new Date(),
       rating: rating,
     }
+
     // Add the new comment
     addCommentMutation.mutate(newComment, {
       // On operation success

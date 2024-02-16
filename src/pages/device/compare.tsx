@@ -1,12 +1,5 @@
-import {
-  Container,
-  Divider,
-  Group,
-  SegmentedControl,
-  Select,
-  SimpleGrid,
-  Title,
-} from '@mantine/core'
+import { Container, Divider, Group, SegmentedControl } from '@mantine/core'
+import { Select, SimpleGrid, Title } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
 import DevicePhotos from '@/components/device/DevicePhotos'
@@ -20,6 +13,8 @@ import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 import { z } from 'zod'
+
+/* eslint-disable @typescript-eslint/no-floating-promises */
 
 // Function to get the buttons for the segmented control
 function getButtons(t: Translate, width: number) {
@@ -40,7 +35,6 @@ function getButtons(t: Translate, width: number) {
   return Buttons.slice(0, 1) // Slice the buttons array to only show two buttons
 }
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 export default function Compare() {
   const { t } = useTranslation('main') // Get the translation function
   const { width } = useViewportSize() // Get the width of the viewport
@@ -97,12 +91,13 @@ export default function Compare() {
 
   // Function to update the device list
   function updateDeviceList(model: string | null, index: number) {
-    if (model === null) return
-    const newDeviceList = deviceList
-    newDeviceList[index] = model
-    router.push(`?deviceList=${newDeviceList.join(',')}`)
+    if (model === null) return // If the model is null exit the function
+    const newDeviceList = deviceList // Create a new device list
+    newDeviceList[index] = model // Update the model in the new device list
+    router.push(generateUrlSring(newDeviceList)) // Push the new device list to the url
   }
 
+  // If all devices query data is loading
   if (allDevicesQuery.data === undefined) {
     return (
       <>
@@ -147,7 +142,7 @@ export default function Compare() {
             />
           ))}
         </Group>
-        {selectedDevicesQuery.data && selectedDevicesQuery.data.length > 0 ? (
+        {selectedDevicesQuery.data && selectedDevicesQuery.data.length > 0 ? ( // If the selected devices query data exists
           <>
             <SimpleGrid mb='md' cols={selectedDevicesQuery.data.length}>
               {deviceList.map((model, index) => {
@@ -172,6 +167,7 @@ export default function Compare() {
             <DevicesSpecs devices={selectedDevicesQuery.data} />
           </>
         ) : (
+          // If the selected devices query data loads
           deviceList && <Loader />
         )}
       </Container>

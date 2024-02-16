@@ -9,39 +9,39 @@ import { env } from '@/server/env' // Importing server environment variables
 
 // Function to fetch the current price of a device model
 export async function fetchCurrentPrice(deviceModel: string) {
-  const prisma = new PrismaClient()
+  const prisma = new PrismaClient() // Initialize the Prisma Client
   const device = await prisma.device.findFirst({
     where: {
       model: deviceModel,
     },
-  })
+  }) // Get the device from the database with the given device model
+  if (!device) return 0 // Return zero if device was not found
+
   const gsmarena = require('gsmarena-api') //create the api client
-  if (!device) return 0
+
   const search = await gsmarena.search.search(
     device.name.toLowerCase().includes('ipad pro')
       ? 'Apple iPad Pro 12.9'
       : device.name.toLowerCase()
-  )
+  ) // Search for the device in the api
   const deviceID =
     search.find((item: { name: string }) =>
       isGsmarenaNameEquals(item.name, device.name, device.type)
-    ).id ?? ''
-  //apple_iphone_13_pro_max-11089
-  // Get the device details
-  const apiDevice = await gsmarena.catalog.getDevice(deviceID)
-  // Extract the price from the device details
-  const price = apiDevice.detailSpec[12].specifications.find((item: any) => item.name === 'Price')
-    .value as string
-  // Format the price
-  const formatterPrice = await FormatPrice(price)
+    ).id ?? '' // Get the device id from the api
 
-  console.log(price, formatterPrice)
-  // Update the price in the database
+  const apiDevice = await gsmarena.catalog.getDevice(deviceID) // Get the device details
+
+  const price = apiDevice.detailSpec[12].specifications.find((item: any) => item.name === 'Price')
+    .value as string // Extract the price from the device details
+
+  const formatterPrice = await FormatPrice(price) // Format the price
+
   await prisma.device.update({
     where: { model: deviceModel },
     data: { price: formatterPrice },
-  })
-  return formatterPrice
+  }) // Update the price in the database
+
+  return formatterPrice // Return the formatted price
 }
 
 // Function to convert the price to a different currency
@@ -72,12 +72,16 @@ async function FormatPrice(priceString: string) {
   }
 }
 
+// Function to check if the gsmarena name is equal to the name of the device in the database
 function isGsmarenaNameEquals(gsmarenaName: string, name: string, deviceType: string): boolean {
+  // If device type is iphone
   if (deviceType === 'iphone') {
+    // Return if both names with trimmed out whitspaces and lowercased are equal
     return (
       gsmarenaName.toLowerCase().replace(/\s|apple/g, '') === name.toLowerCase().replace(/\s/g, '')
     )
   }
+  // Match the ipad name to lowercase without whitespaces to get the gsmarena name
   switch (name.toLowerCase().replace(/\s/g, '')) {
     case 'ipad10':
       return gsmarenaName === 'Apple iPad (2022)'
@@ -101,7 +105,7 @@ function isGsmarenaNameEquals(gsmarenaName: string, name: string, deviceType: st
       return gsmarenaName === 'Apple iPad Pro 12.9 (2021)'
     case 'ipadpro6':
       return gsmarenaName === 'Apple iPad Pro 12.9 (2022)'
-    default:
+    default: // Return false if no match
       return false
   }
 }

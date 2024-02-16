@@ -80,11 +80,10 @@ export function excludeProperty<T, K extends keyof T>(obj: T, propKey: K): Omit<
   return rest // Returning the new object without the excluded property
 }
 
+// Split array into array of arrays with length of size
 export function chunkArray<T>(array: T[], size: number): T[][] {
-  if (!array.length) {
-    return []
-  }
-  const head = array.slice(0, size)
-  const tail = array.slice(size)
-  return [head, ...chunkArray(tail, size)]
+  if (!array.length) return [] // If the array is empty return an empty array
+  const head = array.slice(0, size) // Get the first size elements
+  const tail = array.slice(size) // Get the rest of the elements
+  return [head, ...chunkArray(tail, size)] // Recursively call the function with the rest of the elements
 }

@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import MatchedDevices from '@/components/device/MatchedDevices'
 import { PropertiesSchemaType } from '@/models/deviceProperties'
-import { Translate } from 'next-translate'
 import { deviceType as deviceTypeEnum } from '@/models/enums'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
@@ -21,27 +20,29 @@ type PreferenceType = {
   value: string
 }
 
+/* eslint-disable @typescript-eslint/no-floating-promises */
+
+// Function to get the preferences options of a device type
 const getPreferences = (deviceType: string) => {
+  // Find the device type properties in the deviceTypesProperties array and return it
   return deviceTypesProperties.find((device) => device.deviceType === deviceType)?.properties ?? []
 }
 
+// Function to generate the url string from the device type and preferences
 function generateUrlString(deviceType: string, preferences: PreferenceType[]) {
-  return `?deviceType=${deviceType}&preferences=${preferences
-    .map((preference) => {
-      return `${preference.name}-${preference.value}`
-    })
-    .join(',')}`
+  return `?deviceType=${deviceType}&preferences=${getFormattedPreferences(preferences)}` // Generate the url string with url parameters
 }
 
-function getPreferencesFormatter(preferences: PreferenceType[]) {
+// Function to format the preferences to a string
+function getFormattedPreferences(preferences: PreferenceType[]) {
   return `${preferences
+    // For each preference in the preferences array
     .map((preference) => {
-      return `${preference.name}-${preference.value}`
+      return `${preference.name}-${preference.value}` // Return a formatted string seperated by a dash
     })
-    .join(',')}`
+    .join(',')}` // Join the preferences seperated by a comma
 }
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 export default function Find() {
   const router = useRouter() // Get the router
   const { width } = useViewportSize() // Get the width of the viewport
@@ -50,22 +51,23 @@ export default function Find() {
   const MatchedDevicesMutation = trpc.device.getMatchedDevices.useMutation() // Mutation to get the matched devices
   const deviceType = z.string().parse(router.query.deviceType ?? 'iphone') // Get the device type from the url
   const preferences = z // Get the user preferences from the url
-    .string()
+    .string() // Parse the preferences to a string
     .parse(
       router.query.preferences ??
-        getPreferencesFormatter(getPreferences(deviceType).map((name) => ({ name, value: '' })))
+        getFormattedPreferences(getPreferences(deviceType).map((name) => ({ name, value: '' })))
       // Set the preferences to be empty if they are not in the url
     )
     .split(',') // Split the preferences seperated by a comma into an array
     .map((value) => {
-      // Map the preferences to an object with name and value
+      // Map the preferences to an object with name and value of the preference
       return { name: value.split('-')[0], value: value.split('-')[1] }
     })
 
   const [accordionState, setAccordionState] = useState<string[]>(
     preferences.map((pref) => pref.name)
-  ) // Set the accordion state to manage its state
+  ) // Set the accordion state to manage his opened and closed states
 
+  // When component mounts
   useEffect(() => {
     // If the preferences are not in the url
     if (!router.query.preferences) {
@@ -81,32 +83,37 @@ export default function Find() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Function to handle the submit of the preferences form
   function handleSubmit() {
     const userPreferences = preferences
-      .filter((pref) => pref.value !== 'notInterested' && pref.value !== '')
-      .map((pref) => {
+      // Filter the preferences that are not not interested and empty
+      .filter((preference) => preference.value !== 'notInterested' && preference.value !== '')
+      // For each preference
+      .map((preference) => {
         return {
-          name: pref.name as PropertiesSchemaType,
+          name: preference.name as PropertiesSchemaType, // Cast the name to a PropertiesSchemaType
           value:
             (propertiesLabels
-              .find((property) => property.property === pref.name)
-              ?.labels?.indexOf(pref.value) ?? 0) + 1,
+              .find((property) => property.property === preference.name) // Find the property label in the propertiesLabels array
+              ?.labels?.indexOf(preference.value) ?? 0) + 1, // Get the value of the label
         }
       })
-    userPreferences.length > 0 &&
-      MatchedDevicesMutation.mutate({ deviceType, userPreferences: userPreferences })
+    // If user chose no preferences after the filtering
+    if (userPreferences.length > 0)
+      MatchedDevicesMutation.mutate({ deviceType, userPreferences: userPreferences }) // Send the user preferences to the server
   }
 
-  function getSegmentedData(t: Translate, lang: string, preference: PropertiesSchemaType) {
+  // Function to get the segmented data
+  function getSegmentedData(preference: PropertiesSchemaType) {
     const data = propertiesLabels
-      .find((property) => property.property === preference)
+      .find((property) => property.property === preference) // Find the property in the propertiesLabels array
       ?.labels?.map((value) => {
         return {
           value: value,
-          label: lang === 'he' ? `${t(preference)} ${t(value)}` : `${t(value)} ${t(preference)}`,
+          label: lang === 'he' ? `${t(preference)} ${t(value)}` : `${t(value)} ${t(preference)}`, // Translate the preference label
         }
       })
-    return data ? [{ value: 'notInterested', label: t('notInterested') }, ...data] : []
+    return data ? [{ value: 'notInterested', label: t('notInterested') }, ...data] : [] // Add the not interested option and return segmented data
   }
 
   return (
@@ -127,8 +134,10 @@ export default function Find() {
               color='gray'
               variant='default'
               onClick={() => {
-                MatchedDevicesMutation.reset()
+                MatchedDevicesMutation.reset() // Reset the matched devices query
+                // Push a new url string
                 router.push(
+                  // Generate a url string with empty preferences
                   generateUrlString(
                     deviceType,
                     getPreferences(deviceType).map((name) => ({ name, value: '' }))
@@ -144,8 +153,10 @@ export default function Find() {
               mb={width < 1000 ? 'sm' : 0}
               value={deviceType}
               onChange={(value) => {
-                setAccordionState(getPreferences(value))
+                setAccordionState(getPreferences(value)) // Update the accordion state
+                // Push a new url string
                 router.push(
+                  // Generate a url string with preferences based on the new device type
                   generateUrlString(
                     value,
                     getPreferences(value).map((name) => ({ name, value: '' }))
@@ -175,7 +186,7 @@ export default function Find() {
             }}>
             {getPreferences(deviceType).map((pref, index: number) => (
               <PreferenceInput
-                value={getSegmentedData(t, lang, pref)}
+                value={getSegmentedData(pref)}
                 deviceType={deviceType}
                 preferences={preferences}
                 index={index}
@@ -204,6 +215,7 @@ export default function Find() {
   )
 }
 
+// Type for the preference input
 type preferenceInputType = {
   value: InputType
   index: number
@@ -212,8 +224,8 @@ type preferenceInputType = {
 }
 
 function PreferenceInput({ value, index, deviceType, preferences }: preferenceInputType) {
-  const router = useRouter()
-  const { t } = useTranslation('main')
+  const router = useRouter() // Get the router
+  const { t } = useTranslation('main') // Get the translation function
 
   return (
     <>
@@ -233,10 +245,10 @@ function PreferenceInput({ value, index, deviceType, preferences }: preferenceIn
               }
               value={preferences[index].value}
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onChange={(newValue) => (
-                (preferences[index].value = newValue),
-                router.push(generateUrlString(deviceType, preferences))
-              )}
+              onChange={(newValue) => {
+                preferences[index].value = newValue // Update the preference value
+                router.push(generateUrlString(deviceType, preferences)) // Push a new url string with updated preferences
+              }}
             />
           </ScrollArea>
         </Accordion.Panel>

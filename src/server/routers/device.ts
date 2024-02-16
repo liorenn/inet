@@ -12,10 +12,11 @@ import { selectParams } from '@/models/deviceProperties'
 import { convertPrice, fetchCurrentPrice } from '@/server/price'
 
 export const DeviceRouter = router({
+  // Function to fetch current devices prices
   fetchDevicesPrices: method.mutation(async ({ ctx }) => {
     const devices = await ctx.prisma.device.findMany({
       where: {
-        OR: [{ type: 'iphone' }, { type: 'ipad' }],
+        OR: [{ type: 'iphone' }, { type: 'ipad' }], // If device type is iphone or ipad
       },
     })
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -23,7 +24,8 @@ export const DeviceRouter = router({
       await fetchCurrentPrice(device.model)
     })
   }),
-  convertPrice: method
+  // Function to convert price
+  convertDevicePrice: method
     .input(
       z.object({
         price: z.number(),
@@ -32,8 +34,9 @@ export const DeviceRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return convertPrice(input.price, input.currency, input.targetCurrency)
+      return convertPrice(input.price, input.currency, input.targetCurrency) // Convert and return the price
     }),
+  // Function to get recommended devices
   getRecommendedDevices: method
     .input(z.object({ model: z.string(), deviceType: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -42,14 +45,14 @@ export const DeviceRouter = router({
         where: {
           model: input.model,
         },
-      })
-      if (!queriedDevice) return []
+      }) // Get queried device
+      if (!queriedDevice) return [] // Return an empty array if the device is not found
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { releasePrice, ...queriedDeviceWithoutReleasePrice } = queriedDevice
+      const { releasePrice, ...queriedDeviceWithoutReleasePrice } = queriedDevice // Remove release price
       const device = {
         ...queriedDeviceWithoutReleasePrice,
         price: queriedDevice.releasePrice,
-      }
+      } // Convert release price to price
       const queriesDevices = await ctx.prisma.device.findMany({
         select: selectParams,
         where: {
@@ -60,14 +63,14 @@ export const DeviceRouter = router({
             type: input.deviceType,
           },
         },
-      })
+      }) // Get devices that are not the queried device
       const devices: MatchDeviceType[] = queriesDevices.map((device) => {
         const { releasePrice, ...deviceWithoutReleasePrice } = device
         return {
           ...deviceWithoutReleasePrice,
           price: releasePrice,
         }
-      })
+      }) // Convert release price to price
       const matches = getRecommendedDevices(device, input.deviceType, devices)
       const query = await ctx.prisma.device.findMany({
         select: selectProprties,
@@ -76,17 +79,19 @@ export const DeviceRouter = router({
             in: matches.map((device) => device.model),
           },
         },
-      })
+      }) // Get devices that match the recommended devices
+      // Sort devices by model
       query.sort((a, b) => {
-        const modelAIndex = matches.map((device) => device.model).indexOf(a.model)
-        const modelBIndex = matches.map((device) => device.model).indexOf(b.model)
-        return modelAIndex - modelBIndex
+        const modelAIndex = matches.map((device) => device.model).indexOf(a.model) // Get the index of the first model in the array
+        const modelBIndex = matches.map((device) => device.model).indexOf(b.model) // Get the index of the second model in the array
+        return modelAIndex - modelBIndex // Compare the indices to sort by model
       })
       const recommendedDevices = query.map((device, index) => {
         return { ...device, match: matches[index].match }
-      })
-      return recommendedDevices
+      }) // Add match to each device
+      return recommendedDevices // Return the recommended devices
     }),
+  // Function to get matched devices
   getMatchedDevices: method
     .input(
       z.object({
@@ -100,21 +105,22 @@ export const DeviceRouter = router({
         where: {
           type: input.deviceType,
         },
-      })
+      }) // Get devices that match the device type
       const devices: MatchDeviceType[] = queriesDevices.map((device) => {
-        const { releasePrice, ...deviceWithoutReleasePrice } = device
+        const { releasePrice, ...deviceWithoutReleasePrice } = device // Remove release price
         return {
           ...deviceWithoutReleasePrice,
           price: releasePrice,
         }
       })
+      // Convert all of the preferences to values based on the device type
       const preferencesValues = convertPreferencesToValues(input.userPreferences, input.deviceType)
       const matches = getMatchedDevices(
         preferencesValues,
         devices,
         input.deviceType,
         matchedDevicesLimit
-      )
+      ) // Get the matched devices
       const query = await ctx.prisma.device.findMany({
         select: selectProprties,
         where: {
@@ -122,35 +128,38 @@ export const DeviceRouter = router({
             in: matches.map((device) => device.model),
           },
         },
-      })
+      }) // Query the matched devices data
       query.sort((a, b) => {
-        const modelAIndex = matches.map((device) => device.model).indexOf(a.model)
-        const modelBIndex = matches.map((device) => device.model).indexOf(b.model)
-        return modelAIndex - modelBIndex
+        const modelAIndex = matches.map((device) => device.model).indexOf(a.model) // Get the index of the first model in the array
+        const modelBIndex = matches.map((device) => device.model).indexOf(b.model) // Get the index of the second model in the array
+        return modelAIndex - modelBIndex // Compare the indices to sort by model
       })
       const matchedDevices = query.map((device, index) => {
         return { ...device, match: matches[index].match }
-      })
-      return matchedDevices.sort((a, b) => b.match - a.match)
+      }) // Add match to each device
+      return matchedDevices.sort((a, b) => b.match - a.match) // Return the matched devices
     }),
+  // Function to insert a device
   insertDevice: method
     .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
       try {
-        const { FromAsp, ...device } = input
+        const { FromAsp, ...device } = input // Remove fromAsp from input
         await ctx.prisma.device.create({
           data: {
             ...device,
           },
-        })
+        }) // Create the device
+        // Send soap request if sendSoapRequest config is true and FromAsp is not true
         if (sendSoapRequest && FromAsp !== true) {
-          await insertDeviceSoap({ input: device })
+          await insertDeviceSoap({ input: device }) // Send insert device soap request
         }
-        return true
+        return true // Return true to indicate operation success
       } catch {
-        return false
+        return false // Return false to indicate operation failure
       }
     }),
+  // Function to update a device
   updateDevice: method
     .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
@@ -162,36 +171,41 @@ export const DeviceRouter = router({
             ...device,
           },
         })
+        // Send soap request if sendSoapRequest config is true and FromAsp is not true
         if (sendSoapRequest && FromAsp !== true) {
-          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-          await updateDeviceSoap({ input: device })
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // Allow soap calls to succeed
+          await updateDeviceSoap({ input: device }) // Send update device soap request
         }
-        return true
+        return true // Return true to indicate operation success
       } catch {
-        return false
+        return false // Return false to indicate operation failure
       }
     }),
+  // Function to delete a device
   deleteDevice: method
     .input(z.object({ model: z.string(), FromAsp: z.boolean().optional() }))
     .mutation(async ({ ctx, input }) => {
       try {
-        const { FromAsp, model } = input
+        const { FromAsp, model } = input // Destructure the input
         await ctx.prisma.device.delete({
           where: { model },
-        })
+        }) // Delete the device
+        // Send soap request if sendSoapRequest config is true and FromAsp is not true
         if (sendSoapRequest && FromAsp !== true) {
-          await deleteDeviceSoap({ model: input.model })
+          await deleteDeviceSoap({ model: input.model }) // Send delete device soap request
         }
-        return true
+        return true // Return true to indicate operation success
       } catch {
-        return false
+        return false // Return false to indicate operation failure
       }
     }),
+  // Function to get all devices
   getDevicesData: method.query(async ({ ctx }) => {
-    return await ctx.prisma.device.findMany()
+    return await ctx.prisma.device.findMany() // Get all devices data
   }),
+  // Function to get all devices
   getDevices: method.input(z.object({ deviceType: z.string() })).query(async ({ ctx, input }) => {
-    return await ctx.prisma.device.findMany({
+    const devices = await ctx.prisma.device.findMany({
       select: selectProprties,
       where: {
         deviceType: {
@@ -199,10 +213,12 @@ export const DeviceRouter = router({
         },
       },
       orderBy: {
-        releaseDate: 'desc',
+        releaseDate: 'desc', // Order by release date in descending order
       },
-    })
+    }) // Get all devices
+    return devices // Return all devices
   }),
+  // Function to get a device
   getDevice: method.input(z.object({ model: z.string() })).query(async ({ ctx, input }) => {
     const device = await ctx.prisma.device.findFirst({
       where: { model: input.model },
@@ -210,19 +226,21 @@ export const DeviceRouter = router({
         cameras: { select: { type: true, megapixel: true } },
         colors: { select: { color: true } },
       },
-    })
-    if (device?.price === 0) {
-      const price = await fetchCurrentPrice(input.model)
-      device.price = price ?? 0
-      return device
+    }) // Get the device with cameras and colors
+    // If device exists and the price is zero type is iphone or ipad
+    if (device && device?.price === 0 && (device.type === 'iphone' || device.type === 'ipad')) {
+      const price = await fetchCurrentPrice(input.model) // Fetch current price
+      device.price = price ?? 0 // Set the price
+      return device // Return the device with the updated price
     }
-    return device
+    return device // Return the device
   }),
+  // Function to get devices from an array of models
   getDevicesFromModelsArr: method
     .input(z.object({ modelsArr: z.array(z.string()).optional() }))
     .query(async ({ ctx, input }) => {
       const models = input.modelsArr
-      if (!models) return []
+      if (!models) return [] // Return an empty array if there are no models
       const devices = await ctx.prisma.device.findMany({
         where: {
           model: {
@@ -233,36 +251,43 @@ export const DeviceRouter = router({
           cameras: { select: { type: true, megapixel: true } },
           colors: { select: { color: true } },
         },
-      })
-      // for (const device of devices) {
-      //   if (device) {
-      //     const model = device.model
-      //     const price = await fetchCurrentPrice(model)
-      //     device.price = price ?? 0
-      //   }
-      // }
+      }) // Get devices from the models
+      // For each device in the devices array
+      for (const device of devices) {
+        // If device exists and the price is zero type is iphone or ipad
+        if (device && device?.price === 0 && (device.type === 'iphone' || device.type === 'ipad')) {
+          const model = device.model // Get the model
+          const price = await fetchCurrentPrice(model) // Fetch current price
+          device.price = price ?? 0 // Set the price
+        }
+      }
+      // Sort devices by model
       devices.sort((a, b) => {
-        const modelAIndex = models.indexOf(a.model)
-        const modelBIndex = models.indexOf(b.model)
-        return modelAIndex - modelBIndex
+        const modelAIndex = models.indexOf(a.model) // Get the index of the first model in the array
+        const modelBIndex = models.indexOf(b.model) // Get the index of the second model in the array
+        return modelAIndex - modelBIndex // Compare the indices to sort by model
       })
-      return devices
+      return devices // Return the sorted devices
     }),
+  // Function to get all devices models and names
   getModelsAndNames: method.query(async ({ ctx }) => {
     const devices = await ctx.prisma.device.findMany({
       select: { model: true, name: true, type: true },
-    })
-    return devices
+    }) // Get all devices models and names
+    return devices // Return the devices models and names
   }),
+  // Function to check if a device is in the user devices list
   isDeviceInUser: method
     .input(z.object({ model: z.string(), email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       const user = await ctx.prisma.user.findFirst({
         where: { email: input.email },
         select: { deviceList: true },
-      })
+      }) // Get the user
+      // Check and return if the device is in the user devices list
       return user?.deviceList?.find((device) => device.deviceModel === input.model) !== undefined
     }),
+  // Function to add a device to favorites
   addToFavorites: method
     .input(z.object({ model: z.string(), email: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -275,8 +300,9 @@ export const DeviceRouter = router({
             },
           },
         },
-      })
+      }) // Add the device to the user
     }),
+  // Function to delete a device from favorites
   deleteFromFavorites: method
     .input(z.object({ model: z.string(), email: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -292,8 +318,9 @@ export const DeviceRouter = router({
             },
           },
         },
-      })
+      }) // Delete the device from the user
     }),
+  // Function to get user devices
   getUserDevices: method
     .input(
       z.object({
@@ -305,8 +332,9 @@ export const DeviceRouter = router({
         where: {
           userEmail: input.email,
         },
-      })
-      const devicesArr: DevicePropertiesType[] = []
+      }) // Get users devices
+      const devicesArr: DevicePropertiesType[] = [] // Initialize an empty array
+      // For each device in the devices array
       for (const device of devices) {
         const userDevice = await ctx.prisma.device.findFirst({
           where: { model: device.deviceModel },
@@ -316,13 +344,15 @@ export const DeviceRouter = router({
             imageAmount: true,
             type: true,
           },
-        })
+        }) // Get the users device
+        // If the user device exists
         if (userDevice) {
-          devicesArr.push(userDevice)
+          devicesArr.push(userDevice) // Push the user device to the devices array
         }
       }
-      return devicesArr
+      return devicesArr // Return the users devices
     }),
+  // Function to get user devices properties
   getUserDevicesProperties: method
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
@@ -342,6 +372,6 @@ export const DeviceRouter = router({
             },
           },
         },
-      })
+      }) // Return the users devices properties
     }),
 })

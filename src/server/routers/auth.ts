@@ -18,11 +18,13 @@ import { fetchCurrentPrice } from '@/server/price'
 import { resend } from '@/server/client'
 import { z } from 'zod'
 
+// The data type for the backupDatabase function
 export type allDataType = {
   table: string
   data: Record<string, unknown>[]
 }[]
 
+// The input type for the restoreDatabase function
 type RestoreDatabaseInput = {
   input: {
     data: string
@@ -31,55 +33,59 @@ type RestoreDatabaseInput = {
   prisma: PrismaClient
 }
 
+// Function to restore the database data
 async function restoreDatabase({ input, prisma }: RestoreDatabaseInput) {
+  // If request came from asp soap request
   if (input.FromAsp) {
-    const jsonData = input.data
-    const data: allDataType = JSON.parse(jsonData) as allDataType
-    // Start a transaction
+    const jsonData = input.data // Get the json data from the input
+    const data: allDataType = JSON.parse(jsonData) as allDataType // Parse the json data to allDataType type
+    // Delete all rows from the Device table because other tables rely on the device table
     await prisma.$executeRawUnsafe('DELETE FROM "Device";')
-    await prisma.$executeRawUnsafe('BEGIN;')
+    await prisma.$executeRawUnsafe('BEGIN;') // Start a transaction
     try {
-      for (const { table, data: rows } of data) {
-        // Generate DELETE query for the entire table
-        const deleteQuery = `DELETE FROM "${table}";`
-        await prisma.$executeRawUnsafe(deleteQuery)
-        // Generate INSERT query for all rows in the table
-        if (!rows[0]) continue
-        const columns = Object.keys(rows[0])
-          .map((column) => `"${column}"`)
-          .join(', ')
-        const values = rows
+      // For each table in the data
+      for (const { table, data: tableData } of data) {
+        const deleteQuery = `DELETE FROM "${table}";` // Generate delete query for the entire table
+        await prisma.$executeRawUnsafe(deleteQuery) // Execute the delete query
+        if (!tableData[0]) continue // If table has no data dont proceed to to insert query
+        const columns = Object.keys(tableData[0]) // Get the columns of the table
+          .map((column) => `"${column}"`) // Put it in quotes for the query
+          .join(', ') // Join the columns with commas
+        const values = tableData
+          // For each row in the table
           .map((row) => {
-            const rowValues = Object.values(row)
+            const rowValues = Object.values(row) // Get the row values
               .map((value) => {
+                // If value is null
                 if (value === null) {
-                  return 'NULL'
-                } else if (typeof value === 'number') {
-                  return value
-                } else {
-                  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                  return `'${value}'`
+                  return 'NULL' // Return null in sql format
+                } // If value is number
+                else if (typeof value === 'number') {
+                  return value // Return value in sql format
+                } // If value is string or other data type
+                else {
+                  return `'${value as string}'` // Return value in sql format
                 }
               })
-              .join(', ')
-            return `(${rowValues})`
+              .join(', ') // Join the values with commas
+            return `(${rowValues})` // Return value in sql format
           })
-          .join(', ')
-        const insertQuery = `INSERT INTO "${table}" (${columns}) VALUES ${values};`
-        await prisma.$executeRawUnsafe(insertQuery)
+          .join(', ') // Join the values with commas
+        const insertQuery = `INSERT INTO "${table}" (${columns}) VALUES ${values};` // Create insert query
+        await prisma.$executeRawUnsafe(insertQuery) // Execute the insert query
       }
-      // Commit the transaction if all queries are successful
-      await prisma.$executeRawUnsafe('COMMIT;')
+      await prisma.$executeRawUnsafe('COMMIT;') // Commit the transaction if all queries are successful
     } catch (error) {
-      // Rollback the transaction if there is an error
-      await prisma.$executeRawUnsafe('ROLLBACK;')
+      await prisma.$executeRawUnsafe('ROLLBACK;') // Rollback the transaction if there is an error
       throw error
     }
   }
 }
 
+// Function to backup the database data
 async function backupDatabase({ prisma }: { prisma: PrismaClient }) {
-  const allData: allDataType = []
+  const allData: allDataType = [] // Initialize all data array
+  // Push all tables and their data to the database
   allData.push({ table: 'Device', data: await prisma.device.findMany() })
   allData.push({
     table: 'BiometricFeature',
@@ -94,153 +100,168 @@ async function backupDatabase({ prisma }: { prisma: PrismaClient }) {
   allData.push({ table: 'DeviceType', data: await prisma.deviceType.findMany() })
   allData.push({ table: 'DeviceUser', data: await prisma.deviceUser.findMany() })
   allData.push({ table: 'User', data: await prisma.user.findMany() })
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-  await backupDatabaseSoap({ input: allData })
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // Allow soap calls to succeed
+  await backupDatabaseSoap({ input: allData }) // Send the soap request with all of the tables data
 }
 
 export const authRouter = router({
+  // Function to backup the database
   backupDatabase: method.mutation(async ({ ctx }) => {
-    await backupDatabase({ prisma: ctx.prisma })
-    return true
+    await backupDatabase({ prisma: ctx.prisma }) // Backup the database
+    return true // Return true to indicate operation success
   }),
+  // Function to backup the database
   restoreDatabase: method.mutation(async ({ ctx }) => {
-    const response = await restoreDatabaseSoap()
-    await restoreDatabase({ input: { data: response, FromAsp: true }, prisma: ctx.prisma })
-    return true
+    const response = await restoreDatabaseSoap() // Send the soap request
+    await restoreDatabase({ input: { data: response, FromAsp: true }, prisma: ctx.prisma }) // Restore the database
+    return true // Return true to indicate operation success
   }),
+  // Function to send a soap request to restore the database
   restoreDatabaseSoap: method
     .input(z.object({ data: z.string(), FromAsp: z.boolean().optional() }))
     .mutation(async ({ ctx, input }) => {
-      await restoreDatabase({ input, prisma: ctx.prisma })
-      return true
+      await restoreDatabase({ input, prisma: ctx.prisma }) // Restore the database
+      return true // Return true to indicate operation success
     }),
+  // Function to open the database editor
   openDatabaseEditor: method.mutation(async () => {
     try {
-      const response = await fetch(`http://localhost:${databaseEditorPort}/`)
-      await response.text()
-      return false
+      const response = await fetch(`http://localhost:${databaseEditorPort}/`) // Send request to database editor if it exists
+      await response.text() // Convert response
+      return false // Database editor exists so return false
     } catch {
       exec(
         `npx prisma studio --port ${databaseEditorPort} --browser none --schema=./prisma/schema.prisma`
-      )
-      return true
+      ) // Open database editor by running the command in the terminal
+      return true // Database editor does not exist so return true
     }
   }),
+  // Function to close the database editor
   closeDatabaseEditor: method.mutation(() => {
     try {
       exec(
         `for /f "tokens=5" %a in ('netstat -aon ^| find ":${databaseEditorPort}" ^| find "LISTENING"') do taskkill /f /pid %a`
-      )
-      return true
+      ) // Close database editor by running the command in the terminal
+      return true // Database editor exists so return true
     } catch {
-      return false
+      return false // Database editor does not exist so return false
     }
   }),
+  // Function to get the website configurations
   getConfigs: method.query(() => {
-    const filePath = 'config.ts'
-    const fileContents = readFileSync(filePath, 'utf8')
-    return fileContents
+    const filePath = 'config.ts' // Path to the config file
+    const fileContents = readFileSync(filePath, 'utf8') // Read the contents of the file
+    return fileContents // Return the contents of the file
   }),
+  // Function to save the website configurations
   saveConfigs: method.input(z.object({ configs: z.string() })).mutation(({ input }) => {
-    const filePath = 'config.ts'
-    writeFileSync(filePath, input.configs)
+    const filePath = 'config.ts' // Path to the config file
+    writeFileSync(filePath, input.configs) // Write the contents of the configs to the file
   }),
+  // Function to insert a user
   insertUser: method
     .input(userSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
       try {
-        const { FromAsp, ...user } = input
+        const { FromAsp, ...user } = input // Destructure the input
         await ctx.prisma.user.create({
           data: {
             ...user,
             comments: { create: [] },
             deviceList: { create: [] },
           },
-        })
+        }) // Create the user
+        // Send the soap request if sendSoapRequest config is true and request is not from asp
         if (sendSoapRequest && FromAsp !== true) {
-          await insertUserSoap({ input: user })
+          await insertUserSoap({ input: user }) // Send the soap request
         }
-        return true
+        return true // Return true to indicate operation success
       } catch {
-        return false
+        return false // Return false to indicate operation failure
       }
     }),
+  // Function to update a user
   updateUser: method
     .input(userSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
       try {
-        const { FromAsp, ...user } = input
+        const { FromAsp, ...user } = input // Destructure the input
         await ctx.prisma.user.update({
           where: { email: input.email },
           data: {
             ...user,
           },
-        })
+        }) // Update the user
+        // Send the soap request if sendSoapRequest config is true and request is not from asp
         if (sendSoapRequest && FromAsp !== true) {
-          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-          await updateUserSoap({ input: user })
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // Allow soap calls to succeed
+          await updateUserSoap({ input: user }) // Send the soap request
         }
-        return true
+        return true // Return true to indicate operation success
       } catch {
-        return false
+        return false // Return false to indicate operation failure
       }
     }),
+  // Function to delete a user
   deleteUser: method
     .input(z.object({ email: z.string(), FromAsp: z.boolean().optional() }))
     .mutation(async ({ ctx, input }) => {
       try {
         await ctx.prisma.user.delete({
           where: { email: input.email },
-        })
-        // const query = `SELECT id FROM auth.users WHERE email = '${input.email}';`
-        // const userId = await ctx.prisma.$queryRawUnsafe(query)
-        // if (typeof userId === 'string') {
-        //   await ctx.supabase.auth.admin.deleteUser(userId)
-        // }
+        }) // Delete the user
+        // Send the soap request if sendSoapRequest config is true and request is not from asp
         if (sendSoapRequest && input.FromAsp !== true) {
-          await deleteUserSoap({ email: input.email })
+          await deleteUserSoap({ email: input.email }) // Send the soap request
         }
-        return true
+        return true // Return true to indicate operation success
       } catch {
-        return false
+        return false // Return false to indicate operation failure
       }
     }),
-  getUserColumns: method.query(() => {
-    return Prisma.dmmf.datamodel.models.find((model) => model.name === 'User')
+  // Get all user tables properties
+  getUserProperties: method.query(() => {
+    return Prisma.dmmf.datamodel.models.find((model) => model.name === 'User') // Get user table columns
   }),
+  // Function to get all tables properties
   getTablesProperties: method.query(() => {
-    return Prisma.dmmf.datamodel.models
+    return Prisma.dmmf.datamodel.models // Get tables properties from prisma client
   }),
+  // Function to get all data from a table
   getTableData: method
     .input(z.object({ tableName: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const query = `SELECT * FROM \"${input.tableName}\"`
-      return await ctx.prisma.$queryRawUnsafe(query)
+      const selectQuery = `SELECT * FROM \"${input.tableName}\"` // Build a select query
+      return await ctx.prisma.$queryRawUnsafe(selectQuery) // Send the query to the database
     }),
+  // Function to get all users data
   getUsersData: method.query(async ({ ctx }) => {
-    return await ctx.prisma.user.findMany()
+    return await ctx.prisma.user.findMany() // Get all users from the database
   }),
+  // Function to Send price drops email to a user if the price of saved devices is lower than the price before
   sendPriceDropsEmail: method
     .input(z.object({ email: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
-      const email = input.email
-      if (!email) return false
+      const email = input.email // Get the email from the input
+      if (!email) return false // If no email is provided return false
       const userDevices = await ctx.prisma.deviceUser.findMany({
         where: { userEmail: input.email },
         include: {
           device: true,
           user: true,
         },
-      })
+      }) // Get all devices of a user
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       userDevices.forEach(async (userDevice) => {
-        const price = await fetchCurrentPrice(userDevice.deviceModel)
+        const price = await fetchCurrentPrice(userDevice.deviceModel) // Fetch the current price of the device
+        // If device has a price and it is not the same price as before
         if (price && price != userDevice.device.price) {
           await ctx.prisma.device.update({
             where: { model: userDevice.deviceModel },
             data: { price: price },
           })
         }
+        // If device has a price and it is lower than the price before
         if (price && price < userDevice.device.price) {
           await resend.emails
             .send({
@@ -251,41 +272,46 @@ export const authRouter = router({
                 name: userDevice.user.name,
                 newPrice: price,
                 device: userDevice.device,
-                precentage: calculatePercentageDiff(userDevice.device.price, price),
+                precentage: calculatePercentageDiff(userDevice.device.price, price), // Calculate the percentage of the price drop
               }),
             })
             .then((value) => {
+              // If email was sent and response has an id
               if (value.id) {
-                return true
+                return true // Return true to indicate operation success
               }
             })
         } else {
-          return false
+          return false // Return false to indicate operation failure
         }
       })
     }),
+  // Function to send price drops emails to a all users if the price of saved devices is lower than the price before
   sendPriceDropsEmails: method
     .input(z.object({ sendTest: z.boolean().optional() }))
     .mutation(async ({ ctx, input }) => {
-      const devicesUsers = await ctx.prisma.deviceUser.findMany()
+      const devicesUsers = await ctx.prisma.deviceUser.findMany() // Get all devices of a user
       devicesUsers.map(async (deviceUser) => {
         const device = await ctx.prisma.device.findFirst({
           where: { model: deviceUser.deviceModel },
-        })
+        }) // Get all devices of a user
         const user = await ctx.prisma.user.findFirst({
           where: { email: deviceUser.userEmail },
           select: { name: true, email: true },
-        })
+        }) // Get all devices of a user
+        // If user and device exist
         if (user && device) {
-          const price = await fetchCurrentPrice(device.model)
+          const price = await fetchCurrentPrice(device.model) // Fetch the current price of the device
+          // If device has a price and it is not the same price as before
           if (price && price != device.price) {
             await ctx.prisma.device.update({
               where: { model: device.model },
               data: { price: price },
-            })
+            }) // Update the price
           }
+          //
           if (input.sendTest === true) {
-            device.price = 600
+            device.price = 600 // Set a fake price
             await resend.emails
               .send({
                 from: websiteEmail,
@@ -295,15 +321,17 @@ export const authRouter = router({
                   name: user.name,
                   newPrice: 400,
                   device: device,
-                  precentage: calculatePercentageDiff(device.price, 400),
+                  precentage: calculatePercentageDiff(device.price, 400), // Calculate the percentage of a fake price drop
                 }),
               })
               .then((value) => {
+                // If email was sent and response has an id
                 if (value.id) {
-                  return true
+                  return true // Return true to indicate operation success
                 }
               })
           } else {
+            // If device has a price and it is lower than the price before
             if (price && price < device.price) {
               await resend.emails
                 .send({
@@ -314,41 +342,46 @@ export const authRouter = router({
                     name: user.name,
                     newPrice: price,
                     device: device,
-                    precentage: calculatePercentageDiff(device.price, price),
+                    precentage: calculatePercentageDiff(device.price, price), // Calculate the percentage of the price drop
                   }),
                 })
                 .then((value) => {
                   if (value.id) {
-                    return true
+                    return true // Return true to indicate operation success
                   }
                 })
             } else {
-              return false
+              return false // Return false to indicate operation failure
             }
           }
         }
       })
     }),
+  // Function to check if an image exists
   isImageExists: method.input(z.object({ email: z.string() })).mutation(({ input }) => {
-    const path = `public/users/${encodeEmail(input.email)}.png`
-    return existsSync(path)
+    const path = `public/users/${encodeEmail(input.email)}.png` // The path to the image
+    return existsSync(path) // Return if the image exists
   }),
+  // Function to get the email of a comment
   getCommentEmail: method
     .input(z.object({ username: z.string() }))
     .query(async ({ ctx, input }) => {
       const comment = await ctx.prisma.user.findFirst({
         where: { username: input.username },
-      })
-      return comment?.email
+      }) // Get the comment whose username is the input
+      return comment?.email // Return the email of the comment
     }),
+  // Function to check if a comment image exists
   isCommentImageExists: method
     .input(z.object({ username: z.string() }))
     .query(async ({ ctx, input }) => {
       const comment = await ctx.prisma.user.findFirst({
         where: { username: input.username },
-      })
+      }) // Get the comment whose username is the input
+      // If comment exists return if the image exists
       return comment?.email ? existsSync(`public/users/${encodeEmail(comment?.email)}.png`) : false
     }),
+  // Function to edit a comment
   editComment: method
     .input(
       z.object({
@@ -364,19 +397,21 @@ export const authRouter = router({
           message: input.message,
           rating: input.rating,
         },
-      })
-      return comments
+      }) // Update the comment whose id is the input
+      return comments // Return the updated comments
     }),
+  // Function to delete a comment
   deleteComment: method
     .input(z.object({ commentId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const comments = await ctx.prisma.comment.delete({
         where: { id: input.commentId },
-      })
-      return comments
+      }) // Delete the comment whose id is the input
+      return comments // Return the deleted comments
     }),
+  // Function to create a comment
   addComment: method.input(commentSchema).mutation(async ({ ctx, input }) => {
-    const { createdAt, message, model, rating, updatedAt, username } = input
+    const { createdAt, message, model, rating, updatedAt, username } = input // Destructure the input
     const comment = await ctx.prisma.comment.create({
       data: {
         message,
@@ -386,15 +421,17 @@ export const authRouter = router({
         model,
         username,
       },
-    })
-    return comment
+    }) // Create a new comment
+    return comment // Return the comment
   }),
+  // Function to get all comments
   getAllComments: method.input(z.object({ model: z.string() })).query(async ({ ctx, input }) => {
     const comments = await ctx.prisma.comment.findMany({
       where: { model: input.model },
-    })
-    return comments
+    }) // Get all comments for the model
+    return comments // Return the comments
   }),
+  // Function to get a user
   updateUserDetails: method
     .input(
       z.object({
@@ -411,6 +448,7 @@ export const authRouter = router({
       })
       return details
     }),
+  // Function to get a user
   getUserDetails: method
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
@@ -421,24 +459,17 @@ export const authRouter = router({
       })
       return details
     }),
-  getUserComments: method
-    .input(z.object({ email: z.string().optional() }))
-    .query(async ({ ctx, input }) => {
-      const details = await ctx.prisma.user.findFirst({
-        where: { email: input.email },
-        select: {},
-      })
-      return details
-    }),
+  // Function to get a user
   getAccessKey: method
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
-      if (input.email === undefined) return 0
+      if (input.email === undefined) return 0 // If no email is provided return zero
       const user = await ctx.prisma.user.findFirst({
         where: { email: input.email },
-      })
-      return user?.accessKey
+      }) // Get the user whose email matches the input
+      return user?.accessKey // Return the access key of the user
     }),
+  // Function to create a user
   createUser: method
     .input(
       z.object({
@@ -462,6 +493,7 @@ export const authRouter = router({
         },
       })
     }),
+  // Function to get a user
   IsUserExists: method
     .input(
       z.object({
@@ -473,10 +505,10 @@ export const authRouter = router({
     .mutation(async ({ ctx, input }) => {
       const userEmail = await ctx.prisma.user.findFirst({
         where: { email: input.email },
-      })
+      }) // Get the user whose email matches the input
       const usernameUser = await ctx.prisma.user.findFirst({
         where: { username: input?.username },
-      })
+      }) // Get the user whose username matches the input
       return {
         email: !!userEmail,
         username: !!usernameUser && (userEmail ? userEmail.username === input?.username : true),

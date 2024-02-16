@@ -20,20 +20,7 @@ import useTranslation from 'next-translate/useTranslation'
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
-function createActionsArray(
-  t: Translate,
-  devices: Device[],
-  router: NextRouter
-): SpotlightAction[] {
-  return devices.map((device) => ({
-    title: device.name,
-    group: t(device.type),
-    description: getDeviceDescription(device),
-    onTrigger: () => router.push(`/device/${device.type}/${device.model}`),
-    icon: icons.find((icon) => icon.type === device.type)?.icon ?? <IconDevices size={28} />,
-  }))
-}
-
+// Define an icon for each device type
 const icons = [
   {
     type: 'iphone',
@@ -61,25 +48,42 @@ const icons = [
   },
 ]
 
+// Get the device description that will be shown in the spotlight
 function getDeviceDescription(device: Device) {
+  // Match each device type with its description
   switch (device.type) {
     case 'iphone':
-      return `${device.name} is a iPhone with a ${device.screenSize} inch ${device.screenType} display and a ${device.batterySize} mah cpacity battery`
+      return `${device.name} is a iPhone with a ${device.screenSize} inch and a ${device.batterySize} mah cpacity battery`
     case 'ipad':
-      return `${device.name} is a iPad with a ${device.screenSize} inch ${device.screenType} display and a ${device.batterySize} mah cpacity battery`
+      return `${device.name} is a iPad with a ${device.screenSize} inch and a ${device.batterySize} mah cpacity battery`
     case 'airpods':
-      return `${device.name} is an Airpods with a ${device.chipset} chipset and a ${device.batterySize} mah cpacity battery`
+      return `${device.name} is an Airpods with a ${device.chipset} chipset and a ${device.batterySize} mah battery`
     case 'mac':
-      return `${device.name} is a Mac computer with a ${device.cpu} core cpu and a ${device.gpu} core gpu with a ${device.memory} gb memory`
+      return `${device.name} is a Mac computer with a ${device.cpu} core cpu and a ${device.gpu} core gpu`
     case 'imac':
-      return `${device.name} is a Desktop Computer with a ${device.screenSize} inch display and a ${device.cpu} core cpu and a ${device.gpu} core gpu`
+      return `${device.name} is a Desktop Computer with a ${device.screenSize} inch display and a ${device.cpu} core cpu`
     case 'macbook':
-      return `${device.name} is a Portable Computer with a ${device.screenSize} inch ${device.screenType} display and a ${device.batterySize} mah cpacity battery`
-    default:
-      return `${device.name} is a ${device.type} with a ${
-        device.chipset
-      } chipset and was released in ${device.releaseDate.toDateString()} `
+      return `${device.name} is a Portable Computer with a ${device.screenSize} inch and a ${device.batterySize} mah cpacity battery`
+    default: // Create a default description
+      return `${device.name} is a ${
+        device.type
+      } that was released in ${device.releaseDate.toDateString()}`
   }
+}
+
+// Create the actions array for the spotlight
+function createActionsArray(
+  t: Translate,
+  devices: Device[],
+  router: NextRouter
+): SpotlightAction[] {
+  return devices.map((device) => ({
+    title: device.name,
+    group: t(device.type), // Set the group to the translated device type
+    description: getDeviceDescription(device), // Set the description to the device description
+    onTrigger: () => router.push(`/device/${device.type}/${device.model}`), // Set the trigger function to navigate to the device page
+    icon: icons.find((icon) => icon.type === device.type)?.icon ?? <IconDevices size={28} />, // Set the icon to the device icon
+  }))
 }
 
 export default function SpotlightControl({ children }: { children: ReactNode }) {
@@ -87,8 +91,8 @@ export default function SpotlightControl({ children }: { children: ReactNode }) 
   const devicesQuery = trpc.device.getDevicesData.useQuery() // Get the devices data
   const router = useRouter() // Get the router
   const actions = useMemo(() => {
+    // Check if the data exists
     if (devicesQuery.data) {
-      // Check if the data exists
       return createActionsArray(t, devicesQuery.data, router) // Return the actions array
     } else {
       return [] // Return an empty array

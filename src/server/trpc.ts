@@ -1,7 +1,16 @@
 import { initTRPC } from '@trpc/server' // Importing the initTRPC function from the trpc server
 import superjson from 'superjson' // Importing the superjson library
+import { type inferAsyncReturnType } from '@trpc/server'
+import { prisma } from '@/server/client'
 
-import { type Context } from '@/server/context' // Importing the Context type from the server context
+// Export a function that creates the context based on the provided Next.js context options
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const createContext = () => {
+  return { prisma }
+}
+
+// Define a type for the context based on the return type of the 'createContext' function
+type Context = inferAsyncReturnType<typeof createContext>
 
 // Creating a TRPC context with the specified transformer
 const t = initTRPC.context<Context>().create({

@@ -7,11 +7,11 @@ declare global {
   var prisma: PrismaClient | undefined
 }
 
-export const prisma = global.prisma || new PrismaClient() // Create Prisma Client
+export const prisma = global.prisma || new PrismaClient() // Initialize Prisma client
 
+// Check if website status is not production
 if (env.websiteStatus !== 'production') {
-  // Check if website status is not production
   global.prisma = prisma // Store in global object
 }
 
-export const resend = new Resend(env.resendKey) // Initialize Resend
+export const resend = new Resend(env.resendKey) // Initialize Resend client
