@@ -11,7 +11,8 @@ import { z } from 'zod'
 import { selectParams } from '@/models/deviceProperties'
 import { convertPrice, fetchCurrentPrice } from '@/server/price'
 
-export const DeviceRouter = router({
+// Create a device router
+export const deviceRouter = router({
   // Function to fetch current devices prices
   fetchDevicesPrices: method.mutation(async ({ ctx }) => {
     const devices = await ctx.prisma.device.findMany({
@@ -24,8 +25,8 @@ export const DeviceRouter = router({
       await fetchCurrentPrice(device.model)
     })
   }),
-  // Function to convert price
-  convertDevicePrice: method
+  // Function to convert device price
+  convertPrice: method
     .input(
       z.object({
         price: z.number(),
@@ -164,13 +165,13 @@ export const DeviceRouter = router({
     .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
     .mutation(async ({ ctx, input }) => {
       try {
-        const { FromAsp, ...device } = input
+        const { FromAsp, ...device } = input // Remove fromAsp from input
         await ctx.prisma.device.update({
           where: { model: device.model },
           data: {
             ...device,
           },
-        })
+        }) // Update the device
         // Send soap request if sendSoapRequest config is true and FromAsp is not true
         if (sendSoapRequest && FromAsp !== true) {
           process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // Allow soap calls to succeed

@@ -3,10 +3,5 @@
   "defaultLocale": "en",
   "pages": {
     "*": ["main"]
-  },
-  "namespaces": {
-    "auth": {
-      "createAnAccount": true
-    }
   }
 }

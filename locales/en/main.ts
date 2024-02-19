@@ -25,7 +25,7 @@ export default {
   findYourDevice: 'Find Your Device',
   homeParagraph:
     'Compare between different apple devices\nView devices information and specifications\nFind the apple device that matches you',
-  deviceDoesntExist: 'The Device You Are Looking For Doesnt Exist',
+  deviceDoesntExist: 'The Device You Are Looking For Does not Exist',
   goToHomePage: 'Go To Home Page',
   account: 'Account',
   username: 'Username',
@@ -274,4 +274,5 @@ export default {
   databaseManagement: 'Database Management',
   success: 'Success',
   ethernet: 'Ethernet',
+  deviceTypeDoesntExist: 'The Device Type You Are Looking For Does not Exist',
 }

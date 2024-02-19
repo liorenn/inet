@@ -29,7 +29,7 @@ export default function FavoritesButtons({ model, modelPage, favoritesPage, setD
   // When the is device in user mutation data changes
   useEffect(() => {
     // Check if the data exists
-    if (isDeviceInUserMutation.data) {
+    if (isDeviceInUserMutation.data !== undefined) {
       setIsInList(isDeviceInUserMutation.data) // Set the state variable
     }
   }, [isDeviceInUserMutation.data])

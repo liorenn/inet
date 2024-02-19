@@ -1,14 +1,16 @@
-import { Container, SimpleGrid } from '@mantine/core'
+import { Button, Container, SimpleGrid } from '@mantine/core'
 import type { DevicePropertiesType, DeviceType } from '@/models/enums'
 import { useEffect, useState } from 'react'
 
 import DeviceCard from '@/components/device/DeviceCard'
 import DeviceHeader from '@/components/device/DeviceTypeHeader'
 import Head from 'next/head'
+import Link from 'next/link'
 import Loader from '@/components/layout/Loader'
 import { trpc } from '@/utils/client'
 import { usePostHog } from 'posthog-js/react'
 import { useRouter } from 'next/router'
+import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 
 type Device = {
@@ -18,17 +20,17 @@ type Device = {
 export default function Devices() {
   const router = useRouter() // Get the router object
   const posthog = usePostHog() // Get the posthog client
-  // Get the device type from the url and cast it to DeviceType enum
-  const deviceType = router.asPath.split('/')[router.asPath.split('/').length - 1] as DeviceType
+  const { t } = useTranslation('main') // Get the translation function
+  const deviceType = router.asPath.split('/')[2] as DeviceType // Get the device type from the url
   const user = useUser() // Get the user object from Supabase
-  const [devices, setDevices] = useState<Device[] | undefined>(undefined) //
+  const [devices, setDevices] = useState<Device[] | undefined>(undefined) // State for the devices data
+  const [captured, setCaptured] = useState(false) // Was page captured in posthog
   const devicesQuery = trpc.device.getDevices.useQuery({
     deviceType: deviceType,
   }) // Get the devices from the database
   const userDevicesQuery = trpc.device.getUserDevicesProperties.useQuery({
     email: user?.email,
   }) // Get the user devices from the database
-  const [captured, setCaptured] = useState(false) // Was page captured in posthog
 
   // When user data changes
   useEffect(() => {
@@ -67,28 +69,41 @@ export default function Devices() {
   // If devices are not loaded
   if (!devices) return <Loader />
 
-  // If devices are loaded and there are devices
-  if (devices && devices?.length > 0) {
+  // If requested device type does not exist
+  if (devices.length === 0) {
     return (
-      <>
-        <Head>
-          <title>{deviceType}</title>
-        </Head>
-        <Container size='lg'>
-          <DeviceHeader deviceType={deviceType} />
-          <SimpleGrid
-            cols={3}
-            breakpoints={[
-              { maxWidth: 'sm', cols: 1 },
-              { maxWidth: 'md', cols: 2 },
-              { minWidth: 'lg', cols: 3 },
-            ]}>
-            {devices.map((value, index) => (
-              <DeviceCard device={value} key={index} />
-            ))}
-          </SimpleGrid>
-        </Container>
-      </>
+      <Container size='lg'>
+        {t('deviceTypeDoesntExist')}
+        <br />
+        <Link href={'/'}>
+          <Button color='gray' size='lg' radius='md' mt='lg' variant='light'>
+            {t('goToHomePage')}
+          </Button>
+        </Link>
+      </Container>
     )
   }
+
+  // If devices are loaded and there are devices
+  return (
+    <>
+      <Head>
+        <title>{deviceType}</title>
+      </Head>
+      <Container size='lg'>
+        <DeviceHeader deviceType={deviceType} />
+        <SimpleGrid
+          cols={3}
+          breakpoints={[
+            { maxWidth: 'sm', cols: 1 },
+            { maxWidth: 'md', cols: 2 },
+            { minWidth: 'lg', cols: 3 },
+          ]}>
+          {devices.map((value, index) => (
+            <DeviceCard device={value} key={index} />
+          ))}
+        </SimpleGrid>
+      </Container>
+    </>
+  )
 }

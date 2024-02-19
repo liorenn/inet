@@ -44,34 +44,6 @@ export async function fetchCurrentPrice(deviceModel: string) {
   return formatterPrice // Return the formatted price
 }
 
-// Function to convert the price to a different currency
-export async function convertPrice(price: number, currency: string, targetCurrency: string) {
-  const response = await fetch(
-    `${env.currencyApiUrl}?apikey=${env.currencyApiKey}&currencies=${targetCurrency}&base_currency=${currency}`
-  ) // Fetch the data from the API
-  const data = await response.json() // Extract the data from the response
-  return price * data.data[targetCurrency] // Convert and return the price
-}
-
-// Function to format the price
-async function FormatPrice(priceString: string) {
-  if (priceString.includes('$')) {
-    const dollarIndex = priceString.indexOf('$') // Find the index of the dollar sign
-    const dollarNumber = priceString
-      .slice(dollarIndex + 1)
-      .trim()
-      .split(' ')[0] // Extract the number after the dollar sign
-    return parseFloat(dollarNumber) // Return the formatted price
-  } else {
-    const response = await fetch(
-      `${env.currencyApiUrl}?apikey=${env.currencyApiKey}&currencies=USD&base_currency=EUR`
-    ) // Fetch the data from the API
-    const data = await response.json() // Extract the data from the response
-    const extractedNumber = parseFloat(priceString.split(' ')[1]) // Extract the number from the price string
-    return extractedNumber * data.data.USD // Return the formatted price
-  }
-}
-
 // Function to check if the gsmarena name is equal to the name of the device in the database
 function isGsmarenaNameEquals(gsmarenaName: string, name: string, deviceType: string): boolean {
   // If device type is iphone
@@ -107,5 +79,33 @@ function isGsmarenaNameEquals(gsmarenaName: string, name: string, deviceType: st
       return gsmarenaName === 'Apple iPad Pro 12.9 (2022)'
     default: // Return false if no match
       return false
+  }
+}
+
+// Function to convert the price to a different currency
+export async function convertPrice(price: number, currency: string, targetCurrency: string) {
+  const response = await fetch(
+    `${env.currencyApiUrl}?apikey=${env.currencyApiKey}&currencies=${targetCurrency}&base_currency=${currency}`
+  ) // Fetch the data from the API
+  const data = await response.json() // Extract the data from the response
+  return price * data.data[targetCurrency] // Convert and return the price
+}
+
+// Function to format the price
+async function FormatPrice(priceString: string) {
+  if (priceString.includes('$')) {
+    const dollarIndex = priceString.indexOf('$') // Find the index of the dollar sign
+    const dollarNumber = priceString
+      .slice(dollarIndex + 1)
+      .trim()
+      .split(' ')[0] // Extract the number after the dollar sign
+    return parseFloat(dollarNumber) // Return the formatted price
+  } else {
+    const response = await fetch(
+      `${env.currencyApiUrl}?apikey=${env.currencyApiKey}&currencies=USD&base_currency=EUR`
+    ) // Fetch the data from the API
+    const data = await response.json() // Extract the data from the response
+    const extractedNumber = parseFloat(priceString.split(' ')[1]) // Extract the number from the price string
+    return extractedNumber * data.data.USD // Return the formatted price
   }
 }

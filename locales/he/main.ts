@@ -278,4 +278,5 @@ export default {
   databaseManagement: 'ניהול נתונים',
   success: 'הצלחה',
   ethernet: 'איטרנט',
+  deviceTypeDoesntExist: 'הסוג של המכשיר שאתה מחפש אינו קיים',
 }

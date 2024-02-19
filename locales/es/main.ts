@@ -277,4 +277,5 @@ export default {
   databaseManagement: 'Gestión de Base de Datos',
   success: 'Éxito',
   ethernet: 'Ethernet',
+  deviceTypeDoesntExist: 'El tipo de dispositivo que estás buscando no existe',
 }

@@ -1,11 +1,11 @@
 // Importing necessary modules and types
-import { httpBatchLink } from '@trpc/client' // Importing httpBatchLink from trpc client
-import { createTRPCNext } from '@trpc/next' // Importing createTRPCNext from trpc next
-import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server' // Importing type inferRouterInputs and type inferRouterOutputs from trpc server
-import { type AppRouter } from '@/server/routers/_app' // Importing AppRouter type from server routers
-import superjson from 'superjson' // Importing superjson library
-import { createClient } from '@supabase/supabase-js' // Importing createClient function from supabase-js
-import { clientEnv } from '@/utils/env' // Importing clientEnv from utils/env
+import { httpBatchLink } from '@trpc/client'
+import { createTRPCNext } from '@trpc/next'
+import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server'
+import { type AppRouter } from '@/server/routers/_app'
+import superjson from 'superjson'
+import { createClient } from '@supabase/supabase-js'
+import { clientEnv } from '@/utils/env'
 
 // Creating a Supabase client using the environment variables
 export const supabase = createClient(clientEnv.supabaseUrl, clientEnv.supabaseAnonKey)

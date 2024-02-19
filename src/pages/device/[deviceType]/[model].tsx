@@ -28,6 +28,7 @@ export default function Device() {
   const userDetailsQuery = trpc.auth.getUserDetails.useQuery({
     email: user?.email,
   }) // Get the user details from the database
+  console.log(router.asPath, router.asPath.split('/'))
 
   // When user data changes
   useEffect(() => {

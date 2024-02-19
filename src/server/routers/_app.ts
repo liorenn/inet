@@ -1,12 +1,12 @@
-import { DeviceRouter } from '@/server/routers/device'
 import { authRouter } from '@/server/routers/auth'
+import { deviceRouter } from '@/server/routers/device'
 import { router } from '@/server/trpc'
 
-// export api routes handler
+// Create api routes handler
 export const appRouter = router({
   auth: authRouter,
-  device: DeviceRouter,
+  device: deviceRouter,
 })
 
-// export type definition of API
+// Create type definition of API
 export type AppRouter = typeof appRouter

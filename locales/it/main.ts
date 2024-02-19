@@ -277,4 +277,5 @@ export default {
   backupDatabase: 'Backup Database',
   databaseManagement: 'Gestione Database',
   success: 'Successo',
+  deviceTypeDoesntExist: 'Il tipo di dispositivo che stai cercando non esiste',
 }

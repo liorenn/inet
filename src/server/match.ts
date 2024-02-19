@@ -18,13 +18,13 @@ export function getMatchedDevices(
   // Merge preference values with device values and normalize them
   const mergedValues = preferencesValuesToMergedValues(preferencesValues, devices)
   const normilizedValues = mergedValuesToNormilizedValues(mergedValues, deviceType)
-  // Extract preference values and total device values, then calculate recommended devices
+  // Extract preference values and total device values and then calculate recommended devices
   const totalPrefsValues = normilizedValues.map((value) => value.prefValue) // Get preferences values
   const totalDevicesValues = convertToTotalDevicesValues(normilizedValues) // Get total device values
   return calculateRecommendedDevices(totalDevicesValues, totalPrefsValues, limit) // Return the recommended devices
 }
 
-// Function to get recommended devices based on a single device, device type, and all devices
+// Function to get recommended devices
 export function getRecommendedDevices(
   device: MatchDeviceType,
   deviceType: string,
@@ -210,6 +210,6 @@ function calculateRecommendedDevices(
         match: parseFloat(calculateMatch(totalPrefsValues, device.values).toFixed(2)), // Calculate the match percentage for device
       }))
       .sort((a, b) => b.match - a.match) // Sort the devices based on the match percentage
-      .slice(0, limit)
-  ) // Return the top devices based on the limit amount
+      .slice(0, limit) // Return the top devices based on the limit amount
+  )
 }

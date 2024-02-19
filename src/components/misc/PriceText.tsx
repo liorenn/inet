@@ -7,7 +7,7 @@ import { useCurrency } from '@/hooks/useCurrency'
 /* eslint-disable @typescript-eslint/no-floating-promises */
 export default function PriceText({ priceString }: { priceString: string }) {
   const { currency } = useCurrency() // Get the selected currency
-  const convertPriceMutation = trpc.device.convertDevicePrice.useMutation() // Convert price mutation
+  const convertPriceMutation = trpc.device.convertPrice.useMutation() // Convert price mutation
   const [price, setPrice] = useState<number>(parseFloat(priceString ?? '0')) // State variable to store the price
   const [prevCurrency, setPrevCurrency] = useState<string | undefined>(undefined) // State variable to store the previous currency
 

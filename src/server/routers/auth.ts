@@ -104,6 +104,7 @@ async function backupDatabase({ prisma }: { prisma: PrismaClient }) {
   await backupDatabaseSoap({ input: allData }) // Send the soap request with all of the tables data
 }
 
+// Create a auth router
 export const authRouter = router({
   // Function to backup the database
   backupDatabase: method.mutation(async ({ ctx }) => {
@@ -272,7 +273,7 @@ export const authRouter = router({
                 name: userDevice.user.name,
                 newPrice: price,
                 device: userDevice.device,
-                precentage: calculatePercentageDiff(userDevice.device.price, price), // Calculate the percentage of the price drop
+                percentage: calculatePercentageDiff(userDevice.device.price, price), // Calculate the percentage of the price drop
               }),
             })
             .then((value) => {
@@ -321,7 +322,7 @@ export const authRouter = router({
                   name: user.name,
                   newPrice: 400,
                   device: device,
-                  precentage: calculatePercentageDiff(device.price, 400), // Calculate the percentage of a fake price drop
+                  percentage: calculatePercentageDiff(device.price, 400), // Calculate the percentage of a fake price drop
                 }),
               })
               .then((value) => {
@@ -342,7 +343,7 @@ export const authRouter = router({
                     name: user.name,
                     newPrice: price,
                     device: device,
-                    precentage: calculatePercentageDiff(device.price, price), // Calculate the percentage of the price drop
+                    percentage: calculatePercentageDiff(device.price, price), // Calculate the percentage of the price drop
                   }),
                 })
                 .then((value) => {
