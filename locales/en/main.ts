@@ -275,4 +275,7 @@ export default {
   success: 'Success',
   ethernet: 'Ethernet',
   deviceTypeDoesntExist: 'The Device Type You Are Looking For Does not Exist',
+  usd: 'United States Dollar',
+  ils: 'Israeli Shekel',
+  eur: 'Euro',
 }

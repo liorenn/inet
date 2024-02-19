@@ -278,4 +278,7 @@ export default {
   databaseManagement: 'Gestione Database',
   success: 'Successo',
   deviceTypeDoesntExist: 'Il tipo di dispositivo che stai cercando non esiste',
+  usd: 'Dollaro Statunitense',
+  ils: 'Shekel Israeliano',
+  eur: 'Euro',
 }

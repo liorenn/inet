@@ -5,7 +5,6 @@ import { create } from 'zustand'
 // Define the type for a currency
 type Currency = {
   value: string // The currency code
-  name: string // The currency name
   symbol: string // The currency string symbol
   icon: TablerIcon // The currency icon
 }
@@ -14,19 +13,16 @@ type Currency = {
 export const currencies: Currency[] = [
   {
     value: 'USD',
-    name: 'United States Dollar',
     symbol: '$',
     icon: IconCurrencyDollar,
   },
   {
     value: 'ILS',
-    name: 'Israeli Shekel',
     symbol: '₪',
     icon: IconCurrencyShekel,
   },
   {
     value: 'EUR',
-    name: 'Euro',
     symbol: '€',
     icon: IconCurrencyEuro,
   },

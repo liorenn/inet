@@ -230,13 +230,18 @@ export default function Navbar() {
                   key={Currency.value}
                   mt={6}
                   style={{
-                    background: currency?.value === Currency.value ? '#1c1c1c' : '',
+                    background:
+                      currency?.value === Currency.value
+                        ? colorScheme === 'dark'
+                          ? '#1c1c1c'
+                          : '#f2f2f2'
+                        : '',
                   }}
                   icon={Currency.icon({})}
                   onClick={() => {
                     setCurrency(Currency) // Set the selected currency
                   }}>
-                  <Text weight={700}>{Currency.name}</Text>
+                  <Text weight={700}>{t(Currency.value.toLowerCase())}</Text>
                 </Menu.Item>
               ))}
             </Menu.Dropdown>
@@ -260,7 +265,12 @@ export default function Navbar() {
                   key={language.value}
                   mt={6}
                   style={{
-                    background: lang === language.value ? '#1c1c1c' : '',
+                    background:
+                      lang === language.value
+                        ? colorScheme === 'dark'
+                          ? '#1c1c1c'
+                          : '#f2f2f2'
+                        : '',
                   }}
                   icon={
                     language.value === 'en' ? (

@@ -8,7 +8,7 @@ import type { UserFormType } from '@/components/admin/UserManagement'
 export type UserPropertyName = keyof User
 
 // Define the user property class
-class UserProperty {
+class InputProperty {
   name: UserPropertyName // Property name
   regex: RegExp // Regular expression for validation
   disabled?: boolean // Is the property disabled
@@ -50,8 +50,8 @@ export class FormDefaultValues {
 
 // Define the sign in form class
 export class SignInForm {
-  email: UserProperty // The user email
-  password: UserProperty // The user password
+  email: InputProperty // The user email
+  password: InputProperty // The user password
 
   // Constructor for the class
   constructor() {
@@ -73,8 +73,8 @@ export class SignInForm {
   // Get the default values for the form
   getDefaultValues(): Partial<FormDefaultValues> {
     return {
-      email: 'lior.oren06@gmail.com',
-      password: '123456',
+      email: '',
+      password: '',
     }
   }
 
@@ -91,9 +91,9 @@ export class SignInForm {
 
 // Define the user form class that extends the sign in form class
 class UserForm extends SignInForm {
-  username: UserProperty // The user username
-  name: UserProperty // The user name
-  phone: UserProperty // The user phone
+  username: InputProperty // The user username
+  name: InputProperty // The user name
+  phone: InputProperty // The user phone
 
   // Constructor for the class
   constructor() {
@@ -121,7 +121,7 @@ export class AccountForm extends UserForm {
   }
 
   // Get the user properties from the form
-  getFileds(): UserProperty[] {
+  getFileds(): InputProperty[] {
     return [this.username, this.name, this.phone, this.password]
   }
 
@@ -144,7 +144,7 @@ export class SignUpForm extends AccountForm {
   }
 
   // Get the user properties from the form
-  getFileds(): UserProperty[] {
+  getFileds(): InputProperty[] {
     return [this.email, this.username, this.name, this.password, this.phone]
   }
   // Get the default values for the form
@@ -161,7 +161,7 @@ export class SignUpForm extends AccountForm {
 
 // Define the user management form class that extends the sign up form class
 export class UserManagementForm extends SignUpForm {
-  accessKey: UserProperty // The user access key
+  accessKey: InputProperty // The user access key
 
   // Constructor for the class
   constructor() {
@@ -175,7 +175,7 @@ export class UserManagementForm extends SignUpForm {
   }
 
   // Get the user properties from the form
-  getFileds(): UserProperty[] {
+  getFileds(): InputProperty[] {
     return [this.email, this.username, this.name, this.phone, this.password, this.accessKey]
   }
 

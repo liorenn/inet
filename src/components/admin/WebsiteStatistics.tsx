@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
+
 import { managerAccessKey } from 'config'
-import { useEffect } from 'react'
 import { useMantineColorScheme } from '@mantine/core'
 import { useRouter } from 'next/router'
 
@@ -10,6 +11,7 @@ type Props = {
 
 export default function WebsiteStatistics({ accessKey }: Props) {
   const router = useRouter() // Get the router
+  const [height, setHeight] = useState(1200)
   const { colorScheme } = useMantineColorScheme() // Get the color scheme
 
   useEffect(() => {
@@ -20,20 +22,16 @@ export default function WebsiteStatistics({ accessKey }: Props) {
   }, [accessKey, router])
 
   useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const onChange = (e: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (e.data.event === 'posthog:dimensions') {
-        const iframe = document.getElementById('posthog-iframe') as HTMLIFrameElement
-        if (iframe && e.source === iframe.contentWindow) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
-          iframe.style.height = `${e.data.height}px` // Set the height of the iframe
-        }
+      if (e.data.event === 'posthog:dimensions' && e.data.name === 'MyPostHogIframe') {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        setHeight(e.data.height)
       }
     }
-    window.addEventListener('message', handleMessage) // Listen for messages
-    return () => {
-      window.removeEventListener('message', handleMessage) // Remove the listener
-    }
+    window.addEventListener('message', onChange)
+    return () => window.removeEventListener('message', onChange)
   }, [])
 
   return (
@@ -41,7 +39,7 @@ export default function WebsiteStatistics({ accessKey }: Props) {
       id='posthog-iframe'
       title='PostHog Dashboard'
       width='100%'
-      height='100%'
+      height={height}
       frameBorder='0'
       style={{
         filter: colorScheme === 'dark' ? 'invert(93%) grayscale(5%)' : '',

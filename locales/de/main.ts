@@ -278,4 +278,7 @@ export default {
   success: 'Erfolgreich',
   ethernet: 'Ethernet',
   deviceTypeDoesntExist: 'Der Gerätetyp den Sie suchen existiert nicht',
+  usd: 'US Dollar',
+  ils: 'Israelischer Schekel',
+  eur: 'Euro',
 }

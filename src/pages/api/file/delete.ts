@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-
-import fs from 'fs'
+import { existsSync, unlinkSync } from 'fs'
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -13,8 +12,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     // Check if the file exists
-    if (fs.existsSync(fileName)) {
-      fs.unlinkSync(fileName) // Delete the file
+    if (existsSync(fileName)) {
+      unlinkSync(fileName) // Delete the file
       return res.status(200).json({ message: 'Image deleted successfully' }) // Return success message
     } // If the file doesn't exist
     else {

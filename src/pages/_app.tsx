@@ -40,15 +40,14 @@ const rtlCache = createEmotionCache({
 })
 
 function App({ Component, pageProps }: PageProps) {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const { lang } = useTranslation('main') // Get the current language
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
-    key: 'mantine-color-scheme',
+    key: 'colorScheme',
     defaultValue: defaultColorScheme,
     getInitialValueInEffect: true,
   }) // Get the color scheme
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark')) // Toggle the color scheme function
-  const { lang } = useTranslation('main') // Get the current language
 
   // When the language changes
   useEffect(() => {

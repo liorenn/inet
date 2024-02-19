@@ -279,4 +279,7 @@ export default {
   success: 'הצלחה',
   ethernet: 'איטרנט',
   deviceTypeDoesntExist: 'הסוג של המכשיר שאתה מחפש אינו קיים',
+  usd: 'דולר אמריקאי',
+  ils: 'שקל ישראלי',
+  eur: 'יורו',
 }
