@@ -26,7 +26,7 @@ export default function SignIn() {
   const router = useRouter() // Get the router
   const posthog = usePostHog() // Get the posthog
   const session = useSession() // Get the session
-  const supabase = useSupabaseClient() // Get the supabase
+  const supabase = useSupabaseClient() // Get the supabase client
   const { t } = useTranslation('main') // Get the translation function
   const formProperties = new SignInForm() // Get the form properties
   const [loading, setLoading] = useState(false) // State for loading

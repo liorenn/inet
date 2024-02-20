@@ -450,7 +450,7 @@ export const authRouter = router({
       return details
     }),
   // Function to get a user
-  getUserDetails: method
+  getUser: method
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       if (input.email === undefined) return null

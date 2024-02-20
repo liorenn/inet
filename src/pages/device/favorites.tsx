@@ -14,7 +14,7 @@ export default function Favorites() {
   const { t } = useTranslation('main') // Get the translation function
   const userDevicesQuery = trpc.device.getUserDevices.useQuery({
     email: user?.email,
-  }) // Get the user object from Supabase
+  }) // Get the user devices from the database
   const [devices, setDevices] = useState<DevicePropertiesType[] | undefined>(undefined) // State variable to store the user devices
 
   // When user data changes

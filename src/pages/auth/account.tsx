@@ -37,10 +37,10 @@ export default function Account() {
   const { t } = useTranslation('main') // Get the translation function
   const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' }) // Create formatter
   const updateMutation = trpc.auth.updateUserDetails.useMutation()
-  const userDetailsQuery = trpc.auth.getUserDetails.useQuery({
+  const userQuery = trpc.auth.getUser.useQuery({
     email: user?.email,
   }) // Get the user details query
-  const userDetails = userDetailsQuery.data // Get the user details
+  const userDetails = userQuery.data // Get the user details
   const [account, setAccount] = useState<UserSchemaType | undefined>() // State variable to store the user details
   const omitFields = formProperties.getFileds() as Omit<AccountField, 'validator'>[] // Cast the fields to remove the validator
   // Get the fields from the form properties and create the validator

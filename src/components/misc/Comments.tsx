@@ -48,7 +48,6 @@ export default function Comments({ device }: Props) {
     const newComment = {
       createdAt: new Date(),
       deviceTypeValue: device.type,
-      likes: 0,
       message: text,
       model: device.model,
       username: username,
