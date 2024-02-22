@@ -79,7 +79,7 @@ export default function FavoritesButtons({ model, modelPage, favoritesPage, setD
           CreateNotification(t('addedToFavorites'), 'green') // Create a success notification
         },
       }
-    )
+    ) // Add device to favorites
   }
 
   // If the user is not signed in

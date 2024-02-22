@@ -21,39 +21,40 @@ export default function Device() {
   const { t } = useTranslation('main') // Get the translation function
   const [captured, setCaptured] = useState(false) // Was page captured in posthog
   const deviceModel = router.asPath.split('/')[3] // Get the device model from the url
-  const deviceDetailsQuery = trpc.device.getDevice.useQuery({
+  const deviceQuery = trpc.device.getDevice.useQuery({
     model: deviceModel,
   }) // Get the device details from the database
-  const userDetailsQuery = trpc.auth.getUserDetails.useQuery({
+  const userQuery = trpc.auth.getUser.useQuery({
     email: user?.email,
   }) // Get the user details from the database
 
   // When user data changes
   useEffect(() => {
     // If user data finished loading
-    if (userDetailsQuery.data) {
-      setUsername(userDetailsQuery.data.username) // Set the username to the user username
+    if (userQuery.data) {
+      setUsername(userQuery.data.username) // Set the username to the user username
     }
-  }, [setUsername, userDetailsQuery.data])
+  }, [setUsername, userQuery.data])
 
   // When device data changes
   useEffect(() => {
     // If posthog was not captured
     if (!captured && deviceDetailsQuery.data) {
+      // Capture the device page in posthog
       posthog.capture('Device Page', {
         deviceName: deviceDetailsQuery.data.name,
-      }) // Capture the device page in posthog
+      })
       setCaptured(true) // Set captured state to true
     }
-  }, [captured, deviceDetailsQuery.data, posthog])
+  }, [captured, deviceQuery.data, posthog])
 
   // If device data is not loaded
-  if (deviceDetailsQuery.data === undefined) {
+  if (deviceQuery.data === undefined) {
     return <Loader />
   }
 
   // If requested device does not exist
-  if (deviceDetailsQuery.data === null) {
+  if (deviceQuery.data === null) {
     return (
       <Container size='lg'>
         {t('deviceDoesntExist')}
@@ -70,11 +71,12 @@ export default function Device() {
   return (
     <>
       <Head>
-        <title>{deviceDetailsQuery.data.name}</title>
+        <title>{deviceQuery.data.name}</title>
       </Head>
       <Container size='lg'>
+        <DeviceHeader device={deviceDetailsQuery.data} />
         <DeviceLayout device={deviceDetailsQuery.data} />
-        <Comments device={deviceDetailsQuery.data} />
+        {user && userDetailsQuery.data?.username && <Comments device={deviceDetailsQuery.data} />}
       </Container>
     </>
   )
