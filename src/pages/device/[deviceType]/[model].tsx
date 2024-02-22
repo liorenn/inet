@@ -2,7 +2,6 @@ import { Button, Container } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
 import Comments from '@/components/misc/Comments'
-import DeviceHeader from '@/components/device/DeviceHeader'
 import DeviceLayout from '@/components/device/DeviceLayout'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -28,7 +27,6 @@ export default function Device() {
   const userDetailsQuery = trpc.auth.getUserDetails.useQuery({
     email: user?.email,
   }) // Get the user details from the database
-  console.log(router.asPath, router.asPath.split('/'))
 
   // When user data changes
   useEffect(() => {
@@ -42,10 +40,9 @@ export default function Device() {
   useEffect(() => {
     // If posthog was not captured
     if (!captured && deviceDetailsQuery.data) {
-      // Capture the device page in posthog
       posthog.capture('Device Page', {
         deviceName: deviceDetailsQuery.data.name,
-      })
+      }) // Capture the device page in posthog
       setCaptured(true) // Set captured state to true
     }
   }, [captured, deviceDetailsQuery.data, posthog])
@@ -76,9 +73,8 @@ export default function Device() {
         <title>{deviceDetailsQuery.data.name}</title>
       </Head>
       <Container size='lg'>
-        <DeviceHeader device={deviceDetailsQuery.data} />
         <DeviceLayout device={deviceDetailsQuery.data} />
-        {user && userDetailsQuery.data?.username && <Comments device={deviceDetailsQuery.data} />}
+        <Comments device={deviceDetailsQuery.data} />
       </Container>
     </>
   )

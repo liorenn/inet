@@ -1,6 +1,7 @@
 import { Center, Divider, Grid, Stack, Text } from '@mantine/core'
 
 import CommentsSummary from '@/components/misc/CommentsSummary'
+import DeviceHeader from '@/components/device/DeviceHeader'
 import DevicePhotos from '@/components/device/DevicePhotos'
 import DeviceSpecs from '@/components/device/DeviceSpecs'
 import type { DeviceSpecsType } from '@/models/SpecsFormatter'
@@ -24,6 +25,7 @@ export default function DeviceLayout({ device }: Props) {
 
   return (
     <>
+      <DeviceHeader device={device} />
       <Center>
         <Grid sx={{ marginBottom: 6 }}>
           <Grid.Col xs={12} md={6} lg={6}>

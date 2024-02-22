@@ -1,8 +1,8 @@
 import { Button, Group, Pagination, ScrollArea, Table, Text, TextInput } from '@mantine/core'
 import { CreateNotification, chunkArray } from '@/utils/utils'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { InputPropertyName, UserManagementForm, convertFormUserValues } from '@/models/forms'
 import { UseFormReturnType, useForm } from '@mantine/form'
-import { UserManagementForm, UserPropertyName, convertFormUserValues } from '@/models/forms'
 import { adminTableRows, managerAccessKey, validateInputOnChange } from 'config'
 import { useOs, useViewportSize } from '@mantine/hooks'
 
@@ -13,7 +13,7 @@ import useTranslation from 'next-translate/useTranslation'
 import { userSchema } from '@/models/schemas'
 
 export type UserFormType = {
-  [K in UserPropertyName]: string // Type of the form inputs
+  [K in InputPropertyName]: string // Type of the form inputs
 }
 
 // The component props

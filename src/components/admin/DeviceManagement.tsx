@@ -2,7 +2,7 @@ import { Button, Group, Pagination, ScrollArea, Table, Text, TextInput } from '@
 import { CreateNotification, chunkArray } from '@/utils/utils'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
-import { adminTableRows, managerAccessKey, validateInputOnChange } from 'config'
+import { adminAccessKey, adminTableRows, validateInputOnChange } from 'config'
 import { convertDeviceValues, convertFormDeviceValues, getDeviceFormFields } from '@/models/forms'
 import { useOs, useViewportSize } from '@mantine/hooks'
 
@@ -30,9 +30,10 @@ export default function DeviceManagement({ accessKey }: Props) {
   const [chunkedDevices, setChunkedDevices] = useState<DeviceFormType[][]>([]) // The chunked devices
   const fieldNames = Object.keys(deviceSchema.shape) // The field names of the devices
   const devicesDataQuery = trpc.device.getDevicesData.useQuery() // The devices data query
+  const sendEmailsMutation = trpc.auth.sendPriceDropsEmails.useMutation() // Mutation function for sending price drop emails using trpc
 
   // If the access key is less than the manager access key
-  if (accessKey < managerAccessKey) {
+  if (accessKey < adminAccessKey) {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     router.push('/') // Redirect to the home page
   }
@@ -104,6 +105,42 @@ export default function DeviceManagement({ accessKey }: Props) {
           </Pagination.Root>
         </>
       )}
+      <Group grow mt='lg'>
+        <Button
+          variant='light'
+          color='blue'
+          fullWidth
+          onClick={() => {
+            // Send emails to users
+            sendEmailsMutation.mutate(
+              {},
+              {
+                onSuccess: () => {
+                  CreateNotification('success', 'green') // Create a success notification
+                },
+              }
+            )
+          }}>
+          {t('sendEmails')}
+        </Button>
+        <Button
+          variant='light'
+          color='orange'
+          fullWidth
+          onClick={() => {
+            // Send test emails to users
+            sendEmailsMutation.mutate(
+              { sendTest: true },
+              {
+                onSuccess: () => {
+                  CreateNotification('success', 'green') // Create a success notification
+                },
+              }
+            )
+          }}>
+          {t('sendTestEmails')}
+        </Button>
+      </Group>
     </>
   )
 }

@@ -81,43 +81,45 @@ export default function Comments({ device }: Props) {
         </Text>
       </div>
       <Divider sx={{ marginBottom: 20 }} />
-      <Accordion
-        defaultValue='comments'
-        radius='xl'
-        styles={{
-          label: { fontSize: 24, fontWeight: 500 },
-        }}>
-        <Accordion.Item value='comments'>
-          <Accordion.Control>{t('writeAComment')}</Accordion.Control>
-          <Accordion.Panel>
-            <form onSubmit={(e) => AddComment(e)}>
-              <Group position='apart'>
-                <Group sx={{ padding: 10 }}>
-                  {user?.email && <Avatar src={imageExists ? imagePath : ''} radius='md' />}
-                  <div>
-                    <Text size='lg' weight={500}>
-                      {username}
-                    </Text>
-                    <Text size='xs' weight={400}>
-                      {new Date().toDateString()}
-                    </Text>
-                  </div>
+      {user && (
+        <Accordion
+          defaultValue='comments'
+          radius='xl'
+          styles={{
+            label: { fontSize: 24, fontWeight: 500 },
+          }}>
+          <Accordion.Item value='comments'>
+            <Accordion.Control>{t('writeAComment')}</Accordion.Control>
+            <Accordion.Panel>
+              <form onSubmit={(e) => AddComment(e)}>
+                <Group position='apart'>
+                  <Group sx={{ padding: 10 }}>
+                    {user?.email && <Avatar src={imageExists ? imagePath : ''} radius='md' />}
+                    <div>
+                      <Text size='lg' weight={500}>
+                        {username}
+                      </Text>
+                      <Text size='xs' weight={400}>
+                        {new Date().toDateString()}
+                      </Text>
+                    </div>
+                  </Group>
+                  <Group mb='sm'>
+                    <Rating value={rating} onChange={setRating} />
+                    <Button type='submit' size='xs' variant='subtle'>
+                      {t('addComment')}
+                    </Button>
+                    <Button type='reset' size='xs' variant='subtle' color='gray'>
+                      {t('cancel')}
+                    </Button>
+                  </Group>
                 </Group>
-                <Group mb='sm'>
-                  <Rating value={rating} onChange={setRating} />
-                  <Button type='submit' size='xs' variant='subtle'>
-                    {t('addComment')}
-                  </Button>
-                  <Button type='reset' size='xs' variant='subtle' color='gray'>
-                    {t('cancel')}
-                  </Button>
-                </Group>
-              </Group>
-              <Textarea minRows={4} value={text} onChange={(e) => setText(e.target.value)} />
-            </form>
-          </Accordion.Panel>
-        </Accordion.Item>
-      </Accordion>
+                <Textarea minRows={4} value={text} onChange={(e) => setText(e.target.value)} />
+              </form>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+      )}
       <Box sx={{ marginBottom: 120 }}>
         {comments.map((comment, index) => (
           <Comment comment={comment} comments={comments} setComments={setComments} key={index} />

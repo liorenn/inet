@@ -15,7 +15,7 @@ export async function fetchCurrentPrice(deviceModel: string) {
       model: deviceModel,
     },
   }) // Get the device from the database with the given device model
-  if (!device) return 0 // Return zero if device was not found
+  if (!device || (device.type !== 'iphone' && device.type !== 'ipad')) return 0 // Return zero if device was not found
 
   const gsmarena = require('gsmarena-api') //create the api client
 

@@ -4,12 +4,14 @@ import { deviceTypesProperties, propertiesLabels } from '@/models/deviceProperti
 import { useEffect, useState } from 'react'
 
 import Head from 'next/head'
+import Loader from '@/components/layout/Loader'
 import MatchedDevices from '@/components/device/MatchedDevices'
 import { PropertiesSchemaType } from '@/models/deviceProperties'
 import { deviceType as deviceTypeEnum } from '@/models/enums'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
+import { useUser } from '@supabase/auth-helpers-react'
 import { useViewportSize } from '@mantine/hooks'
 import { z } from 'zod'
 
@@ -44,6 +46,7 @@ function getFormattedPreferences(preferences: PreferenceType[]) {
 }
 
 export default function Find() {
+  const user = useUser()
   const router = useRouter() // Get the router
   const { width } = useViewportSize() // Get the width of the viewport
   const { t, lang } = useTranslation('main') // Get the translation function
@@ -66,6 +69,14 @@ export default function Find() {
   const [accordionState, setAccordionState] = useState<string[]>(
     preferences.map((pref) => pref.name)
   ) // Set the accordion state to manage his opened and closed states
+
+  // When user state or url changes
+  useEffect(() => {
+    // If the user is not signed in
+    if (!user) {
+      router.push('/') // Push the user to the home page
+    }
+  }, [user, router])
 
   // When component mounts
   useEffect(() => {
@@ -114,6 +125,18 @@ export default function Find() {
         }
       })
     return data ? [{ value: 'notInterested', label: t('notInterested') }, ...data] : [] // Add the not interested option and return segmented data
+  }
+
+  // If all devices query data is loading
+  if (!user) {
+    return (
+      <>
+        <Head>
+          <title>{t('compare')}</title>
+        </Head>
+        <Loader />
+      </>
+    )
   }
 
   return (

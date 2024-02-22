@@ -1,4 +1,4 @@
-import { Button, Center, Container, SimpleGrid, Text, Title } from '@mantine/core'
+import { Button, Center, Container, Text, Title } from '@mantine/core'
 import { FormDefaultValues, SignInForm } from '@/models/forms'
 import { Paper, PasswordInput, TextInput } from '@mantine/core'
 import { useEffect, useState } from 'react'
@@ -112,18 +112,6 @@ export default function SignIn() {
               {loading ? t('loading') : t('signIn')}
             </Button>
           </form>
-          <SimpleGrid cols={2}>
-            <Link href={'/auth/signin/viaemail'} style={{ textDecoration: 'none' }}>
-              <Button color='gray' variant='light' fullWidth mt='lg'>
-                {t('viaEmail')}
-              </Button>
-            </Link>
-            <Link href={'/auth/signin/viaphone'} style={{ textDecoration: 'none' }}>
-              <Button color='gray' variant='light' fullWidth mt='lg' mb='sm'>
-                {t('viaPhone')}
-              </Button>
-            </Link>
-          </SimpleGrid>
         </Paper>
       </Container>
     </>

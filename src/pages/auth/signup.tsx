@@ -95,7 +95,7 @@ export default function SignUp() {
                   // If there is no error
                   if (!error) {
                     CreateNotification(t('accountCreatedSuccessfully'), 'green') // Create a success notification
-                    posthog.capture('User Signed Up', { data })
+                    posthog.capture('User Signed Up', { data }) // Capture the user signed up
                     // eslint-disable-next-line @typescript-eslint/no-floating-promises
                     router.push('/') // Redirect to home
                     setLoading(false) // Set loading to false

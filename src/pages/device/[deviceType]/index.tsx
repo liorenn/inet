@@ -58,10 +58,9 @@ export default function Devices() {
     }
     // If posthog was not captured
     if (!captured && devicesQuery.data) {
-      // Capture the device type page in posthog
       posthog.capture('Device Type Page', {
         deviceType,
-      })
+      }) // Capture the device type page in posthog
       setCaptured(true) // Set the captured state to true
     }
   }, [captured, deviceType, devicesQuery.data, posthog])

@@ -352,7 +352,7 @@ const useStyles = createStyles((theme) => ({
   },
 
   actionIcon: {
-    [theme.fn.smallerThan(380)]: {
+    [theme.fn.smallerThan(370)]: {
       display: 'none',
     },
   },

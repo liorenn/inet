@@ -46,8 +46,8 @@ export default function NavBarDropdown({ AccessKey }: Props) {
     }
     buttons.push({ title: t('signOut'), href: '/' })
   } else {
-    buttons.push({ title: t('signIn'), href: '/auth/signin' })
-    buttons.push({ title: t('signUp'), href: '/auth/signup' })
+    buttons.push({ title: t('signIn'), href: '/auth/signIn' })
+    buttons.push({ title: t('signUp'), href: '/auth/signUp' })
   }
 
   return (

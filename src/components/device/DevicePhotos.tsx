@@ -101,8 +101,8 @@ export default function DevicePhotos({ device, miniphotos, withName }: Props) {
             }
             src={activeLink}
             fit='contain'
-            width={width <= 560 ? 280 : 250}
-            height={width <= 560 ? 280 : 300}
+            width={width <= 560 ? 180 : 250}
+            height={width <= 560 ? 180 : 300}
             alt={'photo'}
             style={{ cursor: 'zoom-in' }}
             onClick={() => setOpened(true)}

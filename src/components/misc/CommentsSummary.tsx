@@ -21,7 +21,7 @@ export default function CommentsSummary() {
         variant='light'
         color='gray'
         rightIcon={<IconArrowDown size={16} />}
-        onClick={() => scrollTo({ y: document.body.scrollHeight - 500 })}>
+        onClick={() => scrollTo({ y: document.body.scrollHeight - 660 })}>
         {`${commentsAmount.toString()} ${t('comments')}`}
       </Button>
     </Group>

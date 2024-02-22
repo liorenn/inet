@@ -5,22 +5,21 @@ import type { DeviceFormType } from '@/components/admin/DeviceManagement'
 import type { UserFormType } from '@/components/admin/UserManagement'
 
 // Define the user properties type
-export type UserPropertyName = keyof User
+export type InputPropertyName = keyof User
 
 // Define the user property class
 class InputProperty {
-  name: UserPropertyName // Property name
+  name: InputPropertyName // Property name
   regex: RegExp // Regular expression for validation
   disabled?: boolean // Is the property disabled
 
   // Constructor for the class
-  constructor(name: UserPropertyName, regex: RegExp, disabled?: boolean) {
+  constructor(name: InputPropertyName, regex: RegExp, disabled?: boolean) {
     this.name = name
     this.regex = regex
     this.disabled = disabled
   }
 }
-
 // Define the form default values class
 export class FormDefaultValues {
   email: string // The user email
@@ -28,7 +27,7 @@ export class FormDefaultValues {
   username: string // The user username
   name: string // The user name
   phone: string // The user phone
-  accessKey: number // The user access key
+  accessKey: string // The user access key
 
   // Constructor for the class
   constructor(
@@ -37,7 +36,7 @@ export class FormDefaultValues {
     username: string,
     name: string,
     phone: string,
-    accessKey: number
+    accessKey: string
   ) {
     this.email = email
     this.password = password
@@ -137,7 +136,7 @@ export class AccountForm extends UserForm {
 }
 
 // Define the sign up form class that extends the account form class
-export class SignUpForm extends AccountForm {
+export class SignUpForm extends UserForm {
   // Constructor for the class
   constructor() {
     super() // Call the constructor of the parent class
@@ -150,17 +149,17 @@ export class SignUpForm extends AccountForm {
   // Get the default values for the form
   getDefaultValues() {
     return {
-      email: 'lior.oren10@gmail.com',
-      name: 'Lior Oren',
-      phone: '0548853393',
-      username: 'lioren10',
-      password: '123456',
+      email: '',
+      name: '',
+      phone: '',
+      username: '',
+      password: '',
     }
   }
 }
 
 // Define the user management form class that extends the sign up form class
-export class UserManagementForm extends SignUpForm {
+export class UserManagementForm extends UserForm {
   accessKey: InputProperty // The user access key
 
   // Constructor for the class

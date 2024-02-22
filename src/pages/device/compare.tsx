@@ -11,6 +11,7 @@ import { Translate } from 'next-translate'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
+import { useUser } from '@supabase/auth-helpers-react'
 import { useViewportSize } from '@mantine/hooks'
 import { z } from 'zod'
 
@@ -36,6 +37,7 @@ function getButtons(t: Translate, width: number) {
 }
 
 export default function Compare() {
+  const user = useUser()
   const { t } = useTranslation('main') // Get the translation function
   const { width } = useViewportSize() // Get the width of the viewport
   const router = useRouter() // Get the router
@@ -46,10 +48,18 @@ export default function Compare() {
   const [compareAmount, setCompareAmount] = useState(
     getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
   ) // Get the amount of devices to compare
-  const allDevicesQuery = trpc.device.getModelsAndNames.useQuery() // Get the devices from the database
+  const allDevicesQuery = trpc.device.getModelsAndNames.useQuery() // Get all devices from the database
   const selectedDevicesQuery = trpc.device.getDevicesFromModelsArr.useQuery({
     modelsArr: deviceList,
-  }) // Get the devices from the database
+  }) // Get the selected devices from the database
+
+  // When user state or url changes
+  useEffect(() => {
+    // If the user is not signed in
+    if (!user) {
+      router.push('/') // Push the user to the home page
+    }
+  }, [user, router])
 
   // When compare amount changes
   useEffect(() => {
@@ -98,7 +108,7 @@ export default function Compare() {
   }
 
   // If all devices query data is loading
-  if (allDevicesQuery.data === undefined) {
+  if (allDevicesQuery.data === undefined || !user) {
     return (
       <>
         <Head>

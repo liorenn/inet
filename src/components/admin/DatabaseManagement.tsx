@@ -1,4 +1,4 @@
-import { Button, Divider, SimpleGrid, Stack, Text } from '@mantine/core'
+import { Button, Divider, SimpleGrid, Stack, Text, useMantineColorScheme } from '@mantine/core'
 
 import { CreateNotification } from '@/utils/utils'
 import { adminAccessKey } from 'config'
@@ -21,6 +21,7 @@ type Props = {
 export default function DatabaseManagement({ accessKey }: Props) {
   const router = useRouter() // Get the router
   const { t } = useTranslation('main') // Get the translation function
+  const { colorScheme } = useMantineColorScheme()
   const backupDatabaseMutation = trpc.auth.backupDatabase.useMutation() // The backup mutation
   const restoreDatabaseMutation = trpc.auth.restoreDatabase.useMutation() // The backup mutation
 
@@ -41,8 +42,8 @@ export default function DatabaseManagement({ accessKey }: Props) {
       <Divider />
       <SimpleGrid breakpoints={breakpoints} mb='lg'>
         <Button
-          variant='filled'
-          color='dark'
+          variant={colorScheme === 'dark' ? 'filled' : 'light'}
+          color={colorScheme === 'dark' ? 'dark' : 'gray'}
           size='xl'
           fullWidth
           disabled={backupDatabaseMutation.isLoading}
@@ -58,8 +59,8 @@ export default function DatabaseManagement({ accessKey }: Props) {
           {t('backupDatabase')}
         </Button>
         <Button
-          variant='filled'
-          color='dark'
+          variant={colorScheme === 'dark' ? 'filled' : 'light'}
+          color={colorScheme === 'dark' ? 'dark' : 'gray'}
           size='xl'
           fullWidth
           disabled={restoreDatabaseMutation.isLoading}

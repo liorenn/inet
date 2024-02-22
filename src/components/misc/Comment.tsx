@@ -87,16 +87,14 @@ export default function Comment({ comment, comments, setComments }: Props) {
     <Paper withBorder radius='md' sx={{ padding: 10, marginTop: 20 }}>
       <Group position='apart' sx={{ marginBottom: 10 }}>
         <Group sx={{ padding: 10 }}>
-          {user?.email && (
-            <Avatar
-              src={
-                imageExistsQuery.data && commentEmailQuery.data
-                  ? `/users/${encodeEmail(commentEmailQuery.data)}.png`
-                  : ''
-              }
-              radius='md'
-            />
-          )}
+          <Avatar
+            src={
+              imageExistsQuery.data && commentEmailQuery.data
+                ? `/users/${encodeEmail(commentEmailQuery.data)}.png`
+                : ''
+            }
+            radius='md'
+          />
           <div>
             <Text size='lg' weight={500}>
               {comment.username}
@@ -125,7 +123,6 @@ export default function Comment({ comment, comments, setComments }: Props) {
           )}
         </Group>
       </Group>
-
       {editing ? (
         <Grid mr='xs'>
           <Grid.Col span={11}>

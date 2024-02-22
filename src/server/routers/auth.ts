@@ -326,6 +326,7 @@ export const authRouter = router({
                 }),
               })
               .then((value) => {
+                console.log(value)
                 // If email was sent and response has an id
                 if (value.id) {
                   return true // Return true to indicate operation success

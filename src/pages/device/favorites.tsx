@@ -1,4 +1,4 @@
-import { Center, Container, SimpleGrid } from '@mantine/core'
+import { Center, Container, Divider, SimpleGrid, Title } from '@mantine/core'
 import React, { useEffect, useState } from 'react'
 
 import type { DevicePropertiesType } from '@/models/enums'
@@ -30,9 +30,12 @@ export default function Favorites() {
       <Head>
         <title>{t('favorites')}</title>
       </Head>
+
       {devices ? (
         devices.length > 0 ? (
           <Container size='lg'>
+            <Title>{t('favorites')}</Title>
+            <Divider mb='md' />
             <SimpleGrid
               cols={3}
               breakpoints={[

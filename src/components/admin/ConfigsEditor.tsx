@@ -3,7 +3,6 @@
 import { Button, SimpleGrid, TextInput } from '@mantine/core' // Importing components from Mantine core
 import { Dispatch, SetStateAction, useEffect, useState } from 'react' // Importing necessary hooks and types from React
 
-import { CreateNotification } from '@/utils/utils' // Importing CreateNotification function from utils/utils
 import Loader from '@/components/layout/Loader' // Importing Loader component from components/layout
 import { managerAccessKey } from 'config' // Importing managerAccessKey from config
 import { trpc } from '@/utils/client' // Importing trpc instance from utils/client
@@ -47,7 +46,7 @@ const booleanRegex = /^(true|false)?$/
 const numberRegex = /^-?\d+$/
 
 // Function to validate a string based on its type
-function validateString(value: string, validation: ValidationType): string | null {
+function validateConfig(value: string, validation: ValidationType): string | null {
   switch (validation) {
     case 'number': // If the validation type is number
       return numberRegex.test(value) ? null : 'Must be a number' // If value didnt pass the regex return a number warning
@@ -108,7 +107,6 @@ export default function ConfigsEditor({ accessKey }: Props) {
   const { t } = useTranslation('main') // Getting the translation function from next-translate
   const configsQuery = trpc.auth.getConfigs.useQuery() // Querying for configurations using trpc
   const saveConfigsMutation = trpc.auth.saveConfigs.useMutation() // Mutation function for saving configurations using trpc
-  const sendEmailsMutation = trpc.auth.sendPriceDropsEmails.useMutation() // Mutation function for sending price drop emails using trpc
   const [configs, setConfigs] = useState<ConfigType[]>([]) // State for holding the configurations as an array of configType objects
 
   // When configs query data changes
@@ -125,7 +123,7 @@ export default function ConfigsEditor({ accessKey }: Props) {
     return values
       .map((value, index) => {
         // Map the array of configType objects to an array of validation results
-        return validateString(
+        return validateConfig(
           value.value,
           getValidation(getConfigsArray(configsQuery.data)[index].value)
         )
@@ -157,51 +155,16 @@ export default function ConfigsEditor({ accessKey }: Props) {
           />
         ))}
       </SimpleGrid>
-      <SimpleGrid breakpoints={breakpoints} mt='md'>
-        <Button
-          variant='light'
-          color='blue'
-          fullWidth
-          onClick={() => {
-            // Send emails to users
-            sendEmailsMutation.mutate(
-              {},
-              {
-                onSuccess: () => {
-                  CreateNotification('success', 'green') // Create a success notification
-                },
-              }
-            )
-          }}>
-          {t('sendEmails')}
-        </Button>
-        <Button
-          variant='light'
-          color='orange'
-          fullWidth
-          onClick={() => {
-            // Send test emails to users
-            sendEmailsMutation.mutate(
-              { sendTest: true },
-              {
-                onSuccess: () => {
-                  CreateNotification('success', 'green') // Create a success notification
-                },
-              }
-            )
-          }}>
-          {t('sendTestEmails')}
-        </Button>
-        <Button
-          variant='light'
-          color='green'
-          fullWidth
-          onClick={() => {
-            saveConfigs() // Save the configurations
-          }}>
-          {t('updateConfigs')}
-        </Button>
-      </SimpleGrid>
+      <Button
+        mt='xl'
+        variant='light'
+        color='green'
+        fullWidth
+        onClick={() => {
+          saveConfigs() // Save the configurations
+        }}>
+        {t('updateConfigs')}
+      </Button>
     </>
   )
 }
@@ -224,7 +187,7 @@ function ConfigInput({ config, originalValue, setConfigs }: ConfigInputProps) {
       placeholder={t('enterConfigValue')}
       label={t(config.name)}
       value={config.value}
-      error={validateString(config.value, validation)}
+      error={validateConfig(config.value, validation)}
       onChange={(event) =>
         setConfigs((prev) =>
           prev.map((value) =>
