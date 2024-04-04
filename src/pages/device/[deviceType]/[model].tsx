@@ -39,10 +39,10 @@ export default function Device() {
   // When device data changes
   useEffect(() => {
     // If posthog was not captured
-    if (!captured && deviceDetailsQuery.data) {
+    if (!captured && deviceQuery.data) {
       // Capture the device page in posthog
       posthog.capture('Device Page', {
-        deviceName: deviceDetailsQuery.data.name,
+        deviceName: deviceQuery.data.name,
       })
       setCaptured(true) // Set captured state to true
     }
@@ -74,9 +74,8 @@ export default function Device() {
         <title>{deviceQuery.data.name}</title>
       </Head>
       <Container size='lg'>
-        <DeviceHeader device={deviceDetailsQuery.data} />
-        <DeviceLayout device={deviceDetailsQuery.data} />
-        {user && userDetailsQuery.data?.username && <Comments device={deviceDetailsQuery.data} />}
+        <DeviceLayout device={deviceQuery.data} />
+        <Comments device={deviceQuery.data} />
       </Container>
     </>
   )

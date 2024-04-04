@@ -14,21 +14,21 @@ function convertObjectToJson(object: DeviceSchemaType | UserSchemaType | allData
   return { Name: 'json', Value: JSON.stringify(object) }
 }
 
-// Function to insert a user using a SOAP request
-export async function restoreDatabaseSoap() {
+// Function to restore the database using a SOAP request
+export async function GetTablesDataSoap() {
   const { response } = await soapRequest({
-    // Making a SOAP request to insert a user
+    // Making a SOAP request to restore the database
     url: env.soapServerUrl,
     headers: soapRequestHeaders,
-    xml: createSoapRequestXml('RestoreDatabase'), // Converting the input object to XML
+    xml: createSoapRequestXml('GetTablesData'), // Converting the input object to XML
   })
-  return getResultFromResponse('RestoreDatabase', response.body) // Extracting the result from the response
+  return getResultFromResponse('GetTablesData', response.body) // Extracting the result from the response
 }
 
-// Function to insert a user using a SOAP request
+// Function to backup the database using a SOAP request
 export async function backupDatabaseSoap({ input }: { input: allDataType }) {
   const { response } = await soapRequest({
-    // Making a SOAP request to insert a user
+    // Making a SOAP request to backup the database
     url: env.soapServerUrl,
     headers: soapRequestHeaders,
     xml: createSoapRequestXml('BackupDatabase', {

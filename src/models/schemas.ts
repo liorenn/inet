@@ -36,8 +36,8 @@ export const userSchema = z.object({
   email: z.string(),
   username: z.string(),
   name: z.string(),
-  password: z.string(),
   phone: z.string(),
+  password: z.string(),
   accessKey: z.number(),
 })
 

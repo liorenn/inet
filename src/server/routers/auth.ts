@@ -1,12 +1,12 @@
-import { Prisma, PrismaClient } from '@prisma/client'
-import { UpdateSchema, commentSchema, userSchema } from '@/models/schemas'
 import {
+  GetTablesDataSoap,
   backupDatabaseSoap,
   deleteUserSoap,
   insertUserSoap,
-  restoreDatabaseSoap,
   updateUserSoap,
 } from '@/server/soapFunctions'
+import { Prisma, PrismaClient } from '@prisma/client'
+import { UpdateSchema, commentSchema, userSchema } from '@/models/schemas'
 import { calculatePercentageDiff, encodeEmail } from '@/utils/utils'
 import { databaseEditorPort, sendSoapRequest, websiteEmail } from 'config'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
@@ -28,7 +28,6 @@ export type allDataType = {
 type RestoreDatabaseInput = {
   input: {
     data: string
-    FromAsp?: boolean | undefined
   }
   prisma: PrismaClient
 }
@@ -36,56 +35,54 @@ type RestoreDatabaseInput = {
 // Function to restore the database data
 async function restoreDatabase({ input, prisma }: RestoreDatabaseInput) {
   // If request came from asp soap request
-  if (input.FromAsp) {
-    const jsonData = input.data // Get the json data from the input
-    const data: allDataType = JSON.parse(jsonData) as allDataType // Parse the json data to allDataType type
-    // Delete all rows from the Device table because other tables rely on the device table
-    await prisma.$executeRawUnsafe('DELETE FROM "Device";')
-    await prisma.$executeRawUnsafe('BEGIN;') // Start a transaction
-    try {
-      // For each table in the data
-      for (const { table, data: tableData } of data) {
-        const deleteQuery = `DELETE FROM "${table}";` // Generate delete query for the entire table
-        await prisma.$executeRawUnsafe(deleteQuery) // Execute the delete query
-        if (!tableData[0]) continue // If table has no data dont proceed to to insert query
-        const columns = Object.keys(tableData[0]) // Get the columns of the table
-          .map((column) => `"${column}"`) // Put it in quotes for the query
-          .join(', ') // Join the columns with commas
-        const values = tableData
-          // For each row in the table
-          .map((row) => {
-            const rowValues = Object.values(row) // Get the row values
-              .map((value) => {
-                // If value is null
-                if (value === null) {
-                  return 'NULL' // Return null in sql format
-                } // If value is number
-                else if (typeof value === 'number') {
-                  return value // Return value in sql format
-                } // If value is string or other data type
-                else {
-                  return `'${value as string}'` // Return value in sql format
-                }
-              })
-              .join(', ') // Join the values with commas
-            return `(${rowValues})` // Return value in sql format
-          })
-          .join(', ') // Join the values with commas
-        const insertQuery = `INSERT INTO "${table}" (${columns}) VALUES ${values};` // Create insert query
-        await prisma.$executeRawUnsafe(insertQuery) // Execute the insert query
-      }
-      await prisma.$executeRawUnsafe('COMMIT;') // Commit the transaction if all queries are successful
-    } catch (error) {
-      await prisma.$executeRawUnsafe('ROLLBACK;') // Rollback the transaction if there is an error
-      throw error
+  const jsonData = input.data // Get the json data from the input
+  const data: allDataType = JSON.parse(jsonData) as allDataType // Parse the json data to allDataType type
+  // Delete all rows from the Device table because other tables rely on the device table
+  await prisma.$executeRawUnsafe('DELETE FROM "Device";')
+  await prisma.$executeRawUnsafe('BEGIN;') // Start a transaction
+  try {
+    // For each table in the data
+    for (const { table, data: tableData } of data) {
+      const deleteQuery = `DELETE FROM "${table}";` // Generate delete query for the entire table
+      await prisma.$executeRawUnsafe(deleteQuery) // Execute the delete query
+      if (!tableData[0]) continue // If table has no data dont proceed to to insert query
+      const columns = Object.keys(tableData[0]) // Get the columns of the table
+        .map((column) => `"${column}"`) // Put it in quotes for the query
+        .join(', ') // Join the columns with commas
+      const values = tableData
+        // For each row in the table
+        .map((row) => {
+          const rowValues = Object.values(row) // Get the row values
+            .map((value) => {
+              // If value is null
+              if (value === null) {
+                return 'NULL' // Return null in sql format
+              } // If value is number
+              else if (typeof value === 'number') {
+                return value // Return value in sql format
+              } // If value is string or other data type
+              else {
+                return `'${value as string}'` // Return value in sql format
+              }
+            })
+            .join(', ') // Join the values with commas
+          return `(${rowValues})` // Return value in sql format
+        })
+        .join(', ') // Join the values with commas
+      const insertQuery = `INSERT INTO "${table}" (${columns}) VALUES ${values};` // Create insert query
+      await prisma.$executeRawUnsafe(insertQuery) // Execute the insert query
     }
+    await prisma.$executeRawUnsafe('COMMIT;') // Commit the transaction if all queries are successful
+  } catch (error) {
+    await prisma.$executeRawUnsafe('ROLLBACK;') // Rollback the transaction if there is an error
+    throw error
   }
 }
 
 // Function to backup the database data
 async function backupDatabase({ prisma }: { prisma: PrismaClient }) {
   const allData: allDataType = [] // Initialize all data array
-  // Push all tables and their data to the database
+  // Add all tables and their data to the database
   allData.push({ table: 'Device', data: await prisma.device.findMany() })
   allData.push({
     table: 'BiometricFeature',
@@ -111,10 +108,10 @@ export const authRouter = router({
     await backupDatabase({ prisma: ctx.prisma }) // Backup the database
     return true // Return true to indicate operation success
   }),
-  // Function to backup the database
+  // Function to restore the database
   restoreDatabase: method.mutation(async ({ ctx }) => {
-    const response = await restoreDatabaseSoap() // Send the soap request
-    await restoreDatabase({ input: { data: response, FromAsp: true }, prisma: ctx.prisma }) // Restore the database
+    const response = await GetTablesDataSoap() // Send the soap request
+    await restoreDatabase({ input: { data: response }, prisma: ctx.prisma }) // Restore the database
     return true // Return true to indicate operation success
   }),
   // Function to send a soap request to restore the database
@@ -326,7 +323,6 @@ export const authRouter = router({
                 }),
               })
               .then((value) => {
-                console.log(value)
                 // If email was sent and response has an id
                 if (value.id) {
                   return true // Return true to indicate operation success
