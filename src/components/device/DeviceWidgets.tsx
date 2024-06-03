@@ -27,7 +27,7 @@ export default function DeviceWidgets({ device }: Props) {
     },
     {
       title: t('operatingSystem'),
-      spec: `ios ${device.releaseOS}`,
+      spec: `${device.releaseOS}`,
       icon: <IconBrandApple size={45} />,
     },
     {

@@ -35,12 +35,11 @@ type RestoreDatabaseInput = {
 // Function to restore the database data
 async function restoreDatabase({ input, prisma }: RestoreDatabaseInput) {
   // If request came from asp soap request
-  const jsonData = input.data // Get the json data from the input
-  const data: allDataType = JSON.parse(jsonData) as allDataType // Parse the json data to allDataType type
-  // Delete all rows from the Device table because other tables rely on the device table
-  await prisma.$executeRawUnsafe('DELETE FROM "Device";')
-  await prisma.$executeRawUnsafe('BEGIN;') // Start a transaction
   try {
+    const jsonData = input.data // Get the json data from the input
+    const data: allDataType = JSON.parse(jsonData) as allDataType // Parse the json data to allDataType type
+    // Delete all rows from the Device table because other tables rely on the device table
+    await prisma.$executeRawUnsafe('DELETE FROM "Device";')
     // For each table in the data
     for (const { table, data: tableData } of data) {
       const deleteQuery = `DELETE FROM "${table}";` // Generate delete query for the entire table
@@ -72,10 +71,10 @@ async function restoreDatabase({ input, prisma }: RestoreDatabaseInput) {
       const insertQuery = `INSERT INTO "${table}" (${columns}) VALUES ${values};` // Create insert query
       await prisma.$executeRawUnsafe(insertQuery) // Execute the insert query
     }
-    await prisma.$executeRawUnsafe('COMMIT;') // Commit the transaction if all queries are successful
-  } catch (error) {
-    await prisma.$executeRawUnsafe('ROLLBACK;') // Rollback the transaction if there is an error
-    throw error
+
+    return true
+  } catch {
+    return false
   }
 }
 
@@ -112,14 +111,14 @@ export const authRouter = router({
   restoreDatabase: method.mutation(async ({ ctx }) => {
     const response = await GetTablesDataSoap() // Send the soap request
     await restoreDatabase({ input: { data: response }, prisma: ctx.prisma }) // Restore the database
-    return true // Return true to indicate operation success
+    return true
   }),
   // Function to send a soap request to restore the database
   restoreDatabaseSoap: method
     .input(z.object({ data: z.string(), FromAsp: z.boolean().optional() }))
     .mutation(async ({ ctx, input }) => {
-      await restoreDatabase({ input, prisma: ctx.prisma }) // Restore the database
-      return true // Return true to indicate operation success
+      const result = await restoreDatabase({ input, prisma: ctx.prisma }) // Restore the database
+      return result
     }),
   // Function to open the database editor
   openDatabaseEditor: method.mutation(async () => {

@@ -9,9 +9,6 @@ declare global {
 
 export const prisma = global.prisma || new PrismaClient() // Initialize Prisma client
 
-// Check if website status is not production
-if (env.websiteStatus !== 'production') {
-  global.prisma = prisma // Store in global object
-}
+global.prisma = prisma // Store in global object
 
 export const resend = new Resend(env.resendKey) // Initialize Resend client

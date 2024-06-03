@@ -1,9 +1,9 @@
 import { Center, Container, Divider, SimpleGrid, Title } from '@mantine/core'
 import React, { useEffect, useState } from 'react'
 
+import DeviceListCard from '@/components/device/DeviceListCard'
 import type { DevicePropertiesType } from '@/models/enums'
 import Head from 'next/head'
-import ListCard from '@/components/device/DeviceListCard'
 import Loader from '@/components/layout/Loader'
 import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
@@ -45,7 +45,7 @@ export default function Favorites() {
               ]}>
               {devices &&
                 devices.map((value, index) => (
-                  <ListCard
+                  <DeviceListCard
                     device={value}
                     key={index}
                     deviceType={value.type}

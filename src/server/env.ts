@@ -6,7 +6,6 @@ const envVariables = z.object({
   resendKey: z.string(), // Define resendKey as a string
   currencyApiUrl: z.string(), // Define currencyApiUrl as a string
   currencyApiKey: z.string(), // Define currencyApiKey as a string
-  websiteStatus: z.enum(['development', 'test', 'production']), // Define websiteStatus as an enum with specified values
 })
 
 // Parse and validate the environment variables using the defined schema
@@ -15,5 +14,4 @@ export const env = envVariables.parse({
   resendKey: process.env.RESEND_KEY, // Parse and validate resend key from environment variables
   currencyApiUrl: process.env.CURRENCY_API_URL, // Parse and validate currency API URL from environment variables
   currencyApiKey: process.env.CURRENCY_API_KEY, // Parse and validate currency API key from environment variables
-  websiteStatus: process.env.WEBSITE_STATUS, // Parse and validate website status from environment variables
 })

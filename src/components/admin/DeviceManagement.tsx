@@ -298,6 +298,7 @@ function DeviceRow({ device, activePage, setActivePage, setChunkedDevices }: Dev
   // Update device function
   const handleUpdate = () => {
     // If the form passed the validation
+
     if (form.isValid()) {
       setEditMode(false) // Set the edit mode to false
       // If the form values are different from the current device

@@ -9,6 +9,7 @@ type LanguagesType = {
 export const languages: LanguagesType[] = [
   { value: 'en', name: 'English' },
   { value: 'he', name: 'עברית' },
+  { value: 'ru', name: 'русский' },
   { value: 'de', name: 'Deutsch' },
   { value: 'fr', name: 'Français' },
   { value: 'es', name: 'Español' },

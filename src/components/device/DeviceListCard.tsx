@@ -1,10 +1,10 @@
-import { Button, Card, Grid, Space, Text } from '@mantine/core'
+import { Anchor, Button, Card, Grid, Space, Text } from '@mantine/core'
 
 import DevicePhotos from '@/components/device/DevicePhotos'
 import { DevicePropertiesType } from '@/models/enums'
 import { Dispatch } from 'react'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 
 // The component props
@@ -16,6 +16,7 @@ type Props = {
 
 export default function DeviceListCard({ device, deviceType, setDevices }: Props) {
   const { t } = useTranslation('main') // Get the translation function
+  const router = useRouter() // Get the router
 
   return (
     <Card shadow='lg' p='lg' radius='md'>
@@ -30,11 +31,14 @@ export default function DeviceListCard({ device, deviceType, setDevices }: Props
 
       <Grid sx={{ marginTop: 2 }}>
         <Grid.Col span={6}>
-          <Link href={`device/${deviceType}/${device.model}`} style={{ textDecoration: 'none' }}>
+          <Anchor
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClick={() => router.push(`/device/${deviceType}/${device.model}`)}
+            style={{ textDecoration: 'none' }}>
             <Button variant='light' color='gray' radius='md' size='md' fullWidth>
               {t('moreDetails')}
             </Button>
-          </Link>
+          </Anchor>
         </Grid.Col>
         <Grid.Col span={6}>
           <FavoritesButtons model={device.model} setDevices={setDevices} favoritesPage />

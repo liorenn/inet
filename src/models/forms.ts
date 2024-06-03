@@ -212,7 +212,7 @@ export function getDeviceFormFields() {
   const nullableStringRegex = /^([A-Za-z0-9 _,]{3,})?$/
   const floatRegex = /^[+-]?\d*\.?\d+$/
   const nullableFloatRegex = /^([+-]?\d*\.?\d+)?$/
-  const stringRegex = /^[A-Za-z0-9 _,]{3,}$/
+  const stringRegex = /^[A-Za-z0-9 _,]{2,}$/
   const booleanRegex = /^(true|false)?$/
   const numberRegex = /^(-?\d+)?$/
 
@@ -237,7 +237,7 @@ export function getDeviceFormFields() {
     },
     {
       name: 'releaseOS',
-      regex: stringRegex,
+      regex: nullableStringRegex,
     },
     {
       name: 'releasePrice',

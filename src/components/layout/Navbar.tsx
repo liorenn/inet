@@ -2,7 +2,7 @@ import { ActionIcon, useMantineColorScheme } from '@mantine/core'
 import { Avatar, Container, Menu, createStyles } from '@mantine/core'
 import { Button, Group, Header, Text } from '@mantine/core'
 import { CreateNotification, encodeEmail } from '@/utils/utils'
-import { DEFlag, ESFlag, FRFlag, GBFlag, ILFlag, ITFlag } from 'mantine-flagpack'
+import { DEFlag, ESFlag, FRFlag, GBFlag, ILFlag, ITFlag, RUFlag } from 'mantine-flagpack'
 import { IconCurrencyDollar, IconLanguage, IconMoon, IconSearch, IconSun } from '@tabler/icons'
 import { adminAccessKey, defaultLanguage } from 'config'
 import { currencies, useCurrency } from '@/hooks/useCurrency'
@@ -277,6 +277,8 @@ export default function Navbar() {
                       <GBFlag w={28} />
                     ) : language.value === 'he' ? (
                       <ILFlag w={28} />
+                    ) : language.value === 'ru' ? (
+                      <RUFlag w={28} />
                     ) : language.value === 'de' ? (
                       <DEFlag w={28} />
                     ) : language.value === 'fr' ? (
