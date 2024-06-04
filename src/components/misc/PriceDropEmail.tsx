@@ -27,7 +27,7 @@ export default function PriceDropEmail({
       </Preview>
       <Body style={main}>
         <Container style={container}>
-          <Text style={greeting}>Hi {name},</Text>
+          <Text style={greeting}>Hi {name}</Text>
           <Text style={paragraph}>
             Great news! The price of the {device.name} you saved in your wishlist has dropped by{' '}
             <span style={priceDrop}>{percentage.toFixed(1)}%</span> Now, you can grab it for just
@@ -36,12 +36,12 @@ export default function PriceDropEmail({
           </Text>
           <Text style={paragraph}>Here's a reminder of why the {device.name} is amazing</Text>
           <ul style={list}>
-            <li>Blazing fast {device.chipset} chip for seamless performance.</li>
+            <li>Blazing fast {device.chipset} chip for seamless performance</li>
             {device.screenSize && (
-              <li>Stunning {device.screenSize} inches Super Retina XDR display.</li>
+              <li>Stunning {device.screenSize} inches Super Retina XDR display</li>
             )}
             {device.batterySize && (
-              <li>{device.batterySize} MaH Battery for long lasting battery life.</li>
+              <li>{device.batterySize} MaH Battery for long lasting battery life</li>
             )}
           </ul>
           <Text style={paragraph}>
@@ -53,7 +53,7 @@ export default function PriceDropEmail({
             available for a limited time!
           </Text>
           <Hr style={hr} />
-          <Text style={footer}>Best regards, INet Team</Text>
+          <Text style={footer}>Best regards, iNet Team</Text>
         </Container>
       </Body>
     </Html>

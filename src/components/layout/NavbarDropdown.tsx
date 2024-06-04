@@ -79,7 +79,7 @@ export default function NavBarDropdown({ AccessKey }: Props) {
           </Link>
         ))}
       </Drawer>
-      <ActionIcon pr='lg' size='xl'>
+      <ActionIcon size='xl'>
         <IconMenu2 onClick={() => setOpened(true)} />
       </ActionIcon>
     </>

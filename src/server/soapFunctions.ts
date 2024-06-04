@@ -16,6 +16,7 @@ function convertObjectToJson(object: DeviceSchemaType | UserSchemaType | allData
 
 // Function to restore the database using a SOAP request
 export async function GetTablesDataSoap() {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // Allow soap calls to succeed
   const { response } = await soapRequest({
     // Making a SOAP request to restore the database
     url: env.soapServerUrl,

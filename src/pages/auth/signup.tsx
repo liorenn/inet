@@ -27,7 +27,7 @@ export default function SignUp() {
   const supabase = useSupabaseClient() // Get the supabase
   const formProperties = new SignUpForm() // Get the form properties
   const [loading, setLoading] = useState(false) // State for loading
-  const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation() // Get the IsUserExists mutation
+  const IsUserExistsMutation = trpc.auth.IsSignUpUserExists.useMutation() // Get the IsUserExists mutation
   const createUserMutation = trpc.auth.createUser.useMutation() // Get the createUser mutation
   const { t } = useTranslation('main') // Get the translation function
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({

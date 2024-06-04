@@ -90,12 +90,12 @@ async function backupDatabase({ prisma }: { prisma: PrismaClient }) {
   allData.push({ table: 'Camera', data: await prisma.camera.findMany() })
   allData.push({ table: 'CameraType', data: await prisma.cameraType.findMany() })
   allData.push({ table: 'Color', data: await prisma.color.findMany() })
-  allData.push({ table: 'Comment', data: await prisma.camera.findMany() })
   allData.push({ table: 'DeviceColor', data: await prisma.deviceColor.findMany() })
   allData.push({ table: 'DeviceConnector', data: await prisma.deviceConnector.findMany() })
   allData.push({ table: 'DeviceType', data: await prisma.deviceType.findMany() })
-  allData.push({ table: 'DeviceUser', data: await prisma.deviceUser.findMany() })
   allData.push({ table: 'User', data: await prisma.user.findMany() })
+  allData.push({ table: 'DeviceUser', data: await prisma.deviceUser.findMany() })
+  allData.push({ table: 'Comment', data: await prisma.comment.findMany() })
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // Allow soap calls to succeed
   await backupDatabaseSoap({ input: allData }) // Send the soap request with all of the tables data
 }
@@ -250,7 +250,11 @@ export const authRouter = router({
       }) // Get all devices of a user
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       userDevices.forEach(async (userDevice) => {
-        const price = await fetchCurrentPrice(userDevice.deviceModel) // Fetch the current price of the device
+        let price = 0
+        try {
+          const currentPrice = await fetchCurrentPrice(userDevice.deviceModel) // Fetch the current price of the device
+          price = currentPrice
+        } catch {}
         // If device has a price and it is not the same price as before
         if (price && price != userDevice.device.price) {
           await ctx.prisma.device.update({
@@ -297,8 +301,12 @@ export const authRouter = router({
           select: { name: true, email: true },
         }) // Get all devices of a user
         // If user and device exist
-        if (user && device) {
-          const price = await fetchCurrentPrice(device.model) // Fetch the current price of the device
+        if (user && device && (device.type === 'iphone' || device.type === 'ipad')) {
+          let price = 0
+          try {
+            const currentPrice = await fetchCurrentPrice(device.model) // Fetch the current price of the device
+            price = currentPrice
+          } catch {}
           // If device has a price and it is not the same price as before
           if (price && price != device.price) {
             await ctx.prisma.device.update({
@@ -491,11 +499,10 @@ export const authRouter = router({
       })
     }),
   // Function to get a user
-  IsUserExists: method
+  IsSignUpUserExists: method
     .input(
       z.object({
         email: z.string(),
-        password: z.string(),
         username: z.string().optional(),
       })
     )
@@ -510,5 +517,18 @@ export const authRouter = router({
         email: !!userEmail,
         username: !!usernameUser && (userEmail ? userEmail.username === input?.username : true),
       }
+    }),
+  IsSignInUserExists: method
+    .input(
+      z.object({
+        email: z.string(),
+        password: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.prisma.user.findFirst({
+        where: { email: input.email, password: input.password },
+      }) // Get the user whose email matches the input
+      return user ? true : false
     }),
 })

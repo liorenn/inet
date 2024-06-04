@@ -22,7 +22,9 @@ export const deviceRouter = router({
     })
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     devices.forEach(async (device) => {
-      await fetchCurrentPrice(device.model)
+      try {
+        await fetchCurrentPrice(device.model)
+      } catch {}
     })
   }),
   // Function to convert device price
@@ -230,9 +232,13 @@ export const deviceRouter = router({
     }) // Get the device with cameras and colors
     // If device exists and the price is zero type is iphone or ipad
     if (device && device?.price === 0 && (device.type === 'iphone' || device.type === 'ipad')) {
-      const price = await fetchCurrentPrice(input.model) // Fetch current price
-      device.price = price ?? 0 // Set the price
-      return device // Return the device with the updated price
+      try {
+        const price = await fetchCurrentPrice(input.model) // Fetch current price
+        device.price = price ?? 0 // Set the price
+        return device // Return the device with the updated price
+      } catch {
+        return device
+      }
     }
     return device // Return the device
   }),
@@ -258,8 +264,12 @@ export const deviceRouter = router({
         // If device exists and the price is zero type is iphone or ipad
         if (device && device?.price === 0 && (device.type === 'iphone' || device.type === 'ipad')) {
           const model = device.model // Get the model
-          const price = await fetchCurrentPrice(model) // Fetch current price
-          device.price = price ?? 0 // Set the price
+          try {
+            const price = await fetchCurrentPrice(model) // Fetch current price
+            device.price = price ?? 0 // Set the price
+          } catch {
+            device.price = 0 // Set the price
+          }
         }
       }
       // Sort devices by model

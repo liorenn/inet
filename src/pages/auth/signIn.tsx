@@ -30,7 +30,7 @@ export default function SignIn() {
   const { t } = useTranslation('main') // Get the translation function
   const formProperties = new SignInForm() // Get the form properties
   const [loading, setLoading] = useState(false) // State for loading
-  const IsUserExistsMutation = trpc.auth.IsUserExists.useMutation() // Get the IsUserExists mutation
+  const IsUserExistsMutation = trpc.auth.IsSignInUserExists.useMutation() // Get the IsUserExists mutation
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
     email: session?.user?.email,
   }) // Get the access key for the user
@@ -56,7 +56,7 @@ export default function SignIn() {
         // On operation success
         async onSuccess(data) {
           // If user exists in database
-          if (data.email) {
+          if (data) {
             // Sign in the user
             const { data: user } = await supabase.auth.signInWithPassword({
               email: values.email,

@@ -263,7 +263,7 @@ function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowPr
     if (form.isValid()) {
       setEditMode(false) // Set the edit mode to false
       // If the form values are different from the current user
-      if (form.values !== user) {
+      if (JSON.stringify(form.values) !== JSON.stringify(user)) {
         // Update the user
         updateUserMutation.mutate(
           { ...convertFormUserValues(form.values) },
