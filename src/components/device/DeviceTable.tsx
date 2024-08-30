@@ -72,6 +72,9 @@ export default function DeviceTable({ specs, name }: Props) {
               )
             } else {
               element.value = element.value as string | null // Cast the value to a string or null
+              if (element.property.toLowerCase().includes('price')) {
+                console.log(element.value)
+              }
               return (
                 <tr key={index}>
                   <td>

@@ -75,7 +75,6 @@ export function encodeEmail(email: string) {
 
 // Function to exclude a property from an object and return a new object without that property
 export function excludeProperty<T, K extends keyof T>(obj: T, propKey: K): Omit<T, K> {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { [propKey]: _, ...rest } = obj // Destructuring the property to be excluded and the rest of the object
   return rest // Returning the new object without the excluded property
 }

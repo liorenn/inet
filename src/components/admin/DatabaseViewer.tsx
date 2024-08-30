@@ -2,9 +2,9 @@ import { Center, Container, ScrollArea, SegmentedControl, Table } from '@mantine
 import { useSession, useUser } from '@supabase/auth-helpers-react'
 
 import Loader from '@/components/layout/Loader'
-import { managerAccessKey } from 'config'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
@@ -12,17 +12,6 @@ import { useViewportSize } from '@mantine/hooks'
 // The component props
 type Props = {
   accessKey: number
-}
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
-// Function to find an object in an array by a property value
-function findObjectByPropertyValue<T>(array: T[], name: keyof T, value: T[keyof T]) {
-  return array.find((item) => item[name] === value) // Find the object in the array
 }
 
 export default function DatabaseViewer({ accessKey }: Props) {
@@ -36,10 +25,12 @@ export default function DatabaseViewer({ accessKey }: Props) {
   const tablesPropertiesQuery = trpc.auth.getTablesProperties.useQuery() // Query to get the properties of the tables
   const getTableDataMutation = trpc.auth.getTableData.useMutation() // Mutation to get the data of the selected table
   const [tableData, setTableData] = useState<string[][]>([]) // State variable to store the data of the selected table
+  const {
+    settings: { managerAccessKey },
+  } = useSiteSettings()
 
   if (accessKey < managerAccessKey) {
     // If the access key is less than the manager access key
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     router.push('/') // Redirect to the home page
   }
 
@@ -105,13 +96,11 @@ export default function DatabaseViewer({ accessKey }: Props) {
             <Table striped highlightOnHover withBorder withColumnBorders>
               <thead>
                 <tr>
-                  {findObjectByPropertyValue(
-                    tablesPropertiesQuery.data,
-                    'name',
-                    table
-                  )?.fields?.map((value, index) => {
-                    if (!value.relationName) return <th key={index}>{value.name}</th>
-                  })}
+                  {tablesPropertiesQuery.data
+                    .find((item) => item.name === table)
+                    ?.fields?.map((value, index) => {
+                      if (!value.relationName) return <th key={index}>{value.name}</th>
+                    })}
                 </tr>
               </thead>
               <tbody>

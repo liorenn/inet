@@ -12,8 +12,8 @@ import { trpc } from '@/utils/client'
 import { useForm } from '@mantine/form'
 import { usePostHog } from 'posthog-js/react'
 import { useRouter } from 'next/router'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
-import { validateInputOnChange } from 'config'
 
 // The sign up properties type
 export type SignUpFormType = {
@@ -24,6 +24,9 @@ export default function SignUp() {
   const router = useRouter() // Get the router
   const posthog = usePostHog() // Get the posthog
   const session = useSession() // Get the session
+  const {
+    settings: { validateInputOnChange },
+  } = useSiteSettings()
   const supabase = useSupabaseClient() // Get the supabase
   const formProperties = new SignUpForm() // Get the form properties
   const [loading, setLoading] = useState(false) // State for loading
@@ -53,7 +56,6 @@ export default function SignUp() {
     IsUserExistsMutation.mutate(
       {
         email: fields.email,
-        password: fields.password,
         username: fields.username,
       },
       {
@@ -96,7 +98,6 @@ export default function SignUp() {
                   if (!error) {
                     CreateNotification(t('accountCreatedSuccessfully'), 'green') // Create a success notification
                     posthog.capture('User Signed Up', { data }) // Capture the user signed up
-                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
                     router.push('/') // Redirect to home
                     setLoading(false) // Set loading to false
                   } else {

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-anonymous-default-export */
 export default {
   compare: 'השוואת מכשירים',
   allDevices: 'כל המכשירים',
@@ -209,7 +208,7 @@ export default {
   imacPlural: 'האיימקים',
   macbookPlural: 'המקבוקים',
   enterYour: 'הכנס את',
-  configsEditor: 'עורך הגדרות האתר',
+  SettingsEditor: 'עורך הגדרות האתר',
   find: 'מצא את המכשיר שלך',
   pro: 'פרו',
   notInterested: 'לא מעוניין',
@@ -238,7 +237,7 @@ export default {
   substantial: 'משמעותי',
   sendEmails: 'שלח הודעות דוא"ל על ירידות מחירים',
   sendTestEmails: 'שלח הודעות דוא"ל בדיקה על ירידות מחירים',
-  updateConfigs: 'עדכן תצורות',
+  updateSettings: 'עדכן תצורות',
   enterConfigValue: 'הזן ערך תצורה',
   adminAccessKey: 'מפתח גישה למנהל',
   managerAccessKey: 'מפתח גישה למנהל',

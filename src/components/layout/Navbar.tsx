@@ -4,7 +4,6 @@ import { Button, Group, Header, Text } from '@mantine/core'
 import { CreateNotification, encodeEmail } from '@/utils/utils'
 import { DEFlag, ESFlag, FRFlag, GBFlag, ILFlag, ITFlag, RUFlag } from 'mantine-flagpack'
 import { IconCurrencyDollar, IconLanguage, IconMoon, IconSearch, IconSun } from '@tabler/icons'
-import { adminAccessKey, defaultLanguage } from 'config'
 import { currencies, useCurrency } from '@/hooks/useCurrency'
 import { languages, useLanguage } from '@/hooks/useLanguage'
 import { useEffect, useState } from 'react'
@@ -18,6 +17,7 @@ import useAutoTrigger from '@/hooks/useAutoTrigger'
 import { usePostHog } from 'posthog-js/react'
 import { useProfilePicture } from '@/hooks/useProfilePicture'
 import { useRouter } from 'next/router'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 import { useSpotlight } from '@mantine/spotlight'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
@@ -31,7 +31,6 @@ export default function Navbar() {
   const { width } = useViewportSize() // Get the width of the viewport
   const { t, lang } = useTranslation('main') // Get the translation function and the current language
   const [visitedAdminPage, setVisitedAdminPage] = useState(false) // The visited admin page state
-  // eslint-disable-next-line @typescript-eslint/unbound-method
   const { colorScheme, toggleColorScheme } = useMantineColorScheme() // Get the color scheme
   const { imagePath, imageExists, setImageExists, setImagePath } = useProfilePicture() // Get the profile picture state
   const closeEditorMutation = trpc.auth.closeDatabaseEditor.useMutation() // Mutation to close the database editor
@@ -44,6 +43,9 @@ export default function Navbar() {
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
     email: user?.email,
   }) // Get the access key query
+  const {
+    settings: { adminAccessKey, defaultLanguage },
+  } = useSiteSettings()
 
   // When the user changes router
   useEffect(() => {
@@ -59,7 +61,6 @@ export default function Navbar() {
     ) {
       closeEditorMutation.mutate() // Close the database editor
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.asPath])
 
   // When component mounts
@@ -68,7 +69,6 @@ export default function Navbar() {
     setlanguageStore(
       languages.find((lang) => lang.value === localStorage.getItem('language')) ?? languages[0]
     )
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     setLanguage(localStorage.getItem('language') ?? defaultLanguage) // Set the selected language to the language stored in local storage
     // Set the selected currency state to the currency stored in local storage
     setCurrency(
@@ -79,7 +79,6 @@ export default function Navbar() {
     supabase.auth.onAuthStateChange((_e, session) => {
       setSession(session) // Set the session to the new session
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // When the user state changes
@@ -101,7 +100,6 @@ export default function Navbar() {
         }
       )
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   // Sign out the user
@@ -190,7 +188,6 @@ export default function Navbar() {
                 color='gray'
                 radius='md'
                 className={classes.end}
-                // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onClick={() => signOut()}>
                 {t('signOut')}
               </Button>
@@ -290,7 +287,6 @@ export default function Navbar() {
                     )
                   }
                   onClick={() => {
-                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
                     setLanguage(language.value) // Set the language
                     setlanguageStore(language) // Set the language in local storage
                   }}>

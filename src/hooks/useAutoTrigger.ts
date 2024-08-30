@@ -1,7 +1,7 @@
 import { Cookies } from 'typescript-cookie'
-import { adminAccessKey } from 'config'
 import { trpc } from '@/utils/client'
 import { useEffect } from 'react'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 import { useUser } from '@supabase/auth-helpers-react'
 
 // Define a custom hook to trigger a specific action
@@ -13,6 +13,9 @@ export default function useAutoTrigger() {
   const fetchDevicesPricesMutation = trpc.device.fetchDevicesPrices.useMutation()
   const backupDatabaseMutation = trpc.auth.backupDatabase.useMutation() // The backup mutation
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({ email: user?.email })
+  const {
+    settings: { adminAccessKey },
+  } = useSiteSettings()
 
   useEffect(() => {
     // Use the useEffect hook to perform side effects
@@ -33,6 +36,5 @@ export default function useAutoTrigger() {
         Cookies.set('triggeredFunction', true, { expires: 1 }) // Set the cookie to prevent repeated triggering
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // The empty dependency array ensures that the effect runs only once when the component mounts
 }

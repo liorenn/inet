@@ -15,8 +15,6 @@ import { useUser } from '@supabase/auth-helpers-react'
 import { useViewportSize } from '@mantine/hooks'
 import { z } from 'zod'
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
 // Function to get the buttons for the segmented control
 function getButtons(t: Translate, width: number) {
   const Buttons = [
@@ -53,14 +51,6 @@ export default function Compare() {
     modelsArr: deviceList,
   }) // Get the selected devices from the database
 
-  // When user state or url changes
-  useEffect(() => {
-    // If the user is not signed in
-    if (!user) {
-      router.push('/') // Push the user to the home page
-    }
-  }, [user, router])
-
   // When compare amount changes
   useEffect(() => {
     // If all devices query data exists
@@ -74,7 +64,6 @@ export default function Compare() {
         generateUrlSring(allDevicesQuery.data.slice(0, arrayLength).map((device) => device.model))
       )
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [compareAmount])
 
   // When width changes
@@ -83,7 +72,6 @@ export default function Compare() {
     setCompareAmount(
       getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [width])
 
   // When device list changes

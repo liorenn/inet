@@ -4,8 +4,6 @@ import { Html, Link, Preview, Text } from '@react-email/components'
 import { Device } from '@prisma/client'
 import { clientEnv } from '@/utils/env'
 
-/* eslint-disable react/no-unescaped-entities */
-
 type PriceDropEmailProps = {
   name: string
   device: Device

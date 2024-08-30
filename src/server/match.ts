@@ -1,8 +1,6 @@
 import { MatchDeviceType, PropertiesSchemaType } from '@/models/deviceProperties'
 import { Weight, deviceTypesProperties, weightsValues } from '@/models/deviceProperties'
 
-import { recommendedDevicesLimit } from 'config'
-
 type RecommendedDevice = {
   model: string
   match: number
@@ -28,7 +26,8 @@ export function getMatchedDevices(
 export function getRecommendedDevices(
   device: MatchDeviceType,
   deviceType: string,
-  devices: MatchDeviceType[]
+  devices: MatchDeviceType[],
+  recommendedDevicesLimit: number = 6
 ) {
   const preferencesValues: PreferenceType[] = [] // Initialize the preference values array
   // Get the properties from the device

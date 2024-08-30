@@ -10,6 +10,7 @@ import { PropertiesSchemaType } from '@/models/deviceProperties'
 import { deviceType as deviceTypeEnum } from '@/models/enums'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useViewportSize } from '@mantine/hooks'
@@ -21,8 +22,6 @@ type PreferenceType = {
   name: string
   value: string
 }
-
-/* eslint-disable @typescript-eslint/no-floating-promises */
 
 // Function to get the preferences options of a device type
 const getPreferences = (deviceType: string) => {
@@ -51,6 +50,9 @@ export default function Find() {
   const { width } = useViewportSize() // Get the width of the viewport
   const { t, lang } = useTranslation('main') // Get the translation function
   const { colorScheme } = useMantineColorScheme() // Get the color scheme
+  const {
+    settings: { matchedDevicesLimit },
+  } = useSiteSettings()
   const MatchedDevicesMutation = trpc.device.getMatchedDevices.useMutation() // Mutation to get the matched devices
   const deviceType = z.string().parse(router.query.deviceType ?? 'iphone') // Get the device type from the url
   const preferences = z // Get the user preferences from the url
@@ -70,14 +72,6 @@ export default function Find() {
     preferences.map((pref) => pref.name)
   ) // Set the accordion state to manage his opened and closed states
 
-  // When user state or url changes
-  useEffect(() => {
-    // If the user is not signed in
-    if (!user) {
-      router.push('/') // Push the user to the home page
-    }
-  }, [user, router])
-
   // When component mounts
   useEffect(() => {
     // If the preferences are not in the url
@@ -91,7 +85,6 @@ export default function Find() {
         )
       )
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Function to handle the submit of the preferences form
@@ -111,7 +104,11 @@ export default function Find() {
       })
     // If user chose no preferences after the filtering
     if (userPreferences.length > 0)
-      MatchedDevicesMutation.mutate({ deviceType, userPreferences: userPreferences }) // Send the user preferences to the server
+      MatchedDevicesMutation.mutate({
+        deviceType,
+        userPreferences: userPreferences,
+        matchedDevicesLimit,
+      }) // Send the user preferences to the server
   }
 
   // Function to get the segmented data
@@ -267,7 +264,6 @@ function PreferenceInput({ value, index, deviceType, preferences }: preferenceIn
                   : undefined
               }
               value={preferences[index].value}
-              // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onChange={(newValue) => {
                 preferences[index].value = newValue // Update the preference value
                 router.push(generateUrlString(deviceType, preferences)) // Push a new url string with updated preferences

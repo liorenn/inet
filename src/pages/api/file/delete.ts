@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { existsSync, unlinkSync } from 'fs'
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { fileName } = req.body // Get the file name from request body
 
   // If file name does not exists or isnt a string

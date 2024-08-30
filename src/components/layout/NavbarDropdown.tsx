@@ -4,7 +4,7 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { CreateNotification } from '@/utils/utils'
 import { IconMenu2 } from '@tabler/icons'
 import Link from 'next/link'
-import { adminAccessKey } from 'config'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 
@@ -18,6 +18,9 @@ export default function NavBarDropdown({ AccessKey }: Props) {
   const [opened, setOpened] = useState(false) // State of is the drawer opened
   const { t } = useTranslation('main') // Get the translation function
   const [activeLink, setActiveLink] = useState('Settings') // The active link
+  const {
+    settings: { adminAccessKey },
+  } = useSiteSettings()
 
   // Sign out the user
   async function signOut() {

@@ -32,7 +32,6 @@ export default function DeviceListCard({ device, deviceType, setDevices }: Props
       <Grid sx={{ marginTop: 2 }}>
         <Grid.Col span={6}>
           <Anchor
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClick={() => router.push(`/device/${deviceType}/${device.model}`)}
             style={{ textDecoration: 'none' }}>
             <Button variant='light' color='gray' radius='md' size='md' fullWidth>

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-anonymous-default-export */
 export default {
   compare: 'Confronta Dispositivi',
   allDevices: 'Tutti i Dispositivi',
@@ -207,7 +206,7 @@ export default {
   macPlural: 'Macs',
   imacPlural: 'iMacs',
   macbookPlural: 'Macbooks',
-  configsEditor: 'Editor di Configurazioni',
+  SettingsEditor: 'Editor di Configurazioni',
   find: 'Trova il Tuo Dispositivo',
   pro: 'Pro',
   notInterested: 'Non Interessato',
@@ -236,7 +235,7 @@ export default {
   substantial: 'Sostanziale',
   sendEmails: 'Invia Email per Bajada dei Prezzi',
   sendTestEmails: 'Invia Email di Prova per Bajada dei Prezzi',
-  updateConfigs: 'Aggiorna Configurazioni',
+  updateSettings: 'Aggiorna Configurazioni',
   enterConfigValue: 'Inserisci Valore Configurazione',
   adminAccessKey: 'Chiave di Accesso Admin',
   managerAccessKey: 'Chiave di Accesso Manager',

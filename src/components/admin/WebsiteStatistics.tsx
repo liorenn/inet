@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import { managerAccessKey } from 'config'
 import { useMantineColorScheme } from '@mantine/core'
 import { useRouter } from 'next/router'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 
 // The component props
 type Props = {
@@ -13,20 +13,19 @@ export default function WebsiteStatistics({ accessKey }: Props) {
   const router = useRouter() // Get the router
   const [height, setHeight] = useState(1200)
   const { colorScheme } = useMantineColorScheme() // Get the color scheme
+  const {
+    settings: { managerAccessKey },
+  } = useSiteSettings()
 
   useEffect(() => {
     if (accessKey && accessKey < managerAccessKey) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       router.push('/') // If the access key is less than the manager access key redirect to the home page
     }
   }, [accessKey, router])
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onChange = (e: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (e.data.event === 'posthog:dimensions' && e.data.name === 'MyPostHogIframe') {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
         setHeight(e.data.height)
       }
     }

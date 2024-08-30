@@ -11,8 +11,8 @@ import { trpc } from '@/utils/client'
 import { useForm } from '@mantine/form'
 import { usePostHog } from 'posthog-js/react'
 import { useRouter } from 'next/router'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
-import { validateInputOnChange } from 'config'
 
 // The sign in form properties type
 type SignInFormType = {
@@ -20,12 +20,13 @@ type SignInFormType = {
   password: string
 }
 
-/* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/no-floating-promises */
 export default function SignIn() {
   const router = useRouter() // Get the router
   const posthog = usePostHog() // Get the posthog
   const session = useSession() // Get the session
+  const {
+    settings: { validateInputOnChange },
+  } = useSiteSettings()
   const supabase = useSupabaseClient() // Get the supabase client
   const { t } = useTranslation('main') // Get the translation function
   const formProperties = new SignInForm() // Get the form properties

@@ -4,7 +4,6 @@ import { type inferAsyncReturnType } from '@trpc/server'
 import { prisma } from '@/server/client'
 
 // Create a function that creates the context based on the provided Next.js context options
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const createContext = () => {
   return { prisma }
 }

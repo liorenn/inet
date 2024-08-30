@@ -1,4 +1,3 @@
-// Importing necessary modules and types
 import { httpBatchLink } from '@trpc/client'
 import { createTRPCNext } from '@trpc/next'
 import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server'

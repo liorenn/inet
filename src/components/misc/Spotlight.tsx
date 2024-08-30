@@ -18,8 +18,6 @@ import { Translate } from 'next-translate'
 import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
 
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-
 // Define an icon for each device type
 const icons = [
   {
@@ -97,7 +95,6 @@ export default function SpotlightControl({ children }: { children: ReactNode }) 
     } else {
       return [] // Return an empty array
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [devicesQuery.data, router])
 
   return (

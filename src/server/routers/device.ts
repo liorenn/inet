@@ -6,7 +6,6 @@ import { method, router } from '@/server/trpc'
 import { selectProprties, type DevicePropertiesType } from '@/models/enums'
 import { deviceSchema } from '@/models/schemas'
 import { MatchDeviceType, PropertiesSchema } from '@/models/deviceProperties'
-import { matchedDevicesLimit, sendSoapRequest } from 'config'
 import { z } from 'zod'
 import { selectParams } from '@/models/deviceProperties'
 import { convertPrice, fetchCurrentPrice } from '@/server/price'
@@ -20,7 +19,6 @@ export const deviceRouter = router({
         OR: [{ type: 'iphone' }, { type: 'ipad' }], // If device type is iphone or ipad
       },
     })
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     devices.forEach(async (device) => {
       try {
         await fetchCurrentPrice(device.model)
@@ -50,7 +48,6 @@ export const deviceRouter = router({
         },
       }) // Get queried device
       if (!queriedDevice) return [] // Return an empty array if the device is not found
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { releasePrice, ...queriedDeviceWithoutReleasePrice } = queriedDevice // Remove release price
       const device = {
         ...queriedDeviceWithoutReleasePrice,
@@ -100,6 +97,7 @@ export const deviceRouter = router({
       z.object({
         deviceType: z.string(),
         userPreferences: z.array(z.object({ name: PropertiesSchema, value: z.number() })),
+        matchedDevicesLimit: z.number().default(6),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -122,7 +120,7 @@ export const deviceRouter = router({
         preferencesValues,
         devices,
         input.deviceType,
-        matchedDevicesLimit
+        input.matchedDevicesLimit
       ) // Get the matched devices
       const query = await ctx.prisma.device.findMany({
         select: selectProprties,
@@ -144,7 +142,11 @@ export const deviceRouter = router({
     }),
   // Function to insert a device
   insertDevice: method
-    .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
+    .input(
+      deviceSchema.merge(
+        z.object({ FromAsp: z.boolean().optional(), sendSoapRequest: z.boolean().default(false) })
+      )
+    )
     .mutation(async ({ ctx, input }) => {
       try {
         const { FromAsp, ...device } = input // Remove fromAsp from input
@@ -154,7 +156,7 @@ export const deviceRouter = router({
           },
         }) // Create the device
         // Send soap request if sendSoapRequest config is true and FromAsp is not true
-        if (sendSoapRequest && FromAsp !== true) {
+        if (input.sendSoapRequest && FromAsp !== true) {
           await insertDeviceSoap({ input: device }) // Send insert device soap request
         }
         return true // Return true to indicate operation success
@@ -164,7 +166,11 @@ export const deviceRouter = router({
     }),
   // Function to update a device
   updateDevice: method
-    .input(deviceSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
+    .input(
+      deviceSchema.merge(
+        z.object({ FromAsp: z.boolean().optional(), sendSoapRequest: z.boolean() })
+      )
+    )
     .mutation(async ({ ctx, input }) => {
       try {
         const { FromAsp, ...device } = input // Remove fromAsp from input
@@ -175,7 +181,7 @@ export const deviceRouter = router({
           },
         }) // Update the device
         // Send soap request if sendSoapRequest config is true and FromAsp is not true
-        if (sendSoapRequest && FromAsp !== true) {
+        if (input.sendSoapRequest && FromAsp !== true) {
           process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // Allow soap calls to succeed
           await updateDeviceSoap({ input: device }) // Send update device soap request
         }
@@ -186,7 +192,9 @@ export const deviceRouter = router({
     }),
   // Function to delete a device
   deleteDevice: method
-    .input(z.object({ model: z.string(), FromAsp: z.boolean().optional() }))
+    .input(
+      z.object({ model: z.string(), FromAsp: z.boolean().optional(), sendSoapRequest: z.boolean() })
+    )
     .mutation(async ({ ctx, input }) => {
       try {
         const { FromAsp, model } = input // Destructure the input
@@ -194,7 +202,7 @@ export const deviceRouter = router({
           where: { model },
         }) // Delete the device
         // Send soap request if sendSoapRequest config is true and FromAsp is not true
-        if (sendSoapRequest && FromAsp !== true) {
+        if (input.sendSoapRequest && FromAsp !== true) {
           await deleteDeviceSoap({ model: input.model }) // Send delete device soap request
         }
         return true // Return true to indicate operation success

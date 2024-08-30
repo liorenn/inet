@@ -2,7 +2,6 @@ import { Button, Group, Pagination, ScrollArea, Table, Text, TextInput } from '@
 import { CreateNotification, chunkArray } from '@/utils/utils'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
-import { adminAccessKey, adminTableRows, validateInputOnChange } from 'config'
 import { convertDeviceValues, convertFormDeviceValues, getDeviceFormFields } from '@/models/forms'
 import { useOs, useViewportSize } from '@mantine/hooks'
 
@@ -11,6 +10,7 @@ import Loader from '@/components/layout/Loader'
 import { deviceSchema } from '@/models/schemas'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
 
 export type DeviceFormType = {
@@ -31,10 +31,12 @@ export default function DeviceManagement({ accessKey }: Props) {
   const fieldNames = Object.keys(deviceSchema.shape) // The field names of the devices
   const devicesDataQuery = trpc.device.getDevicesData.useQuery() // The devices data query
   const sendEmailsMutation = trpc.auth.sendPriceDropsEmails.useMutation() // Mutation function for sending price drop emails using trpc
+  const {
+    settings: { adminAccessKey, adminTableRows, validateInputOnChange },
+  } = useSiteSettings()
 
   // If the access key is less than the manager access key
   if (accessKey < adminAccessKey) {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     router.push('/') // Redirect to the home page
   }
 
@@ -156,6 +158,9 @@ function DeviceInsertRow({ setActivePage, setChunkedDevices }: DeviceInsertRowPr
   const [loading, setLoading] = useState(false) // The loading state
   const insertDeviceMutation = trpc.device.insertDevice.useMutation() // The insert device mutation
   const { fields, validators, defaultValues } = getDeviceFormFields() // Get the devices form fields
+  const {
+    settings: { adminTableRows, validateInputOnChange },
+  } = useSiteSettings()
 
   // Form management function
   const form = useForm<DeviceFormType>({
@@ -245,6 +250,9 @@ function DeviceRow({ device, activePage, setActivePage, setChunkedDevices }: Dev
   const deleteDeviceMutation = trpc.device.deleteDevice.useMutation() // The delete device mutation
   const updateDeviceMutation = trpc.device.updateDevice.useMutation() // The update device mutation
   const { fields, validators } = getDeviceFormFields() // Get the devices form fields
+  const {
+    settings: { validateInputOnChange },
+  } = useSiteSettings()
 
   // Form management function
   const form = useForm<DeviceFormType>({
@@ -256,7 +264,6 @@ function DeviceRow({ device, activePage, setActivePage, setChunkedDevices }: Dev
   // When device data changes
   useEffect(() => {
     form.setValues(device) // Set the form values to the changed device data
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [device])
 
   // Delete device function

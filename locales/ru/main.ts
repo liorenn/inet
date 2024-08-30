@@ -1,4 +1,3 @@
-/* eslint-disable import/no-anonymous-default-export */
 export default {
   compare: 'Сравнить устройства',
   allDevices: 'Все устройства',
@@ -206,7 +205,7 @@ export default {
   macPlural: 'Mac',
   imacPlural: 'iMac',
   macbookPlural: 'MacBook',
-  configsEditor: 'Редактор конфигураций',
+  SettingsEditor: 'Редактор конфигураций',
   find: 'Найти ваше устройство',
   pro: 'Pro',
   notInterested: 'Не интересует',
@@ -235,7 +234,7 @@ export default {
   substantial: 'Существенный',
   sendEmails: 'Отправить письма о снижении цен',
   sendTestEmails: 'Отправить тестовые письма о снижении цен',
-  updateConfigs: 'Обновить конфигурации',
+  updateSettings: 'Обновить конфигурации',
   enterConfigValue: 'Введите значение конфигурации',
   adminAccessKey: 'Ключ доступа администратора',
   managerAccessKey: 'Ключ доступа менеджера',

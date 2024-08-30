@@ -3,12 +3,12 @@ import { CreateNotification, chunkArray } from '@/utils/utils'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { InputPropertyName, UserManagementForm, convertFormUserValues } from '@/models/forms'
 import { UseFormReturnType, useForm } from '@mantine/form'
-import { adminTableRows, managerAccessKey, validateInputOnChange } from 'config'
 import { useOs, useViewportSize } from '@mantine/hooks'
 
 import Loader from '@/components/layout/Loader'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
 import { userSchema } from '@/models/schemas'
 
@@ -29,10 +29,12 @@ export default function UserManagement({ accessKey }: Props) {
   const [chunkedUsers, setChunkedUsers] = useState<UserFormType[][]>([[]]) // The chunked users
   const fieldNames = Object.keys(userSchema.shape) // The field names of the users
   const usersDataQuery = trpc.auth.getUsersData.useQuery() // The users data query
+  const {
+    settings: { adminTableRows, managerAccessKey },
+  } = useSiteSettings()
 
   // If the access key is less than the manager access key
   if (accessKey < managerAccessKey) {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     router.push('/') // Redirect to the home page
   }
 
@@ -116,6 +118,9 @@ function UserInsertRow({ setActivePage, setChunkedUsers }: UserInsertRowProps) {
   const { t } = useTranslation('main') // Get the translation function
   const [loading, setLoading] = useState(false) // The loading state
   const insertUserMutation = trpc.auth.insertUser.useMutation() // The insert user mutation
+  const {
+    settings: { adminTableRows, validateInputOnChange },
+  } = useSiteSettings()
 
   // Form management function
   const form = useForm<UserFormType>({
@@ -207,6 +212,9 @@ function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowPr
   const [loading, setLoading] = useState(false) // The loading state
   const deleteUserMutation = trpc.auth.deleteUser.useMutation() // The delete user mutation
   const updateUserMutation = trpc.auth.updateUser.useMutation() // The update user mutation
+  const {
+    settings: { validateInputOnChange },
+  } = useSiteSettings()
 
   // Form management function
   const form = useForm<UserFormType>({
@@ -218,7 +226,6 @@ function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowPr
   // When user data changes
   useEffect(() => {
     form.setValues(user) // Set the form values to the changed user data
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   // Delete user function

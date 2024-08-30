@@ -1,12 +1,6 @@
 import { PrismaClient } from '@prisma/client' // Importing Prisma Client
 import { env } from '@/server/env' // Importing server environment variables
 
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 // Function to fetch the current price of a device model
 export async function fetchCurrentPrice(deviceModel: string) {
   const prisma = new PrismaClient() // Initialize the Prisma Client

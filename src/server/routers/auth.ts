@@ -8,12 +8,11 @@ import {
 import { Prisma, PrismaClient } from '@prisma/client'
 import { UpdateSchema, commentSchema, userSchema } from '@/models/schemas'
 import { calculatePercentageDiff, encodeEmail } from '@/utils/utils'
-import { databaseEditorPort, sendSoapRequest, websiteEmail } from 'config'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { method, router } from '@/server/trpc'
 
 import PriceDropEmail from '@/components/misc/PriceDropEmail'
 import { exec } from 'child_process'
+import { existsSync } from 'fs'
 import { fetchCurrentPrice } from '@/server/price'
 import { resend } from '@/server/client'
 import { z } from 'zod'
@@ -121,43 +120,52 @@ export const authRouter = router({
       return result
     }),
   // Function to open the database editor
-  openDatabaseEditor: method.mutation(async () => {
-    try {
-      const response = await fetch(`http://localhost:${databaseEditorPort}/`) // Send request to database editor if it exists
-      await response.text() // Convert response
-      return false // Database editor exists so return false
-    } catch {
-      exec(
-        `npx prisma studio --port ${databaseEditorPort} --browser none --schema=./prisma/schema.prisma`
-      ) // Open database editor by running the command in the terminal
-      return true // Database editor does not exist so return true
-    }
-  }),
+  openDatabaseEditor: method
+    .input(
+      z
+        .object({
+          databaseEditorPort: z.number(),
+        })
+        .default({ databaseEditorPort: 3000 })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const response = await fetch(`http://localhost:${input.databaseEditorPort}/`) // Send request to database editor if it exists
+        await response.text() // Convert response
+        return false // Database editor exists so return false
+      } catch {
+        exec(
+          `npx prisma studio --port ${input.databaseEditorPort} --browser none --schema=./prisma/schema.prisma`
+        ) // Open database editor by running the command in the terminal
+        return true // Database editor does not exist so return true
+      }
+    }),
   // Function to close the database editor
-  closeDatabaseEditor: method.mutation(() => {
-    try {
-      exec(
-        `for /f "tokens=5" %a in ('netstat -aon ^| find ":${databaseEditorPort}" ^| find "LISTENING"') do taskkill /f /pid %a`
-      ) // Close database editor by running the command in the terminal
-      return true // Database editor exists so return true
-    } catch {
-      return false // Database editor does not exist so return false
-    }
-  }),
-  // Function to get the website configurations
-  getConfigs: method.query(() => {
-    const filePath = 'config.ts' // Path to the config file
-    const fileContents = readFileSync(filePath, 'utf8') // Read the contents of the file
-    return fileContents // Return the contents of the file
-  }),
-  // Function to save the website configurations
-  saveConfigs: method.input(z.object({ configs: z.string() })).mutation(({ input }) => {
-    const filePath = 'config.ts' // Path to the config file
-    writeFileSync(filePath, input.configs) // Write the contents of the configs to the file
-  }),
+  closeDatabaseEditor: method
+    .input(
+      z
+        .object({
+          databaseEditorPort: z.number(),
+        })
+        .default({ databaseEditorPort: 3000 })
+    )
+    .mutation(({ input }) => {
+      try {
+        exec(
+          `for /f "tokens=5" %a in ('netstat -aon ^| find ":${input.databaseEditorPort}" ^| find "LISTENING"') do taskkill /f /pid %a`
+        ) // Close database editor by running the command in the terminal
+        return true // Database editor exists so return true
+      } catch {
+        return false // Database editor does not exist so return false
+      }
+    }),
   // Function to insert a user
   insertUser: method
-    .input(userSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
+    .input(
+      userSchema.merge(
+        z.object({ FromAsp: z.boolean().optional(), sendSoapRequest: z.boolean().default(false) })
+      )
+    )
     .mutation(async ({ ctx, input }) => {
       try {
         const { FromAsp, ...user } = input // Destructure the input
@@ -169,7 +177,7 @@ export const authRouter = router({
           },
         }) // Create the user
         // Send the soap request if sendSoapRequest config is true and request is not from asp
-        if (sendSoapRequest && FromAsp !== true) {
+        if (input.sendSoapRequest && FromAsp !== true) {
           await insertUserSoap({ input: user }) // Send the soap request
         }
         return true // Return true to indicate operation success
@@ -179,7 +187,11 @@ export const authRouter = router({
     }),
   // Function to update a user
   updateUser: method
-    .input(userSchema.merge(z.object({ FromAsp: z.boolean().optional() })))
+    .input(
+      userSchema.merge(
+        z.object({ FromAsp: z.boolean().optional(), sendSoapRequest: z.boolean().default(false) })
+      )
+    )
     .mutation(async ({ ctx, input }) => {
       try {
         const { FromAsp, ...user } = input // Destructure the input
@@ -190,7 +202,7 @@ export const authRouter = router({
           },
         }) // Update the user
         // Send the soap request if sendSoapRequest config is true and request is not from asp
-        if (sendSoapRequest && FromAsp !== true) {
+        if (input.sendSoapRequest && FromAsp !== true) {
           process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // Allow soap calls to succeed
           await updateUserSoap({ input: user }) // Send the soap request
         }
@@ -201,14 +213,20 @@ export const authRouter = router({
     }),
   // Function to delete a user
   deleteUser: method
-    .input(z.object({ email: z.string(), FromAsp: z.boolean().optional() }))
+    .input(
+      z.object({
+        email: z.string(),
+        FromAsp: z.boolean().optional(),
+        sendSoapRequest: z.boolean().default(false),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       try {
         await ctx.prisma.user.delete({
           where: { email: input.email },
         }) // Delete the user
         // Send the soap request if sendSoapRequest config is true and request is not from asp
-        if (sendSoapRequest && input.FromAsp !== true) {
+        if (input.sendSoapRequest && input.FromAsp !== true) {
           await deleteUserSoap({ email: input.email }) // Send the soap request
         }
         return true // Return true to indicate operation success
@@ -237,7 +255,12 @@ export const authRouter = router({
   }),
   // Function to Send price drops email to a user if the price of saved devices is lower than the price before
   sendPriceDropsEmail: method
-    .input(z.object({ email: z.string().optional() }))
+    .input(
+      z.object({
+        email: z.string().optional(),
+        websiteEmail: z.string().default('onboarding@resend.dev'),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const email = input.email // Get the email from the input
       if (!email) return false // If no email is provided return false
@@ -248,7 +271,6 @@ export const authRouter = router({
           user: true,
         },
       }) // Get all devices of a user
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       userDevices.forEach(async (userDevice) => {
         let price = 0
         try {
@@ -266,7 +288,7 @@ export const authRouter = router({
         if (price && price < userDevice.device.price) {
           await resend.emails
             .send({
-              from: websiteEmail,
+              from: input.websiteEmail,
               to: email,
               subject: `${userDevice.device.name} Price Drop`,
               react: PriceDropEmail({
@@ -289,7 +311,12 @@ export const authRouter = router({
     }),
   // Function to send price drops emails to a all users if the price of saved devices is lower than the price before
   sendPriceDropsEmails: method
-    .input(z.object({ sendTest: z.boolean().optional() }))
+    .input(
+      z.object({
+        sendTest: z.boolean().optional(),
+        websiteEmail: z.string().default('onboarding@resend.dev'),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const devicesUsers = await ctx.prisma.deviceUser.findMany() // Get all devices of a user
       devicesUsers.map(async (deviceUser) => {
@@ -319,7 +346,7 @@ export const authRouter = router({
             device.price = 600 // Set a fake price
             await resend.emails
               .send({
-                from: websiteEmail,
+                from: input.websiteEmail,
                 to: user.email,
                 subject: `${device.name} Price Drop`,
                 react: PriceDropEmail({
@@ -340,7 +367,7 @@ export const authRouter = router({
             if (price && price < device.price) {
               await resend.emails
                 .send({
-                  from: websiteEmail,
+                  from: input.websiteEmail,
                   to: user.email,
                   subject: `${device.name} Price Drop`,
                   react: PriceDropEmail({

@@ -7,7 +7,6 @@ import { useWindowScroll } from '@mantine/hooks'
 
 export default function CommentsSummary() {
   const { t } = useTranslation('main') // Get the translation function
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_scroll, scrollTo] = useWindowScroll() // Get scroll function
   const { commentsAmount, ratingValue } = useComments() // Get the comments state
 

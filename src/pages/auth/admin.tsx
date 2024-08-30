@@ -1,17 +1,17 @@
 import { Container, ScrollArea, SegmentedControl } from '@mantine/core'
-import { adminAccessKey, defaultDashboard, managerAccessKey } from 'config'
 
-import ConfigsEditor from '@/components/admin/ConfigsEditor'
 import DatabaseManagement from '@/components/admin/DatabaseManagement'
 import DatabaseViewer from '@/components/admin/DatabaseViewer'
 import DeviceManagement from '@/components/admin/DeviceManagement'
 import Head from 'next/head'
 import Loader from '@/components/layout/Loader'
+import SiteSettingsEditor from '@/components/admin/SiteSettingsEditor'
 import UserManagement from '@/components/admin/UserManagement'
 import WebsiteStatistics from '@/components/admin/WebsiteStatistics'
 import { trpc } from '@/utils/client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useViewportSize } from '@mantine/hooks'
@@ -22,6 +22,9 @@ export default function Admin() {
   const router = useRouter()
   const { width } = useViewportSize() // Get the width of the viewport
   const { t } = useTranslation('main')
+  const {
+    settings: { adminAccessKey, managerAccessKey, defaultDashboard, databaseEditorPort },
+  } = useSiteSettings()
   const openEditorMutation = trpc.auth.openDatabaseEditor.useMutation() // Open the database editor
   const button = z.string().parse(router.query.dashboard ?? '') // Get the dashboard from the url
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
@@ -33,20 +36,17 @@ export default function Admin() {
   useEffect(() => {
     // If the dashboard is undefined
     if (!router.query.dashboard) {
-      openEditorMutation.mutate() // Open the database editor
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      openEditorMutation.mutate({ databaseEditorPort }) // Open the database editor
       router.push(`?dashboard=${defaultDashboard}`) // Set the dashboard to the default dashboard
     } else if (accessKey && accessKey >= managerAccessKey) {
-      openEditorMutation.mutate() // Open the database editor
+      openEditorMutation.mutate({ databaseEditorPort }) // Open the database editor
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router])
 
   // When the access key changes
   useEffect(() => {
     // If the access key is smaller than the admin access key
     if (accessKey && accessKey < adminAccessKey) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       router.push('/') // Redirect to the home page
     }
   }, [accessKey, router])
@@ -64,7 +64,7 @@ export default function Admin() {
           { value: 'userManagement', label: t('userManagement') },
           { value: 'databaseManagement', label: t('databaseManagement') },
           { value: 'websiteStatistics', label: t('websiteStatistics') },
-          { value: 'configsEditor', label: t('configsEditor') },
+          { value: 'siteSettingsEditor', label: t('siteSettingsEditor') },
           { value: 'databaseViewer', label: t('databaseViewer') },
           { value: 'databaseEditor', label: t('databaseEditor') },
         ]
@@ -83,7 +83,6 @@ export default function Admin() {
                 if (value === 'databaseEditor') {
                   window.open('http://localhost:5555/', '_blank')?.focus()
                 } else {
-                  // eslint-disable-next-line @typescript-eslint/no-floating-promises
                   router.push(`?dashboard=${value}`)
                 }
               }}
@@ -109,8 +108,8 @@ export default function Admin() {
           {button === 'websiteStatistics' && accessKey >= managerAccessKey && (
             <WebsiteStatistics accessKey={accessKey} />
           )}
-          {button === 'configsEditor' && accessKey >= managerAccessKey && (
-            <ConfigsEditor accessKey={accessKey} />
+          {button === 'siteSettingsEditor' && accessKey >= managerAccessKey && (
+            <SiteSettingsEditor accessKey={accessKey} />
           )}
         </Container>
       ) : (

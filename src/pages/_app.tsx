@@ -1,5 +1,4 @@
 import { ColorSchemeProvider, MantineProvider, createEmotionCache } from '@mantine/core'
-import { defaultColorScheme, rtlInHebrew } from 'config'
 import { supabase, trpc } from '@/utils/client'
 
 import type { AppProps } from 'next/app'
@@ -16,6 +15,7 @@ import posthog from 'posthog-js'
 import rtlPlugin from 'stylis-plugin-rtl'
 import { useEffect } from 'react'
 import { useLocalStorage } from '@mantine/hooks'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
 
 // If there is a window
@@ -41,9 +41,13 @@ const rtlCache = createEmotionCache({
 
 function App({ Component, pageProps }: PageProps) {
   const { lang } = useTranslation('main') // Get the current language
+  const {
+    settings: { defaultColorScheme, rtlInHebrew },
+  } = useSiteSettings()
+
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'colorScheme',
-    defaultValue: defaultColorScheme,
+    defaultValue: defaultColorScheme as ColorScheme,
     getInitialValueInEffect: true,
   }) // Get the color scheme
   const toggleColorScheme = (value?: ColorScheme) =>

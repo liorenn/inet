@@ -3,7 +3,6 @@ import { Resend } from 'resend'
 import { env } from '@/server/env'
 
 // declare global {
-//   // eslint-disable-next-line no-var
 //   var prisma: PrismaClient | undefined
 // }
 

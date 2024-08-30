@@ -59,7 +59,6 @@ export default function Account() {
     if (userDetails !== undefined) {
       // If the user doesnt exists
       if (userDetails === null) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         router.push('/') // Redirect to home
       } else {
         setAccount(userDetails) // Set the user details
@@ -76,7 +75,6 @@ export default function Account() {
         })
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userDetails])
 
   // Update a user property in the database
@@ -198,7 +196,6 @@ export default function Account() {
                 />
                 <UnstyledButton
                   onClick={() => {
-                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
                     updateProperty(field.name, account) // Update the user property
                   }}>
                   <Text sx={{ fontSize: 18 }} weight={500} align='right' color='green'>

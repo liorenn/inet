@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-
 import { Card, Grid, Stack, Text, Title } from '@mantine/core'
 import { IconBattery3, IconBrandApple, IconCoin } from '@tabler/icons'
 import { IconCalendarTime, IconCpu, IconTypography } from '@tabler/icons'
@@ -27,7 +25,7 @@ export default function DeviceWidgets({ device }: Props) {
     },
     {
       title: t('operatingSystem'),
-      spec: `${device.releaseOS}`,
+      spec: `${device.releaseOS ?? t('none')}`,
       icon: <IconBrandApple size={45} />,
     },
     {
@@ -42,6 +40,7 @@ export default function DeviceWidgets({ device }: Props) {
       icon: <IconCoin size={45} />,
     },
   ]
+
   return (
     <Grid>
       {cards.map((info, index) => (
@@ -54,14 +53,6 @@ export default function DeviceWidgets({ device }: Props) {
                 {info.spec}
               </Text>
             </Stack>
-            {/* <Button
-              variant='light'
-              radius='md'
-              color='gray'
-              fullWidth
-              style={{ marginTop: 10 }}>
-              Go To {info.title}
-            </Button> */}
           </Card>
         </Grid.Col>
       ))}

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Paper, Group, Text, ActionIcon, Avatar, TextInput, Grid } from '@mantine/core'
 import { Tooltip, Rating } from '@mantine/core'
 import type { Comment } from '@prisma/client'
@@ -9,7 +8,7 @@ import { calculateAverageRating, CreateNotification, encodeEmail } from '@/utils
 import useTranslation from 'next-translate/useTranslation'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useComments } from '@/hooks/useComments'
-import { adminAccessKey } from 'config'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 
 // The component props
 type Props = {
@@ -36,6 +35,9 @@ export default function Comment({ comment, comments, setComments }: Props) {
   const { mutateAsync: mutateEdit } = trpc.auth.editComment.useMutation() // Edit comment mutation
   const { setCommentsAmount, setRatingValue, username } = useComments() // Get the comments state
   const { t } = useTranslation('main') // Translation hook
+  const {
+    settings: { adminAccessKey },
+  } = useSiteSettings()
 
   // Delete comment function
   async function deleteComment() {

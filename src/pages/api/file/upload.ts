@@ -24,7 +24,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const upload = uploadProvider.single('file') // Get upload function
     // Call upload function
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
     upload(req as any, res as any, (err: any) => {
       // Check if error
       if (err) {

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-
 import { ActionIcon, Avatar, Center, Modal } from '@mantine/core'
 import { Button, Group, Text, rem } from '@mantine/core'
 import { CreateNotification, encodeEmail } from '@/utils/utils'

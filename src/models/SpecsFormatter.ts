@@ -65,11 +65,9 @@ function mergeCameraTypes(arrays: CamerasSpecsType[][]): MergedCameraType[] {
       if (!mergedMap.has(type)) {
         // Check if the type exists in the map
         const nullArray = new Array(arrays.length).fill(null) // Create an array of null values with the same length as the arrays
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         mergedMap.set(type, nullArray) // Set the value in the map
       }
       const index = arrays.indexOf(array) // Get the index of the array in the arrays array
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       mergedMap.get(type)![index] = megapixel // Set the value in the map
     })
   })

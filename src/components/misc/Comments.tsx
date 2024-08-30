@@ -38,7 +38,6 @@ export default function Comments({ device }: Props) {
       setCommentsAmount(allCommentsQuery.data.length) // Set the comments amount state to the updated comments data length
       setRatingValue(calculateAverageRating(allCommentsQuery.data)) // Set the rating value state to the average rating
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allCommentsQuery.data])
 
   // Add comment function
