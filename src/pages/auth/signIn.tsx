@@ -2,7 +2,6 @@ import { Button, Center, Container, Text, Title } from '@mantine/core'
 import { FormDefaultValues, SignInForm } from '@/models/forms'
 import { Paper, PasswordInput, TextInput } from '@mantine/core'
 import { useEffect, useState } from 'react'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 import { CreateNotification } from '@/utils/utils'
 import Head from 'next/head'
@@ -23,17 +22,16 @@ type SignInFormType = {
 export default function SignIn() {
   const router = useRouter() // Get the router
   const posthog = usePostHog() // Get the posthog
-  const session = useSession() // Get the session
   const {
-    settings: { validateInputOnChange },
+    settings: { validateInputOnChange }
   } = useSiteSettings()
-  const supabase = useSupabaseClient() // Get the supabase client
+  const { mutate } = trpc.auth.signIn.useMutation()
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   const { t } = useTranslation('main') // Get the translation function
   const formProperties = new SignInForm() // Get the form properties
   const [loading, setLoading] = useState(false) // State for loading
-  const IsUserExistsMutation = trpc.auth.IsSignInUserExists.useMutation() // Get the IsUserExists mutation
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
-    email: session?.user?.email,
+    email: user?.email
   }) // Get the access key for the user
 
   // When access key changes
@@ -45,45 +43,38 @@ export default function SignIn() {
   const form = useForm<SignInFormType>({
     initialValues: formProperties.getDefaultValues() as FormDefaultValues,
     validateInputOnChange,
-    validate: formProperties.getValidators(),
+    validate: formProperties.getValidators()
   })
 
   function signIn(values: SignInFormType) {
     setLoading(true) // Set loading to true
-    // Check if the user exists in the database
-    IsUserExistsMutation.mutate(
-      { email: values.email, password: values.password },
+    mutate(
       {
-        // On operation success
-        async onSuccess(data) {
-          // If user exists in database
-          if (data) {
-            // Sign in the user
-            const { data: user } = await supabase.auth.signInWithPassword({
-              email: values.email,
-              password: values.password,
-            })
-            // If there is no error
-            if (user.user) {
-              CreateNotification(t('signedInSuccessfully'), 'green') // Create a success notification
-              posthog.capture('User Signed In', { data: values }) // Capture the user signed in
-              router.push('/') // Redirect to home
-              setLoading(false) // Set loading to false
-            } else {
-              setLoading(false) // Set loading to false
-              CreateNotification(t('errorAccured'), 'red') // Create a error notification
-            }
+        email: values.email,
+        password: values.password
+      },
+      {
+        onError() {
+          setLoading(false) // Set loading to false
+          CreateNotification(t('errorAccured'), 'red') // Create a error notification
+        },
+        onSuccess(data) {
+          if (!data.error) {
+            CreateNotification(t('signedInSuccessfully'), 'green') // Create a success notification
+            posthog.capture('User Signed In', { data: values }) // Capture the user signed in
+            router.push('/') // Redirect to home
+            setLoading(false) // Set loading to false
           } else {
             setLoading(false) // Set loading to false
             CreateNotification(t('userDoesNotExist'), 'red') // Create a error notification
           }
-        },
+        }
       }
     )
   }
 
   // If user is connected
-  if (session || accessKeyQuery.isLoading) {
+  if (user) {
     return <Center>{t('accessDeniedMessageSignOut')}</Center>
   }
 

@@ -243,11 +243,9 @@ export default {
   defaultColorScheme: 'Цветовая схема по умолчанию',
   soapServerUrl: 'URL сервера SOAP',
   posthogToken: 'Токен PostHog',
-  supabaseUrl: 'URL Supabase',
   emailProvider: 'Ключ провайдера эл. почты',
   websiteEmail: 'Эл. почта сайта',
   websiteUrl: 'URL сайта',
-  supabaseAnonKey: 'Анонимный ключ Supabase',
   currrencyApiUrl: 'URL API валют',
   selectDevicesAmount: 'Выбрать количество устройств',
   recommendedDevices: 'Рекомендуемые устройства',
@@ -279,5 +277,5 @@ export default {
   deviceTypeDoesntExist: 'Тип устройства, который вы ищете, не существует',
   usd: 'Доллар США',
   ils: 'Израильский шекель',
-  eur: 'Евро',
+  eur: 'Евро'
 }

@@ -6,8 +6,8 @@ export async function fetchCurrentPrice(deviceModel: string) {
   const prisma = new PrismaClient() // Initialize the Prisma Client
   const device = await prisma.device.findFirst({
     where: {
-      model: deviceModel,
-    },
+      model: deviceModel
+    }
   }) // Get the device from the database with the given device model
   if (!device || (device.type !== 'iphone' && device.type !== 'ipad')) return 0 // Return zero if device was not found
 
@@ -32,7 +32,7 @@ export async function fetchCurrentPrice(deviceModel: string) {
 
   await prisma.device.update({
     where: { model: deviceModel },
-    data: { price: formatterPrice },
+    data: { price: formatterPrice }
   }) // Update the price in the database
 
   return formatterPrice // Return the formatted price

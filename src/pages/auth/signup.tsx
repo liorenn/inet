@@ -2,12 +2,11 @@ import { Button, Center, Container, Text, Title } from '@mantine/core'
 import { FormDefaultValues, SignUpForm } from '@/models/forms'
 import { Paper, TextInput } from '@mantine/core'
 import { useEffect, useState } from 'react'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 import { CreateNotification } from '@/utils/utils'
 import Head from 'next/head'
 import Link from 'next/link'
-import { User } from '@prisma/client'
+import { User } from '@/server/auth'
 import { trpc } from '@/utils/client'
 import { useForm } from '@mantine/form'
 import { usePostHog } from 'posthog-js/react'
@@ -22,19 +21,17 @@ export type SignUpFormType = {
 
 export default function SignUp() {
   const router = useRouter() // Get the router
-  const posthog = usePostHog() // Get the posthog
-  const session = useSession() // Get the session
   const {
-    settings: { validateInputOnChange },
+    settings: { validateInputOnChange }
   } = useSiteSettings()
-  const supabase = useSupabaseClient() // Get the supabase
+  const posthog = usePostHog()
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   const formProperties = new SignUpForm() // Get the form properties
   const [loading, setLoading] = useState(false) // State for loading
-  const IsUserExistsMutation = trpc.auth.IsSignUpUserExists.useMutation() // Get the IsUserExists mutation
-  const createUserMutation = trpc.auth.createUser.useMutation() // Get the createUser mutation
+  const { mutate } = trpc.auth.signUp.useMutation() // Get the createUser mutation
   const { t } = useTranslation('main') // Get the translation function
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
-    email: session?.user?.email,
+    email: user?.email
   }) // Get the access key for the user
 
   // When access key changes
@@ -46,76 +43,43 @@ export default function SignUp() {
   const form = useForm<SignUpFormType>({
     initialValues: formProperties.getDefaultValues() as FormDefaultValues,
     validateInputOnChange,
-    validate: formProperties.getValidators(),
+    validate: formProperties.getValidators()
   })
 
   //Sign up the user
   function signUp(fields: SignUpFormType) {
     setLoading(true) // Set loading to true
     // Check if the user exists in the database
-    IsUserExistsMutation.mutate(
+    mutate(
       {
         email: fields.email,
-        username: fields.username,
+        password: fields.password,
+        name: fields.name,
+        phone: fields.phone,
+        username: fields.username
       },
       {
-        // On operation success
-        onSuccess(data) {
-          const IsExist = data // Is user exists in database
-          // If email  exist in database and username does not exists
-          if (IsExist?.email && !IsExist.username) {
-            CreateNotification(t('emailExistMessage'), 'red') // Create a error notification
-          }
-          // If email does not exist in database and username exists
-          if (!IsExist?.email && IsExist?.username) {
-            CreateNotification(t('usernameExistMessage'), 'red') // Create a error notification
-          }
-          // If both email and username exist in database
-          if (IsExist?.email && IsExist?.username) {
-            CreateNotification(t('usernameAndEmailExistMessage'), 'red') // Create a error notification
-          }
-          // If both email and username does not exist in database
-          if (!IsExist?.email && !IsExist?.username) {
-            // Create the user
-            createUserMutation.mutate(
-              {
-                email: fields.email,
-                phone: fields.phone,
-                name: fields.name,
-                password: fields.password,
-                username: fields.username,
-              },
-              {
-                // On operation success
-                async onSuccess() {
-                  // Sign up the user
-                  const { data, error } = await supabase.auth.signUp({
-                    phone: fields.phone,
-                    email: fields.email,
-                    password: fields.password,
-                  }) // Sign up the user
-                  // If there is no error
-                  if (!error) {
-                    CreateNotification(t('accountCreatedSuccessfully'), 'green') // Create a success notification
-                    posthog.capture('User Signed Up', { data }) // Capture the user signed up
-                    router.push('/') // Redirect to home
-                    setLoading(false) // Set loading to false
-                  } else {
-                    // If there is an error
-                    CreateNotification('Error Couldnt Create Account', 'red') // Create a errpr notification
-                  }
-                },
-              }
-            )
-          }
-          setLoading(false) // Set loading to false
+        onError() {
+          CreateNotification('Error Couldnt Create Account', 'red') // Create an error notification
         },
+        onSuccess(data) {
+          if (!data.error) {
+            CreateNotification(t('accountCreatedSuccessfully'), 'green') // Create a success notification
+            posthog.capture('User Signed Up', { data }) // Capture the user signed up
+            router.push('/') // Redirect to home
+            setLoading(false) // Set loading to false
+          } else {
+            // If there is an error
+            CreateNotification('Error Couldnt Create Account', 'red') // Create a errpr notification
+          }
+        }
       }
     )
+    setLoading(false) // Set loading to false
   }
 
   // If user is connected
-  if (session || accessKeyQuery.isLoading) {
+  if (user || accessKeyQuery.isLoading) {
     return <Center>{t('accessDeniedMessageSignOut')}</Center>
   }
 

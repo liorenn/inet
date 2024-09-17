@@ -13,22 +13,21 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
-import { useUser } from '@supabase/auth-helpers-react'
 import { useViewportSize } from '@mantine/hooks'
 import { z } from 'zod'
 
 export default function Admin() {
-  const user = useUser() // Get the user object from Supabase
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   const router = useRouter()
   const { width } = useViewportSize() // Get the width of the viewport
   const { t } = useTranslation('main')
   const {
-    settings: { adminAccessKey, managerAccessKey, defaultDashboard, databaseEditorPort },
+    settings: { adminAccessKey, managerAccessKey, defaultDashboard, databaseEditorPort }
   } = useSiteSettings()
   const openEditorMutation = trpc.auth.openDatabaseEditor.useMutation() // Open the database editor
   const button = z.string().parse(router.query.dashboard ?? '') // Get the dashboard from the url
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
-    email: user?.email,
+    email: user?.email
   }) // The access key query
   const accessKey = accessKeyQuery.data // The access key
 
@@ -56,7 +55,7 @@ export default function Admin() {
     accessKey && accessKey < managerAccessKey // If the use is an admin
       ? [
           { value: 'deviceManagement', label: t('deviceManagement') },
-          { value: 'databaseManagement', label: t('databaseManagement') },
+          { value: 'databaseManagement', label: t('databaseManagement') }
         ]
       : // If the user is a manager
         [
@@ -66,7 +65,7 @@ export default function Admin() {
           { value: 'websiteStatistics', label: t('websiteStatistics') },
           { value: 'siteSettingsEditor', label: t('siteSettingsEditor') },
           { value: 'databaseViewer', label: t('databaseViewer') },
-          { value: 'databaseEditor', label: t('databaseEditor') },
+          { value: 'databaseEditor', label: t('databaseEditor') }
         ]
 
   return (

@@ -5,7 +5,6 @@ import { CreateNotification } from '@/utils/utils'
 import { DevicePropertiesType } from '@/models/enums'
 import { trpc } from '@/utils/client'
 import useTranslation from 'next-translate/useTranslation'
-import { useUser } from '@supabase/auth-helpers-react'
 
 // The component props
 type Props = {
@@ -15,7 +14,7 @@ type Props = {
   setDevices?: Dispatch<React.SetStateAction<DevicePropertiesType[] | undefined>>
 }
 export default function FavoritesButtons({ model, modelPage, favoritesPage, setDevices }: Props) {
-  const user = useUser() // Get the user object from Supabase
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   const email = user?.email // Get the user email from the user
   const { t } = useTranslation('main') // Get the translation function
   const [isInList, setIsInList] = useState<boolean | undefined>(undefined) // State variable to store if the device is in the user favorites
@@ -23,7 +22,7 @@ export default function FavoritesButtons({ model, modelPage, favoritesPage, setD
   const deleteFromFavoritesMutation = trpc.device.deleteFromFavorites.useMutation() // Delete from favorites mutation
   const isDeviceInUserMutation = trpc.device.isDeviceInUser.useQuery({
     email: user?.email,
-    model: model,
+    model: model
   }) // Check if the device is in the user favorites devices mutation
 
   // When the is device in user mutation data changes
@@ -61,7 +60,7 @@ export default function FavoritesButtons({ model, modelPage, favoritesPage, setD
           if (favoritesPage && setDevices) {
             setDevices((prev) => prev?.filter((device) => device.model !== model)) // Delete the device from the list
           }
-        },
+        }
       }
     )
   }
@@ -77,7 +76,7 @@ export default function FavoritesButtons({ model, modelPage, favoritesPage, setD
         onSuccess() {
           setIsInList(true) // Set the state variable to true
           CreateNotification(t('addedToFavorites'), 'green') // Create a success notification
-        },
+        }
       }
     ) // Add device to favorites
   }

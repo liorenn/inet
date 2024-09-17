@@ -62,7 +62,7 @@ export default {
   accountInformationDescription: 'עדכן ושנה את מידע החשבון שלך',
   placeholders: {
     inputPlaceholder: '...הזן את ה{{input}} שלך',
-    selectDevice: 'להשוואה {{input}} בחר',
+    selectDevice: 'להשוואה {{input}} בחר'
   },
   welcomeBack: 'ברוכים הבאים בחזרה',
   dontHaveAnAccount: 'אין לך חשבון?',
@@ -246,12 +246,10 @@ export default {
   defaultColorScheme: 'ערכת צבעים ראשית',
   soapServerUrl: 'כתובת שרת SOAP',
   posthogToken: 'אסימון PostHog',
-  supabaseUrl: 'כתובת Supabase',
   emailProvider: 'מפתח ספק הדוא"ל',
   websiteEmail: 'דוא"ל אתר',
   websiteUrl: 'כתובת האתר',
   currrencyApiUrl: 'כתובת API מטבע',
-  supabaseAnonKey: 'מפתח אנונימי Supabase',
   selectDevicesAmount: 'בחר את מספר המכשירים',
   recommendedDevices: 'מכשירים מומלצים',
   devices: 'מכשירים',
@@ -280,5 +278,5 @@ export default {
   deviceTypeDoesntExist: 'הסוג של המכשיר שאתה מחפש אינו קיים',
   usd: 'דולר אמריקאי',
   ils: 'שקל ישראלי',
-  eur: 'יורו',
+  eur: 'יורו'
 }

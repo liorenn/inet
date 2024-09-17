@@ -1,6 +1,5 @@
 import { Box, Container, Group, Stack, Text } from '@mantine/core'
 import { Center, SimpleGrid, TextInput, UnstyledButton } from '@mantine/core'
-import { useSession, useUser } from '@supabase/auth-helpers-react'
 
 import { AccountForm } from '@/models/forms'
 import { CreateNotification } from '@/utils/utils'
@@ -9,17 +8,15 @@ import Head from 'next/head'
 import ImageUploader from '@/components/misc/UploadAvatar'
 import Loader from '@/components/layout/Loader'
 import React from 'react'
-import { User } from '@prisma/client'
+import { User } from '@/server/auth'
 import type { UserSchemaType } from '@/models/schemas'
 import { trpc } from '@/utils/client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
-import { useViewportSize } from '@mantine/hooks'
 
 export type AccountFields = Omit<User, 'email' | 'accessKey'>
-
 export type AccountFieldsNames = keyof AccountFields
 
 type AccountField = {
@@ -29,18 +26,11 @@ type AccountField = {
 }
 
 export default function Account() {
-  const user = useUser() // Get the user object from Supabase
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   const router = useRouter() // Get the router object
-  const session = useSession() // Get the user session
-  const { width } = useViewportSize() // Get the width of the viewport
   const formProperties = new AccountForm() // Get the form properties for validation
   const { t } = useTranslation('main') // Get the translation function
-  const dateFormmater = Intl.DateTimeFormat('en-us', { dateStyle: 'short' }) // Create formatter
-  const updateMutation = trpc.auth.updateUserDetails.useMutation()
-  const userQuery = trpc.auth.getUser.useQuery({
-    email: user?.email,
-  }) // Get the user details query
-  const userDetails = userQuery.data // Get the user details
+  const updateMutation = trpc.auth.updateUser.useMutation()
   const [account, setAccount] = useState<UserSchemaType | undefined>() // State variable to store the user details
   const omitFields = formProperties.getFileds() as Omit<AccountField, 'validator'>[] // Cast the fields to remove the validator
   // Get the fields from the form properties and create the validator
@@ -48,7 +38,7 @@ export default function Account() {
     return {
       ...field,
       validator: (value: string | number) =>
-        field.regex.test(value?.toString()) ? null : `${field.name} is not valid`,
+        field.regex.test(value?.toString()) ? null : `${field.name} is not valid`
     }
   })
   const [inputs, setInputs] = useState<AccountFields>(formProperties.getDefaultValues()) // State variable to store the user inputs
@@ -56,57 +46,61 @@ export default function Account() {
   // When user details data changes
   useEffect(() => {
     // If user details is not loading
-    if (userDetails !== undefined) {
+    if (user !== undefined) {
       // If the user doesnt exists
-      if (userDetails === null) {
+      if (user === null) {
         router.push('/') // Redirect to home
       } else {
-        setAccount(userDetails) // Set the user details
+        setAccount(user) // Set the user details
         // For each key in the inputs
         Object.keys(inputs).forEach((key) => {
           // If the key exists in the user details
-          if (key in userDetails) {
+          if (key in user) {
             // Set the input values to updated user details
             setInputs((prevInputs) => ({
               ...prevInputs,
-              [key]: userDetails[key as keyof typeof userDetails],
+              [key]: user[key as keyof typeof user]
             }))
           }
         })
       }
     }
-  }, [userDetails])
+  }, [user])
 
   // Update a user property in the database
-  function updateProperty(property: AccountFieldsNames, account: UserSchemaType) {
+  function updateProperty(
+    user: UserSchemaType,
+    property: AccountFieldsNames,
+    account: UserSchemaType
+  ) {
     // If the property is not validated
     if (fields.find((field) => field.name === property)?.validator(inputs[property]) !== null)
       return // Exist the function
     // Update the user property
     updateMutation.mutate(
       {
-        email: account.email,
-        property: property,
-        value: inputs[property],
+        ...account
       },
       {
         // On operation success
         onSuccess(data) {
           CreateNotification(`${t(property)} ${t('updatedSuccessfully')}`, 'green') // Create a success notification
           setAccount({
-            ...data,
-            [property]: inputs[property],
+            ...inputs,
+            email: user.email,
+            phone: user.phone,
+            accessKey: user.accessKey
           })
         },
         onError() {
           CreateNotification(t('errorAccured'), 'red') // Create an error notification
-        },
+        }
       }
     )
   }
 
   // If user is not connected
-  if (!(user && session)) {
+  if (!user) {
     return <Center>{t('accessDeniedMessageSignIn')}</Center>
   }
 
@@ -134,7 +128,7 @@ export default function Account() {
               </Text>
             </Box>
           </Group>
-          <Stack sx={{ marginTop: 28 }}>
+          {/* <Stack sx={{ marginTop: 28 }}>
             <Text
               ta={width < 400 ? 'left' : 'right'}
               sx={{ fontSize: 18 }}
@@ -161,9 +155,9 @@ export default function Account() {
               weight={500}
               color='dimmed'
               align='right'>
-              {`${userDetails?.comments?.length ?? 0} ${t('commentsCommented')}`}
+              {`${user?.comments?.length ?? 0} ${t('commentsCommented')}`}
             </Text>
-          </Stack>
+          </Stack> */}
         </Group>
         <Stack>
           <div>
@@ -185,7 +179,7 @@ export default function Account() {
                   onChange={(e) =>
                     setInputs((prev) => ({
                       ...prev,
-                      [field.name]: e.target.value,
+                      [field.name]: e.target.value
                     }))
                   }
                   placeholder={`${t('enterYour')} ${t(field.name)}...`}
@@ -196,14 +190,14 @@ export default function Account() {
                 />
                 <UnstyledButton
                   onClick={() => {
-                    updateProperty(field.name, account) // Update the user property
+                    updateProperty(user, field.name, account) // Update the user property
                   }}>
                   <Text sx={{ fontSize: 18 }} weight={500} align='right' color='green'>
                     {t('update')}
                   </Text>
                 </UnstyledButton>
               </SimpleGrid>
-              <Divider />
+              {index !== fields.length - 1 && <Divider />}
             </React.Fragment>
           ))}
         </Stack>

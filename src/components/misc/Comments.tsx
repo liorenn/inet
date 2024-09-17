@@ -10,7 +10,6 @@ import { trpc } from '@/utils/client'
 import { useComments } from '@/hooks/useComments'
 import { useProfilePicture } from '@/hooks/useProfilePicture'
 import useTranslation from 'next-translate/useTranslation'
-import { useUser } from '@supabase/auth-helpers-react'
 
 // The component props
 type Props = {
@@ -18,7 +17,7 @@ type Props = {
 }
 
 export default function Comments({ device }: Props) {
-  const user = useUser() // Get the user object from Supabase
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   const [text, setText] = useState('') // State for the comment text
   const [rating, setRating] = useState(0) // State for the comment rating
   const { t } = useTranslation('main') // Get the translation hook
@@ -26,7 +25,7 @@ export default function Comments({ device }: Props) {
   const addCommentMutation = trpc.auth.addComment.useMutation() // Add comment mutation
   const { username, setRatingValue, setCommentsAmount } = useComments() // Get the comments state and functions
   const allCommentsQuery = trpc.auth.getAllComments.useQuery({
-    model: device.model,
+    model: device.model
   }) // Get all comments
   const { imageExists, imagePath } = useProfilePicture() // Get the profile picture state
 
@@ -51,7 +50,7 @@ export default function Comments({ device }: Props) {
       model: device.model,
       username: username,
       updatedAt: new Date(),
-      rating: rating,
+      rating: rating
     }
 
     // Add the new comment
@@ -64,7 +63,7 @@ export default function Comments({ device }: Props) {
         setComments((prev) => [...prev, data]) // Add the new comment to the comments state
         setCommentsAmount(comments.length + 1) // Increment the comments amount
         setRatingValue(calculateAverageRating([...comments, data])) // Update the rating value
-      },
+      }
     })
   }
 
@@ -84,7 +83,7 @@ export default function Comments({ device }: Props) {
           defaultValue='comments'
           radius='xl'
           styles={{
-            label: { fontSize: 24, fontWeight: 500 },
+            label: { fontSize: 24, fontWeight: 500 }
           }}>
           <Accordion.Item value='comments'>
             <Accordion.Control>{t('writeAComment')}</Accordion.Control>

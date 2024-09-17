@@ -1,5 +1,4 @@
 import { Center, Container, ScrollArea, SegmentedControl, Table } from '@mantine/core'
-import { useSession, useUser } from '@supabase/auth-helpers-react'
 
 import Loader from '@/components/layout/Loader'
 import { trpc } from '@/utils/client'
@@ -15,9 +14,8 @@ type Props = {
 }
 
 export default function DatabaseViewer({ accessKey }: Props) {
-  const user = useUser() // Get the user object from Supabase
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   const router = useRouter() // Get the router object from Next.js
-  const session = useSession() // Get the session object from Supabase
   const { width } = useViewportSize() // Get the viewport size
   const { t } = useTranslation('main') // Get the translation function from Next.js
   const [table, setTable] = useState('') // State variable to store the selected table
@@ -26,7 +24,7 @@ export default function DatabaseViewer({ accessKey }: Props) {
   const getTableDataMutation = trpc.auth.getTableData.useMutation() // Mutation to get the data of the selected table
   const [tableData, setTableData] = useState<string[][]>([]) // State variable to store the data of the selected table
   const {
-    settings: { managerAccessKey },
+    settings: { managerAccessKey }
   } = useSiteSettings()
 
   if (accessKey < managerAccessKey) {
@@ -54,7 +52,7 @@ export default function DatabaseViewer({ accessKey }: Props) {
                   weekday: 'short',
                   year: 'numeric',
                   month: 'short',
-                  day: 'numeric',
+                  day: 'numeric'
                 })
               }
               return String(value) // Convert the value to a string
@@ -62,13 +60,13 @@ export default function DatabaseViewer({ accessKey }: Props) {
           )
           setTableData(stringArrays) // Set the data of the selected table
           setLoading(false) // Set the loading state to false
-        },
+        }
       }
     )
   }
 
   // If the user or session is not available
-  if (!(user && session)) {
+  if (!user) {
     return <Center>{t('accessDeniedMessageSignIn')}</Center>
   }
 

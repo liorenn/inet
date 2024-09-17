@@ -243,11 +243,9 @@ export default {
   defaultColorScheme: 'Schéma de couleur par défaut',
   soapServerUrl: 'URL du serveur SOAP',
   posthogToken: 'Token PostHog',
-  supabaseUrl: 'URL de Supabase',
   emailProvider: 'Clé du fournisseur de messagerie',
   websiteEmail: 'E-mail du site web',
   websiteUrl: 'URL du site web',
-  supabaseAnonKey: 'Clé Supabase',
   currrencyApiUrl: "URL de l'API de devises",
   selectDevicesAmount: "Sélectionner la quantité d'appareils",
   recommendedDevices: 'Appareils recommandés',
@@ -278,5 +276,5 @@ export default {
   deviceTypeDoesntExist: "Le type de dispositif que vous recherchez n'existe pas",
   usd: 'Dollar américain',
   ils: 'Shekel israélien',
-  eur: 'Euro',
+  eur: 'Euro'
 }

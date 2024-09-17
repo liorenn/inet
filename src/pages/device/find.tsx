@@ -12,7 +12,6 @@ import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
-import { useUser } from '@supabase/auth-helpers-react'
 import { useViewportSize } from '@mantine/hooks'
 import { z } from 'zod'
 
@@ -51,7 +50,7 @@ export default function Find() {
   const { t, lang } = useTranslation('main') // Get the translation function
   const { colorScheme } = useMantineColorScheme() // Get the color scheme
   const {
-    settings: { matchedDevicesLimit },
+    settings: { matchedDevicesLimit }
   } = useSiteSettings()
   const MatchedDevicesMutation = trpc.device.getMatchedDevices.useMutation() // Mutation to get the matched devices
   const deviceType = z.string().parse(router.query.deviceType ?? 'iphone') // Get the device type from the url
@@ -99,7 +98,7 @@ export default function Find() {
           value:
             (propertiesLabels
               .find((property) => property.property === preference.name) // Find the property label in the propertiesLabels array
-              ?.labels?.indexOf(preference.value) ?? 0) + 1, // Get the value of the label
+              ?.labels?.indexOf(preference.value) ?? 0) + 1 // Get the value of the label
         }
       })
     // If user chose no preferences after the filtering
@@ -107,7 +106,7 @@ export default function Find() {
       MatchedDevicesMutation.mutate({
         deviceType,
         userPreferences: userPreferences,
-        matchedDevicesLimit,
+        matchedDevicesLimit
       }) // Send the user preferences to the server
   }
 
@@ -118,7 +117,7 @@ export default function Find() {
       ?.labels?.map((value) => {
         return {
           value: value,
-          label: lang === 'he' ? `${t(preference)} ${t(value)}` : `${t(value)} ${t(preference)}`, // Translate the preference label
+          label: lang === 'he' ? `${t(preference)} ${t(value)}` : `${t(value)} ${t(preference)}` // Translate the preference label
         }
       })
     return data ? [{ value: 'notInterested', label: t('notInterested') }, ...data] : [] // Add the not interested option and return segmented data
@@ -200,9 +199,9 @@ export default function Find() {
             styles={{
               control: {
                 lineHeight: 1.3,
-                backgroundColor: colorScheme === 'dark' ? '#1a1b1e' : 'white',
+                backgroundColor: colorScheme === 'dark' ? '#1a1b1e' : 'white'
               },
-              content: { backgroundColor: colorScheme === 'dark' ? '#1a1b1e' : 'white' },
+              content: { backgroundColor: colorScheme === 'dark' ? '#1a1b1e' : 'white' }
             }}>
             {getPreferences(deviceType).map((pref, index: number) => (
               <PreferenceInput

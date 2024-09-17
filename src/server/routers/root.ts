@@ -1,11 +1,11 @@
 import { authRouter } from '@/server/routers/auth'
+import { createTRPCRouter } from '@/server/trpc'
 import { deviceRouter } from '@/server/routers/device'
-import { router } from '@/server/trpc'
 
 // Create api routes handler
-export const appRouter = router({
+export const appRouter = createTRPCRouter({
   auth: authRouter,
-  device: deviceRouter,
+  device: deviceRouter
 })
 
 // Create type definition of API

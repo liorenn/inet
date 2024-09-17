@@ -1,20 +1,93 @@
-import { initTRPC } from '@trpc/server' // Importing the initTRPC function from the trpc server
-import superjson from 'superjson' // Importing the superjson library
-import { type inferAsyncReturnType } from '@trpc/server'
-import { prisma } from '@/server/client'
+import { initTRPC, TRPCError } from '@trpc/server'
+import { type CreateNextContextOptions } from '@trpc/server/adapters/next'
+import { ZodError } from 'zod'
+import { type NextApiRequest, type NextApiResponse } from 'next'
+import { db } from '@/server/client'
+import { validateRequest } from '@/server/auth'
+import superjson from 'superjson'
 
-// Create a function that creates the context based on the provided Next.js context options
-export const createContext = () => {
-  return { prisma }
+interface CreateContextOptions {
+  req: NextApiRequest
+  res: NextApiResponse
 }
 
-// Define a type for the context based on the createContext function
-type Context = inferAsyncReturnType<typeof createContext>
+const createInnerTRPCContext = async (opts: CreateContextOptions) => {
+  const { user, session } = await validateRequest(opts.req, opts.res)
+  return {
+    db,
+    req: opts.req,
+    res: opts.res,
+    user,
+    session
+  }
+}
 
-// Creating a TRPC context with the specified transformer
-const t = initTRPC.context<Context>().create({
+export const createTRPCContext = (opts: CreateNextContextOptions) => {
+  return createInnerTRPCContext({
+    req: opts.req,
+    res: opts.res
+  })
+}
+
+const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
+  errorFormatter({ shape, error }) {
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        zodError:
+          error.code === 'BAD_REQUEST' && error.cause instanceof ZodError
+            ? error.cause.flatten()
+            : null,
+        ...shape.data
+      }
+    }
+  }
 })
 
-export const router = t.router // Create the router from the TRPC context
-export const method = t.procedure // Create the method from the TRPC context
+const isNotAuthed = t.middleware(({ ctx, next }) => {
+  if (ctx.session || ctx.user) {
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Sign in to access' })
+  }
+  return next({
+    ctx: {
+      user: ctx.user,
+      session: ctx.session
+    }
+  })
+})
+
+const isAuthed = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.user) {
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Sign in to access' })
+  }
+  return next({
+    ctx: {
+      user: ctx.user,
+      session: ctx.session
+    }
+  })
+})
+
+const isAdmin = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !(ctx.user!.accessKey > 9)) {
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Be an admin to access' })
+  }
+  return next({
+    ctx: {
+      user: ctx.user,
+      session: ctx.session
+    }
+  })
+})
+
+export const createCallerFactory = t.createCallerFactory
+export const createTRPCRouter = t.router
+
+export const method = t.procedure
+export const unAuthedMethod = t.procedure.use(isNotAuthed)
+export const protectedMethod = t.procedure.use(isAuthed)
+export const adminMethod = t.procedure.use(isAdmin)
+
+export type ContextType = Awaited<ReturnType<typeof createInnerTRPCContext>>

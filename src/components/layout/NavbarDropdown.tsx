@@ -1,9 +1,9 @@
 import { ActionIcon, Drawer, Text, createStyles, rem } from '@mantine/core'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 import { CreateNotification } from '@/utils/utils'
 import { IconMenu2 } from '@tabler/icons'
 import Link from 'next/link'
+import { trpc } from '@/utils/client'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
@@ -12,23 +12,26 @@ import useTranslation from 'next-translate/useTranslation'
 type Props = { AccessKey: number | undefined }
 
 export default function NavBarDropdown({ AccessKey }: Props) {
-  const session = useSession() // Get the session
-  const supabase = useSupabaseClient() // Get the Supabase client
+  const { mutate } = trpc.auth.signOut.useMutation()
+  const { data: user } = trpc.auth.getUser.useQuery()
   const { classes, cx } = useStyles() // Get the styles
   const [opened, setOpened] = useState(false) // State of is the drawer opened
   const { t } = useTranslation('main') // Get the translation function
   const [activeLink, setActiveLink] = useState('Settings') // The active link
   const {
-    settings: { adminAccessKey },
+    settings: { adminAccessKey }
   } = useSiteSettings()
 
   // Sign out the user
   async function signOut() {
-    const { error } = await supabase.auth.signOut() // Sign out the user
-    // If the sign out was successful
-    if (!error) {
-      CreateNotification(t('signedOutSuccessfully'), 'green') // Create a notification
-    }
+    mutate(undefined, {
+      onSuccess(data, variables, context) {
+        // If the sign out was successful
+        if (!data.error) {
+          CreateNotification(t('signedOutSuccessfully'), 'green')
+        }
+      }
+    })
   }
 
   // The buttons data that should be displayed in the navbar
@@ -36,11 +39,11 @@ export default function NavBarDropdown({ AccessKey }: Props) {
     { title: t('home'), href: '/' },
     { title: t('allDevices'), href: '/device' },
     { title: t('compare'), href: '/device/compare' },
-    { title: t('find'), href: '/device/find' },
+    { title: t('find'), href: '/device/find' }
   ]
 
   // Add the buttons to the navbar
-  if (session) {
+  if (user) {
     buttons.push({ title: t('favorites'), href: '/device/favorites' })
     buttons.push({ title: t('account'), href: '/auth/account' })
     // If the user has an access key greater than or equal to the admin access key
@@ -69,7 +72,7 @@ export default function NavBarDropdown({ AccessKey }: Props) {
         {buttons.map((link) => (
           <Link
             className={cx(classes.link, {
-              [classes.linkActive]: activeLink === link.href,
+              [classes.linkActive]: activeLink === link.href
             })}
             href={link.href}
             onClick={() => {
@@ -107,21 +110,21 @@ const useStyles = createStyles((theme) => ({
 
     '&:hover': {
       backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
-      color: theme.colorScheme === 'dark' ? theme.white : theme.black,
-    },
+      color: theme.colorScheme === 'dark' ? theme.white : theme.black
+    }
   },
 
   linkActive: {
     '&, &:hover': {
       borderLeftColor: theme.fn.variant({
         variant: 'filled',
-        color: theme.primaryColor,
+        color: theme.primaryColor
       }).background,
       backgroundColor: theme.fn.variant({
         variant: 'filled',
-        color: theme.primaryColor,
+        color: theme.primaryColor
       }).background,
-      color: theme.white,
-    },
-  },
+      color: theme.white
+    }
+  }
 }))

@@ -11,7 +11,6 @@ import { trpc } from '@/utils/client'
 import { usePostHog } from 'posthog-js/react'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
-import { useUser } from '@supabase/auth-helpers-react'
 
 type Device = {
   isInList?: boolean
@@ -22,14 +21,14 @@ export default function Devices() {
   const posthog = usePostHog() // Get the posthog client
   const { t } = useTranslation('main') // Get the translation function
   const deviceType = router.asPath.split('/')[2] as DeviceType // Get the device type from the url
-  const user = useUser() // Get the user object from Supabase
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   const [devices, setDevices] = useState<Device[] | undefined>(undefined) // State for the devices data
   const [captured, setCaptured] = useState(false) // Was page captured in posthog
   const devicesQuery = trpc.device.getDevices.useQuery({
-    deviceType: deviceType,
+    deviceType: deviceType
   }) // Get the devices from the database
   const userDevicesQuery = trpc.device.getUserDevicesProperties.useQuery({
-    email: user?.email,
+    email: user?.email
   }) // Get the user devices from the database
 
   // When user data changes
@@ -59,7 +58,7 @@ export default function Devices() {
     // If posthog was not captured
     if (!captured && devicesQuery.data) {
       posthog.capture('Device Type Page', {
-        deviceType,
+        deviceType
       }) // Capture the device type page in posthog
       setCaptured(true) // Set the captured state to true
     }
@@ -96,7 +95,7 @@ export default function Devices() {
           breakpoints={[
             { maxWidth: 'sm', cols: 1 },
             { maxWidth: 'md', cols: 2 },
-            { minWidth: 'lg', cols: 3 },
+            { minWidth: 'lg', cols: 3 }
           ]}>
           {devices.map((value, index) => (
             <DeviceCard device={value} key={index} />

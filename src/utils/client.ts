@@ -1,13 +1,9 @@
 import { httpBatchLink } from '@trpc/client'
 import { createTRPCNext } from '@trpc/next'
 import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server'
-import { type AppRouter } from '@/server/routers/_app'
+import { type AppRouter } from '@/server/routers/root'
 import superjson from 'superjson'
-import { createClient } from '@supabase/supabase-js'
 import { clientEnv } from '@/utils/env'
-
-// Creating a Supabase client using the environment variables
-export const supabase = createClient(clientEnv.supabaseUrl, clientEnv.supabaseAnonKey)
 
 // Function to get the base URL based on the environment
 function getBaseUrl() {
@@ -17,17 +13,26 @@ function getBaseUrl() {
 
 // Creating a trpc instance for the AppRouter
 export const trpc = createTRPCNext<AppRouter>({
+  overrides: {
+    useMutation: {
+      async onSuccess(opts) {
+        await opts.originalFn()
+        await opts.queryClient.invalidateQueries()
+      }
+    }
+  },
   config() {
     return {
-      transformer: superjson, // Using superjson as the transformer
       links: [
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`, // Setting the URL for httpBatchLink based on the base URL
-        }),
-      ],
+          transformer: superjson
+        })
+      ]
     }
   },
-  ssr: false, // Disabling server-side rendering
+  transformer: superjson,
+  ssr: false // Disabling server-side rendering
 })
 
 // Defining types for router inputs and outputs based on the AppRouter

@@ -8,14 +8,13 @@ import Loader from '@/components/layout/Loader'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
-import { useUser } from '@supabase/auth-helpers-react'
 
 export default function Favorites() {
   const router = useRouter()
-  const user = useUser() // Get the user object from Supabase
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   const { t } = useTranslation('main') // Get the translation function
   const userDevicesQuery = trpc.device.getUserDevices.useQuery({
-    email: user?.email,
+    email: user?.email
   }) // Get the user devices from the database
   const [devices, setDevices] = useState<DevicePropertiesType[] | undefined>(undefined) // State variable to store the user devices
 
@@ -51,7 +50,7 @@ export default function Favorites() {
               breakpoints={[
                 { maxWidth: 'sm', cols: 1 },
                 { maxWidth: 'md', cols: 2 },
-                { minWidth: 'lg', cols: 3 },
+                { minWidth: 'lg', cols: 3 }
               ]}>
               {devices &&
                 devices.map((value, index) => (

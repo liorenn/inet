@@ -3,15 +3,14 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model Camera {
   type       String
   model      String
-  megapixel  Int        @db.SmallInt
+  megapixel  Int
   device     Device     @relation(fields: [model], references: [model], onDelete: Cascade)
   cameraType CameraType @relation(fields: [type], references: [name])
 
@@ -20,19 +19,29 @@ model Camera {
 
 model Color {
   name    String        @id @unique
-  hex     String        @db.VarChar
+  hex     String
   devices DeviceColor[]
 }
 
 model User {
-  email      String       @id @unique @db.VarChar
-  username   String       @unique @db.VarChar
-  name       String       @db.VarChar
-  password   String       @db.VarChar
-  phone      String       @db.VarChar
+  id         String       @id
+  email      String       @unique
+  username   String       @unique
+  name       String
+  password   String
+  phone      String
   accessKey  Int          @default(1)
   comments   Comment[]
   deviceList DeviceUser[]
+  sessions   Session[]
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+
+  user User @relation(references: [id], fields: [userId], onDelete: Cascade)
 }
 
 model Comment {
@@ -41,15 +50,15 @@ model Comment {
   message   String
   createdAt DateTime @default(now())
   updatedAt DateTime
-  username  String   @db.VarChar
+  username  String
   rating    Int
   device    Device   @relation(fields: [model], references: [model], onDelete: Cascade)
   user      User     @relation(fields: [username], references: [username], onDelete: Cascade)
 }
 
 model DeviceUser {
-  deviceModel String @db.VarChar
-  userEmail   String @db.VarChar
+  deviceModel String
+  userEmail   String
   device      Device @relation(fields: [deviceModel], references: [model], onDelete: Cascade)
   user        User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
@@ -67,29 +76,29 @@ model DeviceColor {
 
 model Device {
   model            String           @id
-  name             String           @db.VarChar
-  type             String           @db.VarChar
-  releaseDate      DateTime         @db.Date
-  releaseOS        String?          @db.VarChar
-  releasePrice     Float            @db.Real
-  connector        String           @db.VarChar
-  biometrics       String           @db.VarChar
-  batterySize      Int?             @db.SmallInt
-  chipset          String           @db.VarChar
-  weight           Float            @db.Real
-  imageAmount      Int              @db.SmallInt
-  height           Float            @db.Real
-  width            Float            @db.Real
-  depth            Float            @db.Real
-  storage          Int?             @db.SmallInt
-  cpu              Int?             @db.SmallInt
-  gpu              Int?             @db.SmallInt
-  memory           Int?             @db.SmallInt
+  name             String
+  type             String
+  releaseDate      DateTime
+  releaseOS        String?
+  releasePrice     Float
+  connector        String
+  biometrics       String
+  batterySize      Int?
+  chipset          String
+  weight           Float
+  imageAmount      Int
+  height           Float
+  width            Float
+  depth            Float
+  storage          Int?
+  cpu              Int?
+  gpu              Int?
+  memory           Int?
   magsafe          Boolean?
-  screenSize       Float?           @db.Real
-  screenType       String?          @db.VarChar
-  resistanceRating String?          @db.VarChar
-  price            Float            @default(0) @db.Real
+  screenSize       Float?
+  screenType       String?
+  resistanceRating String?
+  price            Float            @default(0)
   cameras          Camera[]
   comments         Comment[]
   biometricFeature BiometricFeature @relation(fields: [biometrics], references: [name])

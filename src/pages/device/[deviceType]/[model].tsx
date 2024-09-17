@@ -11,10 +11,9 @@ import { useComments } from '@/hooks/useComments'
 import { usePostHog } from 'posthog-js/react'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
-import { useUser } from '@supabase/auth-helpers-react'
 
 export default function Device() {
-  const user = useUser() // Get the user object from Supabase
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   const router = useRouter() // Get the router object
   const posthog = usePostHog() // Get the posthog client
   const { setUsername } = useComments() // Get the set username function for comments component
@@ -22,10 +21,10 @@ export default function Device() {
   const [captured, setCaptured] = useState(false) // Was page captured in posthog
   const deviceModel = router.asPath.split('/')[3] // Get the device model from the url
   const deviceQuery = trpc.device.getDevice.useQuery({
-    model: deviceModel,
+    model: deviceModel
   }) // Get the device details from the database
   const userQuery = trpc.auth.getUser.useQuery({
-    email: user?.email,
+    email: user?.email
   }) // Get the user details from the database
 
   // When user data changes
@@ -42,7 +41,7 @@ export default function Device() {
     if (!captured && deviceQuery.data) {
       // Capture the device page in posthog
       posthog.capture('Device Page', {
-        deviceName: deviceQuery.data.name,
+        deviceName: deviceQuery.data.name
       })
       setCaptured(true) // Set captured state to true
     }

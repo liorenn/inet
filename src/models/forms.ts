@@ -56,11 +56,11 @@ export class SignInForm {
   constructor() {
     this.email = {
       name: 'email',
-      regex: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
+      regex: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/
     }
     this.password = {
       name: 'password',
-      regex: /^[A-Za-z\d_.!@#$%^&*]{5,}$/,
+      regex: /^[A-Za-z\d_.!@#$%^&*]{5,}$/
     }
   }
 
@@ -73,7 +73,7 @@ export class SignInForm {
   getDefaultValues(): Partial<FormDefaultValues> {
     return {
       email: '',
-      password: '',
+      password: ''
     }
   }
 
@@ -99,15 +99,15 @@ class UserForm extends SignInForm {
     super() // Call the constructor of the parent class
     this.username = {
       name: 'username',
-      regex: /^[A-Za-z\d_.]{5,}$/,
+      regex: /^[A-Za-z\d_.]{5,}$/
     }
     this.name = {
       name: 'name',
-      regex: /^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/,
+      regex: /^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/
     }
     this.phone = {
       name: 'phone',
-      regex: /^0\d{1,2}-?\d{7}$/,
+      regex: /^0\d{1,2}-?\d{7}$/
     }
   }
 }
@@ -121,7 +121,7 @@ export class AccountForm extends UserForm {
 
   // Get the user properties from the form
   getFileds(): InputProperty[] {
-    return [this.username, this.name, this.phone, this.password]
+    return [this.username, this.name, this.phone]
   }
 
   // Get the default values for the form
@@ -130,7 +130,7 @@ export class AccountForm extends UserForm {
       username: '',
       name: '',
       password: '',
-      phone: '',
+      phone: ''
     }
   }
 }
@@ -153,7 +153,7 @@ export class SignUpForm extends UserForm {
       name: '',
       phone: '',
       username: '',
-      password: '',
+      password: ''
     }
   }
 }
@@ -169,7 +169,7 @@ export class UserManagementForm extends UserForm {
     this.email = {
       name: 'email',
       regex: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
-      disabled: true,
+      disabled: true
     }
   }
 
@@ -186,7 +186,7 @@ export class UserManagementForm extends UserForm {
       name: '',
       phone: '',
       password: '',
-      accessKey: '',
+      accessKey: ''
     }
   }
 }
@@ -195,7 +195,7 @@ export class UserManagementForm extends UserForm {
 export function convertFormUserValues(values: UserFormType): UserSchemaType {
   return {
     ...values,
-    accessKey: values.accessKey === '' ? 0 : Number(values.accessKey),
+    accessKey: values.accessKey === '' ? 0 : Number(values.accessKey)
   }
 }
 
@@ -221,100 +221,100 @@ export function getDeviceFormFields() {
     {
       disabled: true,
       name: 'model',
-      regex: stringRegex,
+      regex: stringRegex
     },
     {
       name: 'name',
-      regex: stringRegex,
+      regex: stringRegex
     },
     {
       name: 'type',
-      regex: stringRegex,
+      regex: stringRegex
     },
     {
       name: 'releaseDate',
-      regex: stringRegex,
+      regex: stringRegex
     },
     {
       name: 'releaseOS',
-      regex: nullableStringRegex,
+      regex: nullableStringRegex
     },
     {
       name: 'releasePrice',
-      regex: floatRegex,
+      regex: floatRegex
     },
     {
       name: 'price',
-      regex: floatRegex,
+      regex: floatRegex
     },
     {
       name: 'connector',
-      regex: stringRegex,
+      regex: stringRegex
     },
     {
       name: 'biometrics',
-      regex: stringRegex,
+      regex: stringRegex
     },
     {
       name: 'batterySize',
-      regex: numberRegex,
+      regex: numberRegex
     },
     {
       name: 'chipset',
-      regex: stringRegex,
+      regex: stringRegex
     },
     {
       name: 'weight',
-      regex: floatRegex,
+      regex: floatRegex
     },
     {
       name: 'imageAmount',
-      regex: numberRegex,
+      regex: numberRegex
     },
     {
       name: 'height',
-      regex: floatRegex,
+      regex: floatRegex
     },
     {
       name: 'width',
-      regex: floatRegex,
+      regex: floatRegex
     },
     {
       name: 'depth',
-      regex: floatRegex,
+      regex: floatRegex
     },
     {
       name: 'storage',
-      regex: numberRegex,
+      regex: numberRegex
     },
     {
       name: 'cpu',
-      regex: numberRegex,
+      regex: numberRegex
     },
     {
       name: 'gpu',
-      regex: numberRegex,
+      regex: numberRegex
     },
     {
       name: 'memory',
-      regex: numberRegex,
+      regex: numberRegex
     },
     {
       name: 'magsafe',
-      regex: booleanRegex,
+      regex: booleanRegex
     },
     {
       name: 'screenSize',
-      regex: nullableFloatRegex,
+      regex: nullableFloatRegex
     },
     {
       name: 'screenType',
-      regex: nullableStringRegex,
+      regex: nullableStringRegex
     },
     {
       name: 'resistanceRating',
-      regex: nullableStringRegex,
-    },
+      regex: nullableStringRegex
+    }
   ]
 
   const validators: { [key: string]: (value: string) => string | null } = {} // Create an object to store the validators
@@ -349,7 +349,7 @@ export function getDeviceFormFields() {
     magsafe: '',
     screenSize: '',
     screenType: '',
-    resistanceRating: '',
+    resistanceRating: ''
   }
 
   return { fields, validators, defaultValues } // Return the device form fields
@@ -377,7 +377,7 @@ export function convertFormDeviceValues(values: DeviceFormType): DeviceSchemaTyp
     magsafe: values.magsafe === '' ? undefined : Boolean(values.magsafe),
     screenSize: values.screenSize === '' ? undefined : Number(values.screenSize),
     screenType: values.screenType === '' ? undefined : values.screenType,
-    resistanceRating: values.resistanceRating === '' ? undefined : values.resistanceRating,
+    resistanceRating: values.resistanceRating === '' ? undefined : values.resistanceRating
   }
 }
 
@@ -386,7 +386,7 @@ export function convertDeviceValues(values: Device): DeviceFormType {
   const formatter = new Intl.DateTimeFormat('en-US', {
     day: 'numeric',
     month: 'short',
-    year: 'numeric',
+    year: 'numeric'
   }) // Create a date formatter
   // Return all values as strings
   return {
@@ -408,6 +408,6 @@ export function convertDeviceValues(values: Device): DeviceFormType {
     magsafe: values.magsafe === null ? '' : values.magsafe.toString(),
     screenSize: values.screenSize === null ? '' : values.screenSize.toString(),
     screenType: values.screenType === null ? '' : values.screenType,
-    resistanceRating: values.resistanceRating === null ? '' : values.resistanceRating,
+    resistanceRating: values.resistanceRating === null ? '' : values.resistanceRating
   }
 }

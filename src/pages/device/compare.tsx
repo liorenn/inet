@@ -11,7 +11,6 @@ import { Translate } from 'next-translate'
 import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
-import { useUser } from '@supabase/auth-helpers-react'
 import { useViewportSize } from '@mantine/hooks'
 import { z } from 'zod'
 
@@ -20,7 +19,7 @@ function getButtons(t: Translate, width: number) {
   const Buttons = [
     { label: `${t('two')} ${t('devices')}`, value: '2' },
     { label: `${t('three')} ${t('devices')}`, value: '3' },
-    { label: `${t('four')} ${t('devices')}`, value: '4' },
+    { label: `${t('four')} ${t('devices')}`, value: '4' }
   ]
   // If the screen is wide only show four buttons
   if (width > 1100) {
@@ -48,7 +47,7 @@ export default function Compare() {
   ) // Get the amount of devices to compare
   const allDevicesQuery = trpc.device.getModelsAndNames.useQuery() // Get all devices from the database
   const selectedDevicesQuery = trpc.device.getDevicesFromModelsArr.useQuery({
-    modelsArr: deviceList,
+    modelsArr: deviceList
   }) // Get the selected devices from the database
 
   // When compare amount changes
@@ -135,7 +134,7 @@ export default function Compare() {
               data={allDevicesQuery.data.map((value) => ({
                 value: value.model,
                 label: value.name,
-                group: value.type,
+                group: value.type
               }))}
             />
           ))}
@@ -155,7 +154,7 @@ export default function Compare() {
                         name: device.name,
                         model: device.model,
                         type: device.type,
-                        imageAmount: device.imageAmount,
+                        imageAmount: device.imageAmount
                       }}
                     />
                   )

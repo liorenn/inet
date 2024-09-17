@@ -2,11 +2,10 @@ import { Cookies } from 'typescript-cookie'
 import { trpc } from '@/utils/client'
 import { useEffect } from 'react'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
-import { useUser } from '@supabase/auth-helpers-react'
 
 // Define a custom hook to trigger a specific action
 export default function useAutoTrigger() {
-  const user = useUser() // Get the user object from Supabase // Get the user object from Supabase
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   // Get the mutate function from the trpc client for sending price drop emails
   const sendEmailMutation = trpc.auth.sendPriceDropsEmail.useMutation()
   const sendEmailsMutation = trpc.auth.sendPriceDropsEmails.useMutation()
@@ -14,7 +13,7 @@ export default function useAutoTrigger() {
   const backupDatabaseMutation = trpc.auth.backupDatabase.useMutation() // The backup mutation
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({ email: user?.email })
   const {
-    settings: { adminAccessKey },
+    settings: { adminAccessKey }
   } = useSiteSettings()
 
   useEffect(() => {

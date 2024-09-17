@@ -7,7 +7,6 @@ import { IconCurrencyDollar, IconLanguage, IconMoon, IconSearch, IconSun } from 
 import { currencies, useCurrency } from '@/hooks/useCurrency'
 import { languages, useLanguage } from '@/hooks/useLanguage'
 import { useEffect, useState } from 'react'
-import { useSession, useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 
 import Link from 'next/link'
 import NavBarDropdown from '@/components/layout/NavbarDropdown'
@@ -24,7 +23,8 @@ import { useViewportSize } from '@mantine/hooks'
 
 export default function Navbar() {
   useAutoTrigger()
-  const user = useUser() // Get the user object from Supabase
+  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
+  const { mutate } = trpc.auth.signOut.useMutation()
   const router = useRouter() // Get the router
   const posthog = usePostHog() // Get the posthog client instance
   const { classes } = useStyles() // Get the styles
@@ -35,16 +35,14 @@ export default function Navbar() {
   const { imagePath, imageExists, setImageExists, setImagePath } = useProfilePicture() // Get the profile picture state
   const closeEditorMutation = trpc.auth.closeDatabaseEditor.useMutation() // Mutation to close the database editor
   const isImageExistsMutation = trpc.auth.isImageExists.useMutation() // Mutation to check if the profile picture exists
-  const supabase = useSupabaseClient() // Get the Supabase client
   const spotlight = useSpotlight() // Get the spotlight
-  const [session, setSession] = useState(useSession()) // Get the session
   const { currency, setCurrency } = useCurrency() // Get the selected currency
   const { setLanguage: setlanguageStore } = useLanguage() // Get the select language function
   const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
-    email: user?.email,
+    email: user?.email
   }) // Get the access key query
   const {
-    settings: { adminAccessKey, defaultLanguage },
+    settings: { adminAccessKey, defaultLanguage }
   } = useSiteSettings()
 
   // When the user changes router
@@ -75,10 +73,6 @@ export default function Navbar() {
       currencies.find((Currency) => Currency.value === localStorage.getItem('currency')) ??
         currencies[0]
     )
-    // When user session changes
-    supabase.auth.onAuthStateChange((_e, session) => {
-      setSession(session) // Set the session to the new session
-    })
   }, [])
 
   // When the user state changes
@@ -96,7 +90,7 @@ export default function Navbar() {
               setImageExists(true) // Set the imageExists state to true
               setImagePath(`${''}/users/${encodeEmail(params.email)}.png`) // Set the imagePath state
             }
-          },
+          }
         }
       )
     }
@@ -104,17 +98,18 @@ export default function Navbar() {
 
   // Sign out the user
   async function signOut() {
-    const { error } = await supabase.auth.signOut() // Sign out the user
-    // If the sign out was successful
-    if (!error) {
-      CreateNotification(t('signedOutSuccessfully'), 'green') // Create a notification
-      posthog.capture('User Signed Out', { user }) // Capture the event in PostHog statistics
-      // After half a second
-      setTimeout(() => {
-        setImageExists(false) // Set the imageExists state to false
-        setImagePath('') // Set the imagePath state to an empty string
-      }, 500)
-    }
+    mutate(undefined, {
+      // If the sign out was successful
+      onSuccess(data, variables, context) {
+        CreateNotification(t('signedOutSuccessfully'), 'green') // Create a notification
+        posthog.capture('User Signed Out', { user }) // Capture the event in PostHog statistics
+        // After half a second
+        setTimeout(() => {
+          setImageExists(false) // Set the imageExists state to false
+          setImagePath('') // Set the imagePath state to an empty string
+        }, 500)
+      }
+    }) // Sign out the user
   }
 
   return (
@@ -130,7 +125,7 @@ export default function Navbar() {
               textDecoration: 'none',
               fontSize: '22px',
               fontWeight: 500,
-              color: colorScheme === 'dark' ? '#c1c2c5' : '#a3a8ae',
+              color: colorScheme === 'dark' ? '#c1c2c5' : '#a3a8ae'
             }}
             href={'/'}>
             {t('inet')}
@@ -152,7 +147,7 @@ export default function Navbar() {
               {t('find')}
             </Button>
           </Link>
-          {session && (
+          {user && (
             <Link href={'/device/favorites'}>
               <Button variant='light' color='gray' radius='md' className={classes.end}>
                 {t('favorites')}
@@ -161,7 +156,7 @@ export default function Navbar() {
           )}
         </Group>
         <Group>
-          {!session ? (
+          {!user ? (
             <>
               <Link href={'/auth/signIn'}>
                 <Button variant='light' color='gray' radius='md' className={classes.end}>
@@ -232,7 +227,7 @@ export default function Navbar() {
                         ? colorScheme === 'dark'
                           ? '#1c1c1c'
                           : '#f2f2f2'
-                        : '',
+                        : ''
                   }}
                   icon={Currency.icon({})}
                   onClick={() => {
@@ -267,7 +262,7 @@ export default function Navbar() {
                         ? colorScheme === 'dark'
                           ? '#1c1c1c'
                           : '#f2f2f2'
-                        : '',
+                        : ''
                   }}
                   icon={
                     language.value === 'en' ? (
@@ -314,44 +309,44 @@ export default function Navbar() {
 const useStyles = createStyles((theme) => ({
   root: {
     position: 'relative',
-    zIndex: 1,
+    zIndex: 1
   },
 
   inner: {
     height: 65,
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'center'
   },
 
   title: {
     [theme.fn.smallerThan(450)]: {
-      display: 'none',
-    },
+      display: 'none'
+    }
   },
 
   dropdown: {
     [theme.fn.largerThan(1200)]: {
-      display: 'none',
-    },
+      display: 'none'
+    }
   },
 
   buttons: {
     //prev lg, current sm
     [theme.fn.smallerThan(1200)]: {
-      display: 'none',
-    },
+      display: 'none'
+    }
   },
 
   end: {
     [theme.fn.smallerThan(650)]: {
-      display: 'none',
-    },
+      display: 'none'
+    }
   },
 
   actionIcon: {
     [theme.fn.smallerThan(370)]: {
-      display: 'none',
-    },
-  },
+      display: 'none'
+    }
+  }
 }))
