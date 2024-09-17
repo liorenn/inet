@@ -5,7 +5,6 @@ import { create } from 'zustand'
 type SiteSettingsNames = {
   adminAccessKey: number
   managerAccessKey: number
-  sendSoapRequest: boolean
   rtlInHebrew: boolean
   validateInputOnChange: boolean
   defaultLanguage: string
@@ -36,7 +35,6 @@ interface SiteSettings {
 const defaultSettings: Setting = {
   adminAccessKey: 5,
   managerAccessKey: 9,
-  sendSoapRequest: true,
   rtlInHebrew: true,
   validateInputOnChange: true,
   defaultLanguage: 'en',
@@ -46,7 +44,7 @@ const defaultSettings: Setting = {
   databaseEditorPort: 5555,
   recommendedDevicesLimit: 6,
   matchedDevicesLimit: 9,
-  adminTableRows: 6,
+  adminTableRows: 6
 }
 
 export const useSiteSettings = create<SiteSettings>()(
@@ -57,8 +55,8 @@ export const useSiteSettings = create<SiteSettings>()(
         set((state) => ({
           settings: {
             ...state.settings,
-            [key]: value,
-          },
+            [key]: value
+          }
         })),
       updateSettings: (updates) =>
         set((state) => ({
@@ -69,12 +67,12 @@ export const useSiteSettings = create<SiteSettings>()(
               return newSettings
             },
             { ...state.settings }
-          ),
-        })),
+          )
+        }))
     }),
     {
       name: 'site-settings',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => localStorage)
     }
   )
 )

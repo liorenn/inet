@@ -12,7 +12,6 @@ import Link from 'next/link'
 import NavBarDropdown from '@/components/layout/NavbarDropdown'
 import setLanguage from 'next-translate/setLanguage'
 import { trpc } from '@/utils/client'
-import useAutoTrigger from '@/hooks/useAutoTrigger'
 import { usePostHog } from 'posthog-js/react'
 import { useProfilePicture } from '@/hooks/useProfilePicture'
 import { useRouter } from 'next/router'
@@ -22,7 +21,6 @@ import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 
 export default function Navbar() {
-  useAutoTrigger()
   const { data: user } = trpc.auth.getUser.useQuery() // Get the user
   const { mutate } = trpc.auth.signOut.useMutation()
   const router = useRouter() // Get the router
@@ -100,13 +98,14 @@ export default function Navbar() {
   async function signOut() {
     mutate(undefined, {
       // If the sign out was successful
-      onSuccess(data, variables, context) {
+      onSuccess() {
         CreateNotification(t('signedOutSuccessfully'), 'green') // Create a notification
         posthog.capture('User Signed Out', { user }) // Capture the event in PostHog statistics
         // After half a second
         setTimeout(() => {
           setImageExists(false) // Set the imageExists state to false
           setImagePath('') // Set the imagePath state to an empty string
+          router.push('/')
         }, 500)
       }
     }) // Sign out the user

@@ -30,14 +30,6 @@ export default function SignIn() {
   const { t } = useTranslation('main') // Get the translation function
   const formProperties = new SignInForm() // Get the form properties
   const [loading, setLoading] = useState(false) // State for loading
-  const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
-    email: user?.email
-  }) // Get the access key for the user
-
-  // When access key changes
-  useEffect(() => {
-    accessKeyQuery.data && accessKeyQuery.data >= 1 && router.push('/') // Check if the data exists and redirect to home
-  }, [accessKeyQuery, router])
 
   // Create the form with the properties
   const form = useForm<SignInFormType>({
@@ -62,8 +54,8 @@ export default function SignIn() {
           if (!data.error) {
             CreateNotification(t('signedInSuccessfully'), 'green') // Create a success notification
             posthog.capture('User Signed In', { data: values }) // Capture the user signed in
-            router.push('/') // Redirect to home
             setLoading(false) // Set loading to false
+            router.push('/') // Redirect to home
           } else {
             setLoading(false) // Set loading to false
             CreateNotification(t('userDoesNotExist'), 'red') // Create a error notification

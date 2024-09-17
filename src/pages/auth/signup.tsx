@@ -30,14 +30,6 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false) // State for loading
   const { mutate } = trpc.auth.signUp.useMutation() // Get the createUser mutation
   const { t } = useTranslation('main') // Get the translation function
-  const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
-    email: user?.email
-  }) // Get the access key for the user
-
-  // When access key changes
-  useEffect(() => {
-    accessKeyQuery.data && accessKeyQuery.data >= 1 && router.push('/') // Check if the accessKeyQuery.data exists and redirect to home
-  }, [accessKeyQuery.data, router])
 
   // Create the form with the properties
   const form = useForm<SignUpFormType>({
@@ -79,7 +71,7 @@ export default function SignUp() {
   }
 
   // If user is connected
-  if (user || accessKeyQuery.isLoading) {
+  if (user) {
     return <Center>{t('accessDeniedMessageSignOut')}</Center>
   }
 

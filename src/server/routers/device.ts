@@ -1,5 +1,4 @@
 import { convertPreferencesToValues, getRecommendedDevices } from '@/server/match'
-import { deleteDeviceSoap, insertDeviceSoap, updateDeviceSoap } from '@/server/soapFunctions'
 import { getMatchedDevices } from '@/server/match'
 import { createTRPCRouter, method } from '@/server/trpc'
 
@@ -8,23 +7,10 @@ import { deviceSchema } from '@/models/schemas'
 import { MatchDeviceType, PropertiesSchema } from '@/models/deviceProperties'
 import { z } from 'zod'
 import { selectParams } from '@/models/deviceProperties'
-import { convertPrice, fetchCurrentPrice } from '@/server/price'
+import { env } from '@/server/env'
 
 // Create a device router
 export const deviceRouter = createTRPCRouter({
-  // Function to fetch current devices prices
-  fetchDevicesPrices: method.mutation(async ({ ctx }) => {
-    const devices = await ctx.db.device.findMany({
-      where: {
-        OR: [{ type: 'iphone' }, { type: 'ipad' }] // If device type is iphone or ipad
-      }
-    })
-    devices.forEach(async (device) => {
-      try {
-        await fetchCurrentPrice(device.model)
-      } catch {}
-    })
-  }),
   // Function to convert device price
   convertPrice: method
     .input(
@@ -35,7 +21,11 @@ export const deviceRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
-      return convertPrice(input.price, input.currency, input.targetCurrency) // Convert and return the price
+      const response = await fetch(
+        `${env.currencyApiUrl}?apikey=${env.currencyApiKey}&currencies=${input.targetCurrency}&base_currency=${input.currency}`
+      ) // Fetch the data from the API
+      const data = await response.json() // Extract the data from the response
+      return input.price * data.data[input.targetCurrency] // Convert and return the price
     }),
   // Function to get recommended devices
   getRecommendedDevices: method
@@ -141,75 +131,43 @@ export const deviceRouter = createTRPCRouter({
       return matchedDevices.sort((a, b) => b.match - a.match) // Return the matched devices
     }),
   // Function to insert a device
-  insertDevice: method
-    .input(
-      deviceSchema.merge(
-        z.object({ FromAsp: z.boolean().optional(), sendSoapRequest: z.boolean().default(false) })
-      )
-    )
-    .mutation(async ({ ctx, input }) => {
-      try {
-        const { FromAsp, ...device } = input // Remove fromAsp from input
-        await ctx.db.device.create({
-          data: {
-            ...device
-          }
-        }) // Create the device
-        // Send soap request if sendSoapRequest config is true and FromAsp is not true
-        if (input.sendSoapRequest && FromAsp !== true) {
-          await insertDeviceSoap({ input: device }) // Send insert device soap request
+  insertDevice: method.input(deviceSchema).mutation(async ({ ctx, input }) => {
+    try {
+      await ctx.db.device.create({
+        data: {
+          ...input
         }
-        return true // Return true to indicate operation success
-      } catch {
-        return false // Return false to indicate operation failure
-      }
-    }),
+      }) // Create the device
+      return true // Return true to indicate operation success
+    } catch {
+      return false // Return false to indicate operation failure
+    }
+  }),
   // Function to update a device
-  updateDevice: method
-    .input(
-      deviceSchema.merge(
-        z.object({ FromAsp: z.boolean().optional(), sendSoapRequest: z.boolean() })
-      )
-    )
-    .mutation(async ({ ctx, input }) => {
-      try {
-        const { FromAsp, ...device } = input // Remove fromAsp from input
-        await ctx.db.device.update({
-          where: { model: device.model },
-          data: {
-            ...device
-          }
-        }) // Update the device
-        // Send soap request if sendSoapRequest config is true and FromAsp is not true
-        if (input.sendSoapRequest && FromAsp !== true) {
-          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // Allow soap calls to succeed
-          await updateDeviceSoap({ input: device }) // Send update device soap request
+  updateDevice: method.input(deviceSchema).mutation(async ({ ctx, input }) => {
+    try {
+      await ctx.db.device.update({
+        where: { model: input.model },
+        data: {
+          ...input
         }
-        return true // Return true to indicate operation success
-      } catch {
-        return false // Return false to indicate operation failure
-      }
-    }),
+      }) // Update the device
+      return true // Return true to indicate operation success
+    } catch {
+      return false // Return false to indicate operation failure
+    }
+  }),
   // Function to delete a device
-  deleteDevice: method
-    .input(
-      z.object({ model: z.string(), FromAsp: z.boolean().optional(), sendSoapRequest: z.boolean() })
-    )
-    .mutation(async ({ ctx, input }) => {
-      try {
-        const { FromAsp, model } = input // Destructure the input
-        await ctx.db.device.delete({
-          where: { model }
-        }) // Delete the device
-        // Send soap request if sendSoapRequest config is true and FromAsp is not true
-        if (input.sendSoapRequest && FromAsp !== true) {
-          await deleteDeviceSoap({ model: input.model }) // Send delete device soap request
-        }
-        return true // Return true to indicate operation success
-      } catch {
-        return false // Return false to indicate operation failure
-      }
-    }),
+  deleteDevice: method.input(z.object({ model: z.string() })).mutation(async ({ ctx, input }) => {
+    try {
+      await ctx.db.device.delete({
+        where: { model: input.model }
+      }) // Delete the device
+      return true // Return true to indicate operation success
+    } catch {
+      return false // Return false to indicate operation failure
+    }
+  }),
   // Function to get all devices
   getDevicesData: method.query(async ({ ctx }) => {
     return await ctx.db.device.findMany() // Get all devices data
@@ -238,16 +196,6 @@ export const deviceRouter = createTRPCRouter({
         colors: { select: { color: true } }
       }
     }) // Get the device with cameras and colors
-    // If device exists and the price is zero type is iphone or ipad
-    if (device && device?.price === 0 && (device.type === 'iphone' || device.type === 'ipad')) {
-      try {
-        const price = await fetchCurrentPrice(input.model) // Fetch current price
-        device.price = price ?? 0 // Set the price
-        return device // Return the device with the updated price
-      } catch {
-        return device
-      }
-    }
     return device // Return the device
   }),
   // Function to get devices from an array of models
@@ -267,19 +215,6 @@ export const deviceRouter = createTRPCRouter({
           colors: { select: { color: true } }
         }
       }) // Get devices from the models
-      // For each device in the devices array
-      for (const device of devices) {
-        // If device exists and the price is zero type is iphone or ipad
-        if (device && device?.price === 0 && (device.type === 'iphone' || device.type === 'ipad')) {
-          const model = device.model // Get the model
-          try {
-            const price = await fetchCurrentPrice(model) // Fetch current price
-            device.price = price ?? 0 // Set the price
-          } catch {
-            device.price = 0 // Set the price
-          }
-        }
-      }
       // Sort devices by model
       devices.sort((a, b) => {
         const modelAIndex = models.indexOf(a.model) // Get the index of the first model in the array
