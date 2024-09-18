@@ -1,7 +1,7 @@
 import { Affix, Button, Transition } from '@mantine/core'
 import { useOs, useWindowScroll } from '@mantine/hooks'
 
-import { IconArrowUp } from '@tabler/icons'
+import { IconArrowUp } from '@tabler/icons-react'
 import useTranslation from 'next-translate/useTranslation'
 
 export default function ScrollToTop() {

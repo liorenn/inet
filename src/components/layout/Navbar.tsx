@@ -1,9 +1,15 @@
 import { ActionIcon, useMantineColorScheme } from '@mantine/core'
 import { Avatar, Container, Menu, createStyles } from '@mantine/core'
 import { Button, Group, Header, Text } from '@mantine/core'
-import { CreateNotification, encodeEmail } from '@/lib/utils'
 import { DEFlag, ESFlag, FRFlag, GBFlag, ILFlag, ITFlag, RUFlag } from 'mantine-flagpack'
-import { IconCurrencyDollar, IconLanguage, IconMoon, IconSearch, IconSun } from '@tabler/icons'
+import {
+  IconCurrencyDollar,
+  IconLanguage,
+  IconMoon,
+  IconSearch,
+  IconSun
+} from '@tabler/icons-react'
+import { createNotification, encodeEmail } from '@/lib/utils'
 import { currencies, useCurrency } from '@/hooks/useCurrency'
 import { languages, useLanguage } from '@/hooks/useLanguage'
 
@@ -23,7 +29,6 @@ import { useViewportSize } from '@mantine/hooks'
 export default function Navbar() {
   const { data: user } = api.auth.getUser.useQuery() // Get the user
   const { mutate } = api.auth.signOut.useMutation()
-  const router = useRouter() // Get the router
   const posthog = usePostHog() // Get the posthog client instance
   const { classes } = useStyles() // Get the styles
   const { width } = useViewportSize() // Get the width of the viewport
@@ -34,7 +39,6 @@ export default function Navbar() {
   const spotlight = useSpotlight() // Get the spotlight
   const { currency, setCurrency } = useCurrency() // Get the selected currency
   const { setLanguage: setlanguageStore } = useLanguage() // Get the select language function
-  const { settings } = useSiteSettings()
 
   // When component mounts
   useEffect(() => {
@@ -42,7 +46,6 @@ export default function Navbar() {
     setlanguageStore(
       languages.find((lang) => lang.value === localStorage.getItem('language')) ?? languages[0]
     )
-    setLanguage(localStorage.getItem('language') ?? settings.defaultLanguage) // Set the selected language to the language stored in local storage
     // Set the selected currency state to the currency stored in local storage
     setCurrency(
       currencies.find((Currency) => Currency.value === localStorage.getItem('currency')) ??
@@ -76,13 +79,12 @@ export default function Navbar() {
     mutate(undefined, {
       // If the sign out was successful
       onSuccess() {
-        CreateNotification(t('signedOutSuccessfully'), 'green') // Create a notification
+        createNotification(t('signedOutSuccessfully'), 'green') // Create a notification
         posthog.capture('User Signed Out', { user }) // Capture the event in PostHog statistics
         // After half a second
         setTimeout(() => {
           setImageExists(false) // Set the imageExists state to false
           setImagePath('') // Set the imagePath state to an empty string
-          router.push('/')
         }, 500)
       }
     }) // Sign out the user
@@ -134,12 +136,12 @@ export default function Navbar() {
         <Group>
           {!user ? (
             <>
-              <Link href={'/auth/signIn'}>
+              <Link href={'/signIn'}>
                 <Button variant='light' color='gray' radius='md' className={classes.end}>
                   {t('signIn')}
                 </Button>
               </Link>
-              <Link href={'/auth/signUp'}>
+              <Link href={'/signUp'}>
                 <Button variant='light' color='gray' radius='md' className={classes.end}>
                   {t('signUp')}
                 </Button>
@@ -148,7 +150,7 @@ export default function Navbar() {
           ) : (
             <>
               {(user.role === 'admin' || user.role === 'manager') && (
-                <Link href={'/auth/admin'}>
+                <Link href={'/admin'}>
                   <Button variant='light' color='gray' radius='md' className={classes.end}>
                     {t('admin')}
                   </Button>
@@ -163,7 +165,7 @@ export default function Navbar() {
                 {t('signOut')}
               </Button>
               {user?.email && (
-                <Link className={classes.actionIcon} href={'/auth/account'}>
+                <Link className={classes.actionIcon} href={'/account'}>
                   <Avatar src={imageExists ? imagePath : ''} radius='md' />
                 </Link>
               )}
@@ -205,7 +207,7 @@ export default function Navbar() {
                           : '#f2f2f2'
                         : ''
                   }}
-                  icon={Currency.icon({})}
+                  icon={<Currency.icon />}
                   onClick={() => {
                     setCurrency(Currency) // Set the selected currency
                   }}>

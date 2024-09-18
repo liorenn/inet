@@ -2,14 +2,16 @@ import { initTRPC, TRPCError } from '@trpc/server'
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next'
 import { ZodError } from 'zod'
 import { type NextApiRequest, type NextApiResponse } from 'next'
-import { db } from '@/server/db'
 import { validateRequest } from '@/server/auth'
 import superjson from 'superjson'
+import { PrismaClient } from '@prisma/client'
 
 type CreateContextOptions = {
   req: NextApiRequest
   res: NextApiResponse
 }
+
+const db = new PrismaClient()
 
 const createInnerTRPCContext = async (opts: CreateContextOptions) => {
   const { user, session } = await validateRequest(opts.req, opts.res)

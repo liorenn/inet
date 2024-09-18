@@ -1,4 +1,9 @@
-import { IconCurrencyDollar, IconCurrencyEuro, IconCurrencyShekel, TablerIcon } from '@tabler/icons'
+import {
+  IconCurrencyDollar,
+  IconCurrencyEuro,
+  IconCurrencyShekel,
+  TablerIcon
+} from '@tabler/icons-react'
 
 import { create } from 'zustand'
 
@@ -14,18 +19,18 @@ export const currencies: Currency[] = [
   {
     value: 'USD',
     symbol: '$',
-    icon: IconCurrencyDollar,
+    icon: IconCurrencyDollar
   },
   {
     value: 'ILS',
     symbol: '₪',
-    icon: IconCurrencyShekel,
+    icon: IconCurrencyShekel
   },
   {
     value: 'EUR',
     symbol: '€',
-    icon: IconCurrencyEuro,
-  },
+    icon: IconCurrencyEuro
+  }
 ]
 
 // Define the type for the currency state and its setter function
@@ -40,5 +45,5 @@ export const useCurrency = create<CurrencyState>()((set) => ({
   setCurrency: (newCurrency) => {
     set(() => ({ currency: newCurrency })) // Set the selected currency
     localStorage.setItem('currency', newCurrency.value) // Store the selected currency in local storage
-  },
+  }
 }))

@@ -1,10 +1,10 @@
 import { ActionIcon, Avatar, Center, Modal } from '@mantine/core'
 import { Button, Group, Text, rem } from '@mantine/core'
-import { CreateNotification, encodeEmail } from '@/lib/utils'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
-import { IconPhoto, IconUpload, IconX } from '@tabler/icons'
+import { IconPhoto, IconUpload, IconX } from '@tabler/icons-react'
+import { createNotification, encodeEmail } from '@/lib/utils'
 
-import { env } from '~/src/lib/clientEnv'
+import { env } from '@/lib/clientEnv'
 import { useDisclosure } from '@mantine/hooks'
 import { useProfilePicture } from '@/hooks/useProfilePicture'
 import { useRouter } from 'next/router'
@@ -33,7 +33,7 @@ export default function ImageUploader({ email }: Props) {
         fileName: `public/users/${encodeEmail(email)}.png` // The name of the image to delete
       })
     }).then(() => {
-      CreateNotification('Profile Picture Deleted', 'green') // Create a success notification
+      createNotification('Profile Picture Deleted', 'green') // Create a success notification
       setImageExists(false) // Set the imageExists state to false
       setFile(undefined) // Set the file state to undefined
       close() // Close the modal
@@ -55,7 +55,7 @@ export default function ImageUploader({ email }: Props) {
       }).then((response) => {
         // If the response is ok
         if (response.ok) {
-          CreateNotification('Profile Picture Changed', 'green') // Create a success notification
+          createNotification('Profile Picture Changed', 'green') // Create a success notification
           setImagePath(`${env.websiteUrl}/users/${newFileName}`) // Set the imagePath state
           setFile(newFile) // Set the file state
           router.reload() // Reload the page

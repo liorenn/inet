@@ -1,7 +1,7 @@
 import { Device, User } from '@prisma/client'
-import { DeviceSchemaType, UserRole } from '~/src/models/schemas'
+import { DeviceSchemaType, UserRole } from '@/models/schemas'
 
-import { DeviceFormType } from '~/src/components/admin/DeviceManagement'
+import { DeviceFormType } from '@/components/admin/DeviceManagement'
 
 type InputPropertyName = keyof User
 
@@ -45,15 +45,16 @@ const signInConfig: FormConfig & { defaultValues: SignInFormType } = {
   }
 }
 
-export type AccountFields = Omit<User, 'email' | 'role' | 'id' | 'password'>
+export type AccountFields = Omit<User, 'email' | 'role' | 'id'>
 export type AccountFieldsNames = keyof AccountFields
 
 const accountConfig: FormConfig & { defaultValues: AccountFields } = {
-  fields: [usernameProperty, nameProperty, phoneProperty],
+  fields: [usernameProperty, nameProperty, phoneProperty, passwordProperty],
   defaultValues: {
     username: '',
     name: '',
-    phone: ''
+    phone: '',
+    password: ''
   }
 }
 

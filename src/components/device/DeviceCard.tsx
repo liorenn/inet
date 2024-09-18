@@ -1,7 +1,7 @@
 import { Button, Card, Grid, Progress, Space, Text, Tooltip } from '@mantine/core'
 
 import DevicePhotos from '@/components/device/DevicePhotos'
-import { DevicePropertiesType } from '~/src/models/schemas'
+import { DevicePropertiesType } from '@/models/schemas'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import Link from 'next/link'
 import useTranslation from 'next-translate/useTranslation'

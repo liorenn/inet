@@ -2,7 +2,7 @@ import { Body, Container, Head, Hr } from '@react-email/components'
 import { Html, Link, Preview, Text } from '@react-email/components'
 
 import { Device } from '@prisma/client'
-import { env } from '~/src/lib/clientEnv'
+import { env } from '@/lib/clientEnv'
 
 type PriceDropEmailProps = {
   name: string

@@ -3,7 +3,7 @@ import { createTRPCNext } from '@trpc/next'
 import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server'
 import { type AppRouter } from '@/server/routers/root'
 import superjson from 'superjson'
-import { env } from '~/src/lib/clientEnv'
+import { env } from '@/lib/clientEnv'
 
 // Function to get the base URL based on the environment
 function getBaseUrl() {

@@ -1,12 +1,12 @@
 import { Button, Group, Pagination, ScrollArea, Table, Text, TextInput } from '@mantine/core'
-import { CreateNotification, chunkArray } from '@/lib/utils'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
+import { chunkArray, createNotification } from '@/lib/utils'
 import {
   convertDeviceValues,
   convertFormDeviceValues,
   getDeviceFormFields
-} from '~/src/models/formValidation'
+} from '@/models/formValidation'
 import { useOs, useViewportSize } from '@mantine/hooks'
 
 import type { Device } from '@prisma/client'
@@ -169,11 +169,11 @@ function DeviceInsertRow({ setActivePage, setChunkedDevices }: DeviceInsertRowPr
             return newData // Return the new chunked devices
           })
           form.setValues(defaultValues) // Set the form values to the default values
-          CreateNotification(t('insertedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
+          createNotification(t('insertedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
         },
         onError: () => {
           setLoading(false) // Set the loading state to false
-          CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
+          createNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
         }
       }
     )
@@ -265,11 +265,11 @@ function DeviceRow({ device, activePage, setActivePage, setChunkedDevices }: Dev
             })
             return newData // Return the new chunked devices
           })
-          CreateNotification(t('deletedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
+          createNotification(t('deletedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
         },
         onError: () => {
           setLoading(false) // Set the loading state to false
-          CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
+          createNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
         }
       }
     )
@@ -290,12 +290,12 @@ function DeviceRow({ device, activePage, setActivePage, setChunkedDevices }: Dev
           {
             // On update success
             onSuccess: () => {
-              CreateNotification(t('updatedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
+              createNotification(t('updatedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
             },
             // On update error
             onError: () => {
               form.setValues(device) // Set the form values to the current device
-              CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
+              createNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
             }
           }
         )

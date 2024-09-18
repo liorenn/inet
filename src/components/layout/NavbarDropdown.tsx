@@ -1,9 +1,9 @@
 import { ActionIcon, Drawer, Text, createStyles, rem } from '@mantine/core'
 
-import { CreateNotification } from '@/lib/utils'
-import { IconMenu2 } from '@tabler/icons'
+import { IconMenu2 } from '@tabler/icons-react'
 import Link from 'next/link'
 import { api } from '@/lib/trpc'
+import { createNotification } from '@/lib/utils'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 
@@ -21,7 +21,7 @@ export default function NavBarDropdown() {
       onSuccess(data, variables, context) {
         // If the sign out was successful
         if (!data.error) {
-          CreateNotification(t('signedOutSuccessfully'), 'green')
+          createNotification(t('signedOutSuccessfully'), 'green')
         }
       }
     })
@@ -38,15 +38,15 @@ export default function NavBarDropdown() {
   // Add the buttons to the navbar
   if (user) {
     buttons.push({ title: t('favorites'), href: '/device/favorites' })
-    buttons.push({ title: t('account'), href: '/auth/account' })
+    buttons.push({ title: t('account'), href: '/account' })
     // If the user has an access key greater than or equal to the admin access key
     if (user && (user.role === 'admin' || user.role === 'manager')) {
-      buttons.push({ title: t('admin'), href: '/auth/admin' }) // Add the admin button
+      buttons.push({ title: t('admin'), href: '/admin' }) // Add the admin button
     }
     buttons.push({ title: t('signOut'), href: '/' })
   } else {
-    buttons.push({ title: t('signIn'), href: '/auth/signIn' })
-    buttons.push({ title: t('signUp'), href: '/auth/signUp' })
+    buttons.push({ title: t('signIn'), href: '/signIn' })
+    buttons.push({ title: t('signUp'), href: '/signUp' })
   }
 
   return (

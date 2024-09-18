@@ -1,10 +1,10 @@
 import { Paper, Group, Text, ActionIcon, Avatar, TextInput, Grid } from '@mantine/core'
 import { Tooltip, Rating } from '@mantine/core'
 import type { Comment } from '@prisma/client'
-import { IconTrash, IconPencil, IconCheck } from '@tabler/icons'
+import { IconTrash, IconPencil, IconCheck } from '@tabler/icons-react'
 import { useState } from 'react'
 import { api } from '@/lib/trpc'
-import { calculateAverageRating, CreateNotification, encodeEmail } from '@/lib/utils'
+import { calculateAverageRating, createNotification, encodeEmail } from '@/lib/utils'
 import useTranslation from 'next-translate/useTranslation'
 
 import { useComments } from '@/hooks/useComments'
@@ -41,7 +41,7 @@ export default function Comment({ comment, comments, setComments }: Props) {
       {
         // Add the new comment
         onSuccess() {
-          CreateNotification(t('commentDeletedSuccessfully'), 'green') // Create a success notification
+          createNotification(t('commentDeletedSuccessfully'), 'green') // Create a success notification
         }
       }
     )
@@ -66,7 +66,7 @@ export default function Comment({ comment, comments, setComments }: Props) {
       {
         // Add the new comment
         onSuccess() {
-          CreateNotification(t('commentEditedSuccessfully'), 'green') // Create a success notification
+          createNotification(t('commentEditedSuccessfully'), 'green') // Create a success notification
         }
       }
     )

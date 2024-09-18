@@ -1,6 +1,6 @@
 import { Button, Group, Rating, Text } from '@mantine/core'
 
-import { IconArrowDown } from '@tabler/icons'
+import { IconArrowDown } from '@tabler/icons-react'
 import { useComments } from '@/hooks/useComments'
 import useTranslation from 'next-translate/useTranslation'
 import { useWindowScroll } from '@mantine/hooks'

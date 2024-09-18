@@ -7,7 +7,7 @@ import {
   IconDevices,
   IconDevicesPc,
   IconSearch
-} from '@tabler/icons'
+} from '@tabler/icons-react'
 import { NextRouter, useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
 

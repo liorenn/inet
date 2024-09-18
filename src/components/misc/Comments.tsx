@@ -1,7 +1,7 @@
 import { Accordion, Divider, Group, Text } from '@mantine/core'
 import { Avatar, Box, Button, Rating, Textarea } from '@mantine/core'
-import { CreateNotification, calculateAverageRating } from '@/lib/utils'
 import type { Device, Comment as commentType } from '@prisma/client'
+import { calculateAverageRating, createNotification } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 
 import Comment from '@/components/misc/Comment'
@@ -57,7 +57,7 @@ export default function Comments({ device }: Props) {
     addCommentMutation.mutate(newComment, {
       // On operation success
       onSuccess(data) {
-        CreateNotification(t('commentAddedSuccessfully'), 'green') // Create a notification
+        createNotification(t('commentAddedSuccessfully'), 'green') // Create a notification
         setText('') // Clear the comment text
         setRating(0) // Clear the comment rating
         setComments((prev) => [...prev, data]) // Add the new comment to the comments state

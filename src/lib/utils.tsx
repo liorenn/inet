@@ -1,41 +1,38 @@
-import { IconCheck, IconExclamationMark, IconX } from '@tabler/icons'
+import { IconCheck, IconExclamationMark, IconX } from '@tabler/icons-react'
 
 import type { Comment } from '@prisma/client'
 import type { ReactNode } from 'react'
+import { rem } from '@mantine/core'
 import { showNotification } from '@mantine/notifications'
 
-// Function to create a notification with a message, color, and optional mobile parameter
-export function CreateNotification(
-  message: string,
-  color: 'red' | 'green' | 'yellow', // Color parameter can be red, green, or yellow
-  mobile?: boolean // Optional mobile parameter
-) {
-  const icon: ReactNode | null = getIcon() // Initializing icon with the result of getIcon function
-
-  // Function to get the appropriate icon based on the color
-  function getIcon(): ReactNode | null {
-    if (color === 'green') {
-      return IconCheck({}) // Return green check icon
-    } else if (color === 'yellow') {
-      return IconExclamationMark({}) // Return yellow exclamation mark icon
-    } else if (color === 'red') {
-      return IconX({}) // Return red X icon
-    }
-    return IconExclamationMark({}) // Return default exclamation mark icon
-  }
-
-  // Showing the notification with the provided parameters
-  return showNotification({
-    title: message,
-    message: '', // Empty message
-    color: color,
-    autoClose: 6000, // Auto close after 6 seconds
-    radius: 'md', // Medium radius
-    icon: icon,
-    style: { width: '60%', float: 'right', marginBottom: mobile ? '40px' : '' } // Dynamic style based on the mobile parameter
-  })
+export type ActionResponse = {
+  message: string
+  error: boolean
 }
 
+const icons = [
+  { color: 'red', icon: <IconX style={{ width: rem(18), height: rem(18) }} /> },
+  { color: 'yellow', icon: <IconExclamationMark style={{ width: rem(18), height: rem(18) }} /> },
+  { color: 'green', icon: <IconCheck style={{ width: rem(18), height: rem(18) }} /> }
+]
+
+// export function createNotification(response: ActionResponse) {
+//   showNotification(response.message, response.error ? 'red' : 'green')
+// }
+
+export function createNotification(message: string, color: 'red' | 'green' | 'yellow') {
+  const icon = icons.find((i) => i.color === color)?.icon
+
+  return showNotification({
+    title: message,
+    message: '',
+    color: color,
+    autoClose: 6000,
+    radius: 'md',
+    icon: icon,
+    style: { width: '70%', float: 'right' }
+  })
+}
 // Function to calculate the average rating based on an array of comments
 export function calculateAverageRating(comments: Comment[]) {
   let AverageRating = 0 // Initializing average rating

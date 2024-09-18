@@ -1,9 +1,9 @@
 import { Button, Group, Pagination, ScrollArea, Table, Text, TextInput } from '@mantine/core'
-import { CreateNotification, chunkArray } from '@/lib/utils'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
-import { UserFormType, getValidators, userManagementConfig } from '~/src/models/formValidation'
+import { UserFormType, getValidators, userManagementConfig } from '@/models/formValidation'
 import { UserRole, userSchema } from '@/models/schemas'
+import { chunkArray, createNotification } from '@/lib/utils'
 import { useOs, useViewportSize } from '@mantine/hooks'
 
 import Loader from '@/components/layout/Loader'
@@ -140,11 +140,11 @@ function UserInsertRow({ setActivePage, setChunkedUsers }: UserInsertRowProps) {
               return newData // Return the new chunked users
             })
             form.setValues(userManagementConfig.defaultValues) // Set the form values to the default values
-            CreateNotification(t('insertedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
+            createNotification(t('insertedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
           },
           onError: () => {
             setLoading(false) // Set the loading state to false
-            CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
+            createNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
           }
         }
       )
@@ -236,11 +236,11 @@ function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowPr
             })
             return newData // Return the new chunked users
           })
-          CreateNotification(t('deletedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
+          createNotification(t('deletedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
         },
         onError: () => {
           setLoading(false) // Set the loading state to false
-          CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
+          createNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
         }
       }
     )
@@ -260,11 +260,11 @@ function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowPr
           {
             // On update success
             onSuccess() {
-              CreateNotification(t('updatedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
+              createNotification(t('updatedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
             }, // On update error
             onError() {
               form.setValues(user) // Set the form values to the current user
-              CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
+              createNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
             }
           }
         )

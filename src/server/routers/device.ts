@@ -1,9 +1,9 @@
 import { DevicePropertiesType, deviceSchema, selectProprties } from '@/models/schemas'
 import { MatchDeviceType, PropertiesSchema } from '@/models/deviceProperties'
+import { adminMethod, createTRPCRouter, method, protectedMethod } from '@/server/trpc'
 import { convertPreferencesToValues, getRecommendedDevices } from '@/lib/match'
-import { createTRPCRouter, method } from '@/server/trpc'
 
-import { env } from '~/src/lib/serverEnv'
+import { env } from '@/server/env'
 import { getMatchedDevices } from '@/lib/match'
 import { selectParams } from '@/models/deviceProperties'
 import { z } from 'zod'
@@ -130,7 +130,7 @@ export const deviceRouter = createTRPCRouter({
       return matchedDevices.sort((a, b) => b.match - a.match) // Return the matched devices
     }),
   // Function to insert a device
-  insertDevice: method.input(deviceSchema).mutation(async ({ ctx, input }) => {
+  insertDevice: adminMethod.input(deviceSchema).mutation(async ({ ctx, input }) => {
     try {
       await ctx.db.device.create({
         data: {
@@ -143,7 +143,7 @@ export const deviceRouter = createTRPCRouter({
     }
   }),
   // Function to update a device
-  updateDevice: method.input(deviceSchema).mutation(async ({ ctx, input }) => {
+  updateDevice: adminMethod.input(deviceSchema).mutation(async ({ ctx, input }) => {
     try {
       await ctx.db.device.update({
         where: { model: input.model },
@@ -157,16 +157,18 @@ export const deviceRouter = createTRPCRouter({
     }
   }),
   // Function to delete a device
-  deleteDevice: method.input(z.object({ model: z.string() })).mutation(async ({ ctx, input }) => {
-    try {
-      await ctx.db.device.delete({
-        where: { model: input.model }
-      }) // Delete the device
-      return true // Return true to indicate operation success
-    } catch {
-      return false // Return false to indicate operation failure
-    }
-  }),
+  deleteDevice: adminMethod
+    .input(z.object({ model: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await ctx.db.device.delete({
+          where: { model: input.model }
+        }) // Delete the device
+        return true // Return true to indicate operation success
+      } catch {
+        return false // Return false to indicate operation failure
+      }
+    }),
   // Function to get all devices
   getDevicesData: method.query(async ({ ctx }) => {
     return await ctx.db.device.findMany() // Get all devices data
@@ -230,7 +232,7 @@ export const deviceRouter = createTRPCRouter({
     return devices // Return the devices models and names
   }),
   // Function to check if a device is in the user devices list
-  isDeviceInUser: method
+  isDeviceInUser: protectedMethod
     .input(z.object({ model: z.string(), email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       const user = await ctx.db.user.findFirst({
@@ -241,7 +243,7 @@ export const deviceRouter = createTRPCRouter({
       return user?.deviceList?.find((device) => device.deviceModel === input.model) !== undefined
     }),
   // Function to add a device to favorites
-  addToFavorites: method
+  addToFavorites: protectedMethod
     .input(z.object({ model: z.string(), email: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db.user.update({
@@ -256,7 +258,7 @@ export const deviceRouter = createTRPCRouter({
       }) // Add the device to the user
     }),
   // Function to delete a device from favorites
-  deleteFromFavorites: method
+  deleteFromFavorites: protectedMethod
     .input(z.object({ model: z.string(), email: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db.user.update({
@@ -274,7 +276,7 @@ export const deviceRouter = createTRPCRouter({
       }) // Delete the device from the user
     }),
   // Function to get user devices
-  getUserDevices: method
+  getUserDevices: protectedMethod
     .input(
       z.object({
         email: z.string().optional()
@@ -306,7 +308,7 @@ export const deviceRouter = createTRPCRouter({
       return devicesArr // Return the users devices
     }),
   // Function to get user devices properties
-  getUserDevicesProperties: method
+  getUserDevicesProperties: protectedMethod
     .input(z.object({ email: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       return await ctx.db.user.findFirst({
@@ -314,7 +316,7 @@ export const deviceRouter = createTRPCRouter({
         select: {
           deviceList: {
             select: {
-              Device: {
+              device: {
                 select: {
                   model: true,
                   name: true,

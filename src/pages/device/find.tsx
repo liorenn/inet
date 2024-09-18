@@ -1,5 +1,5 @@
-import { Accordion, Button, Container, Divider, Group, ScrollArea } from '@mantine/core'
-import { SegmentedControl, Stack, Title, useMantineColorScheme } from '@mantine/core'
+import { Accordion, Button, Container, Group, ScrollArea } from '@mantine/core'
+import { SegmentedControl, Title } from '@mantine/core'
 import { deviceTypesProperties, propertiesLabels } from '@/models/deviceProperties'
 import { useEffect, useState } from 'react'
 
@@ -7,118 +7,91 @@ import Head from 'next/head'
 import MatchedDevices from '@/components/device/MatchedDevices'
 import { PropertiesSchemaType } from '@/models/deviceProperties'
 import { api } from '@/lib/trpc'
-import { deviceTypeSchema } from '~/src/models/schemas'
-import { useRouter } from 'next/router'
+import { deviceTypeSchema } from '@/models/schemas'
+import { useQueryState } from 'nuqs'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 import { z } from 'zod'
 
 type InputType = { value: string; label: string }[]
-
 type PreferenceType = {
   name: string
   value: string
 }
 
-// Function to get the preferences options of a device type
 const getPreferences = (deviceType: string) => {
-  // Find the device type properties in the deviceTypesProperties array and return it
   return deviceTypesProperties.find((device) => device.deviceType === deviceType)?.properties ?? []
 }
 
-// Function to generate the url string from the device type and preferences
-function generateUrlString(deviceType: string, preferences: PreferenceType[]) {
-  return `?deviceType=${deviceType}&preferences=${getFormattedPreferences(preferences)}` // Generate the url string with url parameters
-}
-
-// Function to format the preferences to a string
-function getFormattedPreferences(preferences: PreferenceType[]) {
-  return `${preferences
-    // For each preference in the preferences array
-    .map((preference) => {
-      return `${preference.name}-${preference.value}` // Return a formatted string seperated by a dash
-    })
-    .join(',')}` // Join the preferences seperated by a comma
+const getFormattedPreferences = (preferences: PreferenceType[]) => {
+  return preferences.map((preference) => `${preference.name}-${preference.value}`).join(',')
 }
 
 export default function Find() {
-  const router = useRouter() // Get the router
-  const { width } = useViewportSize() // Get the width of the viewport
-  const { t, lang } = useTranslation('main') // Get the translation function
-  const { colorScheme } = useMantineColorScheme() // Get the color scheme
+  const { width } = useViewportSize()
+  const { t, lang } = useTranslation('main')
   const {
     settings: { matchedDevicesLimit }
   } = useSiteSettings()
-  const MatchedDevicesMutation = api.device.getMatchedDevices.useMutation() // Mutation to get the matched devices
-  const deviceType = z.string().parse(router.query.deviceType ?? 'iphone') // Get the device type from the url
-  const preferences = z // Get the user preferences from the url
-    .string() // Parse the preferences to a string
-    .parse(
-      router.query.preferences ??
-        getFormattedPreferences(getPreferences(deviceType).map((name) => ({ name, value: '' })))
-      // Set the preferences to be empty if they are not in the url
-    )
-    .split(',') // Split the preferences seperated by a comma into an array
-    .map((value) => {
-      // Map the preferences to an object with name and value of the preference
-      return { name: value.split('-')[0], value: value.split('-')[1] }
-    })
 
-  const [accordionState, setAccordionState] = useState<string[]>(
-    preferences.map((pref) => pref.name)
-  ) // Set the accordion state to manage his opened and closed states
+  const MatchedDevicesMutation = api.device.getMatchedDevices.useMutation()
 
-  // When component mounts
+  const [deviceType, setDeviceType] = useQueryState('deviceType', {
+    defaultValue: 'iphone',
+    parse: (value) => z.string().parse(value)
+  })
+
+  const [preferences, setPreferences] = useQueryState('preferences', {
+    defaultValue: getFormattedPreferences(
+      getPreferences(deviceType).map((name) => ({ name, value: '' }))
+    ),
+    parse: (value) => z.string().parse(value)
+  })
+
+  const parsedPreferences = preferences.split(',').map((value) => {
+    return { name: value.split('-')[0], value: value.split('-')[1] }
+  })
+
+  const [accordionState, setAccordionState] = useState(parsedPreferences.map((pref) => pref.name))
+
   useEffect(() => {
-    // If the preferences are not in the url
-    if (!router.query.preferences) {
-      // Push the preferences to the url
-      router.push(
-        // Generate the url string
-        generateUrlString(
-          deviceType,
-          getPreferences(deviceType).map((name) => ({ name, value: '' }))
-        )
+    if (!preferences) {
+      setPreferences(
+        getFormattedPreferences(getPreferences(deviceType).map((name) => ({ name, value: '' })))
       )
     }
   }, [])
 
-  // Function to handle the submit of the preferences form
   function handleSubmit() {
-    const userPreferences = preferences
-      // Filter the preferences that are not not interested and empty
+    const userPreferences = parsedPreferences
       .filter((preference) => preference.value !== 'notInterested' && preference.value !== '')
-      // For each preference
-      .map((preference) => {
-        return {
-          name: preference.name as PropertiesSchemaType, // Cast the name to a PropertiesSchemaType
-          value:
-            (propertiesLabels
-              .find((property) => property.property === preference.name) // Find the property label in the propertiesLabels array
-              ?.labels?.indexOf(preference.value) ?? 0) + 1 // Get the value of the label
-        }
-      })
-    // If user chose no preferences after the filtering
-    if (userPreferences.length > 0)
+      .map((preference) => ({
+        name: preference.name as PropertiesSchemaType,
+        value:
+          (propertiesLabels
+            .find((property) => property.property === preference.name)
+            ?.labels?.indexOf(preference.value) ?? 0) + 1
+      }))
+
+    if (userPreferences.length > 0) {
       MatchedDevicesMutation.mutate({
         deviceType,
-        userPreferences: userPreferences,
+        userPreferences,
         matchedDevicesLimit
-      }) // Send the user preferences to the server
+      })
+    }
   }
 
-  // Function to get the segmented data
   function getSegmentedData(preference: PropertiesSchemaType) {
     const data = propertiesLabels
-      .find((property) => property.property === preference) // Find the property in the propertiesLabels array
-      ?.labels?.map((value) => {
-        return {
-          value: value,
-          label: lang === 'he' ? `${t(preference)} ${t(value)}` : `${t(value)} ${t(preference)}` // Translate the preference label
-        }
-      })
-    return data ? [{ value: 'notInterested', label: t('notInterested') }, ...data] : [] // Add the not interested option and return segmented data
+      .find((property) => property.property === preference)
+      ?.labels?.map((value) => ({
+        value,
+        label: lang === 'he' ? `${t(preference)} ${t(value)}` : `${t(value)} ${t(preference)}`
+      }))
+
+    return data ? [{ value: 'notInterested', label: t('notInterested') }, ...data] : []
   }
 
   return (
@@ -126,137 +99,109 @@ export default function Find() {
       <Head>
         <title>{t('find')}</title>
       </Head>
-      <Container size={1200}>
-        <Title>{t('compareTitle')}</Title>
-        <Divider mb='md' />
-        <Stack spacing={0}>
-          <Group position='apart'>
-            <Title size={width < 1000 ? 20 : 22}>{t('selectDeviceType')}</Title>
-            <Button
-              mb={8}
-              w={'auto'}
-              disabled={MatchedDevicesMutation.isPending}
-              color='gray'
-              variant='default'
-              onClick={() => {
-                MatchedDevicesMutation.reset() // Reset the matched devices query
-                // Push a new url string
-                router.push(
-                  // Generate a url string with empty preferences
-                  generateUrlString(
-                    deviceType,
-                    getPreferences(deviceType).map((name) => ({ name, value: '' }))
-                  )
+      <Container size='xl'>
+        <Title order={1} mb='xl'>
+          {t('compareTitle')}
+        </Title>
+        <Group position='apart' mb='xl'>
+          <Title order={2}>{t('selectDeviceType')}</Title>
+          <Button
+            mb={8}
+            w={'auto'}
+            disabled={MatchedDevicesMutation.isPending}
+            color='gray'
+            variant='default'
+            onClick={() => {
+              MatchedDevicesMutation.reset()
+              setDeviceType('iphone')
+              setPreferences(
+                getFormattedPreferences(
+                  getPreferences('iphone').map((name) => ({ name, value: '' }))
                 )
-              }}>
-              {t('resetPreferences')}
-            </Button>
-          </Group>
-          <ScrollArea offsetScrollbars type='always'>
-            <SegmentedControl
-              fullWidth
-              mb={width < 1000 ? 'sm' : 0}
-              value={deviceType}
-              onChange={(value) => {
-                setAccordionState(getPreferences(value)) // Update the accordion state
-                // Push a new url string
-                router.push(
-                  // Generate a url string with preferences based on the new device type
-                  generateUrlString(
-                    value,
-                    getPreferences(value).map((name) => ({ name, value: '' }))
-                  )
-                )
-              }}
-              data={Object.keys(deviceTypeSchema.Enum).map((deviceType) => {
-                return { label: t(deviceType), value: deviceType }
-              })}
-            />
-          </ScrollArea>
-        </Stack>
-
-        {preferences && (
-          <Accordion
-            mt='md'
-            multiple
-            variant='contained'
-            value={accordionState}
-            onChange={setAccordionState}
-            styles={{
-              control: {
-                lineHeight: 1.3,
-                backgroundColor: colorScheme === 'dark' ? '#1a1b1e' : 'white'
-              },
-              content: { backgroundColor: colorScheme === 'dark' ? '#1a1b1e' : 'white' }
+              )
             }}>
+            {t('resetPreferences')}
+          </Button>
+        </Group>
+        <SegmentedControl
+          fullWidth
+          value={deviceType}
+          onChange={(value) => {
+            setDeviceType(value)
+            setAccordionState(getPreferences(value))
+            setPreferences(
+              getFormattedPreferences(getPreferences(value).map((name) => ({ name, value: '' })))
+            )
+          }}
+          data={Object.keys(deviceTypeSchema.Enum).map((deviceType) => ({
+            label: t(deviceType),
+            value: deviceType
+          }))}
+        />
+
+        {parsedPreferences && (
+          <Accordion multiple value={accordionState} onChange={setAccordionState} mt='xl'>
             {getPreferences(deviceType).map((pref, index: number) => (
-              <PreferenceInput
-                value={getSegmentedData(pref)}
-                deviceType={deviceType}
-                preferences={preferences}
-                index={index}
-                key={index}
-              />
+              <Accordion.Item key={pref} value={pref}>
+                <Accordion.Control>{t(pref)}</Accordion.Control>
+                <Accordion.Panel>
+                  <PreferenceInput
+                    value={getSegmentedData(pref as PropertiesSchemaType)}
+                    index={index}
+                    preferences={parsedPreferences}
+                    setPreferences={setPreferences}
+                  />
+                </Accordion.Panel>
+              </Accordion.Item>
             ))}
           </Accordion>
         )}
         <Button
           fullWidth
-          mt='xl'
-          mb='md'
+          mt='md'
+          mb='xl'
           disabled={MatchedDevicesMutation.isPending}
           color='green'
           variant='light'
-          onClick={() => handleSubmit()}>
+          onClick={handleSubmit}>
           {MatchedDevicesMutation.isPending ? t('loading') : t('findYourDevice')}
         </Button>
-        <MatchedDevices
-          data={MatchedDevicesMutation.data}
-          isLoading={MatchedDevicesMutation.isPending}
-          title={t('bestMatchedDevices')}
-        />
+        {MatchedDevicesMutation.data && (
+          <ScrollArea offsetScrollbars type='always' h={width > 768 ? 600 : 400}>
+            <MatchedDevices
+              data={MatchedDevicesMutation.data}
+              isLoading={MatchedDevicesMutation.isPending}
+              title={t('bestMatchedDevices')}
+            />
+          </ScrollArea>
+        )}
       </Container>
     </>
   )
 }
 
-// Type for the preference input
-type preferenceInputType = {
+type PreferenceInputType = {
   value: InputType
   index: number
-  deviceType: string
   preferences: PreferenceType[]
+  setPreferences: (value: string) => void
 }
 
-function PreferenceInput({ value, index, deviceType, preferences }: preferenceInputType) {
-  const router = useRouter() // Get the router
-  const { t } = useTranslation('main') // Get the translation function
-
+function PreferenceInput({ value, index, preferences, setPreferences }: PreferenceInputType) {
   return (
-    <>
-      <Accordion.Item value={preferences[index].name}>
-        <Accordion.Control>{t(preferences[index].name)}</Accordion.Control>
-        <Accordion.Panel>
-          <ScrollArea offsetScrollbars type='always'>
-            <SegmentedControl
-              fullWidth
-              data={value}
-              defaultValue=''
-              mb='sm'
-              styles={
-                preferences[index].value === ''
-                  ? { indicator: { backgroundColor: 'transparent' } }
-                  : undefined
-              }
-              value={preferences[index].value}
-              onChange={(newValue) => {
-                preferences[index].value = newValue // Update the preference value
-                router.push(generateUrlString(deviceType, preferences)) // Push a new url string with updated preferences
-              }}
-            />
-          </ScrollArea>
-        </Accordion.Panel>
-      </Accordion.Item>
-    </>
+    <ScrollArea offsetScrollbars type='always'>
+      <SegmentedControl
+        fullWidth
+        data={value}
+        defaultValue=''
+        mb='sm'
+        value={preferences[index].value}
+        onChange={(newValue) => {
+          const updatedPreferences = [...preferences]
+          updatedPreferences[index].value = newValue
+          setPreferences(getFormattedPreferences(updatedPreferences))
+        }}
+      />
+    </ScrollArea>
   )
 }

@@ -40,7 +40,7 @@ model DeviceColor {
 model DeviceUser {
   deviceModel String
   userEmail   String
-  Device      Device @relation(fields: [deviceModel], references: [model], onDelete: Cascade)
+  device      Device @relation(fields: [deviceModel], references: [model], onDelete: Cascade)
   user        User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
   @@id([deviceModel, userEmail])

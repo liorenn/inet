@@ -1,4 +1,4 @@
-import { adminRouter } from '~/src/server/routers/admin'
+import { adminRouter } from '@/server/routers/admin'
 import { authRouter } from '@/server/routers/auth'
 import { createTRPCRouter } from '@/server/trpc'
 import { deviceRouter } from '@/server/routers/device'

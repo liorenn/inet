@@ -5,7 +5,6 @@ import { create } from 'zustand'
 type SiteSettingsNames = {
   rtlInHebrew: boolean
   validateInputOnChange: boolean
-  defaultLanguage: string
   defaultColorScheme: string
   recommendedDevicesLimit: number
   matchedDevicesLimit: number
@@ -30,7 +29,6 @@ type SiteSettings = {
 const defaultSettings: Setting = {
   rtlInHebrew: true,
   validateInputOnChange: true,
-  defaultLanguage: 'en',
   defaultColorScheme: 'dark',
   recommendedDevicesLimit: 6,
   matchedDevicesLimit: 9,

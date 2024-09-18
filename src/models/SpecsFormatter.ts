@@ -39,7 +39,7 @@ export type CamerasSpecsType = {
 
 // Define a type for the color specs, which contains an array of color objects with name and hex properties
 export type ColorsSpecsType = {
-  devicesColors: {
+  color: {
     name: string
     hex: string
   }

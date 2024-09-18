@@ -10,7 +10,6 @@ import { iPads } from '~/data/ipads'
 import { iPhones } from '~/data/iphones'
 
 const db = new PrismaClient()
-//{ log: ['query'] } // Initialize Prisma client
 
 export async function seedDatabase() {
   try {

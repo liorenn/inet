@@ -1,97 +1,62 @@
 import { Container, Divider, Group, SegmentedControl } from '@mantine/core'
+import React, { useRef } from 'react'
 import { Select, SimpleGrid, Title } from '@mantine/core'
-import { useEffect, useState } from 'react'
+import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 
 import DevicePhotos from '@/components/device/DevicePhotos'
 import DevicesSpecs from '@/components/device/DevicesSpecs'
 import Head from 'next/head'
 import Loader from '@/components/layout/Loader'
-import React from 'react'
 import { Translate } from 'next-translate'
 import { api } from '@/lib/trpc'
-import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
-import { z } from 'zod'
 
 // Function to get the buttons for the segmented control
 function getButtons(t: Translate, width: number) {
   const Buttons = [
-    { label: `${t('two')} ${t('devices')}`, value: '2' },
-    { label: `${t('three')} ${t('devices')}`, value: '3' },
-    { label: `${t('four')} ${t('devices')}`, value: '4' }
+    { label: `${t('two')} ${t('devices')}`, value: 2 },
+    { label: `${t('three')} ${t('devices')}`, value: 3 },
+    { label: `${t('four')} ${t('devices')}`, value: 4 }
   ]
-  // If the screen is wide only show four buttons
-  if (width > 1100) {
-    return Buttons // Return the buttons
-  }
-  // If the screen is medium only show three buttons
-  if (width > 800) {
-    return Buttons.slice(0, 2) // Slice the buttons array to only show three buttons
-  }
-  // If the screen is small only show two buttons
-  return Buttons.slice(0, 1) // Slice the buttons array to only show two buttons
+  // Return the amount of buttons based on the width of the viewport
+  return width > 1100 ? Buttons : width > 800 ? Buttons.slice(0, 2) : Buttons.slice(0, 1)
 }
 
 export default function Compare() {
   const { t } = useTranslation('main') // Get the translation function
   const { width } = useViewportSize() // Get the width of the viewport
-  const router = useRouter() // Get the router
-  const deviceList = z
-    .string() // Parse to string
-    .parse(router.query.deviceList ?? '') // Parse the device list from the url
-    .split(',') // Split the device list into an array
-  const [compareAmount, setCompareAmount] = useState(
-    getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
-  ) // Get the amount of devices to compare
+  const prevWidthRef = useRef(width) // Store previous width
+  const [comparison, setComparison] = useQueryStates({
+    compareAmount: parseAsInteger.withDefault(3),
+    deviceList: parseAsArrayOf(parseAsString, ';').withDefault([
+      'iphone14',
+      'iphone15',
+      'iphone15pro'
+    ])
+  })
+
   const allDevicesQuery = api.device.getModelsAndNames.useQuery() // Get all devices from the database
   const selectedDevicesQuery = api.device.getDevicesFromModelsArr.useQuery({
-    modelsArr: deviceList
+    modelsArr: comparison.deviceList ?? []
   }) // Get the selected devices from the database
-
-  // When compare amount changes
-  useEffect(() => {
-    // If all devices query data exists
-    if (allDevicesQuery.data) {
-      // Get the new compare amount
-      const arrayLength = Number(
-        getButtons(t, width).find((mark) => mark.value === compareAmount)?.value
-      )
-      // Push the new compare amount to device list in the url
-      router.push(
-        generateUrlSring(allDevicesQuery.data.slice(0, arrayLength).map((device) => device.model))
-      )
-    }
-  }, [compareAmount])
 
   // When width changes
   useEffect(() => {
-    // Set the new compare amount based on the width
-    setCompareAmount(
-      getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
-    )
-  }, [width])
-
-  // When device list changes
-  useEffect(() => {
-    // If the device list is not in the url
-    if (!router.query.deviceList) {
-      router.push(generateUrlSring(['iphone14', 'iphone15pro'])) // Push the default device list to the url
+    if (allDevicesQuery.data && width !== prevWidthRef.current) {
+      const buttons = getButtons(t, width)
+      const newCompareAmount =
+        buttons.find((button) => Number(button.value) === comparison.compareAmount)?.value ??
+        buttons[buttons.length - 1].value
+      setComparison((prevComparison) => ({
+        ...prevComparison,
+        compareAmount: newCompareAmount,
+        deviceList: allDevicesQuery.data.slice(0, newCompareAmount).map((device) => device.model)
+      }))
+      prevWidthRef.current = width // Update previous width
     }
-  }, [router])
-
-  // Function to generate the url string
-  function generateUrlSring(deviceList: string[]) {
-    return `?deviceList=${deviceList.join(',')}` // Return the url string
-  }
-
-  // Function to update the device list
-  function updateDeviceList(model: string | null, index: number) {
-    if (model === null) return // If the model is null exit the function
-    const newDeviceList = deviceList // Create a new device list
-    newDeviceList[index] = model // Update the model in the new device list
-    router.push(generateUrlSring(newDeviceList)) // Push the new device list to the url
-  }
+  }, [width])
 
   // If all devices query data is loading
   if (allDevicesQuery.data === undefined) {
@@ -115,21 +80,35 @@ export default function Compare() {
         <Divider mb='md' />
         <Title size={22}>{t('selectDevicesAmount')}</Title>
         <SegmentedControl
-          value={compareAmount}
-          onChange={setCompareAmount}
-          data={getButtons(t, width)}
+          value={String(comparison.compareAmount)}
+          onChange={(value) =>
+            setComparison({
+              compareAmount: Number(value),
+              deviceList: allDevicesQuery.data.slice(0, Number(value)).map((value) => value.model)
+            })
+          }
+          data={getButtons(t, width).map((mark) => ({
+            value: String(mark.value),
+            label: mark.label
+          }))}
           size='lg'
           fullWidth
         />
         <Group grow position='apart' mb='xs' mt='sm'>
-          {deviceList.map((_, index) => (
+          {comparison.deviceList.slice(0, comparison.compareAmount).map((_, index) => (
             <Select
               searchable
               label={t('selectDevice')}
               placeholder='Pick one'
-              value={deviceList[index]}
+              value={comparison.deviceList[index]}
               key={index}
-              onChange={(e) => updateDeviceList(e, index)}
+              onChange={(newDevice) =>
+                setComparison({
+                  deviceList: comparison.deviceList.map((device, i) =>
+                    i === index && newDevice ? newDevice : device
+                  )
+                })
+              }
               data={allDevicesQuery.data.map((value) => ({
                 value: value.model,
                 label: value.name,
@@ -140,8 +119,10 @@ export default function Compare() {
         </Group>
         {selectedDevicesQuery.data && selectedDevicesQuery.data.length > 0 ? ( // If the selected devices query data exists
           <>
-            <SimpleGrid mb='md' cols={selectedDevicesQuery.data.length}>
-              {deviceList.map((model, index) => {
+            <SimpleGrid
+              mb='md'
+              cols={selectedDevicesQuery.data.slice(0, comparison.compareAmount).length}>
+              {comparison.deviceList.slice(0, comparison.compareAmount).map((model, index) => {
                 const device = selectedDevicesQuery.data.find((device) => device.model === model)
                 return (
                   device && (
@@ -160,11 +141,10 @@ export default function Compare() {
                 )
               })}
             </SimpleGrid>
-            <DevicesSpecs devices={selectedDevicesQuery.data} />
+            <DevicesSpecs devices={selectedDevicesQuery.data.slice(0, comparison.compareAmount)} />
           </>
         ) : (
-          // If the selected devices query data loads
-          deviceList && <Loader />
+          comparison.deviceList && <Loader />
         )}
       </Container>
     </>

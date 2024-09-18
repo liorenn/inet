@@ -1,5 +1,5 @@
 import { Button, Container, SimpleGrid } from '@mantine/core'
-import { DevicePropertiesType, DeviceType } from '~/src/models/schemas'
+import { DevicePropertiesType, DeviceType } from '@/models/schemas'
 import { useEffect, useState } from 'react'
 
 import DeviceCard from '@/components/device/DeviceCard'

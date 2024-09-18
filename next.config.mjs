@@ -1,10 +1,16 @@
 import nextTranslate from 'next-translate-plugin'
 
-export default nextTranslate({
+/**
+ * @type {import('next').NextConfig}
+ */
+const configs = {
+  swcMinify: true,
   reactStrictMode: true,
   distDir: 'build',
   compiler: {
-    styledComponents: true,
-  },
-  swcMinify: true,
-})
+    styledComponents: true
+  }
+}
+
+//export default configs
+export default nextTranslate(configs)

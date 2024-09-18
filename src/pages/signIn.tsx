@@ -1,26 +1,23 @@
-import { Button, Center, Container, Text, Title } from '@mantine/core'
+import { Button, Stack, Text, Title } from '@mantine/core'
 import { Paper, PasswordInput, TextInput } from '@mantine/core'
-import { SignInFormType, getValidators, signInConfig } from '~/src/models/formValidation'
+import { SignInFormType, getValidators, signInConfig } from '@/models/formValidation'
 
-import { CreateNotification } from '@/lib/utils'
-import Head from 'next/head'
 import Link from 'next/link'
+import UnAuthPage from '@/components/pages/UnAuthPage'
 import { api } from '@/lib/trpc'
+import { createNotification } from '@/lib/utils'
 import { useForm } from '@mantine/form'
 import { usePostHog } from 'posthog-js/react'
-import { useRouter } from 'next/router'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 
 export default function SignIn() {
-  const router = useRouter() // Get the router
   const posthog = usePostHog() // Get the posthog
   const {
     settings: { validateInputOnChange }
   } = useSiteSettings()
   const { mutate: signIn } = api.auth.signIn.useMutation()
-  const { data: user } = api.auth.getUser.useQuery() // Get the user
   const { t } = useTranslation('main') // Get the translation function
   const [loading, setLoading] = useState(false) // State for loading
 
@@ -41,37 +38,28 @@ export default function SignIn() {
       {
         onError() {
           setLoading(false) // Set loading to false
-          CreateNotification(t('errorAccured'), 'red') // Create a error notification
+          createNotification(t('errorAccured'), 'red') // Create a error notification
         },
         onSuccess(data) {
           if (data.error === false) {
-            CreateNotification(t('signedInSuccessfully'), 'green') // Create a success notification
+            createNotification(t('signedInSuccessfully'), 'green') // Create a success notification
             posthog.capture('User Signed In', { data: values }) // Capture the user signed in
             setLoading(false) // Set loading to false
-            router.push('/') // Redirect to home
           } else {
             setLoading(false) // Set loading to false
-            CreateNotification(t('userDoesNotExist'), 'red') // Create a error notification
+            createNotification(t('userDoesNotExist'), 'red') // Create a error notification
           }
         }
       }
     )
   }
 
-  // If user is connected
-  if (user) {
-    return <Center>{t('accessDeniedMessageSignOut')}</Center>
-  }
-
   return (
-    <>
-      <Head>
-        <title>{t('signIn')}</title>
-      </Head>
-      <Container size={420} my={40}>
+    <UnAuthPage title={t('signIn')} container={420}>
+      <Stack my={40}>
         <Title align='center'>{t('welcomeBack')}</Title>
         <Text color='dimmed' size='sm' align='center' mt={5}>
-          {t('dontHaveAnAccount')} <Link href='/auth/signUp'>{t('createAnAccount')}</Link>
+          {t('dontHaveAnAccount')} <Link href='/signUp'>{t('createAnAccount')}</Link>
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
           <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -90,7 +78,7 @@ export default function SignIn() {
             </Button>
           </form>
         </Paper>
-      </Container>
-    </>
+      </Stack>
+    </UnAuthPage>
   )
 }

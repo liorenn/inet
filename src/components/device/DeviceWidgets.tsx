@@ -1,6 +1,6 @@
 import { Card, Grid, Stack, Text, Title } from '@mantine/core'
-import { IconBattery3, IconBrandApple, IconCoin } from '@tabler/icons'
-import { IconCalendarTime, IconCpu, IconTypography } from '@tabler/icons'
+import { IconBattery3, IconBrandApple, IconCoin } from '@tabler/icons-react'
+import { IconCalendarTime, IconCpu, IconTypography } from '@tabler/icons-react'
 
 import type { Device } from '@prisma/client'
 import { FormatDate } from '@/lib/utils'

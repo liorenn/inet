@@ -1,9 +1,9 @@
 import { Dispatch, useEffect, useState } from 'react'
 
 import { Button } from '@mantine/core'
-import { CreateNotification } from '@/lib/utils'
 import { DevicePropertiesType } from '@/models/schemas'
 import { api } from '@/lib/trpc'
+import { createNotification } from '@/lib/utils'
 import useTranslation from 'next-translate/useTranslation'
 
 // The component props
@@ -55,7 +55,7 @@ export default function FavoritesButtons({ model, modelPage, favoritesPage, setD
         // On operation success
         onSuccess() {
           setIsInList(false) // Set the state variable to false
-          CreateNotification(t('removedFromFavorites'), 'green') // Create a success notification
+          createNotification(t('removedFromFavorites'), 'green') // Create a success notification
           // If the favorites page and setDevices exist
           if (favoritesPage && setDevices) {
             setDevices((prev) => prev?.filter((device) => device.model !== model)) // Delete the device from the list
@@ -75,7 +75,7 @@ export default function FavoritesButtons({ model, modelPage, favoritesPage, setD
         // On operation success
         onSuccess() {
           setIsInList(true) // Set the state variable to true
-          CreateNotification(t('addedToFavorites'), 'green') // Create a success notification
+          createNotification(t('addedToFavorites'), 'green') // Create a success notification
         }
       }
     ) // Add device to favorites
