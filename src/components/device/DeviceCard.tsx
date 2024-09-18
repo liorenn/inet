@@ -1,7 +1,7 @@
 import { Button, Card, Grid, Progress, Space, Text, Tooltip } from '@mantine/core'
 
 import DevicePhotos from '@/components/device/DevicePhotos'
-import type { DevicePropertiesType } from '@/models/enums'
+import { DevicePropertiesType } from '~/src/models/schemas'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import Link from 'next/link'
 import useTranslation from 'next-translate/useTranslation'
@@ -40,7 +40,7 @@ export default function DeviceCard({ device, matchPrecentage }: Props) {
           <Link
             href={{
               pathname: '/device/[deviceType]/[model]',
-              query: { deviceType: device.type, model: device.model },
+              query: { deviceType: device.type, model: device.model }
             }}
             style={{ textDecoration: 'none' }}>
             <Button variant='light' color='gray' radius='md' size='md' fullWidth>

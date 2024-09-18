@@ -8,7 +8,7 @@ import type { DeviceSpecsType } from '@/models/SpecsFormatter'
 import DeviceWidgets from '@/components/device/DeviceWidgets'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import MatchedDevices from '@/components/device/MatchedDevices'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import useTranslation from 'next-translate/useTranslation'
 
 // The component props
@@ -18,9 +18,9 @@ type Props = {
 
 export default function DeviceLayout({ device }: Props) {
   const { t } = useTranslation('main') // Get the translation function
-  const recommendedDevicesQuery = trpc.device.getRecommendedDevices.useQuery({
+  const recommendedDevicesQuery = api.device.getRecommendedDevices.useQuery({
     model: device.model,
-    deviceType: device.type,
+    deviceType: device.type
   }) // The recommended devices query
 
   return (
@@ -35,7 +35,7 @@ export default function DeviceLayout({ device }: Props) {
                   model: device.model,
                   name: device.name,
                   type: device.type,
-                  imageAmount: device.imageAmount,
+                  imageAmount: device.imageAmount
                 }}
                 miniphotos={true}
               />

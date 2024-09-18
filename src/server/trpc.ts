@@ -2,11 +2,11 @@ import { initTRPC, TRPCError } from '@trpc/server'
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next'
 import { ZodError } from 'zod'
 import { type NextApiRequest, type NextApiResponse } from 'next'
-import { db } from '@/server/client'
+import { db } from '@/server/db'
 import { validateRequest } from '@/server/auth'
 import superjson from 'superjson'
 
-interface CreateContextOptions {
+type CreateContextOptions = {
   req: NextApiRequest
   res: NextApiResponse
 }
@@ -71,7 +71,19 @@ const isAuthed = t.middleware(({ ctx, next }) => {
 })
 
 const isAdmin = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !(ctx.user!.accessKey > 9)) {
+  if (!ctx.session || !(ctx.user!.role === 'admin' || ctx.user!.role === 'manager')) {
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Be an admin to access' })
+  }
+  return next({
+    ctx: {
+      user: ctx.user,
+      session: ctx.session
+    }
+  })
+})
+
+const isManager = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !(ctx.user!.role === 'manager')) {
     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Be an admin to access' })
   }
   return next({
@@ -89,5 +101,6 @@ export const method = t.procedure
 export const unAuthedMethod = t.procedure.use(isNotAuthed)
 export const protectedMethod = t.procedure.use(isAuthed)
 export const adminMethod = t.procedure.use(isAdmin)
+export const managerMethod = t.procedure.use(isManager)
 
 export type ContextType = Awaited<ReturnType<typeof createInnerTRPCContext>>

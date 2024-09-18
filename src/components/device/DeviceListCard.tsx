@@ -1,7 +1,7 @@
 import { Anchor, Button, Card, Grid, Space, Text } from '@mantine/core'
 
 import DevicePhotos from '@/components/device/DevicePhotos'
-import { DevicePropertiesType } from '@/models/enums'
+import { DevicePropertiesType } from '@/models/schemas'
 import { Dispatch } from 'react'
 import FavoritesButtons from '@/components/misc/FavoritesButtons'
 import { useRouter } from 'next/router'

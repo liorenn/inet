@@ -1,10 +1,10 @@
 import { ActionIcon, Avatar, Center, Modal } from '@mantine/core'
 import { Button, Group, Text, rem } from '@mantine/core'
-import { CreateNotification, encodeEmail } from '@/utils/utils'
+import { CreateNotification, encodeEmail } from '@/lib/utils'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { IconPhoto, IconUpload, IconX } from '@tabler/icons'
 
-import { clientEnv } from '@/utils/env'
+import { env } from '~/src/lib/clientEnv'
 import { useDisclosure } from '@mantine/hooks'
 import { useProfilePicture } from '@/hooks/useProfilePicture'
 import { useRouter } from 'next/router'
@@ -27,11 +27,11 @@ export default function ImageUploader({ email }: Props) {
     await fetch('/api/file/delete', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        fileName: `public/users/${encodeEmail(email)}.png`, // The name of the image to delete
-      }),
+        fileName: `public/users/${encodeEmail(email)}.png` // The name of the image to delete
+      })
     }).then(() => {
       CreateNotification('Profile Picture Deleted', 'green') // Create a success notification
       setImageExists(false) // Set the imageExists state to false
@@ -51,12 +51,12 @@ export default function ImageUploader({ email }: Props) {
       // Send a request to the server to upload the image
       await fetch('/api/file/upload', {
         method: 'POST',
-        body: formData, // Send the FormData object
+        body: formData // Send the FormData object
       }).then((response) => {
         // If the response is ok
         if (response.ok) {
           CreateNotification('Profile Picture Changed', 'green') // Create a success notification
-          setImagePath(`${clientEnv.websiteUrl}/users/${newFileName}`) // Set the imagePath state
+          setImagePath(`${env.websiteUrl}/users/${newFileName}`) // Set the imagePath state
           setFile(newFile) // Set the file state
           router.reload() // Reload the page
         }

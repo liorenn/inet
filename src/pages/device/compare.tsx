@@ -8,7 +8,7 @@ import Head from 'next/head'
 import Loader from '@/components/layout/Loader'
 import React from 'react'
 import { Translate } from 'next-translate'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
@@ -34,7 +34,6 @@ function getButtons(t: Translate, width: number) {
 }
 
 export default function Compare() {
-  const user = useUser()
   const { t } = useTranslation('main') // Get the translation function
   const { width } = useViewportSize() // Get the width of the viewport
   const router = useRouter() // Get the router
@@ -45,8 +44,8 @@ export default function Compare() {
   const [compareAmount, setCompareAmount] = useState(
     getButtons(t, width).find((mark) => Number(mark.value) === deviceList.length)?.value
   ) // Get the amount of devices to compare
-  const allDevicesQuery = trpc.device.getModelsAndNames.useQuery() // Get all devices from the database
-  const selectedDevicesQuery = trpc.device.getDevicesFromModelsArr.useQuery({
+  const allDevicesQuery = api.device.getModelsAndNames.useQuery() // Get all devices from the database
+  const selectedDevicesQuery = api.device.getDevicesFromModelsArr.useQuery({
     modelsArr: deviceList
   }) // Get the selected devices from the database
 
@@ -95,7 +94,7 @@ export default function Compare() {
   }
 
   // If all devices query data is loading
-  if (allDevicesQuery.data === undefined || !user) {
+  if (allDevicesQuery.data === undefined) {
     return (
       <>
         <Head>

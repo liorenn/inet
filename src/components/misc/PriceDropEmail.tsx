@@ -2,7 +2,7 @@ import { Body, Container, Head, Hr } from '@react-email/components'
 import { Html, Link, Preview, Text } from '@react-email/components'
 
 import { Device } from '@prisma/client'
-import { clientEnv } from '@/utils/env'
+import { env } from '~/src/lib/clientEnv'
 
 type PriceDropEmailProps = {
   name: string
@@ -15,7 +15,7 @@ export default function PriceDropEmail({
   name,
   device,
   newPrice,
-  percentage,
+  percentage
 }: PriceDropEmailProps) {
   return (
     <Html>
@@ -44,7 +44,7 @@ export default function PriceDropEmail({
           </ul>
           <Text style={paragraph}>
             Don't miss out on this opportunity! Head over to{' '}
-            <Link href={`${clientEnv.websiteUrl}/device/${device.type}/${device.model}`}>
+            <Link href={`${env.websiteUrl}/device/${device.type}/${device.model}`}>
               {device.name} Details
             </Link>{' '}
             now and make it yours before the offer ends. Act fast, as this special price is only
@@ -61,44 +61,44 @@ export default function PriceDropEmail({
 const main = {
   backgroundColor: '#ffffff',
   fontFamily:
-    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif'
 }
 
 const container = {
   margin: '0 auto',
-  padding: '20px 0 48px',
+  padding: '20px 0 48px'
 }
 
 const greeting = {
   fontSize: '18px',
-  fontWeight: 'bold',
+  fontWeight: 'bold'
 }
 
 const paragraph = {
   fontSize: '16px',
-  lineHeight: '1.5',
+  lineHeight: '1.5'
 }
 
 const list = {
   listStyleType: 'disc',
-  paddingLeft: '20px',
+  paddingLeft: '20px'
 }
 
 const hr = {
   borderColor: '#cccccc',
-  margin: '20px 0',
+  margin: '20px 0'
 }
 
 const footer = {
   color: '#8898aa',
-  fontSize: '12px',
+  fontSize: '12px'
 }
 
 const priceDrop = {
   color: '#52c41a', // Green color for the price drop
-  fontWeight: 'bold',
+  fontWeight: 'bold'
 }
 const oldPrice = {
   textDecoration: 'line-through',
-  color: '#ff4d4f', // Red color for the old price
+  color: '#ff4d4f' // Red color for the old price
 }

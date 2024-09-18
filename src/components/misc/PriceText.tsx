@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 
 import { Loader } from '@mantine/core'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import { useCurrency } from '@/hooks/useCurrency'
 
 export default function PriceText({ priceString }: { priceString: string }) {
   const { currency } = useCurrency() // Get the selected currency
-  const convertPriceMutation = trpc.device.convertPrice.useMutation() // Convert price mutation
+  const convertPriceMutation = api.device.convertPrice.useMutation() // Convert price mutation
   const [price, setPrice] = useState<number>(parseFloat(priceString ?? '0')) // State variable to store the price
   const [prevCurrency, setPrevCurrency] = useState<string | undefined>(undefined) // State variable to store the previous currency
 
@@ -28,7 +28,7 @@ export default function PriceText({ priceString }: { priceString: string }) {
           onSuccess(data) {
             setPrice(data) // Set the price
             setPrevCurrency(currency.value) // Set the previous currency
-          },
+          }
         }
       )
     }
@@ -44,7 +44,7 @@ export default function PriceText({ priceString }: { priceString: string }) {
         onSuccess(data) {
           setPrice(data) // Set the price
           setPrevCurrency(currencyValue) // Set the previous currency
-        },
+        }
       }
     )
   }

@@ -1,8 +1,7 @@
 import { Setting, SettingUpdate, useSiteSettings } from '@/hooks/useSiteSettings'
 import { SimpleGrid, TextInput } from '@mantine/core' // Importing components from Mantine core
-import { useEffect, useState } from 'react' // Importing necessary hooks and types from React
 
-import { useRouter } from 'next/router' // Importing useRouter hook from next/router
+import { useState } from 'react' // Importing necessary hooks and types from React
 import useTranslation from 'next-translate/useTranslation' // Importing useTranslation hook from next-translate
 
 // Regular expressions for different types of settings values
@@ -27,23 +26,9 @@ function validateConfig(
   }
 }
 
-// Defining the props for the SiteSettingsEditor component
-type Props = {
-  accessKey: number
-}
-
 // Defining the SiteSettingsEditor component
-export default function SiteSettingsEditor({ accessKey }: Props) {
-  const router = useRouter() // Get the router
+export default function SiteSettingsEditor() {
   const { settings } = useSiteSettings()
-
-  // When access key changes
-  useEffect(() => {
-    // If the access key is smaller than the manager access key
-    if (accessKey && accessKey < settings.managerAccessKey) {
-      router.push('/') // Redirect to the home page
-    }
-  }, [accessKey, router])
 
   // Displaying Settings
   return (
@@ -52,7 +37,7 @@ export default function SiteSettingsEditor({ accessKey }: Props) {
         breakpoints={[
           { minWidth: 300, cols: 1 },
           { minWidth: 500, cols: 2 },
-          { minWidth: 800, cols: 3 },
+          { minWidth: 800, cols: 3 }
         ]}>
         {Object.entries(settings).map(([key, value], index) => {
           return (
@@ -60,7 +45,7 @@ export default function SiteSettingsEditor({ accessKey }: Props) {
               key={index}
               setting={{
                 name: key as keyof Setting,
-                value: value,
+                value: value
               }}
             />
           )

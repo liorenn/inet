@@ -1,36 +1,22 @@
 import { Center, Container, ScrollArea, SegmentedControl, Table } from '@mantine/core'
 
 import Loader from '@/components/layout/Loader'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import { useRouter } from 'next/router'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 
-// The component props
-type Props = {
-  accessKey: number
-}
-
-export default function DatabaseViewer({ accessKey }: Props) {
-  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
-  const router = useRouter() // Get the router object from Next.js
+export default function DatabaseViewer() {
+  const { data: user } = api.auth.getUser.useQuery() // Get the user
   const { width } = useViewportSize() // Get the viewport size
   const { t } = useTranslation('main') // Get the translation function from Next.js
   const [table, setTable] = useState('') // State variable to store the selected table
   const [loading, setLoading] = useState(false) // State variable to store the loading state
-  const tablesPropertiesQuery = trpc.auth.getTablesProperties.useQuery() // Query to get the properties of the tables
-  const getTableDataMutation = trpc.auth.getTableData.useMutation() // Mutation to get the data of the selected table
+  const tablesPropertiesQuery = api.admin.getTablesProperties.useQuery() // Query to get the properties of the tables
+  const getTableDataMutation = api.admin.getTableData.useMutation() // Mutation to get the data of the selected table
   const [tableData, setTableData] = useState<string[][]>([]) // State variable to store the data of the selected table
-  const {
-    settings: { managerAccessKey }
-  } = useSiteSettings()
-
-  if (accessKey < managerAccessKey) {
-    // If the access key is less than the manager access key
-    router.push('/') // Redirect to the home page
-  }
 
   // Change the table name
   function changeTableName(tableName: string) {
@@ -78,7 +64,7 @@ export default function DatabaseViewer({ accessKey }: Props) {
   return (
     <>
       <Container size='xl'>
-        <ScrollArea mb='lg' type={width < 400 ? 'always' : 'auto'}>
+        <ScrollArea offsetScrollbars mb='lg' type={width < 400 ? 'always' : 'auto'}>
           <SegmentedControl
             data={tablesPropertiesQuery.data.map((value) => value.name)}
             onChange={(tableName) => changeTableName(tableName)}
@@ -89,7 +75,7 @@ export default function DatabaseViewer({ accessKey }: Props) {
             mb='sm'
           />
         </ScrollArea>
-        <ScrollArea type={width < 400 ? 'always' : 'auto'}>
+        <ScrollArea offsetScrollbars type={width < 400 ? 'always' : 'auto'}>
           {tableData.length > 0 && !loading ? ( // If there is data and the data finished loading
             <Table striped highlightOnHover withBorder withColumnBorders>
               <thead>

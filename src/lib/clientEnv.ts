@@ -8,7 +8,7 @@ const clientEnvVariables = z.object({
 })
 
 // Parsing the environment variables using the defined schema
-export const clientEnv = clientEnvVariables.parse({
+export const env = clientEnvVariables.parse({
   websiteUrl: process.env.NEXT_PUBLIC_WEBSITE_URL, // Parsing website URL from environment variables
   posthogToken: process.env.NEXT_PUBLIC_POSTHOG_TOKEN, // Parsing Posthog token from environment variables
   posthogApiHost: process.env.NEXT_PUBLIC_POSTHOG_API_HOST // Parsing Posthog API host from environment variables

@@ -2,18 +2,18 @@ import { Center, Container, Divider, SimpleGrid, Title } from '@mantine/core'
 import React, { useEffect, useState } from 'react'
 
 import DeviceListCard from '@/components/device/DeviceListCard'
-import type { DevicePropertiesType } from '@/models/enums'
+import { DevicePropertiesType } from '~/src/models/schemas'
 import Head from 'next/head'
 import Loader from '@/components/layout/Loader'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 
 export default function Favorites() {
   const router = useRouter()
-  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
+  const { data: user } = api.auth.getUser.useQuery() // Get the user
   const { t } = useTranslation('main') // Get the translation function
-  const userDevicesQuery = trpc.device.getUserDevices.useQuery({
+  const userDevicesQuery = api.device.getUserDevices.useQuery({
     email: user?.email
   }) // Get the user devices from the database
   const [devices, setDevices] = useState<DevicePropertiesType[] | undefined>(undefined) // State variable to store the user devices

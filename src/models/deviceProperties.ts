@@ -1,5 +1,5 @@
 import { Device } from '@prisma/client'
-import { DeviceType } from '@/models/enums'
+import { DeviceType } from '@/models/schemas'
 import { z } from 'zod'
 
 // Define the Weight type
@@ -28,8 +28,8 @@ export const weightsValues: DeviceTypeWeight[] = [
       { property: 'cpu', minValue: 2, maxValue: 8 },
       { property: 'gpu', minValue: 2, maxValue: 8 },
       { property: 'weight', minValue: 100, maxValue: 210 },
-      { property: 'storage', minValue: 64, maxValue: 128 },
-    ],
+      { property: 'storage', minValue: 64, maxValue: 128 }
+    ]
   },
   {
     deviceType: 'ipad',
@@ -42,8 +42,8 @@ export const weightsValues: DeviceTypeWeight[] = [
       { property: 'cpu', minValue: 6, maxValue: 8 },
       { property: 'gpu', minValue: 4, maxValue: 10 },
       { property: 'weight', minValue: 300, maxValue: 700 },
-      { property: 'storage', minValue: 32, maxValue: 128 },
-    ],
+      { property: 'storage', minValue: 32, maxValue: 128 }
+    ]
   },
   {
     deviceType: 'airpods',
@@ -51,8 +51,8 @@ export const weightsValues: DeviceTypeWeight[] = [
       { property: 'batterySize', minValue: 350, maxValue: 1000 },
       { property: 'releaseDate', minValue: 2020, maxValue: 2023 },
       { property: 'price', minValue: 150, maxValue: 550 },
-      { property: 'weight', minValue: 40, maxValue: 500 },
-    ],
+      { property: 'weight', minValue: 40, maxValue: 500 }
+    ]
   },
   {
     deviceType: 'mac',
@@ -62,8 +62,8 @@ export const weightsValues: DeviceTypeWeight[] = [
       { property: 'memory', minValue: 16, maxValue: 192 },
       { property: 'cpu', minValue: 8, maxValue: 24 },
       { property: 'gpu', minValue: 8, maxValue: 76 },
-      { property: 'storage', minValue: 64, maxValue: 128 },
-    ],
+      { property: 'storage', minValue: 64, maxValue: 128 }
+    ]
   },
   {
     deviceType: 'imac',
@@ -74,8 +74,8 @@ export const weightsValues: DeviceTypeWeight[] = [
       { property: 'memory', minValue: 8, maxValue: 8 },
       { property: 'cpu', minValue: 8, maxValue: 8 },
       { property: 'gpu', minValue: 7, maxValue: 7 },
-      { property: 'storage', minValue: 256, maxValue: 512 },
-    ],
+      { property: 'storage', minValue: 256, maxValue: 512 }
+    ]
   },
   {
     deviceType: 'macbook',
@@ -88,9 +88,9 @@ export const weightsValues: DeviceTypeWeight[] = [
       { property: 'cpu', minValue: 8, maxValue: 10 },
       { property: 'gpu', minValue: 7, maxValue: 32 },
       { property: 'storage', minValue: 2000, maxValue: 8000 },
-      { property: 'weight', minValue: 1290, maxValue: 1600 },
-    ],
-  },
+      { property: 'weight', minValue: 1290, maxValue: 1600 }
+    ]
+  }
 ]
 
 // Define the Property Labels type
@@ -109,7 +109,7 @@ export const propertiesLabels: PropertyLabels[] = [
   { property: 'gpu', labels: ['bad', 'acceptable', 'good', 'excellent'] },
   { property: 'memory', labels: ['bad', 'acceptable', 'good', 'excellent'] },
   { property: 'storage', labels: ['small', 'medium', 'large', 'massive'] },
-  { property: 'weight', labels: ['light', 'moderate', 'heavy', 'substantial'] },
+  { property: 'weight', labels: ['light', 'moderate', 'heavy', 'substantial'] }
 ]
 
 // Define the deviceTypeProperties type
@@ -122,23 +122,23 @@ export type DeviceTypeProperties = {
 export const deviceTypesProperties: DeviceTypeProperties[] = [
   {
     deviceType: 'iphone',
-    properties: ['screenSize', 'batterySize', 'releaseDate', 'price'],
+    properties: ['screenSize', 'batterySize', 'releaseDate', 'price']
   },
   {
     deviceType: 'ipad',
-    properties: ['screenSize', 'batterySize', 'releaseDate', 'price'],
+    properties: ['screenSize', 'batterySize', 'releaseDate', 'price']
   },
   {
     deviceType: 'airpods',
-    properties: ['batterySize', 'weight', 'releaseDate', 'price'],
+    properties: ['batterySize', 'weight', 'releaseDate', 'price']
   },
   {
     deviceType: 'mac',
-    properties: ['cpu', 'gpu', 'memory', 'releaseDate', 'price'],
+    properties: ['cpu', 'gpu', 'memory', 'releaseDate', 'price']
   },
   {
     deviceType: 'imac',
-    properties: ['cpu', 'gpu', 'memory', 'screenSize', 'releaseDate', 'price'],
+    properties: ['cpu', 'gpu', 'memory', 'screenSize', 'releaseDate', 'price']
   },
   {
     deviceType: 'macbook',
@@ -150,9 +150,9 @@ export const deviceTypesProperties: DeviceTypeProperties[] = [
       'gpu',
       'memory',
       'releaseDate',
-      'price',
-    ],
-  },
+      'price'
+    ]
+  }
 ]
 
 // Define the device Specs Categories
@@ -163,7 +163,7 @@ export const deviceSpecsCategories = [
   'dimensions',
   'cameras',
   'features',
-  'availability',
+  'availability'
 ]
 
 // Define the device Specs Categories with the 'name' property
@@ -180,7 +180,7 @@ export const selectParams = {
   gpu: true,
   memory: true,
   screenSize: true,
-  releaseDate: true,
+  releaseDate: true
 } // Define the properties schema
 
 // Define the properties schema
@@ -193,7 +193,7 @@ export const PropertiesSchema = z.enum([
   'memory',
   'weight',
   'cpu',
-  'gpu',
+  'gpu'
 ])
 
 // Define the properties schema type

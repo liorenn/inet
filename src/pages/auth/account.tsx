@@ -1,47 +1,35 @@
+import { AccountFields, AccountFieldsNames, accountConfig } from '~/src/models/formValidation'
 import { Box, Container, Group, Stack, Text } from '@mantine/core'
 import { Center, SimpleGrid, TextInput, UnstyledButton } from '@mantine/core'
 
-import { AccountForm } from '@/models/forms'
-import { CreateNotification } from '@/utils/utils'
+import { CreateNotification } from '@/lib/utils'
 import { Divider } from '@mantine/core'
 import Head from 'next/head'
 import ImageUploader from '@/components/misc/UploadAvatar'
 import Loader from '@/components/layout/Loader'
 import React from 'react'
-import { User } from '@/server/auth'
 import type { UserSchemaType } from '@/models/schemas'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 
-export type AccountFields = Omit<User, 'email' | 'accessKey'>
-export type AccountFieldsNames = keyof AccountFields
-
-type AccountField = {
-  name: AccountFieldsNames
-  regex: RegExp
-  validator: (value: string) => string | null
-}
-
 export default function Account() {
-  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
+  const { data: user } = api.auth.getUser.useQuery() // Get the user
   const router = useRouter() // Get the router object
-  const formProperties = new AccountForm() // Get the form properties for validation
   const { t } = useTranslation('main') // Get the translation function
-  const updateMutation = trpc.auth.updateUser.useMutation()
+  const updateMutation = api.admin.updateUser.useMutation()
   const [account, setAccount] = useState<UserSchemaType | undefined>() // State variable to store the user details
-  const omitFields = formProperties.getFileds() as Omit<AccountField, 'validator'>[] // Cast the fields to remove the validator
   // Get the fields from the form properties and create the validator
-  const fields = omitFields.map((field) => {
+  const fields = accountConfig.fields.map((field) => {
     return {
       ...field,
       validator: (value: string | number) =>
         field.regex.test(value?.toString()) ? null : `${field.name} is not valid`
     }
   })
-  const [inputs, setInputs] = useState<AccountFields>(formProperties.getDefaultValues()) // State variable to store the user inputs
+  const [inputs, setInputs] = useState<AccountFields>(accountConfig.defaultValues) // State variable to store the user inputs
 
   // When user details data changes
   useEffect(() => {
@@ -83,13 +71,11 @@ export default function Account() {
       },
       {
         // On operation success
-        onSuccess(data) {
+        onSuccess() {
           CreateNotification(`${t(property)} ${t('updatedSuccessfully')}`, 'green') // Create a success notification
           setAccount({
             ...inputs,
-            email: user.email,
-            phone: user.phone,
-            accessKey: user.accessKey
+            ...user
           })
         },
         onError() {
@@ -183,14 +169,15 @@ export default function Account() {
                     }))
                   }
                   placeholder={`${t('enterYour')} ${t(field.name)}...`}
-                  error={field.validator(inputs[field.name])}
-                  value={inputs[field.name]}
+                  error={field.validator(inputs[field.name as keyof typeof inputs])}
+                  value={inputs[field.name as keyof typeof inputs]}
                   radius='md'
                   size='md'
                 />
                 <UnstyledButton
                   onClick={() => {
-                    updateProperty(user, field.name, account) // Update the user property
+                    const property = field.name as AccountFieldsNames
+                    updateProperty(user, property, account) // Update the user property
                   }}>
                   <Text sx={{ fontSize: 18 }} weight={500} align='right' color='green'>
                     {t('update')}

@@ -1,42 +1,27 @@
 import { Button, Group, Pagination, ScrollArea, Table, Text, TextInput } from '@mantine/core'
-import { CreateNotification, chunkArray } from '@/utils/utils'
+import { CreateNotification, chunkArray } from '@/lib/utils'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { InputPropertyName, UserManagementForm, convertFormUserValues } from '@/models/forms'
 import { UseFormReturnType, useForm } from '@mantine/form'
+import { UserFormType, getValidators, userManagementConfig } from '~/src/models/formValidation'
+import { UserRole, userSchema } from '@/models/schemas'
 import { useOs, useViewportSize } from '@mantine/hooks'
 
 import Loader from '@/components/layout/Loader'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import { useRouter } from 'next/router'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
-import { userSchema } from '@/models/schemas'
 
-export type UserFormType = {
-  [K in InputPropertyName]: string // Type of the form inputs
-}
-
-// The component props
-type Props = {
-  accessKey: number // Access key of the user
-}
-
-export default function UserManagement({ accessKey }: Props) {
-  const router = useRouter() // Get the router
+export default function UserManagement() {
   const { width } = useViewportSize() // Get the viewport size
   const { t } = useTranslation('main') // Get the translation function
   const [activePage, setActivePage] = useState(0) // The active page of the table
   const [chunkedUsers, setChunkedUsers] = useState<UserFormType[][]>([[]]) // The chunked users
   const fieldNames = Object.keys(userSchema.shape) // The field names of the users
-  const usersDataQuery = trpc.auth.getUsersData.useQuery() // The users data query
+  const usersDataQuery = api.admin.getUsersData.useQuery() // The users data query
   const {
-    settings: { adminTableRows, managerAccessKey },
+    settings: { adminTableRows }
   } = useSiteSettings()
-
-  // If the access key is less than the manager access key
-  if (accessKey < managerAccessKey) {
-    router.push('/') // Redirect to the home page
-  }
 
   // When the users query data updates
   useEffect(() => {
@@ -47,7 +32,7 @@ export default function UserManagement({ accessKey }: Props) {
         // Chunk the users data
         chunkArray(
           usersDataQuery.data.map((user) => {
-            return { ...user, accessKey: user.accessKey.toString() }
+            return { ...user }
           }),
           adminTableRows
         )
@@ -61,7 +46,7 @@ export default function UserManagement({ accessKey }: Props) {
         <Loader /> // Show the loader
       ) : (
         <>
-          <ScrollArea mb='sm' type={width < 400 ? 'always' : 'auto'}>
+          <ScrollArea offsetScrollbars mb='sm' type={width < 400 ? 'always' : 'auto'}>
             <Table mb='sm' withBorder withColumnBorders>
               <thead>
                 <tr>
@@ -114,19 +99,18 @@ type UserInsertRowProps = {
 
 function UserInsertRow({ setActivePage, setChunkedUsers }: UserInsertRowProps) {
   const os = useOs() // Get the client operating system
-  const formProperties = new UserManagementForm() // Get the form properties
   const { t } = useTranslation('main') // Get the translation function
   const [loading, setLoading] = useState(false) // The loading state
-  const insertUserMutation = trpc.auth.insertUser.useMutation() // The insert user mutation
+  const insertUserMutation = api.admin.insertUser.useMutation() // The insert user mutation
   const {
-    settings: { adminTableRows, validateInputOnChange },
+    settings: { adminTableRows, validateInputOnChange }
   } = useSiteSettings()
 
   // Form management function
   const form = useForm<UserFormType>({
-    initialValues: formProperties.getDefaultValues(),
+    initialValues: userManagementConfig.defaultValues,
     validateInputOnChange,
-    validate: formProperties.getValidators(),
+    validate: getValidators(userManagementConfig.fields)
   })
 
   // Insert user function
@@ -135,7 +119,7 @@ function UserInsertRow({ setActivePage, setChunkedUsers }: UserInsertRowProps) {
       setLoading(true) // Set the loading state to true
       // Insert the user
       insertUserMutation.mutate(
-        { ...convertFormUserValues(form.values) },
+        { ...form.values },
         {
           // On insertion success
           onSuccess: () => {
@@ -155,13 +139,13 @@ function UserInsertRow({ setActivePage, setChunkedUsers }: UserInsertRowProps) {
               }
               return newData // Return the new chunked users
             })
-            form.setValues(formProperties.getDefaultValues()) // Set the form values to the default values
+            form.setValues(userManagementConfig.defaultValues) // Set the form values to the default values
             CreateNotification(t('insertedSuccessfully'), 'green', os === 'ios' ? true : false) // Create a success notification
           },
           onError: () => {
             setLoading(false) // Set the loading state to false
             CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
-          },
+          }
         }
       )
       setLoading(false) // Set the loading state to false
@@ -171,7 +155,7 @@ function UserInsertRow({ setActivePage, setChunkedUsers }: UserInsertRowProps) {
   return (
     <>
       <tr>
-        {formProperties.getFileds().map((field, index) => (
+        {userManagementConfig.fields.map((field, index) => (
           <td key={index}>
             <UserTableFormInput
               form={form}
@@ -206,21 +190,20 @@ type UserRowProps = {
 
 function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowProps) {
   const os = useOs() // Get the client operating system
-  const formProperties = new UserManagementForm() // Get the form properties
   const { t } = useTranslation('main') // Get the translation function
   const [editMode, setEditMode] = useState(false) // The edit mode state
   const [loading, setLoading] = useState(false) // The loading state
-  const deleteUserMutation = trpc.auth.deleteUser.useMutation() // The delete user mutation
-  const updateUserMutation = trpc.auth.updateUser.useMutation() // The update user mutation
+  const deleteUserMutation = api.admin.deleteUser.useMutation() // The delete user mutation
+  const updateUserMutation = api.admin.updateUser.useMutation() // The update user mutation
   const {
-    settings: { validateInputOnChange },
+    settings: { validateInputOnChange }
   } = useSiteSettings()
 
   // Form management function
   const form = useForm<UserFormType>({
     initialValues: user,
     validateInputOnChange,
-    validate: formProperties.getValidators(),
+    validate: getValidators(userManagementConfig.fields)
   })
 
   // When user data changes
@@ -258,7 +241,7 @@ function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowPr
         onError: () => {
           setLoading(false) // Set the loading state to false
           CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
-        },
+        }
       }
     )
     setLoading(false) // Set the loading state to false
@@ -273,7 +256,7 @@ function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowPr
       if (JSON.stringify(form.values) !== JSON.stringify(user)) {
         // Update the user
         updateUserMutation.mutate(
-          { ...convertFormUserValues(form.values) },
+          { ...form.values },
           {
             // On update success
             onSuccess() {
@@ -282,7 +265,7 @@ function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowPr
             onError() {
               form.setValues(user) // Set the form values to the current user
               CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
-            },
+            }
           }
         )
       }
@@ -292,7 +275,7 @@ function UserRow({ user, activePage, setActivePage, setChunkedUsers }: UserRowPr
   return (
     <>
       <tr>
-        {formProperties.getFileds().map((field, index) => (
+        {userManagementConfig.fields.map((field, index) => (
           <td key={index}>
             <UserTableFormInput
               form={form}
@@ -351,7 +334,7 @@ function UserTableFormInput({ form, inputName, disabled, editMode }: UserTableFo
           w='120px'
           style={{
             pointerEvents: disabled ? 'none' : 'auto',
-            opacity: disabled ? 0.6 : 1,
+            opacity: disabled ? 0.6 : 1
           }}
         />
       ) : (

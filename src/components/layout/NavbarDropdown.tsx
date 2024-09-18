@@ -1,26 +1,19 @@
 import { ActionIcon, Drawer, Text, createStyles, rem } from '@mantine/core'
 
-import { CreateNotification } from '@/utils/utils'
+import { CreateNotification } from '@/lib/utils'
 import { IconMenu2 } from '@tabler/icons'
 import Link from 'next/link'
-import { trpc } from '@/utils/client'
-import { useSiteSettings } from '@/hooks/useSiteSettings'
+import { api } from '@/lib/trpc'
 import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
 
-// The component props
-type Props = { AccessKey: number | undefined }
-
-export default function NavBarDropdown({ AccessKey }: Props) {
-  const { mutate } = trpc.auth.signOut.useMutation()
-  const { data: user } = trpc.auth.getUser.useQuery()
+export default function NavBarDropdown() {
+  const { mutate } = api.auth.signOut.useMutation()
+  const { data: user } = api.auth.getUser.useQuery()
   const { classes, cx } = useStyles() // Get the styles
   const [opened, setOpened] = useState(false) // State of is the drawer opened
   const { t } = useTranslation('main') // Get the translation function
   const [activeLink, setActiveLink] = useState('Settings') // The active link
-  const {
-    settings: { adminAccessKey }
-  } = useSiteSettings()
 
   // Sign out the user
   async function signOut() {
@@ -47,7 +40,7 @@ export default function NavBarDropdown({ AccessKey }: Props) {
     buttons.push({ title: t('favorites'), href: '/device/favorites' })
     buttons.push({ title: t('account'), href: '/auth/account' })
     // If the user has an access key greater than or equal to the admin access key
-    if (AccessKey && AccessKey >= adminAccessKey) {
+    if (user && (user.role === 'admin' || user.role === 'manager')) {
       buttons.push({ title: t('admin'), href: '/auth/admin' }) // Add the admin button
     }
     buttons.push({ title: t('signOut'), href: '/' })

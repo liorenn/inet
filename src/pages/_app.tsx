@@ -7,10 +7,10 @@ import { Notifications } from '@mantine/notifications'
 import { PostHogProvider } from 'posthog-js/react'
 import RouterTransition from '@/components/layout/RouterTransition'
 import SpotlightControl from '@/components/misc/Spotlight'
-import { clientEnv } from '@/utils/env'
+import { api } from '@/lib/trpc'
+import { env } from '~/src/lib/clientEnv'
 import posthog from 'posthog-js'
 import rtlPlugin from 'stylis-plugin-rtl'
-import { trpc } from '@/utils/client'
 import { useEffect } from 'react'
 import { useLocalStorage } from '@mantine/hooks'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
@@ -19,8 +19,8 @@ import useTranslation from 'next-translate/useTranslation'
 // If there is a window
 if (typeof window !== 'undefined') {
   // Initialize PostHog client
-  posthog.init(clientEnv.posthogToken, {
-    api_host: clientEnv.posthogApiHost,
+  posthog.init(env.posthogToken, {
+    api_host: env.posthogApiHost,
     loaded: (posthog) => {
       posthog.debug(false)
     }
@@ -84,4 +84,4 @@ function App({ Component, pageProps }: AppProps) {
   )
 }
 
-export default trpc.withTRPC(App)
+export default api.withTRPC(App)

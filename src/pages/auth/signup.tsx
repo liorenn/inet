@@ -1,23 +1,17 @@
 import { Button, Center, Container, Text, Title } from '@mantine/core'
-import { FormDefaultValues, SignUpForm } from '@/models/forms'
 import { Paper, TextInput } from '@mantine/core'
-import { useEffect, useState } from 'react'
+import { SignUpFormType, getValidators, signUpConfig } from '~/src/models/formValidation'
 
-import { CreateNotification } from '@/utils/utils'
+import { CreateNotification } from '@/lib/utils'
 import Head from 'next/head'
 import Link from 'next/link'
-import { User } from '@/server/auth'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import { useForm } from '@mantine/form'
 import { usePostHog } from 'posthog-js/react'
 import { useRouter } from 'next/router'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
+import { useState } from 'react'
 import useTranslation from 'next-translate/useTranslation'
-
-// The sign up properties type
-export type SignUpFormType = {
-  [K in keyof Omit<User, 'accessKey'>]: string
-}
 
 export default function SignUp() {
   const router = useRouter() // Get the router
@@ -25,17 +19,16 @@ export default function SignUp() {
     settings: { validateInputOnChange }
   } = useSiteSettings()
   const posthog = usePostHog()
-  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
-  const formProperties = new SignUpForm() // Get the form properties
+  const { data: user } = api.auth.getUser.useQuery() // Get the user
   const [loading, setLoading] = useState(false) // State for loading
-  const { mutate } = trpc.auth.signUp.useMutation() // Get the createUser mutation
+  const { mutate } = api.auth.signUp.useMutation() // Get the createUser mutation
   const { t } = useTranslation('main') // Get the translation function
 
   // Create the form with the properties
   const form = useForm<SignUpFormType>({
-    initialValues: formProperties.getDefaultValues() as FormDefaultValues,
+    initialValues: signUpConfig.defaultValues,
     validateInputOnChange,
-    validate: formProperties.getValidators()
+    validate: getValidators(signUpConfig.fields)
   })
 
   //Sign up the user
@@ -55,7 +48,7 @@ export default function SignUp() {
           CreateNotification('Error Couldnt Create Account', 'red') // Create an error notification
         },
         onSuccess(data) {
-          if (!data.error) {
+          if (data.error === false) {
             CreateNotification(t('accountCreatedSuccessfully'), 'green') // Create a success notification
             posthog.capture('User Signed Up', { data }) // Capture the user signed up
             router.push('/') // Redirect to home
@@ -89,7 +82,7 @@ export default function SignUp() {
         </Text>
         <Paper withBorder shadow='md' p={30} mt={30} radius='md'>
           <form onSubmit={form.onSubmit((values) => signUp(values))}>
-            {formProperties.getFileds().map((field, index) => (
+            {signUpConfig.fields.map((field, index) => (
               <TextInput
                 key={index}
                 label={t(field.name)}

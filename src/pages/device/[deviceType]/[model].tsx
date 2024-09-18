@@ -6,34 +6,31 @@ import DeviceLayout from '@/components/device/DeviceLayout'
 import Head from 'next/head'
 import Link from 'next/link'
 import Loader from '@/components/layout/Loader'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import { useComments } from '@/hooks/useComments'
 import { usePostHog } from 'posthog-js/react'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
 
 export default function Device() {
-  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
+  const { data: user } = api.auth.getUser.useQuery() // Get the user
   const router = useRouter() // Get the router object
   const posthog = usePostHog() // Get the posthog client
   const { setUsername } = useComments() // Get the set username function for comments component
   const { t } = useTranslation('main') // Get the translation function
   const [captured, setCaptured] = useState(false) // Was page captured in posthog
   const deviceModel = router.asPath.split('/')[3] // Get the device model from the url
-  const deviceQuery = trpc.device.getDevice.useQuery({
+  const deviceQuery = api.device.getDevice.useQuery({
     model: deviceModel
   }) // Get the device details from the database
-  const userQuery = trpc.auth.getUser.useQuery({
-    email: user?.email
-  }) // Get the user details from the database
 
   // When user data changes
   useEffect(() => {
     // If user data finished loading
-    if (userQuery.data) {
-      setUsername(userQuery.data.username) // Set the username to the user username
+    if (user) {
+      setUsername(user.username) // Set the username to the user username
     }
-  }, [setUsername, userQuery.data])
+  }, [user])
 
   // When device data changes
   useEffect(() => {

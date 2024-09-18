@@ -1,9 +1,9 @@
 import { Divider, SimpleGrid, Title } from '@mantine/core'
 
 import DeviceCard from '@/components/device/DeviceCard'
-import { DevicePropertiesType } from '@/models/enums'
+import { DevicePropertiesType } from '@/models/schemas'
 import Loader from '@/components/layout/Loader'
-import { excludeProperty } from '@/utils/utils'
+import { excludeProperty } from '@/lib/utils'
 
 // The component props
 type Props = {
@@ -30,7 +30,7 @@ export default function MatchedDevices({ title, data, isLoading }: Props) {
             breakpoints={[
               { minWidth: 400, cols: 1 },
               { minWidth: 800, cols: 2 },
-              { minWidth: 'lg', cols: 3 },
+              { minWidth: 'lg', cols: 3 }
             ]}
             mb={40}>
             {data.map((device, index) => (

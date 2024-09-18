@@ -6,7 +6,7 @@ import {
   IconDeviceTablet,
   IconDevices,
   IconDevicesPc,
-  IconSearch,
+  IconSearch
 } from '@tabler/icons'
 import { NextRouter, useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
@@ -15,35 +15,35 @@ import { Device } from '@prisma/client'
 import type { SpotlightAction } from '@mantine/spotlight'
 import { SpotlightProvider } from '@mantine/spotlight'
 import { Translate } from 'next-translate'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import useTranslation from 'next-translate/useTranslation'
 
 // Define an icon for each device type
 const icons = [
   {
     type: 'iphone',
-    icon: <IconDeviceMobile size={28} />,
+    icon: <IconDeviceMobile size={28} />
   },
   {
     type: 'ipad',
-    icon: <IconDeviceTablet size={28} />,
+    icon: <IconDeviceTablet size={28} />
   },
   {
     type: 'airpods',
-    icon: <IconDeviceAirpods size={28} />,
+    icon: <IconDeviceAirpods size={28} />
   },
   {
     type: 'mac',
-    icon: <IconDevicesPc size={28} />,
+    icon: <IconDevicesPc size={28} />
   },
   {
     type: 'imac',
-    icon: <IconDeviceDesktop size={28} />,
+    icon: <IconDeviceDesktop size={28} />
   },
   {
     type: 'macbook',
-    icon: <IconDeviceLaptop size={28} />,
-  },
+    icon: <IconDeviceLaptop size={28} />
+  }
 ]
 
 // Get the device description that will be shown in the spotlight
@@ -80,13 +80,13 @@ function createActionsArray(
     group: t(device.type), // Set the group to the translated device type
     description: getDeviceDescription(device), // Set the description to the device description
     onTrigger: () => router.push(`/device/${device.type}/${device.model}`), // Set the trigger function to navigate to the device page
-    icon: icons.find((icon) => icon.type === device.type)?.icon ?? <IconDevices size={28} />, // Set the icon to the device icon
+    icon: icons.find((icon) => icon.type === device.type)?.icon ?? <IconDevices size={28} /> // Set the icon to the device icon
   }))
 }
 
 export default function SpotlightControl({ children }: { children: ReactNode }) {
   const { t } = useTranslation('main') // Get the translation function
-  const devicesQuery = trpc.device.getDevicesData.useQuery() // Get the devices data
+  const devicesQuery = api.device.getDevicesData.useQuery() // Get the devices data
   const router = useRouter() // Get the router
   const actions = useMemo(() => {
     // Check if the data exists

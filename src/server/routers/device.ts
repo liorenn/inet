@@ -1,13 +1,12 @@
-import { convertPreferencesToValues, getRecommendedDevices } from '@/server/match'
-import { getMatchedDevices } from '@/server/match'
+import { DevicePropertiesType, deviceSchema, selectProprties } from '@/models/schemas'
+import { MatchDeviceType, PropertiesSchema } from '@/models/deviceProperties'
+import { convertPreferencesToValues, getRecommendedDevices } from '@/lib/match'
 import { createTRPCRouter, method } from '@/server/trpc'
 
-import { selectProprties, type DevicePropertiesType } from '@/models/enums'
-import { deviceSchema } from '@/models/schemas'
-import { MatchDeviceType, PropertiesSchema } from '@/models/deviceProperties'
-import { z } from 'zod'
+import { env } from '~/src/lib/serverEnv'
+import { getMatchedDevices } from '@/lib/match'
 import { selectParams } from '@/models/deviceProperties'
-import { env } from '@/server/env'
+import { z } from 'zod'
 
 // Create a device router
 export const deviceRouter = createTRPCRouter({
@@ -193,7 +192,7 @@ export const deviceRouter = createTRPCRouter({
       where: { model: input.model },
       include: {
         cameras: { select: { type: true, megapixel: true } },
-        colors: { select: { color: true } }
+        devicesColors: { select: { color: true } }
       }
     }) // Get the device with cameras and colors
     return device // Return the device
@@ -212,7 +211,7 @@ export const deviceRouter = createTRPCRouter({
         },
         include: {
           cameras: { select: { type: true, megapixel: true } },
-          colors: { select: { color: true } }
+          devicesColors: { select: { color: true } }
         }
       }) // Get devices from the models
       // Sort devices by model
@@ -315,7 +314,7 @@ export const deviceRouter = createTRPCRouter({
         select: {
           deviceList: {
             select: {
-              device: {
+              Device: {
                 select: {
                   model: true,
                   name: true,

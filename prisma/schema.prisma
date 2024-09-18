@@ -7,22 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Camera {
-  type       String
-  model      String
-  megapixel  Int
-  device     Device     @relation(fields: [model], references: [model], onDelete: Cascade)
-  cameraType CameraType @relation(fields: [type], references: [name])
-
-  @@id([model, type])
-}
-
-model Color {
-  name    String        @id @unique
-  hex     String
-  devices DeviceColor[]
-}
-
 model User {
   id         String       @id
   email      String       @unique
@@ -30,7 +14,7 @@ model User {
   name       String
   password   String
   phone      String
-  accessKey  Int          @default(1)
+  role       String       @default("user")
   comments   Comment[]
   deviceList DeviceUser[]
   sessions   Session[]
@@ -44,6 +28,50 @@ model Session {
   user User @relation(references: [id], fields: [userId], onDelete: Cascade)
 }
 
+model DeviceColor {
+  colorName   String
+  deviceModel String
+  color       Color  @relation(fields: [colorName], references: [name], onDelete: Cascade)
+  device      Device @relation(fields: [deviceModel], references: [model], onDelete: Cascade)
+
+  @@id([deviceModel, colorName])
+}
+
+model DeviceUser {
+  deviceModel String
+  userEmail   String
+  Device      Device @relation(fields: [deviceModel], references: [model], onDelete: Cascade)
+  user        User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+
+  @@id([deviceModel, userEmail])
+}
+
+model BiometricFeature {
+  name    String   @id @unique
+  devices Device[]
+}
+
+model DeviceConnector {
+  name    String   @id @unique
+  devices Device[]
+}
+
+model Camera {
+  type       String
+  model      String
+  megapixel  Int
+  device     Device     @relation(fields: [model], references: [model], onDelete: Cascade)
+  cameraType CameraType @relation(fields: [type], references: [name])
+
+  @@id([model, type])
+}
+
+model Color {
+  name          String        @id @unique
+  hex           String
+  devicesColors DeviceColor[]
+}
+
 model Comment {
   id        Int      @id @unique @default(autoincrement())
   model     String
@@ -54,24 +82,6 @@ model Comment {
   rating    Int
   device    Device   @relation(fields: [model], references: [model], onDelete: Cascade)
   user      User     @relation(fields: [username], references: [username], onDelete: Cascade)
-}
-
-model DeviceUser {
-  deviceModel String
-  userEmail   String
-  device      Device @relation(fields: [deviceModel], references: [model], onDelete: Cascade)
-  user        User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
-
-  @@id([deviceModel, userEmail])
-}
-
-model DeviceColor {
-  colorName   String
-  deviceModel String
-  color       Color  @relation(fields: [colorName], references: [name], onDelete: Cascade)
-  device      Device @relation(fields: [deviceModel], references: [model], onDelete: Cascade)
-
-  @@id([deviceModel, colorName])
 }
 
 model Device {
@@ -104,18 +114,8 @@ model Device {
   biometricFeature BiometricFeature @relation(fields: [biometrics], references: [name])
   deviceConnector  DeviceConnector  @relation(fields: [connector], references: [name])
   deviceType       DeviceType       @relation(fields: [type], references: [name])
-  colors           DeviceColor[]
-  users            DeviceUser[]
-}
-
-model DeviceConnector {
-  name    String   @id @unique
-  devices Device[]
-}
-
-model BiometricFeature {
-  name    String   @id @unique
-  devices Device[]
+  devicesColors    DeviceColor[]
+  devicesUsers     DeviceUser[]
 }
 
 model DeviceType {

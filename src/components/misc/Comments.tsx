@@ -1,12 +1,12 @@
 import { Accordion, Divider, Group, Text } from '@mantine/core'
 import { Avatar, Box, Button, Rating, Textarea } from '@mantine/core'
-import { CreateNotification, calculateAverageRating } from '@/utils/utils'
+import { CreateNotification, calculateAverageRating } from '@/lib/utils'
 import type { Device, Comment as commentType } from '@prisma/client'
 import { useEffect, useState } from 'react'
 
 import Comment from '@/components/misc/Comment'
 import type { FormEvent } from 'react'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import { useComments } from '@/hooks/useComments'
 import { useProfilePicture } from '@/hooks/useProfilePicture'
 import useTranslation from 'next-translate/useTranslation'
@@ -17,14 +17,14 @@ type Props = {
 }
 
 export default function Comments({ device }: Props) {
-  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
+  const { data: user } = api.auth.getUser.useQuery() // Get the user
   const [text, setText] = useState('') // State for the comment text
   const [rating, setRating] = useState(0) // State for the comment rating
   const { t } = useTranslation('main') // Get the translation hook
   const [comments, setComments] = useState<commentType[]>([]) // State for the comments
-  const addCommentMutation = trpc.auth.addComment.useMutation() // Add comment mutation
+  const addCommentMutation = api.auth.addComment.useMutation() // Add comment mutation
   const { username, setRatingValue, setCommentsAmount } = useComments() // Get the comments state and functions
-  const allCommentsQuery = trpc.auth.getAllComments.useQuery({
+  const allCommentsQuery = api.auth.getAllComments.useQuery({
     model: device.model
   }) // Get all comments
   const { imageExists, imagePath } = useProfilePicture() // Get the profile picture state

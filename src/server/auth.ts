@@ -3,7 +3,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { User as DatabaseUser } from '@prisma/client'
 import { Lucia } from 'lucia'
 import { PrismaAdapter } from '@lucia-auth/adapter-prisma'
-import { db } from '@/server/client'
+import { UserRole } from '~/src/models/schemas'
+import { db } from '@/server/db'
 
 export type User = Omit<DatabaseUser, 'id'>
 
@@ -22,7 +23,7 @@ export const lucia = new Lucia(adapter, {
       name: attributes.name,
       password: attributes.password,
       phone: attributes.phone,
-      accessKey: attributes.accessKey
+      role: attributes.role
     }
   }
 })
@@ -50,11 +51,11 @@ declare module 'lucia' {
   }
 }
 
-interface DatabaseUserAttributes {
+type DatabaseUserAttributes = {
   email: string
   username: string
   name: string
   password: string
   phone: string
-  accessKey: number
+  role: UserRole
 }

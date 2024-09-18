@@ -3,15 +3,10 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { create } from 'zustand'
 
 type SiteSettingsNames = {
-  adminAccessKey: number
-  managerAccessKey: number
   rtlInHebrew: boolean
   validateInputOnChange: boolean
   defaultLanguage: string
   defaultColorScheme: string
-  websiteEmail: string
-  defaultDashboard: string
-  databaseEditorPort: number
   recommendedDevicesLimit: number
   matchedDevicesLimit: number
   adminTableRows: number
@@ -26,22 +21,17 @@ export type SettingUpdate = {
   value: Setting[keyof Setting]
 }
 
-interface SiteSettings {
+type SiteSettings = {
   settings: Setting
   setSetting: <K extends keyof Setting>(key: K, value: Setting[K]) => void
   updateSettings: (updates: SettingUpdate[]) => void
 }
 
 const defaultSettings: Setting = {
-  adminAccessKey: 5,
-  managerAccessKey: 9,
   rtlInHebrew: true,
   validateInputOnChange: true,
   defaultLanguage: 'en',
   defaultColorScheme: 'dark',
-  websiteEmail: 'onboarding@resend.dev',
-  defaultDashboard: 'deviceManagement',
-  databaseEditorPort: 5555,
   recommendedDevicesLimit: 6,
   matchedDevicesLimit: 9,
   adminTableRows: 6

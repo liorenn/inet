@@ -54,7 +54,7 @@ export default function DevicesTable({ specs, name }: Props) {
       <Table fontSize={16} highlightOnHover verticalSpacing='lg'>
         <tbody>
           {specs.map((element, index) => {
-            if (element.property === 'colors') {
+            if (element.property === 'devicesColors') {
               element.values = element.values as ColorsSpecsType[] // Cast the values to ColorsSpecsType
               return (
                 <tr key={`c${index}`}>
@@ -75,9 +75,9 @@ export default function DevicesTable({ specs, name }: Props) {
                               <Tooltip
                                 offset={10}
                                 color='gray'
-                                label={color.color.name}
+                                label={color.devicesColors.name}
                                 key={`e${index}`}>
-                                <ColorSwatch color={color.color.hex} withShadow />
+                                <ColorSwatch color={color.devicesColors.hex} withShadow />
                               </Tooltip>
                             ))}
                           </Group>

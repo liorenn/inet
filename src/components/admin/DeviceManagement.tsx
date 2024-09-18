@@ -1,14 +1,18 @@
 import { Button, Group, Pagination, ScrollArea, Table, Text, TextInput } from '@mantine/core'
-import { CreateNotification, chunkArray } from '@/utils/utils'
+import { CreateNotification, chunkArray } from '@/lib/utils'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { UseFormReturnType, useForm } from '@mantine/form'
-import { convertDeviceValues, convertFormDeviceValues, getDeviceFormFields } from '@/models/forms'
+import {
+  convertDeviceValues,
+  convertFormDeviceValues,
+  getDeviceFormFields
+} from '~/src/models/formValidation'
 import { useOs, useViewportSize } from '@mantine/hooks'
 
 import type { Device } from '@prisma/client'
 import Loader from '@/components/layout/Loader'
+import { api } from '@/lib/trpc'
 import { deviceSchema } from '@/models/schemas'
-import { trpc } from '@/utils/client'
 import { useRouter } from 'next/router'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
@@ -17,28 +21,19 @@ export type DeviceFormType = {
   [K in keyof Device]: string // Type of the form inputs
 }
 
-// The component props
-type Props = {
-  accessKey: number // Access key of the user
-}
-
-export default function DeviceManagement({ accessKey }: Props) {
-  const router = useRouter() // Get the router
+export default function DeviceManagement() {
+  const router = useRouter()
   const { width } = useViewportSize() // Get the viewport size
   const { t } = useTranslation('main') // Get the translation function
+  const [loading, setLoading] = useState(false) // The loading state
   const [activePage, setActivePage] = useState(0) // The active page of the table
   const [chunkedDevices, setChunkedDevices] = useState<DeviceFormType[][]>([]) // The chunked devices
   const fieldNames = Object.keys(deviceSchema.shape) // The field names of the devices
-  const devicesDataQuery = trpc.device.getDevicesData.useQuery() // The devices data query
-  const sendEmailsMutation = trpc.auth.sendPriceDropsEmails.useMutation() // Mutation function for sending price drop emails using trpc
+  const { mutate: seedDevicesData } = api.admin.seedDevicesData.useMutation()
+  const devicesDataQuery = api.device.getDevicesData.useQuery() // The devices data query
   const {
-    settings: { adminAccessKey, adminTableRows, validateInputOnChange },
+    settings: { adminTableRows }
   } = useSiteSettings()
-
-  // If the access key is less than the manager access key
-  if (accessKey < adminAccessKey) {
-    router.push('/') // Redirect to the home page
-  }
 
   // When the devices query data updates
   useEffect(() => {
@@ -61,7 +56,7 @@ export default function DeviceManagement({ accessKey }: Props) {
         <Loader /> // Show the loader
       ) : (
         <>
-          <ScrollArea mb='sm' type={width < 400 ? 'always' : 'auto'}>
+          <ScrollArea offsetScrollbars mb='sm' type={width < 400 ? 'always' : 'auto'}>
             <Table mb='sm' withBorder withColumnBorders>
               <thead>
                 <tr>
@@ -105,44 +100,23 @@ export default function DeviceManagement({ accessKey }: Props) {
               <Pagination.Last />
             </Group>
           </Pagination.Root>
+          <Button
+            loading={loading}
+            variant='default'
+            mt='lg'
+            onClick={() => {
+              setLoading(true) // Set the loading state to true
+              seedDevicesData(undefined, {
+                onSuccess: () => {
+                  setLoading(false) // Set the loading state to false
+                  router.reload()
+                }
+              }) // Seed the devices data
+            }}>
+            Seed Devices Data
+          </Button>
         </>
       )}
-      <Group grow mt='lg'>
-        <Button
-          variant='light'
-          color='blue'
-          fullWidth
-          onClick={() => {
-            // Send emails to users
-            sendEmailsMutation.mutate(
-              {},
-              {
-                onSuccess: () => {
-                  CreateNotification('success', 'green') // Create a success notification
-                },
-              }
-            )
-          }}>
-          {t('sendEmails')}
-        </Button>
-        <Button
-          variant='light'
-          color='orange'
-          fullWidth
-          onClick={() => {
-            // Send test emails to users
-            sendEmailsMutation.mutate(
-              { sendTest: true },
-              {
-                onSuccess: () => {
-                  CreateNotification('success', 'green') // Create a success notification
-                },
-              }
-            )
-          }}>
-          {t('sendTestEmails')}
-        </Button>
-      </Group>
     </>
   )
 }
@@ -156,17 +130,17 @@ function DeviceInsertRow({ setActivePage, setChunkedDevices }: DeviceInsertRowPr
   const os = useOs() // Get the client operating system
   const { t } = useTranslation('main') // Get the translation function
   const [loading, setLoading] = useState(false) // The loading state
-  const insertDeviceMutation = trpc.device.insertDevice.useMutation() // The insert device mutation
+  const insertDeviceMutation = api.device.insertDevice.useMutation() // The insert device mutation
   const { fields, validators, defaultValues } = getDeviceFormFields() // Get the devices form fields
   const {
-    settings: { adminTableRows, validateInputOnChange },
+    settings: { adminTableRows, validateInputOnChange }
   } = useSiteSettings()
 
   // Form management function
   const form = useForm<DeviceFormType>({
     initialValues: defaultValues,
     validateInputOnChange,
-    validate: validators,
+    validate: validators
   })
 
   // Insert device function
@@ -200,7 +174,7 @@ function DeviceInsertRow({ setActivePage, setChunkedDevices }: DeviceInsertRowPr
         onError: () => {
           setLoading(false) // Set the loading state to false
           CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
-        },
+        }
       }
     )
     setLoading(false) // Set the loading state to false
@@ -247,18 +221,18 @@ function DeviceRow({ device, activePage, setActivePage, setChunkedDevices }: Dev
   const { t } = useTranslation('main') // Get the translation function
   const [editMode, setEditMode] = useState(false) // The edit mode state
   const [loading, setLoading] = useState(false) // The loading state
-  const deleteDeviceMutation = trpc.device.deleteDevice.useMutation() // The delete device mutation
-  const updateDeviceMutation = trpc.device.updateDevice.useMutation() // The update device mutation
+  const deleteDeviceMutation = api.device.deleteDevice.useMutation() // The delete device mutation
+  const updateDeviceMutation = api.device.updateDevice.useMutation() // The update device mutation
   const { fields, validators } = getDeviceFormFields() // Get the devices form fields
   const {
-    settings: { validateInputOnChange },
+    settings: { validateInputOnChange }
   } = useSiteSettings()
 
   // Form management function
   const form = useForm<DeviceFormType>({
     initialValues: device,
     validateInputOnChange,
-    validate: validators,
+    validate: validators
   })
 
   // When device data changes
@@ -296,7 +270,7 @@ function DeviceRow({ device, activePage, setActivePage, setChunkedDevices }: Dev
         onError: () => {
           setLoading(false) // Set the loading state to false
           CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
-        },
+        }
       }
     )
     setLoading(false) // Set the loading state to false
@@ -322,7 +296,7 @@ function DeviceRow({ device, activePage, setActivePage, setChunkedDevices }: Dev
             onError: () => {
               form.setValues(device) // Set the form values to the current device
               CreateNotification(t('errorAccured'), 'red', os === 'ios' ? true : false) // Create an error notification
-            },
+            }
           }
         )
       }
@@ -342,7 +316,6 @@ function DeviceRow({ device, activePage, setActivePage, setChunkedDevices }: Dev
             />
           </td>
         ))}
-
         <td>
           {editMode === false ? (
             <Button
@@ -391,7 +364,7 @@ function DeviceTableFormInput({ form, inputName, disabled, editMode }: DeviceTab
           w='120px'
           style={{
             pointerEvents: disabled ? 'none' : 'auto',
-            opacity: disabled ? 0.6 : 1,
+            opacity: disabled ? 0.6 : 1
           }}
         />
       ) : (

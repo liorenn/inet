@@ -1,5 +1,5 @@
 import { Button, Container, SimpleGrid } from '@mantine/core'
-import type { DevicePropertiesType, DeviceType } from '@/models/enums'
+import { DevicePropertiesType, DeviceType } from '~/src/models/schemas'
 import { useEffect, useState } from 'react'
 
 import DeviceCard from '@/components/device/DeviceCard'
@@ -7,7 +7,7 @@ import DeviceHeader from '@/components/device/DeviceTypeHeader'
 import Head from 'next/head'
 import Link from 'next/link'
 import Loader from '@/components/layout/Loader'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
 import { usePostHog } from 'posthog-js/react'
 import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
@@ -21,13 +21,13 @@ export default function Devices() {
   const posthog = usePostHog() // Get the posthog client
   const { t } = useTranslation('main') // Get the translation function
   const deviceType = router.asPath.split('/')[2] as DeviceType // Get the device type from the url
-  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
+  const { data: user } = api.auth.getUser.useQuery() // Get the user
   const [devices, setDevices] = useState<Device[] | undefined>(undefined) // State for the devices data
   const [captured, setCaptured] = useState(false) // Was page captured in posthog
-  const devicesQuery = trpc.device.getDevices.useQuery({
+  const devicesQuery = api.device.getDevices.useQuery({
     deviceType: deviceType
   }) // Get the devices from the database
-  const userDevicesQuery = trpc.device.getUserDevicesProperties.useQuery({
+  const userDevicesQuery = api.device.getUserDevicesProperties.useQuery({
     email: user?.email
   }) // Get the user devices from the database
 

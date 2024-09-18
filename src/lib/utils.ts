@@ -1,10 +1,8 @@
-// Importing icons from the Tabler and React libraries
-
 import { IconCheck, IconExclamationMark, IconX } from '@tabler/icons'
 
-import type { Comment } from '@prisma/client' // Importing Comment type from Prisma client
-import type { ReactElement } from 'react' // Importing ReactElement type from React
-import { showNotification } from '@mantine/notifications' // Importing showNotification function from Mantine notifications
+import type { Comment } from '@prisma/client'
+import type { ReactNode } from 'react'
+import { showNotification } from '@mantine/notifications'
 
 // Function to create a notification with a message, color, and optional mobile parameter
 export function CreateNotification(
@@ -12,10 +10,10 @@ export function CreateNotification(
   color: 'red' | 'green' | 'yellow', // Color parameter can be red, green, or yellow
   mobile?: boolean // Optional mobile parameter
 ) {
-  const icon: ReactElement | null = getIcon() // Initializing icon with the result of getIcon function
+  const icon: ReactNode | null = getIcon() // Initializing icon with the result of getIcon function
 
   // Function to get the appropriate icon based on the color
-  function getIcon(): ReactElement | null {
+  function getIcon(): ReactNode | null {
     if (color === 'green') {
       return IconCheck({}) // Return green check icon
     } else if (color === 'yellow') {
@@ -34,7 +32,7 @@ export function CreateNotification(
     autoClose: 6000, // Auto close after 6 seconds
     radius: 'md', // Medium radius
     icon: icon,
-    style: { width: '60%', float: 'right', marginBottom: mobile ? '40px' : '' }, // Dynamic style based on the mobile parameter
+    style: { width: '60%', float: 'right', marginBottom: mobile ? '40px' : '' } // Dynamic style based on the mobile parameter
   })
 }
 

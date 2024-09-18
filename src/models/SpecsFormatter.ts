@@ -1,5 +1,5 @@
 import type { Device } from '@prisma/client' // Define the type for the 'Device' imported from '@prisma/client'
-import { FormatDate } from '@/utils/utils' // Import the date format function
+import { FormatDate } from '@/lib/utils' // Import the date format function
 
 // Define a type for an array of categories, each containing a name and an array of specs
 type CategoriesType = {
@@ -39,7 +39,7 @@ export type CamerasSpecsType = {
 
 // Define a type for the color specs, which contains an array of color objects with name and hex properties
 export type ColorsSpecsType = {
-  color: {
+  devicesColors: {
     name: string
     hex: string
   }
@@ -49,7 +49,7 @@ export type ColorsSpecsType = {
 export type DeviceSpecsType =
   | {
       cameras: CamerasSpecsType[]
-      colors: ColorsSpecsType
+      devicesColors: ColorsSpecsType
     } & Device
 
 // Define a type for the merged camera, which contains the type and an array of megapixels
@@ -85,24 +85,20 @@ export function formatArrSpecs(devices: DeviceSpecsType[]): CategoriesType {
     // Define an array of categories
     {
       name: 'name',
-      specs: [{ property: 'name', values: devices.map((device) => device.name) }],
+      specs: [{ property: 'name', values: devices.map((device) => device.name) }]
     },
     {
       name: 'display',
       specs: [
         {
           property: 'screenSize',
-          values: devices.map((device) =>
-            device.screenSize ? device.screenSize.toString() : null
-          ),
+          values: devices.map((device) => (device.screenSize ? device.screenSize.toString() : null))
         },
         {
           property: 'screenType',
-          values: devices.map((device) =>
-            device.screenType ? device.screenType.toString() : null
-          ),
-        },
-      ],
+          values: devices.map((device) => (device.screenType ? device.screenType.toString() : null))
+        }
+      ]
     },
     {
       name: 'battery',
@@ -111,76 +107,74 @@ export function formatArrSpecs(devices: DeviceSpecsType[]): CategoriesType {
           property: 'batterySize',
           values: devices.map((device) =>
             device.batterySize ? device.batterySize.toString() : null
-          ),
-        },
-      ],
+          )
+        }
+      ]
     },
     {
       name: 'hardware',
       specs: [
         {
           property: 'chipset',
-          values: devices.map((device) => (device.chipset ? device.chipset.toString() : null)),
+          values: devices.map((device) => (device.chipset ? device.chipset.toString() : null))
         },
         {
           property: 'connector',
-          values: devices.map((device) => (device.connector ? device.connector.toString() : null)),
+          values: devices.map((device) => (device.connector ? device.connector.toString() : null))
         },
         {
           property: 'memory',
-          values: devices.map((device) => (device.memory ? device.memory.toString() : null)),
+          values: devices.map((device) => (device.memory ? device.memory.toString() : null))
         },
         {
           property: 'storage',
-          values: devices.map((device) => (device.storage ? device.storage.toString() : null)),
+          values: devices.map((device) => (device.storage ? device.storage.toString() : null))
         },
         {
           property: 'releaseOS',
-          values: devices.map((device) => (device.releaseOS ? device.releaseOS.toString() : null)),
-        },
-      ],
+          values: devices.map((device) => (device.releaseOS ? device.releaseOS.toString() : null))
+        }
+      ]
     },
     {
       name: 'dimensions',
       specs: [
         {
           property: 'weight',
-          values: devices.map((device) => (device.weight ? device.weight.toString() : null)),
+          values: devices.map((device) => (device.weight ? device.weight.toString() : null))
         },
         {
           property: 'height',
-          values: devices.map((device) => (device.height ? device.height.toString() : null)),
+          values: devices.map((device) => (device.height ? device.height.toString() : null))
         },
         {
           property: 'width',
-          values: devices.map((device) => (device.width ? device.width.toString() : null)),
+          values: devices.map((device) => (device.width ? device.width.toString() : null))
         },
         {
           property: 'depth',
-          values: devices.map((device) => (device.depth ? device.depth.toString() : null)),
-        },
-      ],
+          values: devices.map((device) => (device.depth ? device.depth.toString() : null))
+        }
+      ]
     },
     {
       name: 'cameras',
-      specs: mergeCameraTypes(devices.map((device) => device.cameras)),
+      specs: mergeCameraTypes(devices.map((device) => device.cameras))
     },
     {
       name: 'features',
       specs: [
         {
           property: 'biometrics',
-          values: devices.map((device) =>
-            device.biometrics ? device.biometrics.toString() : null
-          ),
+          values: devices.map((device) => (device.biometrics ? device.biometrics.toString() : null))
         },
         {
           property: 'resistanceRating',
           values: devices.map((device) =>
             device.resistanceRating ? device.resistanceRating.toString() : null
-          ),
-        },
-      ],
+          )
+        }
+      ]
     },
     {
       name: 'availability',
@@ -189,24 +183,24 @@ export function formatArrSpecs(devices: DeviceSpecsType[]): CategoriesType {
           property: 'releaseDate',
           values: devices.map((device) =>
             device.releaseDate ? FormatDate(device.releaseDate) : null
-          ),
+          )
         },
         {
           property: 'releasePrice',
           values: devices.map((device) =>
             device.releasePrice ? device.releasePrice.toString() : null
-          ),
+          )
         },
         {
           property: 'price',
-          values: devices.map((device) => (device.price >= 0 ? device.price.toString() : null)),
+          values: devices.map((device) => (device.price >= 0 ? device.price.toString() : null))
         },
         {
           property: 'colors',
-          values: devices.map((device) => device.colors),
-        },
-      ],
-    },
+          values: devices.map((device) => device.devicesColors)
+        }
+      ]
+    }
   ]
   return mergedCameras // Return the array
 }
@@ -220,107 +214,107 @@ export function formatSpecs(device: DeviceSpecsType): CategoryType[] {
       specs: [
         {
           property: 'screenSize',
-          value: device.screenSize ? device.screenSize.toString() : null,
+          value: device.screenSize ? device.screenSize.toString() : null
         },
         {
           property: 'screenType',
-          value: device.screenType ? device.screenType.toString() : null,
-        },
-      ],
+          value: device.screenType ? device.screenType.toString() : null
+        }
+      ]
     },
     {
       name: 'battery',
       specs: [
         {
           property: 'batterySize',
-          value: device.batterySize ? device.batterySize.toString() : null,
-        },
-      ],
+          value: device.batterySize ? device.batterySize.toString() : null
+        }
+      ]
     },
     {
       name: 'hardware',
       specs: [
         {
           property: 'chipset',
-          value: device.chipset ? device.chipset.toString() : null,
+          value: device.chipset ? device.chipset.toString() : null
         },
         {
           property: 'connector',
-          value: device.connector ? device.connector.toString() : null,
+          value: device.connector ? device.connector.toString() : null
         },
         {
           property: 'memory',
-          value: device.memory ? device.memory.toString() : null,
+          value: device.memory ? device.memory.toString() : null
         },
         {
           property: 'storage',
-          value: device.storage ? device.storage.toString() : null,
+          value: device.storage ? device.storage.toString() : null
         },
         {
           property: 'releaseOS',
-          value: device.releaseOS ? device.releaseOS.toString() : null,
-        },
-      ],
+          value: device.releaseOS ? device.releaseOS.toString() : null
+        }
+      ]
     },
     {
       name: 'dimensions',
       specs: [
         {
           property: 'weight',
-          value: device.weight ? device.weight.toString() : null,
+          value: device.weight ? device.weight.toString() : null
         },
         {
           property: 'height',
-          value: device.height ? device.height.toString() : null,
+          value: device.height ? device.height.toString() : null
         },
         {
           property: 'width',
-          value: device.width ? device.width.toString() : null,
+          value: device.width ? device.width.toString() : null
         },
         {
           property: 'depth',
-          value: device.depth ? device.depth.toString() : null,
-        },
-      ],
+          value: device.depth ? device.depth.toString() : null
+        }
+      ]
     },
     {
       name: 'cameras',
-      specs: device.cameras,
+      specs: device.cameras
     },
     {
       name: 'features',
       specs: [
         {
           property: 'biometrics',
-          value: device.biometrics ? device.biometrics.toString() : null,
+          value: device.biometrics ? device.biometrics.toString() : null
         },
         {
           property: 'resistanceRating',
-          value: device.resistanceRating ? device.resistanceRating.toString() : null,
-        },
-      ],
+          value: device.resistanceRating ? device.resistanceRating.toString() : null
+        }
+      ]
     },
     {
       name: 'availability',
       specs: [
         {
           property: 'releaseDate',
-          value: device.releaseDate ? FormatDate(device.releaseDate) : null,
+          value: device.releaseDate ? FormatDate(device.releaseDate) : null
         },
         {
           property: 'releasePrice',
-          value: device.releasePrice ? device.releasePrice.toString() : null,
+          value: device.releasePrice ? device.releasePrice.toString() : null
         },
         {
           property: 'price',
-          value: device.price > 0 ? device.price.toString() : null,
+          value: device.price > 0 ? device.price.toString() : null
         },
         {
           property: 'colors',
-          value: device.colors,
-        },
-      ],
-    },
+          value: device.devicesColors
+        }
+      ]
+    }
   ]
   return categories // Return the array of categories
 }

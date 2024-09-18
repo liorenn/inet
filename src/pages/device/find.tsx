@@ -4,11 +4,10 @@ import { deviceTypesProperties, propertiesLabels } from '@/models/deviceProperti
 import { useEffect, useState } from 'react'
 
 import Head from 'next/head'
-import Loader from '@/components/layout/Loader'
 import MatchedDevices from '@/components/device/MatchedDevices'
 import { PropertiesSchemaType } from '@/models/deviceProperties'
-import { deviceType as deviceTypeEnum } from '@/models/enums'
-import { trpc } from '@/utils/client'
+import { api } from '@/lib/trpc'
+import { deviceTypeSchema } from '~/src/models/schemas'
 import { useRouter } from 'next/router'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
 import useTranslation from 'next-translate/useTranslation'
@@ -44,7 +43,6 @@ function getFormattedPreferences(preferences: PreferenceType[]) {
 }
 
 export default function Find() {
-  const user = useUser()
   const router = useRouter() // Get the router
   const { width } = useViewportSize() // Get the width of the viewport
   const { t, lang } = useTranslation('main') // Get the translation function
@@ -52,7 +50,7 @@ export default function Find() {
   const {
     settings: { matchedDevicesLimit }
   } = useSiteSettings()
-  const MatchedDevicesMutation = trpc.device.getMatchedDevices.useMutation() // Mutation to get the matched devices
+  const MatchedDevicesMutation = api.device.getMatchedDevices.useMutation() // Mutation to get the matched devices
   const deviceType = z.string().parse(router.query.deviceType ?? 'iphone') // Get the device type from the url
   const preferences = z // Get the user preferences from the url
     .string() // Parse the preferences to a string
@@ -123,18 +121,6 @@ export default function Find() {
     return data ? [{ value: 'notInterested', label: t('notInterested') }, ...data] : [] // Add the not interested option and return segmented data
   }
 
-  // If all devices query data is loading
-  if (!user) {
-    return (
-      <>
-        <Head>
-          <title>{t('compare')}</title>
-        </Head>
-        <Loader />
-      </>
-    )
-  }
-
   return (
     <>
       <Head>
@@ -149,7 +135,7 @@ export default function Find() {
             <Button
               mb={8}
               w={'auto'}
-              disabled={MatchedDevicesMutation.isLoading}
+              disabled={MatchedDevicesMutation.isPending}
               color='gray'
               variant='default'
               onClick={() => {
@@ -166,7 +152,7 @@ export default function Find() {
               {t('resetPreferences')}
             </Button>
           </Group>
-          <ScrollArea type='always'>
+          <ScrollArea offsetScrollbars type='always'>
             <SegmentedControl
               fullWidth
               mb={width < 1000 ? 'sm' : 0}
@@ -182,7 +168,7 @@ export default function Find() {
                   )
                 )
               }}
-              data={Object.keys(deviceTypeEnum).map((deviceType) => {
+              data={Object.keys(deviceTypeSchema.Enum).map((deviceType) => {
                 return { label: t(deviceType), value: deviceType }
               })}
             />
@@ -218,15 +204,15 @@ export default function Find() {
           fullWidth
           mt='xl'
           mb='md'
-          disabled={MatchedDevicesMutation.isLoading}
+          disabled={MatchedDevicesMutation.isPending}
           color='green'
           variant='light'
           onClick={() => handleSubmit()}>
-          {MatchedDevicesMutation.isLoading ? t('loading') : t('findYourDevice')}
+          {MatchedDevicesMutation.isPending ? t('loading') : t('findYourDevice')}
         </Button>
         <MatchedDevices
           data={MatchedDevicesMutation.data}
-          isLoading={MatchedDevicesMutation.isLoading}
+          isLoading={MatchedDevicesMutation.isPending}
           title={t('bestMatchedDevices')}
         />
       </Container>
@@ -251,7 +237,7 @@ function PreferenceInput({ value, index, deviceType, preferences }: preferenceIn
       <Accordion.Item value={preferences[index].name}>
         <Accordion.Control>{t(preferences[index].name)}</Accordion.Control>
         <Accordion.Panel>
-          <ScrollArea type='always'>
+          <ScrollArea offsetScrollbars type='always'>
             <SegmentedControl
               fullWidth
               data={value}

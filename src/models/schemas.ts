@@ -25,11 +25,17 @@ export const deviceSchema = z.object({
   magsafe: z.boolean().optional(),
   screenSize: z.number().optional(),
   screenType: z.string().optional(),
-  resistanceRating: z.string().optional(),
+  resistanceRating: z.string().optional()
 })
 
 // Define the device schema type
 export type DeviceSchemaType = z.infer<typeof deviceSchema>
+
+// Define the user role enum
+export const userRole = z.enum(['user', 'admin', 'manager'])
+
+// Define the user role enum type
+export type UserRole = z.infer<typeof userRole>
 
 // Define the user schema
 export const userSchema = z.object({
@@ -38,7 +44,7 @@ export const userSchema = z.object({
   name: z.string(),
   phone: z.string(),
   password: z.string(),
-  accessKey: z.number(),
+  role: userRole
 })
 
 // Define the user schema type
@@ -51,8 +57,25 @@ export const commentSchema = z.object({
   updatedAt: z.date(),
   createdAt: z.date(),
   model: z.string(),
-  username: z.string(),
+  username: z.string()
 })
 
 // Define the update user function schema
 export const UpdateSchema = z.enum(['username', 'name', 'password', 'phone'])
+
+// Define the device type enum
+export const deviceTypeSchema = z.enum(['iphone', 'ipad', 'airpods', 'mac', 'imac', 'macbook'])
+
+// Define the device type enum type
+export type DeviceType = z.infer<typeof deviceTypeSchema>
+
+// Define the device properties type
+export type DevicePropertiesType = {
+  model: string
+  name: string
+  type: string
+  imageAmount: number
+}
+
+// Define the DevicePropertiesType object to query
+export const selectProprties = { model: true, name: true, type: true, imageAmount: true }

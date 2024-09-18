@@ -3,7 +3,7 @@ import { Center, Group, Stack, Text } from '@mantine/core'
 import { Container, Modal, useMantineColorScheme } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
-import { DevicePropertiesType } from '@/models/enums'
+import { DevicePropertiesType } from '@/models/schemas'
 import useTranslation from 'next-translate/useTranslation'
 import { useViewportSize } from '@mantine/hooks'
 

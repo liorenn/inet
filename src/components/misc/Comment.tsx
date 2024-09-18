@@ -3,8 +3,8 @@ import { Tooltip, Rating } from '@mantine/core'
 import type { Comment } from '@prisma/client'
 import { IconTrash, IconPencil, IconCheck } from '@tabler/icons'
 import { useState } from 'react'
-import { trpc } from '@/utils/client'
-import { calculateAverageRating, CreateNotification, encodeEmail } from '@/utils/utils'
+import { api } from '@/lib/trpc'
+import { calculateAverageRating, CreateNotification, encodeEmail } from '@/lib/utils'
 import useTranslation from 'next-translate/useTranslation'
 
 import { useComments } from '@/hooks/useComments'
@@ -18,26 +18,20 @@ type Props = {
 }
 
 export default function Comment({ comment, comments, setComments }: Props) {
-  const { data: user } = trpc.auth.getUser.useQuery() // Get the user
+  const { data: user } = api.auth.getUser.useQuery() // Get the user
   const [rating, setRating] = useState(comment.rating) // State for the comment rating
   const [editing, setEditing] = useState(false) // State for is user editing the comment
   const [editText, setEditText] = useState(comment.message) // State for the comment text
-  const accessKeyQuery = trpc.auth.getAccessKey.useQuery({
-    email: user?.email
-  }) // Get the access key
-  const imageExistsQuery = trpc.auth.isCommentImageExists.useQuery({
+  const imageExistsQuery = api.auth.isCommentImageExists.useQuery({
     username: comment.username
   }) // Get is the profile picture exists
-  const commentEmailQuery = trpc.auth.getCommentEmail.useQuery({
+  const commentEmailQuery = api.auth.getCommentEmail.useQuery({
     username: comment.username
   }) // Get the comment email
-  const { mutateAsync: mutateDelete } = trpc.auth.deleteComment.useMutation() // Delete comment mutation
-  const { mutateAsync: mutateEdit } = trpc.auth.editComment.useMutation() // Edit comment mutation
+  const { mutateAsync: mutateDelete } = api.auth.deleteComment.useMutation() // Delete comment mutation
+  const { mutateAsync: mutateEdit } = api.auth.editComment.useMutation() // Edit comment mutation
   const { setCommentsAmount, setRatingValue, username } = useComments() // Get the comments state
   const { t } = useTranslation('main') // Translation hook
-  const {
-    settings: { adminAccessKey }
-  } = useSiteSettings()
 
   // Delete comment function
   async function deleteComment() {
@@ -109,7 +103,7 @@ export default function Comment({ comment, comments, setComments }: Props) {
         <Group sx={{ padding: 10 }}>
           <Rating readOnly={!editing} value={rating} onChange={setRating} />
           {(comment.username === username ||
-            (accessKeyQuery.data && accessKeyQuery.data >= adminAccessKey)) && (
+            (user && (user.role === 'admin' || user.role === 'manager'))) && (
             <>
               <Tooltip color='gray' label={t('edit')}>
                 <ActionIcon color='dark'>

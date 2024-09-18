@@ -1,204 +1,108 @@
 import { Device, User } from '@prisma/client'
-import { DeviceSchemaType, UserSchemaType } from '@/models/schemas'
+import { DeviceSchemaType, UserRole } from '~/src/models/schemas'
 
-import type { DeviceFormType } from '@/components/admin/DeviceManagement'
-import type { UserFormType } from '@/components/admin/UserManagement'
+import { DeviceFormType } from '~/src/components/admin/DeviceManagement'
 
-// Define the user properties type
-export type InputPropertyName = keyof User
+type InputPropertyName = keyof User
 
-// Define the user property class
-class InputProperty {
-  name: InputPropertyName // Property name
-  regex: RegExp // Regular expression for validation
-  disabled?: boolean // Is the property disabled
-
-  // Constructor for the class
-  constructor(name: InputPropertyName, regex: RegExp, disabled?: boolean) {
-    this.name = name
-    this.regex = regex
-    this.disabled = disabled
-  }
+type InputProperty = {
+  name: InputPropertyName
+  regex: RegExp
+  disabled?: boolean
 }
-// Define the form default values class
-export class FormDefaultValues {
-  email: string // The user email
-  password: string // The user password
-  username: string // The user username
-  name: string // The user name
-  phone: string // The user phone
-  accessKey: string // The user access key
 
-  // Constructor for the class
-  constructor(
-    email: string,
-    password: string,
-    username: string,
-    name: string,
-    phone: string,
-    accessKey: string
-  ) {
-    this.email = email
-    this.password = password
-    this.username = username
-    this.name = name
-    this.phone = phone
-    this.accessKey = accessKey
+type FormConfig = {
+  fields: InputProperty[]
+}
+
+const createInputProperty = (
+  name: InputPropertyName,
+  regex: RegExp,
+  disabled?: boolean
+): InputProperty => ({
+  name,
+  regex,
+  disabled
+})
+
+export const emailProperty = createInputProperty('email', /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/)
+export const passwordProperty = createInputProperty('password', /^[A-Za-z\d_.!@#$%^&*]{5,}$/)
+export const usernameProperty = createInputProperty('username', /^[A-Za-z\d_.]{5,}$/)
+export const nameProperty = createInputProperty('name', /^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/)
+export const phoneProperty = createInputProperty('phone', /^0\d{1,2}-?\d{7}$/)
+export const roleProperty = createInputProperty('role', /^\d$/)
+
+export type SignInFormType = {
+  email: string
+  password: string
+}
+
+const signInConfig: FormConfig & { defaultValues: SignInFormType } = {
+  fields: [emailProperty, passwordProperty],
+  defaultValues: {
+    email: 'lior.oren06@gmail.com',
+    password: '123456'
   }
 }
 
-// Define the sign in form class
-export class SignInForm {
-  email: InputProperty // The user email
-  password: InputProperty // The user password
+export type AccountFields = Omit<User, 'email' | 'role' | 'id' | 'password'>
+export type AccountFieldsNames = keyof AccountFields
 
-  // Constructor for the class
-  constructor() {
-    this.email = {
-      name: 'email',
-      regex: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/
-    }
-    this.password = {
-      name: 'password',
-      regex: /^[A-Za-z\d_.!@#$%^&*]{5,}$/
-    }
-  }
-
-  // Get the user properties from the form
-  getFileds() {
-    return [this.email, this.password]
-  }
-
-  // Get the default values for the form
-  getDefaultValues(): Partial<FormDefaultValues> {
-    return {
-      email: '',
-      password: ''
-    }
-  }
-
-  // Get the validators for the form
-  getValidators() {
-    const validators: { [key: string]: (value: string) => string | null } = {} // Create an object to store the validators
-    this.getFileds().forEach(({ name, regex }) => {
-      validators[name] = (value: string | number) =>
-        regex.test(value.toString()) ? null : `${name} is not valid` // Add the validator
-    })
-    return validators // Return the validators
+const accountConfig: FormConfig & { defaultValues: AccountFields } = {
+  fields: [usernameProperty, nameProperty, phoneProperty],
+  defaultValues: {
+    username: '',
+    name: '',
+    phone: ''
   }
 }
 
-// Define the user form class that extends the sign in form class
-class UserForm extends SignInForm {
-  username: InputProperty // The user username
-  name: InputProperty // The user name
-  phone: InputProperty // The user phone
+export type SignUpFormType = {
+  [K in keyof Omit<User, 'role' | 'id'>]: string
+}
 
-  // Constructor for the class
-  constructor() {
-    super() // Call the constructor of the parent class
-    this.username = {
-      name: 'username',
-      regex: /^[A-Za-z\d_.]{5,}$/
-    }
-    this.name = {
-      name: 'name',
-      regex: /^[A-Z][a-z]{2,} [A-Z][a-z]{2,}$/
-    }
-    this.phone = {
-      name: 'phone',
-      regex: /^0\d{1,2}-?\d{7}$/
-    }
+const signUpConfig: FormConfig & { defaultValues: SignUpFormType } = {
+  fields: [emailProperty, usernameProperty, nameProperty, passwordProperty, phoneProperty],
+  defaultValues: {
+    email: '',
+    name: '',
+    phone: '',
+    username: '',
+    password: ''
   }
 }
 
-// Define the account form class that extends the user form class
-export class AccountForm extends UserForm {
-  // Constructor for the class
-  constructor() {
-    super() // Call the constructor of the parent class
-  }
+export type UserFormType = Omit<User, 'role'> & { role: UserRole }
 
-  // Get the user properties from the form
-  getFileds(): InputProperty[] {
-    return [this.username, this.name, this.phone]
-  }
-
-  // Get the default values for the form
-  getDefaultValues() {
-    return {
-      username: '',
-      name: '',
-      password: '',
-      phone: ''
-    }
-  }
-}
-
-// Define the sign up form class that extends the account form class
-export class SignUpForm extends UserForm {
-  // Constructor for the class
-  constructor() {
-    super() // Call the constructor of the parent class
-  }
-
-  // Get the user properties from the form
-  getFileds(): InputProperty[] {
-    return [this.email, this.username, this.name, this.password, this.phone]
-  }
-  // Get the default values for the form
-  getDefaultValues() {
-    return {
-      email: '',
-      name: '',
-      phone: '',
-      username: '',
-      password: ''
-    }
+const userManagementConfig: FormConfig & { defaultValues: UserFormType } = {
+  fields: [
+    { ...emailProperty, disabled: true },
+    usernameProperty,
+    nameProperty,
+    phoneProperty,
+    passwordProperty,
+    roleProperty
+  ],
+  defaultValues: {
+    id: '',
+    email: '',
+    username: '',
+    name: '',
+    phone: '',
+    password: '',
+    role: 'user'
   }
 }
 
-// Define the user management form class that extends the sign up form class
-export class UserManagementForm extends UserForm {
-  accessKey: InputProperty // The user access key
-
-  // Constructor for the class
-  constructor() {
-    super() // Call the constructor of the parent class
-    this.accessKey = { name: 'accessKey', regex: /^\d$/ }
-    this.email = {
-      name: 'email',
-      regex: /^[A-Za-z]+(\.?\w+)*@\w+(\.?\w+)?$/,
-      disabled: true
-    }
-  }
-
-  // Get the user properties from the form
-  getFileds(): InputProperty[] {
-    return [this.email, this.username, this.name, this.phone, this.password, this.accessKey]
-  }
-
-  // Get the default values for the form
-  getDefaultValues() {
-    return {
-      email: '',
-      username: '',
-      name: '',
-      phone: '',
-      password: '',
-      accessKey: ''
-    }
-  }
+const getValidators = (fields: InputProperty[]) => {
+  const validators: { [key: string]: (value: string) => string | null } = {}
+  fields.forEach(({ name, regex }) => {
+    validators[name] = (value: string) => (regex.test(value) ? null : `${name} is not valid`)
+  })
+  return validators
 }
 
-// Convert the user values to string values
-export function convertFormUserValues(values: UserFormType): UserSchemaType {
-  return {
-    ...values,
-    accessKey: values.accessKey === '' ? 0 : Number(values.accessKey)
-  }
-}
-
+export { signInConfig, accountConfig, signUpConfig, userManagementConfig, getValidators }
 // Define the device form type
 type DeviceField = {
   name: keyof Device

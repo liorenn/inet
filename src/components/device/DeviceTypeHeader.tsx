@@ -1,6 +1,6 @@
 import { Breadcrumbs, Group, Text, Title } from '@mantine/core'
 
-import type { DeviceType } from '@/models/enums'
+import type { DeviceType } from '@/models/schemas'
 import Link from 'next/link'
 import { useMantineColorScheme } from '@mantine/core'
 import useTranslation from 'next-translate/useTranslation'
@@ -17,7 +17,7 @@ export default function DeviceTypeHeader({ deviceType }: Props) {
   // Define the links for the breadcrumbs
   const links = [
     { name: t('allDevices'), href: '/device' },
-    { name: t(deviceType), href: `/device/${deviceType}` },
+    { name: t(deviceType), href: `/device/${deviceType}` }
   ]
 
   return (
@@ -25,7 +25,7 @@ export default function DeviceTypeHeader({ deviceType }: Props) {
       position='apart'
       sx={{
         marginBottom: 15,
-        borderBottom: colorScheme === 'dark' ? '1px solid #333333' : '1px solid #e6e6e6',
+        borderBottom: colorScheme === 'dark' ? '1px solid #333333' : '1px solid #e6e6e6'
       }}>
       <Breadcrumbs separator='>'>
         {links.map((item, index) => (
